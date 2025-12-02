@@ -22,12 +22,10 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest }) => {
     const handleSlotClick = (category) => {
         const item = equippedItems[category];
         if (item) {
-            // 이미 착용 중인 경우 -> 해제 또는 교체 옵션 (여기서는 단순 해제/정보 표시)
-            if (window.confirm(`${item.name}을(를) 해제하시겠습니까?`)) {
-                const result = unequipItem(category);
-                if (result.success) {
-                    loadEquippedItems();
-                }
+            // 이미 착용 중인 경우 -> 바로 해제
+            const result = unequipItem(category);
+            if (result.success) {
+                loadEquippedItems();
             }
         } else {
             // 비어있는 경우 -> 인벤토리 열기 요청 (부모 컴포넌트로 전달)

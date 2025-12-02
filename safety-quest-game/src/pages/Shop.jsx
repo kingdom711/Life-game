@@ -24,10 +24,11 @@ function Shop() {
     const handlePurchase = (item) => {
         const result = purchaseItem(item.id);
         if (result.success) {
-            alert(result.message);
+            // alert(result.message); // 제거됨
             loadData(); // 새로고침
         } else {
-            alert(result.message);
+            // alert(result.message); // 제거됨
+            console.log(result.message);
         }
     };
 

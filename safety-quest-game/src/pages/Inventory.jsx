@@ -20,7 +20,7 @@ function Inventory() {
     const handleEquip = (item) => {
         const result = equipItem(item.id);
         if (result.success) {
-            alert(result.message);
+            // alert(result.message); // 제거됨
             loadData();
         }
     };
@@ -28,7 +28,7 @@ function Inventory() {
     const handleUnequip = (item) => {
         const result = unequipItem(item.category);
         if (result.success) {
-            alert(result.message);
+            // alert(result.message); // 제거됨
             loadData();
         }
     };

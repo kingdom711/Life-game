@@ -156,10 +156,9 @@ function Profile({ role }) {
                         </p>
                         <button
                             onClick={() => {
-                                if (window.confirm('정말로 모든 데이터를 초기화하시겠습니까?')) {
-                                    localStorage.clear();
-                                    window.location.reload();
-                                }
+                                // 사용자 요청으로 확인 팝업 제거
+                                localStorage.clear();
+                                window.location.reload();
                             }}
                             className="btn btn-danger"
                         >

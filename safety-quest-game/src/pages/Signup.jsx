@@ -40,7 +40,7 @@ function Signup({ onSignupComplete }) {
         // 현재 로컬 스토리지 구조상 이름만 저장하고 넘어갑니다.
         // 추후 확장을 위해 로직은 남겨둡니다.
 
-        alert('회원가입이 완료되었습니다!');
+        // alert('회원가입이 완료되었습니다!'); // 제거됨
         if (onSignupComplete) {
             onSignupComplete();
         }

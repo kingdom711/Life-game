@@ -99,7 +99,7 @@ function Dashboard({ role }) {
                             <StreakButton
                                 onCheckIn={(result) => {
                                     loadData(); // 데이터 새로고침
-                                    alert(result.message);
+                                    // alert 제거됨
                                 }}
                             />
                         </div>
