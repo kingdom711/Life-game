@@ -61,14 +61,19 @@ const Avatar = ({ equippedItems, size = 300 }) => {
 
             {/* 착용 아이템 렌더링 */}
             {Object.entries(equippedItems).map(([category, item]) => {
-                if (!item || !item.image) return null;
+                if (!item) return null;
+
+                // avatarLayer가 있는 경우 (우선 사용)
+                const layerImage = item.avatarLayer || item.image;
+
+                if (!layerImage) return null;
 
                 // 이미지가 경로인 경우 (이미지 파일)
-                if (item.image.startsWith('/') || item.image.startsWith('http')) {
+                if (layerImage.startsWith('/') || layerImage.startsWith('http')) {
                     return (
                         <img
                             key={category}
-                            src={item.image}
+                            src={layerImage}
                             alt={item.name}
                             style={{
                                 position: 'absolute',
@@ -98,7 +103,7 @@ const Avatar = ({ equippedItems, size = 300 }) => {
                             pointerEvents: 'none'
                         }}
                     >
-                        {item.image}
+                        {layerImage}
                     </div>
                 );
             })}

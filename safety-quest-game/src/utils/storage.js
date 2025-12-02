@@ -166,7 +166,7 @@ export const inventory = {
     }
 };
 
-// 장착된 아이템
+// 장착된 아이템 (Item_Gear 모델)
 export const equippedItems = {
     get: () => {
         return storage.get(STORAGE_KEYS.EQUIPPED_ITEMS, {});
@@ -176,14 +176,26 @@ export const equippedItems = {
         return storage.set(STORAGE_KEYS.EQUIPPED_ITEMS, equipped);
     },
 
+    // 특정 카테고리의 장착 아이템 ID 반환 (하위 호환성 유지)
     getEquipped: (category) => {
         const equipped = equippedItems.get();
-        return equipped[category] || null;
+        const itemData = equipped[category];
+        if (!itemData) return null;
+        return typeof itemData === 'string' ? itemData : itemData.itemId;
     },
 
-    equip: (category, itemId) => {
+    // 특정 카테고리의 장착 아이템 전체 데이터 반환 (강화 레벨 포함)
+    getEquippedData: (category) => {
         const equipped = equippedItems.get();
-        equipped[category] = itemId;
+        const itemData = equipped[category];
+        if (!itemData) return null;
+        return typeof itemData === 'string' ? { itemId: itemData, enhancementLevel: 0 } : itemData;
+    },
+
+    // 아이템 장착 (강화 레벨 포함)
+    equip: (category, itemId, enhancementLevel = 0) => {
+        const equipped = equippedItems.get();
+        equipped[category] = { itemId, enhancementLevel };
         return equippedItems.set(equipped);
     },
 

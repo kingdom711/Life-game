@@ -11,6 +11,8 @@ import HazardQuestModal from '../components/HazardQuestModal';
 import StreakButton from '../components/StreakButton';
 import { completeQuest, triggerQuestAction } from '../utils/questManager';
 
+import AvatarWindow from '../components/AvatarWindow';
+
 function Dashboard({ role }) {
     const [playerStats, setPlayerStats] = useState({
         points: 0,
@@ -21,6 +23,7 @@ function Dashboard({ role }) {
     const [equippedItems, setEquippedItems] = useState({});
     const [dailyQuests, setDailyQuests] = useState([]);
     const [isHazardModalOpen, setIsHazardModalOpen] = useState(false);
+    const [isAvatarWindowOpen, setIsAvatarWindowOpen] = useState(false);
 
     useEffect(() => {
         loadData();
@@ -106,15 +109,29 @@ function Dashboard({ role }) {
                 <div className="card mb-xl">
                     <div className="card-header">
                         <h3 className="card-title">👤 내 아바타</h3>
-                        <Link to="/inventory">
-                            <button className="btn btn-secondary btn-sm">인벤토리 열기</button>
-                        </Link>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button
+                                className="btn btn-primary btn-sm"
+                                onClick={() => setIsAvatarWindowOpen(true)}
+                            >
+                                장비 관리
+                            </button>
+                            <Link to="/inventory">
+                                <button className="btn btn-secondary btn-sm">인벤토리</button>
+                            </Link>
+                        </div>
                     </div>
                     <div className="card-body">
-                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem' }}>
+                        <div
+                            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem', cursor: 'pointer' }}
+                            onClick={() => setIsAvatarWindowOpen(true)}
+                        >
                             <div className="avatar-container">
                                 <Avatar equippedItems={equippedItems} size={250} />
                             </div>
+                        </div>
+                        <div style={{ textAlign: 'center', marginTop: '1rem', color: '#64748b', fontSize: '0.9rem' }}>
+                            * 아바타를 클릭하여 장비를 관리하세요
                         </div>
                     </div>
                 </div>
@@ -193,6 +210,20 @@ function Dashboard({ role }) {
                     triggerQuestAction('check_risk', role);
 
                     loadData(); // 포인트 및 퀘스트 상태 업데이트 반영
+                }}
+            />
+
+            <AvatarWindow
+                isOpen={isAvatarWindowOpen}
+                onClose={() => {
+                    setIsAvatarWindowOpen(false);
+                    loadData(); // 장비 변경 사항 반영
+                }}
+                onEquipRequest={(category) => {
+                    // 인벤토리로 이동하거나 인벤토리 모달을 열 수 있음
+                    // 여기서는 간단히 알림 후 닫기 (추후 구현)
+                    setIsAvatarWindowOpen(false);
+                    window.location.href = '/inventory';
                 }}
             />
         </div>

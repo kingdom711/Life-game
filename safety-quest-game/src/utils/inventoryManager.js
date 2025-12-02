@@ -63,8 +63,8 @@ export const equipItem = (itemId) => {
     // 이전에 착용 중인 아이템 확인
     const previousItem = equippedItems.getEquipped(item.category);
 
-    // 착용 처리
-    equippedItems.equip(item.category, itemId);
+    // 착용 처리 (기본 강화 레벨 0)
+    equippedItems.equip(item.category, itemId, 0);
 
     return {
         success: true,
@@ -95,10 +95,15 @@ export const unequipItem = (category) => {
     };
 };
 
-// 착용 중인 아이템 가져오기
+// 착용 중인 아이템 가져오기 (아이템 객체 반환)
 export const getEquippedItem = (category) => {
     const itemId = equippedItems.getEquipped(category);
     return itemId ? getItemById(itemId) : null;
+};
+
+// 착용 중인 아이템 데이터 가져오기 (강화 레벨 포함)
+export const getEquippedItemData = (category) => {
+    return equippedItems.getEquippedData(category);
 };
 
 // 모든 착용 중인 아이템 가져오기
@@ -106,8 +111,15 @@ export const getAllEquippedItems = () => {
     const equipped = equippedItems.get();
     const items = {};
 
-    Object.entries(equipped).forEach(([category, itemId]) => {
-        items[category] = getItemById(itemId);
+    Object.entries(equipped).forEach(([category, data]) => {
+        const itemId = typeof data === 'string' ? data : data.itemId;
+        const item = getItemById(itemId);
+        if (item) {
+            items[category] = {
+                ...item,
+                enhancementLevel: typeof data === 'string' ? 0 : data.enhancementLevel
+            };
+        }
     });
 
     return items;
