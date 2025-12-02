@@ -193,7 +193,6 @@ function Dashboard({ role }) {
                     triggerQuestAction('check_risk', role);
 
                     loadData(); // 포인트 및 퀘스트 상태 업데이트 반영
-                    alert(`위험 요인 발굴 완료! ${points} 포인트를 획득했습니다.`);
                 }}
             />
         </div>
