@@ -12,6 +12,7 @@ import StreakButton from '../components/StreakButton';
 import { completeQuest, triggerQuestAction } from '../utils/questManager';
 
 import AvatarWindow from '../components/AvatarWindow';
+import AvatarGearDisplay from '../components/AvatarGearDisplay';
 
 function Dashboard({ role }) {
     const [playerStats, setPlayerStats] = useState({
