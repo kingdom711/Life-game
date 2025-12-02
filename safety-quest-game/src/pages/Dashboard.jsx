@@ -124,11 +124,16 @@ function Dashboard({ role }) {
                     </div>
                     <div className="card-body">
                         <div
-                            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem', cursor: 'pointer' }}
+                            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem', cursor: 'pointer' }}
                             onClick={() => setIsAvatarWindowOpen(true)}
                         >
-                            <div className="avatar-container">
-                                <Avatar equippedItems={equippedItems} size={250} />
+                            <div className="avatar-container" style={{ maxWidth: '100%', height: 'auto' }}>
+                                <AvatarGearDisplay
+                                    equippedItems={equippedItems}
+                                    size={200}
+                                    slotSize={45}
+                                    onSlotClick={() => setIsAvatarWindowOpen(true)}
+                                />
                             </div>
                         </div>
                         <div style={{ textAlign: 'center', marginTop: '1rem', color: '#64748b', fontSize: '0.9rem' }}>
