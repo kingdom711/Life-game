@@ -249,12 +249,13 @@ export const level = {
     }
 };
 
-// 스트릭 (연속 로그인)
+// 스트릭 (연속 로그인) - 수동 체크인 방식
 export const streak = {
     get: () => {
         return storage.get(STORAGE_KEYS.STREAK, {
             current: 0,
-            longest: 0
+            longest: 0,
+            lastLoginDate: null
         });
     },
 
@@ -262,40 +263,49 @@ export const streak = {
         return storage.set(STORAGE_KEYS.STREAK, streakData);
     },
 
-    update: () => {
-        const lastLogin = storage.get(STORAGE_KEYS.LAST_LOGIN);
+    // 수동 출석 체크
+    checkIn: () => {
         const now = new Date();
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString().split('T')[0];
 
-        if (lastLogin) {
-            const lastLoginDate = new Date(lastLogin);
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
+        const streakData = streak.get();
+        const lastLoginDate = streakData.lastLoginDate ? streakData.lastLoginDate.split('T')[0] : null;
 
-            const streakData = streak.get();
-
-            if (lastLoginDate.getTime() === today.getTime()) {
-                // 이미 오늘 로그인함
-                return streakData;
-            } else if (lastLoginDate.getTime() === yesterday.getTime()) {
-                // 어제 로그인함 - 스트릭 증가
-                streakData.current += 1;
-                streakData.longest = Math.max(streakData.longest, streakData.current);
-            } else {
-                // 스트릭 끊김
-                streakData.current = 1;
-            }
-
-            streak.set(streakData);
-            storage.set(STORAGE_KEYS.LAST_LOGIN, today.toISOString());
-            return streakData;
-        } else {
-            // 첫 로그인
-            const streakData = { current: 1, longest: 1 };
-            streak.set(streakData);
-            storage.set(STORAGE_KEYS.LAST_LOGIN, today.toISOString());
-            return streakData;
+        if (lastLoginDate === today) {
+            return { success: false, message: '오늘은 이미 출석했습니다.' };
         }
+
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+        if (lastLoginDate === yesterdayStr) {
+            // 연속 출석
+            streakData.current += 1;
+            streakData.longest = Math.max(streakData.longest, streakData.current);
+        } else {
+            // 스트릭 끊김 (또는 첫 출석)
+            streakData.current = 1;
+            if (streakData.longest === 0) streakData.longest = 1;
+        }
+
+        streakData.lastLoginDate = now.toISOString();
+        streak.set(streakData);
+
+        // 포인트 보상 (출석 보상 20포인트)
+        points.add(20);
+
+        return { success: true, message: '출석 완료! +1 스트릭', streak: streakData.current };
+    },
+
+    // 오늘 출석 여부 확인
+    isCheckedInToday: () => {
+        const streakData = streak.get();
+        if (!streakData.lastLoginDate) return false;
+
+        const today = new Date().toISOString().split('T')[0];
+        const lastLogin = streakData.lastLoginDate.split('T')[0];
+        return today === lastLogin;
     }
 };
 
@@ -309,10 +319,9 @@ export const initializeUserData = () => {
             exp: 0,
             expToNext: 100
         });
-        streak.update();
+        streak.get(); // 데이터 초기화 확인만 수행
     } else {
-        // 기존 사용자 - 스트릭 업데이트
-        streak.update();
+        // 기존 사용자
     }
 };
 

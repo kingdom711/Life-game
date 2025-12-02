@@ -8,6 +8,7 @@ import { QUEST_TYPE } from '../data/questsData';
 import QuestCard from '../components/QuestCard';
 import Avatar from '../components/Avatar';
 import HazardQuestModal from '../components/HazardQuestModal';
+import StreakButton from '../components/StreakButton';
 import { completeQuest } from '../utils/questManager';
 
 function Dashboard({ role }) {
@@ -90,13 +91,13 @@ function Dashboard({ role }) {
                         <div className="card-header">
                             <h4 className="card-title">🔥 연속 로그인</h4>
                         </div>
-                        <div className="card-body" style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>
-                                {playerStats.streak.current}일
-                            </div>
-                            <div className="text-muted" style={{ fontSize: '0.875rem' }}>
-                                최고 기록: {playerStats.streak.longest}일
-                            </div>
+                        <div className="card-body" style={{ textAlign: 'center', padding: '1rem' }}>
+                            <StreakButton
+                                onCheckIn={(result) => {
+                                    loadData(); // 데이터 새로고침
+                                    alert(result.message);
+                                }}
+                            />
                         </div>
                     </div>
                 </div>

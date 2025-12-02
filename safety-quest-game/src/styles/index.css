@@ -1138,3 +1138,243 @@ a:hover {
     100% { left: 100%; }
 }
 
+
+/* Quest Card Futuristic Styles */
+.quest-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.quest-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    border-color: rgba(56, 189, 248, 0.5);
+}
+
+.quest-card.completed {
+    border-color: #fbbf24;
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+    animation: flash 0.5s ease-out;
+}
+
+.quest-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.quest-title {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #e2e8f0;
+}
+
+.quest-reward {
+    background: rgba(56, 189, 248, 0.2);
+    color: #38bdf8;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: bold;
+}
+
+.quest-description {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.quest-progress-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.progress-text {
+    font-size: 0.875rem;
+    color: #cbd5e1;
+    font-weight: bold;
+}
+
+.completion-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-weight: bold;
+    width: 100%;
+}
+
+.checkmark {
+    font-size: 1.2rem;
+    animation: glow 1.5s infinite alternate;
+}
+
+.btn-action {
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-action:disabled {
+    background: #475569;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.btn-action:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.hologram-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        45deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.03) 50%,
+        transparent 100%
+    );
+    pointer-events: none;
+}
+
+@keyframes flash {
+    0% { background-color: rgba(251, 191, 36, 0.5); }
+    100% { background-color: rgba(255, 255, 255, 0.05); }
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 5px rgba(251, 191, 36, 0.5); }
+    to { text-shadow: 0 0 15px rgba(251, 191, 36, 1); }
+}
+
+/* Streak Button Styles */
+.streak-button-container {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.btn-streak {
+    width: 100%;
+    padding: 1.5rem;
+    background: transparent;
+    border: 2px solid #ef4444; /* Fire color base */
+    border-radius: 16px;
+    color: white;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.btn-streak.checked-in {
+    border-color: #22c55e; /* Success green */
+    cursor: default;
+}
+
+.streak-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.streak-content .icon {
+    font-size: 2rem;
+    animation: flame 1.5s infinite alternate;
+}
+
+.streak-content .text {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.streak-content .count {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+}
+
+.streak-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+    z-index: 1;
+    transition: all 0.3s;
+}
+
+.btn-streak.checked-in .streak-bg {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+}
+
+.btn-streak:not(:disabled):hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+.streak-animation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.plus-one, .plus-points {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #22c55e;
+    text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+    animation: fadeUp 1.5s ease-out forwards;
+}
+
+.plus-points {
+    color: #fbbf24;
+    animation-delay: 0.2s;
+}
+
+@keyframes flame {
+    from { transform: scale(1); filter: drop-shadow(0 0 5px #ef4444); }
+    to { transform: scale(1.2); filter: drop-shadow(0 0 15px #f87171); }
+}
+
+@keyframes fadeUp {
+    0% { transform: translateY(20px); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translateY(-40px); opacity: 0; }
+}
+
