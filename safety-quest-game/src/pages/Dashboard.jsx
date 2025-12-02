@@ -9,7 +9,7 @@ import QuestCard from '../components/QuestCard';
 import Avatar from '../components/Avatar';
 import HazardQuestModal from '../components/HazardQuestModal';
 import StreakButton from '../components/StreakButton';
-import { completeQuest } from '../utils/questManager';
+import { completeQuest, triggerQuestAction } from '../utils/questManager';
 
 function Dashboard({ role }) {
     const [playerStats, setPlayerStats] = useState({
@@ -189,7 +189,10 @@ function Dashboard({ role }) {
                 isOpen={isHazardModalOpen}
                 onClose={() => setIsHazardModalOpen(false)}
                 onComplete={(points) => {
-                    loadData(); // 포인트 업데이트 반영
+                    // 위험 항목 확인 퀘스트 트리거
+                    triggerQuestAction('check_risk', role);
+
+                    loadData(); // 포인트 및 퀘스트 상태 업데이트 반영
                     alert(`위험 요인 발굴 완료! ${points} 포인트를 획득했습니다.`);
                 }}
             />
