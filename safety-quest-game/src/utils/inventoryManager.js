@@ -140,7 +140,12 @@ export const getInventoryItemsByCategory = (category) => {
 // 아이템 착용 여부 확인
 export const isItemEquipped = (itemId) => {
     const equipped = equippedItems.get();
-    return Object.values(equipped).includes(itemId);
+    return Object.values(equipped).some(data => {
+        // 하위 호환성: 문자열인 경우
+        if (typeof data === 'string') return data === itemId;
+        // 객체인 경우: itemId 속성 확인
+        return data.itemId === itemId;
+    });
 };
 
 // 인벤토리 통계
