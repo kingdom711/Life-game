@@ -316,4 +316,32 @@ export const initializeUserData = () => {
     }
 };
 
-export default storage;
+// 위험 발굴 로그 관리
+export const hazardLogs = {
+    get: () => {
+        return storage.get('safety_quest_hazard_logs', []);
+    },
+    add: (log) => {
+        const logs = hazardLogs.get();
+        logs.push(log);
+        return storage.set('safety_quest_hazard_logs', logs);
+    },
+    // 오늘 날짜의 퀘스트 수행 여부 확인
+    hasCompletedToday: (userId) => {
+        const logs = hazardLogs.get();
+        const today = new Date().toISOString().split('T')[0];
+        // userId가 없으면(비로그인 등) 로컬스토리지 전체에서 오늘 날짜 확인
+        return logs.some(log => log.questDate === today);
+    }
+};
+
+export default {
+    userProfile,
+    points,
+    level,
+    streak,
+    questProgress,
+    inventory,
+    equippedItems,
+    hazardLogs
+};

@@ -7,6 +7,7 @@ import { getAllEquippedItems } from '../utils/inventoryManager';
 import { QUEST_TYPE } from '../data/questsData';
 import QuestCard from '../components/QuestCard';
 import Avatar from '../components/Avatar';
+import HazardQuestModal from '../components/HazardQuestModal';
 import { completeQuest } from '../utils/questManager';
 
 function Dashboard({ role }) {
@@ -18,6 +19,7 @@ function Dashboard({ role }) {
 
     const [equippedItems, setEquippedItems] = useState({});
     const [dailyQuests, setDailyQuests] = useState([]);
+    const [isHazardModalOpen, setIsHazardModalOpen] = useState(false);
 
     useEffect(() => {
         loadData();
@@ -116,6 +118,17 @@ function Dashboard({ role }) {
                     </div>
                 </div>
 
+                {/* 찾아라 위험! 일일 퀘스트 */}
+                <div className="mb-xl" style={{ textAlign: 'center' }}>
+                    <button
+                        className="btn-hologram"
+                        onClick={() => setIsHazardModalOpen(true)}
+                        style={{ width: '100%', maxWidth: '400px', fontSize: '1.2rem' }}
+                    >
+                        ⚠️ 찾아라 위험! (일일 퀘스트)
+                    </button>
+                </div>
+
                 {/* 오늘의 퀘스트 */}
                 <div className="mb-xl">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
@@ -170,6 +183,15 @@ function Dashboard({ role }) {
                     </div>
                 </div>
             </div>
+
+            <HazardQuestModal
+                isOpen={isHazardModalOpen}
+                onClose={() => setIsHazardModalOpen(false)}
+                onComplete={(points) => {
+                    loadData(); // 포인트 업데이트 반영
+                    alert(`위험 요인 발굴 완료! ${points} 포인트를 획득했습니다.`);
+                }}
+            />
         </div>
     );
 }
