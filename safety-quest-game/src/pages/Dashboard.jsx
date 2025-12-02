@@ -6,6 +6,7 @@ import { getQuestsByTypeAndRole } from '../data/questsData';
 import { getAllEquippedItems } from '../utils/inventoryManager';
 import { QUEST_TYPE } from '../data/questsData';
 import QuestCard from '../components/QuestCard';
+import Avatar from '../components/Avatar';
 import { completeQuest } from '../utils/questManager';
 
 function Dashboard({ role }) {
@@ -109,25 +110,7 @@ function Dashboard({ role }) {
                     <div className="card-body">
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem' }}>
                             <div className="avatar-container">
-                                <div className="avatar-base">
-                                    <div style={{ padding: '2rem', textAlign: 'center' }}>
-                                        <div style={{ fontSize: '8rem', marginBottom: '1rem' }}>🧑‍💼</div>
-
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', fontSize: '2rem' }}>
-                                            {equippedItems.helmet && <div title={equippedItems.helmet.name}>⛑️</div>}
-                                            {equippedItems.glasses && <div title={equippedItems.glasses.name}>🥽</div>}
-                                            {equippedItems.mask && <div title={equippedItems.mask.name}>😷</div>}
-                                            {equippedItems.vest && <div title={equippedItems.vest.name}>🦺</div>}
-                                            {equippedItems.gloves && <div title={equippedItems.gloves.name}>🧤</div>}
-                                            {equippedItems.belt && <div title={equippedItems.belt.name}>🔒</div>}
-                                            {equippedItems.shoes && <div title={equippedItems.shoes.name}>👞</div>}
-                                        </div>
-
-                                        {Object.keys(equippedItems).length === 0 && (
-                                            <p className="text-muted mt-md">아직 착용 중인 안전용품이 없습니다</p>
-                                        )}
-                                    </div>
-                                </div>
+                                <Avatar equippedItems={equippedItems} size={250} />
                             </div>
                         </div>
                     </div>
