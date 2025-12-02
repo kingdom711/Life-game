@@ -59,54 +59,7 @@ const Avatar = ({ equippedItems, size = 300 }) => {
                 🧑‍🔧
             </div>
 
-            {/* 착용 아이템 렌더링 */}
-            {Object.entries(equippedItems).map(([category, item]) => {
-                if (!item) return null;
-
-                // avatarLayer가 있는 경우 (우선 사용)
-                const layerImage = item.avatarLayer || item.image;
-
-                if (!layerImage) return null;
-
-                // 이미지가 경로인 경우 (이미지 파일)
-                if (layerImage.startsWith('/') || layerImage.startsWith('http')) {
-                    return (
-                        <img
-                            key={category}
-                            src={layerImage}
-                            alt={item.name}
-                            style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'contain',
-                                zIndex: zIndexMap[category],
-                                pointerEvents: 'none' // 클릭 통과
-                            }}
-                        />
-                    );
-                }
-
-                // 이미지가 이모지인 경우 (fallback)
-                return (
-                    <div
-                        key={category}
-                        style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            fontSize: `${size * 0.3}px`,
-                            zIndex: zIndexMap[category],
-                            pointerEvents: 'none'
-                        }}
-                    >
-                        {layerImage}
-                    </div>
-                );
-            })}
+            {/* 착용 아이템 렌더링 로직 제거됨 */}
         </div>
     );
 };
