@@ -147,7 +147,7 @@ export const items = [
         rarity: ITEM_RARITY.COMMON,
         price: 120,
         description: '손을 보호하는 기본 작업용 장갑',
-        image: '/assets/items/gloves_common.png',
+        image: '/gloves_common.png',
         effect: {
             type: 'quest_bonus',
             questType: 'checklist',
