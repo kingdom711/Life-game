@@ -14,58 +14,57 @@ function QuestCard({ quest, onComplete }) {
     };
 
     return (
-        <div className={`card ${isCompleted ? 'opacity-60' : ''}`} style={{ position: 'relative' }}>
-            {isCompleted && (
-                <div style={{
-                    position: 'absolute',
-                    top: '1rem',
-                    right: '1rem',
-                    fontSize: '2rem'
-                }}>
-                    ✅
-                </div>
-            )}
+        <div className={`quest-card ${isCompleted ? 'completed' : ''}`}>
+            {isCompleted && <div className="completed-overlay"></div>}
 
-            <div className="card-header">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+            <div className="quest-header">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <span style={{ fontSize: '2rem' }}>{quest.icon}</span>
-                    <div style={{ flex: 1 }}>
-                        <h3 className="card-title mb-0">{quest.title}</h3>
-                    </div>
+                    <h3 className="quest-title">{quest.title}</h3>
                 </div>
-                <p className="card-subtitle">{quest.description}</p>
+                {isCompleted ? (
+                    <div className="completed-badge-icon">
+                        <span className="glowing-checkmark">✓</span>
+                    </div>
+                ) : (
+                    <span className="quest-reward">+{quest.reward.points} P</span>
+                )}
             </div>
 
-            <div className="card-body">
-                <div style={{ marginBottom: '1rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                        <span className="text-muted" style={{ fontSize: '0.875rem' }}>진행도</span>
-                        <span className="font-semibold">{progress.current} / {target}</span>
-                    </div>
-                    <ProgressBar progress={percentage} />
-                </div>
+            <p className="quest-description">{quest.description}</p>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div className="flex gap-md">
-                        <div className="badge badge-primary">
-                            💰 {quest.reward.points}P
-                        </div>
-                        {quest.reward.exp && (
-                            <div className="badge badge-secondary">
-                                ⭐ {quest.reward.exp} EXP
-                            </div>
-                        )}
-                    </div>
-                </div>
+            <div className="quest-progress-container">
+                {isCompleted ? (
+                    <div className="quest-complete-text">QUEST COMPLETE</div>
+                ) : (
+                    <>
+                        <ProgressBar
+                            progress={percentage}
+                            color={isCompleted ? '#10b981' : '#38bdf8'}
+                        />
+                        <span className="progress-text">
+                            {progress.current} / {target}
+                        </span>
+                    </>
+                )}
             </div>
 
-            {!isCompleted && percentage === 100 && (
-                <div className="card-footer">
-                    <button onClick={handleComplete} className="btn btn-success" style={{ width: '100%' }}>
-                        완료하기
-                    </button>
-                </div>
+            {isCompleted ? (
+                <button className="btn-action completed" disabled>
+                    보상 지급 완료
+                </button>
+            ) : (
+                <button
+                    className="btn-action"
+                    onClick={handleComplete}
+                    disabled={percentage < 100}
+                >
+                    {percentage >= 100 ? '보상 받기' : '진행 중'}
+                </button>
             )}
+
+            {/* 홀로그램 효과용 배경 */}
+            <div className="hologram-effect"></div>
         </div>
     );
 }

@@ -1378,3 +1378,75 @@ a:hover {
     100% { transform: translateY(-40px); opacity: 0; }
 }
 
+
+/* Quest Completion Styles (Emerald Green Theme) */
+.quest-card.completed {
+    border-color: #10b981; /* Emerald 500 */
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+    animation: flash-emerald 0.5s ease-out;
+}
+
+.completed-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(16, 185, 129, 0.15); /* Green overlay */
+    pointer-events: none;
+    z-index: 0;
+}
+
+.completed-badge-icon {
+    background: rgba(16, 185, 129, 0.2);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.glowing-checkmark {
+    color: #10b981;
+    font-size: 1.5rem;
+    font-weight: bold;
+    animation: glow-emerald 1.5s infinite alternate;
+}
+
+.quest-complete-text {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #10b981;
+    text-align: center;
+    width: 100%;
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    letter-spacing: 2px;
+    animation: pulse-text 2s infinite;
+}
+
+.btn-action.completed {
+    background: #334155; /* Slate 700 */
+    color: #94a3b8; /* Slate 400 */
+    border: 1px solid #475569;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+@keyframes flash-emerald {
+    0% { background-color: rgba(16, 185, 129, 0.5); }
+    100% { background-color: rgba(255, 255, 255, 0.05); }
+}
+
+@keyframes glow-emerald {
+    from { text-shadow: 0 0 5px rgba(16, 185, 129, 0.5); transform: scale(1); }
+    to { text-shadow: 0 0 15px rgba(16, 185, 129, 1); transform: scale(1.1); }
+}
+
+@keyframes pulse-text {
+    0% { opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { opacity: 0.8; }
+}
+
