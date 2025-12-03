@@ -17,7 +17,12 @@ import Signup from './pages/Signup';
 import RoleSelector from './components/RoleSelector';
 import Navigation from './components/Navigation';
 
+import LaunchScreen from './pages/LaunchScreen';
+
+// ...
+
 function App() {
+    const [showLaunchScreen, setShowLaunchScreen] = useState(true);
     const [user, setUser] = useState(null);
     const [selectedRole, setSelectedRole] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -55,6 +60,10 @@ function App() {
         setSelectedRole(role);
     };
 
+    const handleStartGame = () => {
+        setShowLaunchScreen(false);
+    };
+
     if (loading) {
         return (
             <div className="loading-container">
@@ -66,7 +75,9 @@ function App() {
     return (
         <BrowserRouter>
             <div className="app" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-                {!user ? (
+                {showLaunchScreen ? (
+                    <LaunchScreen onStart={handleStartGame} />
+                ) : !user ? (
                     <Signup onSignupComplete={handleSignupComplete} />
                 ) : !selectedRole ? (
                     <RoleSelector onSelectRole={handleRoleSelect} />

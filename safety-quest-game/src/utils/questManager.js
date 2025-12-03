@@ -1,5 +1,5 @@
 import { questProgress, points, level } from './storage';
-import { getQuestById } from '../data/questsData';
+import { getQuestById, dailyQuests, weeklyQuests, monthlyQuests } from '../data/questsData';
 
 // 퀘스트 진행도 업데이트
 export const updateQuestProgress = (questId, increment = 1) => {
@@ -78,21 +78,18 @@ export const triggerQuestAction = (action, role, amount = 1) => {
 
 // 일간 퀘스트 리셋
 export const resetDailyQuests = () => {
-    const { dailyQuests } = require('../data/questsData');
     const questIds = dailyQuests.map(q => q.id);
     questProgress.resetQuests(questIds);
 };
 
 // 주간 퀘스트 리셋
 export const resetWeeklyQuests = () => {
-    const { weeklyQuests } = require('../data/questsData');
     const questIds = weeklyQuests.map(q => q.id);
     questProgress.resetQuests(questIds);
 };
 
 // 월간 퀘스트 리셋
 export const resetMonthlyQuests = () => {
-    const { monthlyQuests } = require('../data/questsData');
     const questIds = monthlyQuests.map(q => q.id);
     questProgress.resetQuests(questIds);
 };
