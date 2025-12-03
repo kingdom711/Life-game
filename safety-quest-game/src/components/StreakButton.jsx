@@ -8,10 +8,21 @@ const StreakButton = ({ onCheckIn }) => {
 
     useEffect(() => {
         // 초기 상태 확인
-        const checkedIn = streak.isCheckedInToday();
-        setIsCheckedIn(checkedIn);
-        const currentStreak = streak.get().current;
-        setStreakCount(currentStreak);
+        const checkStatus = () => {
+            const checkedIn = streak.isCheckedInToday();
+            setIsCheckedIn(checkedIn);
+            const currentStreak = streak.get().current;
+            setStreakCount(currentStreak);
+        };
+
+        checkStatus();
+
+        // 1분마다 날짜 변경 체크 (자정 지나면 버튼 활성화)
+        const interval = setInterval(() => {
+            checkStatus();
+        }, 60000);
+
+        return () => clearInterval(interval);
     }, []);
 
     const handleCheckIn = () => {
