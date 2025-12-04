@@ -4,6 +4,7 @@ export const roles = [
         name: '기술인 (작업자)',
         description: '현장에서 직접 작업을 수행하는 역할',
         icon: '👷',
+        image: '/role_technician.png',
         color: '#3b82f6',
         features: [
             '체크리스트 작성 및 제출',
@@ -17,6 +18,7 @@ export const roles = [
         name: '관리감독자',
         description: '작업자를 관리하고 체크리스트를 검토하는 역할',
         icon: '👨‍💼',
+        image: '/role_supervisor.png',
         color: '#8b5cf6',
         features: [
             '체크리스트 검토 및 승인',
@@ -30,6 +32,7 @@ export const roles = [
         name: '안전관리자',
         description: '전체 현장의 안전을 총괄 관리하는 역할',
         icon: '🛡️',
+        image: '/role_safety_manager.png',
         color: '#10b981',
         features: [
             '위험현황 모니터링',

@@ -15,7 +15,22 @@ function RoleSelector({ onSelectRole }) {
                     {roles.map(role => (
                         <div key={role.id} className="card" style={{ cursor: 'pointer' }}>
                             <div className="card-header" style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>{role.icon}</div>
+                                <div style={{ marginBottom: '1rem', height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    {role.image ? (
+                                        <img
+                                            src={role.image}
+                                            alt={role.name}
+                                            style={{
+                                                height: '100%',
+                                                width: 'auto',
+                                                objectFit: 'contain',
+                                                filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))'
+                                            }}
+                                        />
+                                    ) : (
+                                        <div style={{ fontSize: '4rem' }}>{role.icon}</div>
+                                    )}
+                                </div>
                                 <h3 className="card-title">{role.name}</h3>
                                 <p className="card-subtitle">{role.description}</p>
                             </div>
