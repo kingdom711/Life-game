@@ -151,8 +151,8 @@ function Dashboard({ role }) {
 
                 {/* 찾아라 위험! 일일 퀘스트 */}
                 <div className="mb-xl" style={{ textAlign: 'center' }}>
-                    <button
-                        className={`btn-hologram ${isHazardQuestCompleted ? 'completed' : ''}`}
+                    <div
+                        className={`quest-trigger-card ${isHazardQuestCompleted ? 'completed' : ''}`}
                         onClick={() => {
                             if (isHazardQuestCompleted) {
                                 alert("오늘은 이미 퀘스트를 완료했습니다. 내일 다시 도전해 주세요!");
@@ -160,15 +160,19 @@ function Dashboard({ role }) {
                             }
                             setIsHazardModalOpen(true);
                         }}
-                        style={{
-                            width: '100%', maxWidth: '400px', fontSize: '1.2rem',
-                            opacity: isHazardQuestCompleted ? 0.7 : 1,
-                            cursor: isHazardQuestCompleted ? 'default' : 'pointer',
-                            filter: isHazardQuestCompleted ? 'grayscale(100%)' : 'none'
-                        }}
                     >
-                        {isHazardQuestCompleted ? '✅ 오늘의 위험요인 찾기 완료!' : '⚠️ 찾아라 위험! (일일 퀘스트)'}
-                    </button>
+                        <div className="icon">
+                            {isHazardQuestCompleted ? '✅' : '⚠️'}
+                        </div>
+                        <div className="content">
+                            <div className="title">
+                                {isHazardQuestCompleted ? '위험요인 발굴 완료!' : '찾아라 위험!'}
+                            </div>
+                            <div className="subtitle">
+                                {isHazardQuestCompleted ? '오늘의 안전을 지켰습니다' : '일일 퀘스트 • +100P'}
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {/* 오늘의 퀘스트 */}

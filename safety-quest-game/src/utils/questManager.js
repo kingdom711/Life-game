@@ -1,5 +1,5 @@
 import { questProgress, points, level } from './storage';
-import { getQuestById, dailyQuests, weeklyQuests, monthlyQuests } from '../data/questsData';
+import { getQuestById, dailyQuests, weeklyQuests, monthlyQuests, allQuests } from '../data/questsData';
 
 // 퀘스트 진행도 업데이트
 export const updateQuestProgress = (questId, increment = 1) => {
@@ -50,20 +50,16 @@ const grantQuestReward = (quest) => {
 
 // 특정 액션으로 관련 퀘스트 진행도 업데이트
 export const triggerQuestAction = (action, role, amount = 1) => {
-    const allProgress = questProgress.get();
     const completedQuests = [];
 
-    // 해당 액션과 관련된 모든 퀘스트 찾기
-    Object.keys(allProgress).forEach(questId => {
-        const quest = getQuestById(questId);
-        if (!quest) return;
-
+    // 모든 퀘스트를 순회하며 해당 액션과 관련된 퀘스트 찾기
+    allQuests.forEach(quest => {
         // 역할 체크
         if (quest.role !== 'all' && quest.role !== role) return;
 
         // 액션 체크
         if (quest.requirement.action === action) {
-            const result = updateQuestProgress(questId, amount);
+            const result = updateQuestProgress(quest.id, amount);
             if (result.completed) {
                 completedQuests.push({
                     quest,
