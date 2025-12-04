@@ -65,6 +65,16 @@ function App() {
         setIsPlayingBgm(true); // 게임 시작 시 BGM 재생
     };
 
+    const handleSignupComplete = (userData) => {
+        setUser(userData);
+        userProfile.set(userData); // 저장
+    };
+
+    const handleRoleSelect = (roleId) => {
+        setSelectedRole(roleId);
+        userProfile.setRole(roleId); // 저장
+    };
+
     if (loading) {
         return (
             <div className="loading-container">

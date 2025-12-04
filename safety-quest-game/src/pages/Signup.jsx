@@ -42,7 +42,7 @@ function Signup({ onSignupComplete }) {
 
         // alert('회원가입이 완료되었습니다!'); // 제거됨
         if (onSignupComplete) {
-            onSignupComplete();
+            onSignupComplete({ name: formData.nickname });
         }
     };
 
