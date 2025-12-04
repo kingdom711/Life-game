@@ -21,8 +21,8 @@ export const dailyQuests = [
         type: QUEST_TYPE.DAILY,
         category: QUEST_CATEGORY.CHECKLIST,
         role: 'technician',
-        title: '체크리스트 1건 작성하기',
-        description: '오늘 체크리스트를 1건 작성하고 제출하세요',
+        title: '오늘의 안전 점검',
+        description: '작업 시작 전 필수 체크리스트를 1건 작성하여 안전을 확보하세요!',
         icon: '📝',
         requirement: {
             type: 'count',
@@ -30,8 +30,8 @@ export const dailyQuests = [
             action: 'submit_checklist'
         },
         reward: {
-            points: 50,
-            exp: 10
+            points: 100,
+            exp: 20
         }
     },
     {
@@ -39,17 +39,17 @@ export const dailyQuests = [
         type: QUEST_TYPE.DAILY,
         category: QUEST_CATEGORY.PHOTO,
         role: 'technician',
-        title: '작업 사진 3장 업로드하기',
-        description: '작업 현장 사진을 3장 업로드하세요',
-        icon: '📷',
+        title: '현장 포착: 위험을 찾아라',
+        description: '작업 현장의 안전/위험 요소를 촬영하여 3장 업로드하세요.',
+        icon: '📸',
         requirement: {
             type: 'count',
             target: 3,
             action: 'upload_photo'
         },
         reward: {
-            points: 30,
-            exp: 5
+            points: 150,
+            exp: 30
         }
     },
     {
@@ -57,17 +57,17 @@ export const dailyQuests = [
         type: QUEST_TYPE.DAILY,
         category: QUEST_CATEGORY.REVIEW,
         role: 'supervisor',
-        title: '체크리스트 2건 검토하기',
-        description: '제출된 체크리스트를 2건 검토하세요',
-        icon: '🔍',
+        title: '꼼꼼한 관리자',
+        description: '팀원들이 제출한 체크리스트 2건을 검토하고 피드백을 남기세요.',
+        icon: '🧐',
         requirement: {
             type: 'count',
             target: 2,
             action: 'review_checklist'
         },
         reward: {
-            points: 60,
-            exp: 12
+            points: 200,
+            exp: 40
         }
     },
     {
@@ -75,17 +75,17 @@ export const dailyQuests = [
         type: QUEST_TYPE.DAILY,
         category: QUEST_CATEGORY.SAFETY,
         role: 'safetyManager',
-        title: '위험 항목 1건 확인하기',
-        description: '위험도가 높은 항목을 1건 확인하고 조치하세요',
-        icon: '⚠️',
+        title: '일일 위험 요소 제거',
+        description: '현장에서 발견된 고위험 항목 1건을 확인하고 조치 완료하세요.',
+        icon: '🛡️',
         requirement: {
             type: 'count',
             target: 1,
             action: 'check_risk'
         },
         reward: {
-            points: 70,
-            exp: 15
+            points: 250,
+            exp: 50
         }
     },
     {
@@ -93,16 +93,16 @@ export const dailyQuests = [
         type: QUEST_TYPE.DAILY,
         category: QUEST_CATEGORY.LOGIN,
         role: 'all',
-        title: '로그인 스트릭 유지하기',
-        description: '매일 접속하여 연속 로그인 기록을 유지하세요',
-        icon: '🔥',
+        title: '출근 도장 쾅!',
+        description: '오늘도 안전한 하루! 게임에 접속하여 출석 체크를 완료하세요.',
+        icon: '📅',
         requirement: {
             type: 'action',
             action: 'daily_login'
         },
         reward: {
-            points: 20,
-            exp: 5
+            points: 50,
+            exp: 10
         }
     }
 ];
@@ -114,8 +114,8 @@ export const weeklyQuests = [
         type: QUEST_TYPE.WEEKLY,
         category: QUEST_CATEGORY.CHECKLIST,
         role: 'technician',
-        title: '체크리스트 10건 제출하기',
-        description: '이번 주에 체크리스트를 10건 제출하세요',
+        title: '성실한 안전 지킴이',
+        description: '이번 주 동안 체크리스트 10건을 작성하여 꾸준함을 증명하세요.',
         icon: '📋',
         requirement: {
             type: 'count',
@@ -123,8 +123,8 @@ export const weeklyQuests = [
             action: 'submit_checklist'
         },
         reward: {
-            points: 300,
-            exp: 50
+            points: 1000,
+            exp: 200
         }
     },
     {
@@ -132,17 +132,17 @@ export const weeklyQuests = [
         type: QUEST_TYPE.WEEKLY,
         category: QUEST_CATEGORY.LOGIN,
         role: 'all',
-        title: '모든 일간 퀘스트 달성하기',
-        description: '일주일 동안 매일 모든 일간 퀘스트를 완료하세요',
-        icon: '🎯',
+        title: '7일의 기적',
+        description: '일주일 동안 하루도 빠짐없이 모든 일간 퀘스트를 완료하세요!',
+        icon: '🔥',
         requirement: {
             type: 'streak',
             target: 7,
             action: 'complete_daily_quests'
         },
         reward: {
-            points: 400,
-            exp: 80
+            points: 1500,
+            exp: 300
         }
     },
     {
@@ -150,17 +150,17 @@ export const weeklyQuests = [
         type: QUEST_TYPE.WEEKLY,
         category: QUEST_CATEGORY.SAFETY,
         role: 'safetyManager',
-        title: '위험도 높음 항목 5건 조치하기',
-        description: '위험도가 높은 항목을 5건 조치하고 완료하세요',
-        icon: '🛡️',
+        title: '위험 제로 챌린지',
+        description: '이번 주 고위험 항목 5건을 완벽하게 조치하여 사고를 예방하세요.',
+        icon: '👷',
         requirement: {
             type: 'count',
             target: 5,
             action: 'resolve_high_risk'
         },
         reward: {
-            points: 500,
-            exp: 100
+            points: 2000,
+            exp: 400
         }
     },
     {
@@ -168,17 +168,17 @@ export const weeklyQuests = [
         type: QUEST_TYPE.WEEKLY,
         category: QUEST_CATEGORY.REVIEW,
         role: 'supervisor',
-        title: '승인율 90% 이상 달성하기',
-        description: '체크리스트 검토 승인율 90% 이상을 달성하세요',
-        icon: '✅',
+        title: '완벽한 관리 감독',
+        description: '체크리스트 검토 승인율 90% 이상을 달성하여 신뢰받는 관리자가 되세요.',
+        icon: '👑',
         requirement: {
             type: 'rate',
             target: 90,
             action: 'approval_rate'
         },
         reward: {
-            points: 350,
-            exp: 70
+            points: 1200,
+            exp: 250
         }
     },
     {
@@ -186,17 +186,17 @@ export const weeklyQuests = [
         type: QUEST_TYPE.WEEKLY,
         category: QUEST_CATEGORY.PHOTO,
         role: 'technician',
-        title: '작업 사진 20장 수집하기',
-        description: '다양한 작업 현장 사진을 20장 업로드하세요',
-        icon: '📸',
+        title: '현장 기록 전문가',
+        description: '현장의 생생한 모습을 담은 사진 20장을 수집하여 데이터베이스를 구축하세요.',
+        icon: '📂',
         requirement: {
             type: 'count',
             target: 20,
             action: 'upload_photo'
         },
         reward: {
-            points: 250,
-            exp: 40
+            points: 800,
+            exp: 150
         }
     }
 ];
@@ -208,8 +208,8 @@ export const monthlyQuests = [
         type: QUEST_TYPE.MONTHLY,
         category: QUEST_CATEGORY.CHECKLIST,
         role: 'technician',
-        title: '누적 체크리스트 50건 달성',
-        description: '이번 달에 체크리스트를 총 50건 제출하세요',
+        title: '전설의 체크리스트 마스터',
+        description: '한 달 동안 체크리스트 50건을 작성하여 안전 관리의 달인이 되세요!',
         icon: '🏆',
         requirement: {
             type: 'count',
@@ -217,8 +217,8 @@ export const monthlyQuests = [
             action: 'submit_checklist'
         },
         reward: {
-            points: 1500,
-            exp: 250
+            points: 5000,
+            exp: 1000
         }
     },
     {
@@ -226,8 +226,8 @@ export const monthlyQuests = [
         type: QUEST_TYPE.MONTHLY,
         category: QUEST_CATEGORY.LOGIN,
         role: 'all',
-        title: '완벽한 주간 퀘스트 달성 (4주 연속)',
-        description: '4주 연속으로 모든 주간 퀘스트를 완료하세요',
+        title: '4주 연속 퍼펙트 클리어',
+        description: '4주 연속으로 주간 퀘스트를 모두 완료하여 끈기와 열정을 보여주세요.',
         icon: '💎',
         requirement: {
             type: 'streak',
@@ -235,8 +235,8 @@ export const monthlyQuests = [
             action: 'complete_weekly_quests'
         },
         reward: {
-            points: 2000,
-            exp: 400
+            points: 10000,
+            exp: 2000
         }
     },
     {
@@ -244,17 +244,17 @@ export const monthlyQuests = [
         type: QUEST_TYPE.MONTHLY,
         category: QUEST_CATEGORY.SAFETY,
         role: 'safetyManager',
-        title: 'AI 위험도 분석 정확도 기여',
-        description: 'AI 위험도 분석 결과를 검증하고 정확도를 높이세요',
-        icon: '🤖',
+        title: 'AI 안전 분석가',
+        description: 'AI 위험도 분석 결과 30건을 검증하여 시스템의 정확도를 높이세요.',
+        icon: '🧠',
         requirement: {
             type: 'count',
             target: 30,
             action: 'verify_ai_analysis'
         },
         reward: {
-            points: 1800,
-            exp: 350
+            points: 8000,
+            exp: 1500
         }
     },
     {
@@ -262,8 +262,8 @@ export const monthlyQuests = [
         type: QUEST_TYPE.MONTHLY,
         category: QUEST_CATEGORY.SAFETY,
         role: 'all',
-        title: '안전 사고 0건 유지',
-        description: '이번 달 안전 사고를 0건으로 유지하세요',
+        title: '무재해 30일 달성',
+        description: '우리 현장의 안전을 지켜 이번 달 안전 사고 0건을 달성하세요!',
         icon: '🌟',
         requirement: {
             type: 'maintain',
@@ -271,8 +271,8 @@ export const monthlyQuests = [
             action: 'accident_count'
         },
         reward: {
-            points: 2500,
-            exp: 500
+            points: 15000,
+            exp: 3000
         }
     },
     {
@@ -280,17 +280,17 @@ export const monthlyQuests = [
         type: QUEST_TYPE.MONTHLY,
         category: QUEST_CATEGORY.REVIEW,
         role: 'supervisor',
-        title: '검토 마스터',
-        description: '이번 달 100건 이상의 체크리스트를 검토하세요',
-        icon: '👨‍🏫',
+        title: '최고의 멘토',
+        description: '한 달 동안 100건 이상의 체크리스트를 검토하고 팀원들을 이끄세요.',
+        icon: '🎖️',
         requirement: {
             type: 'count',
             target: 100,
             action: 'review_checklist'
         },
         reward: {
-            points: 1600,
-            exp: 300
+            points: 7000,
+            exp: 1200
         }
     }
 ];
