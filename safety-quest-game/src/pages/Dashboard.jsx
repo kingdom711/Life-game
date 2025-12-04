@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { points, level, streak, dailyQuestInstances } from '../utils/storage';
+import { points, level, streak, dailyQuestInstances, userProfile } from '../utils/storage';
 import { calculateLevel } from '../utils/pointsCalculator';
 import { getQuestsByTypeAndRole } from '../data/questsData';
 import { getAllEquippedItems } from '../utils/inventoryManager';
