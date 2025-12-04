@@ -19,6 +19,7 @@ import Navigation from './components/Navigation';
 
 import LaunchScreen from './pages/LaunchScreen';
 import BackgroundMusic from './components/BackgroundMusic';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // ...
 
@@ -73,10 +74,6 @@ function App() {
     }
 
     console.log("App Render State:", { showLaunchScreen, user, selectedRole });
-
-    import ErrorBoundary from './components/ErrorBoundary';
-
-    // ...
 
     return (
         <BrowserRouter>
