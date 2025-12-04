@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { points, level, streak } from '../utils/storage';
+import { points, level, streak, dailyQuestInstances } from '../utils/storage';
 import { calculateLevel } from '../utils/pointsCalculator';
 import { getQuestsByTypeAndRole } from '../data/questsData';
 import { getAllEquippedItems } from '../utils/inventoryManager';
@@ -25,6 +25,7 @@ function Dashboard({ role }) {
     const [dailyQuests, setDailyQuests] = useState([]);
     const [isHazardModalOpen, setIsHazardModalOpen] = useState(false);
     const [isAvatarWindowOpen, setIsAvatarWindowOpen] = useState(false);
+    const [isHazardQuestCompleted, setIsHazardQuestCompleted] = useState(false);
 
     useEffect(() => {
         loadData();
@@ -44,6 +45,9 @@ function Dashboard({ role }) {
         });
         setEquippedItems(equipped);
         setDailyQuests(quests.slice(0, 3)); // 처음 3개만 표시
+
+        const todayInstance = dailyQuestInstances.getTodayInstance(userProfile.getName() || 'guest');
+        setIsHazardQuestCompleted(todayInstance.isCompleted);
     };
 
     const handleCompleteQuest = (quest) => {
@@ -143,14 +147,26 @@ function Dashboard({ role }) {
                     </div>
                 </div>
 
+
                 {/* 찾아라 위험! 일일 퀘스트 */}
                 <div className="mb-xl" style={{ textAlign: 'center' }}>
                     <button
-                        className="btn-hologram"
-                        onClick={() => setIsHazardModalOpen(true)}
-                        style={{ width: '100%', maxWidth: '400px', fontSize: '1.2rem' }}
+                        className={`btn-hologram ${isHazardQuestCompleted ? 'completed' : ''}`}
+                        onClick={() => {
+                            if (isHazardQuestCompleted) {
+                                alert("오늘은 이미 퀘스트를 완료했습니다. 내일 다시 도전해 주세요!");
+                                return;
+                            }
+                            setIsHazardModalOpen(true);
+                        }}
+                        style={{
+                            width: '100%', maxWidth: '400px', fontSize: '1.2rem',
+                            opacity: isHazardQuestCompleted ? 0.7 : 1,
+                            cursor: isHazardQuestCompleted ? 'default' : 'pointer',
+                            filter: isHazardQuestCompleted ? 'grayscale(100%)' : 'none'
+                        }}
                     >
-                        ⚠️ 찾아라 위험! (일일 퀘스트)
+                        {isHazardQuestCompleted ? '✅ 오늘의 위험요인 찾기 완료!' : '⚠️ 찾아라 위험! (일일 퀘스트)'}
                     </button>
                 </div>
 

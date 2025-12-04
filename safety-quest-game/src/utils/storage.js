@@ -356,6 +356,79 @@ export const hazardLogs = {
     }
 };
 
+// 일일 퀘스트 인스턴스 (Daily_Quest_Instance)
+export const dailyQuestInstances = {
+    get: () => {
+        return storage.get('safety_quest_daily_instances', []);
+    },
+
+    // 오늘 날짜의 퀘스트 인스턴스 가져오기 (없으면 생성)
+    getTodayInstance: (userId) => {
+        const instances = dailyQuestInstances.get();
+        const today = new Date().toISOString().split('T')[0];
+
+        let instance = instances.find(inst => inst.userId === userId && inst.questDate === today);
+
+        if (!instance) {
+            instance = {
+                id: crypto.randomUUID(),
+                userId: userId,
+                questDate: today,
+                photoUrl: '/bg_bright_construction.png', // 기본 이미지
+                isCompleted: false,
+                attemptCount: 0,
+                completionTimestamp: null
+            };
+            instances.push(instance);
+            storage.set('safety_quest_daily_instances', instances);
+        }
+
+        return instance;
+    },
+
+    // 퀘스트 완료 처리
+    complete: (instanceId) => {
+        const instances = dailyQuestInstances.get();
+        const index = instances.findIndex(inst => inst.id === instanceId);
+
+        if (index !== -1) {
+            instances[index].isCompleted = true;
+            instances[index].completionTimestamp = new Date().toISOString();
+            instances[index].attemptCount += 1;
+            storage.set('safety_quest_daily_instances', instances);
+            return true;
+        }
+        return false;
+    }
+};
+
+// 위험 요인 식별 로그 (Hazard_Identification_Log)
+export const hazardIdentificationLogs = {
+    get: () => {
+        return storage.get('safety_quest_hazard_id_logs', []);
+    },
+
+    add: (instanceId, x, y, text) => {
+        const logs = hazardIdentificationLogs.get();
+        const newLog = {
+            id: crypto.randomUUID(),
+            instanceId: instanceId,
+            xCoord: x,
+            yCoord: y,
+            userIdentifiedHazard: text,
+            timestamp: new Date().toISOString()
+        };
+        logs.push(newLog);
+        storage.set('safety_quest_hazard_id_logs', logs);
+        return newLog;
+    },
+
+    getByInstanceId: (instanceId) => {
+        const logs = hazardIdentificationLogs.get();
+        return logs.filter(log => log.instanceId === instanceId);
+    }
+};
+
 export default {
     userProfile,
     points,
@@ -364,5 +437,7 @@ export default {
     questProgress,
     inventory,
     equippedItems,
-    hazardLogs
+    hazardLogs,
+    dailyQuestInstances,
+    hazardIdentificationLogs
 };
