@@ -4,7 +4,7 @@ import GearSlot from './GearSlot';
 import { ITEM_CATEGORY, CATEGORY_NAMES } from '../data/itemsData';
 import { getAllEquippedItems, unequipItem } from '../utils/inventoryManager';
 
-const AvatarWindow = ({ isOpen, onClose, onEquipRequest }) => {
+const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
     const [equippedItems, setEquippedItems] = useState({});
     const [selectedSlot, setSelectedSlot] = useState(null);
 
@@ -126,7 +126,7 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest }) => {
                         padding: '1rem',
                         background: 'radial-gradient(circle at center, rgba(56, 189, 248, 0.1) 0%, transparent 70%)'
                     }}>
-                        <Avatar equippedItems={equippedItems} size={300} />
+                        <Avatar equippedItems={equippedItems} size={300} roleId={roleId} />
 
                         {/* 바닥 효과 */}
                         <div style={{

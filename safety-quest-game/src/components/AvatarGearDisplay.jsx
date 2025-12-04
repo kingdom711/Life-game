@@ -3,7 +3,7 @@ import Avatar from './Avatar';
 import GearSlot from './GearSlot';
 import { ITEM_CATEGORY } from '../data/itemsData';
 
-const AvatarGearDisplay = ({ equippedItems, size = 200, slotSize = 50, onSlotClick }) => {
+const AvatarGearDisplay = ({ equippedItems, size = 200, slotSize = 50, onSlotClick, roleId }) => {
     // 슬롯 배치 정의
     const leftSlots = [
         ITEM_CATEGORY.HELMET,
@@ -46,7 +46,7 @@ const AvatarGearDisplay = ({ equippedItems, size = 200, slotSize = 50, onSlotCli
                 position: 'relative',
                 padding: '0.5rem',
             }}>
-                <Avatar equippedItems={equippedItems} size={size} />
+                <Avatar equippedItems={equippedItems} size={size} roleId={roleId} />
 
                 {/* 바닥 효과 */}
                 <div style={{

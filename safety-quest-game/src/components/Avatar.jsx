@@ -1,7 +1,8 @@
-import React from 'react';
-import { ITEM_CATEGORY } from '../data/itemsData';
+import { getRoleById } from '../data/rolesData';
 
-const Avatar = ({ equippedItems, size = 300 }) => {
+const Avatar = ({ equippedItems, size = 300, roleId }) => {
+    const roleInfo = roleId ? getRoleById(roleId) : null;
+
     // 레이어 순서 정의 (낮을수록 뒤에 배치)
     const layerOrder = [
         'base',
@@ -41,7 +42,7 @@ const Avatar = ({ equippedItems, size = 300 }) => {
                 boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
             }}
         >
-            {/* 베이스 아바타 (이미지가 없을 경우를 대비해 텍스트/이모지 fallback) */}
+            {/* 베이스 아바타 */}
             <div
                 style={{
                     position: 'absolute',
@@ -56,7 +57,19 @@ const Avatar = ({ equippedItems, size = 300 }) => {
                     fontSize: `${size * 0.5}px`
                 }}
             >
-                🧑‍🔧
+                {roleInfo?.image ? (
+                    <img
+                        src={roleInfo.image}
+                        alt={roleInfo.name}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover'
+                        }}
+                    />
+                ) : (
+                    roleInfo?.icon || '🧑‍🔧'
+                )}
             </div>
 
             {/* 착용 아이템 렌더링 로직 제거됨 */}

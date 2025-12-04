@@ -40,7 +40,22 @@ function Profile({ role }) {
         <div className="page">
             <div className="container">
                 <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '5rem', marginBottom: '1rem' }}>{roleInfo?.icon || '👤'}</div>
+                    <div style={{ fontSize: '5rem', marginBottom: '1rem', height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {roleInfo?.image ? (
+                            <img
+                                src={roleInfo.image}
+                                alt={roleInfo.name}
+                                style={{
+                                    height: '100%',
+                                    width: 'auto',
+                                    objectFit: 'contain',
+                                    filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))'
+                                }}
+                            />
+                        ) : (
+                            roleInfo?.icon || '👤'
+                        )}
+                    </div>
                     <h1>{stats.profile.name}</h1>
                     <p className="text-muted">{roleInfo?.name}</p>
                 </div>

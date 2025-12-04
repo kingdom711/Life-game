@@ -133,6 +133,7 @@ function Dashboard({ role }) {
                                     size={200}
                                     slotSize={45}
                                     onSlotClick={() => setIsAvatarWindowOpen(true)}
+                                    roleId={role}
                                 />
                             </div>
                         </div>
@@ -231,6 +232,7 @@ function Dashboard({ role }) {
                     setIsAvatarWindowOpen(false);
                     window.location.href = '/inventory';
                 }}
+                roleId={role}
             />
         </div>
     );
