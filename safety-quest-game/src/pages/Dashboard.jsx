@@ -27,28 +27,41 @@ function Dashboard({ role }) {
     const [isAvatarWindowOpen, setIsAvatarWindowOpen] = useState(false);
     const [isHazardQuestCompleted, setIsHazardQuestCompleted] = useState(false);
 
-    useEffect(() => {
-        loadData();
-    }, [role]);
-
     const loadData = () => {
         const currentPoints = points.get();
-        const currentLevel = calculateLevel(currentPoints);
+        const currentLevel = level.get();
         const currentStreak = streak.get();
-        const equipped = getAllEquippedItems();
-        const quests = getQuestsByTypeAndRole(QUEST_TYPE.DAILY, role);
+
+        // 출석 체크 상태와 퀘스트 동기화 (누락 방지)
+        if (streak.isCheckedInToday()) {
+            triggerQuestAction('daily_login', role);
+        }
 
         setPlayerStats({
             points: currentPoints,
-            level: currentLevel,
+            level: {
+                name: calculateLevel(currentLevel.current).name,
+                progress: Math.floor((currentLevel.exp / currentLevel.expToNext) * 100)
+            },
             streak: currentStreak
         });
-        setEquippedItems(equipped);
+
+        setEquippedItems(getAllEquippedItems());
+
+        // 퀘스트 로드
+        const quests = getQuestsByTypeAndRole(QUEST_TYPE.DAILY, role);
         setDailyQuests(quests.slice(0, 3)); // 처음 3개만 표시
 
         const todayInstance = dailyQuestInstances.getTodayInstance(userProfile.getName() || 'guest');
         setIsHazardQuestCompleted(todayInstance.isCompleted);
     };
+
+    useEffect(() => {
+        loadData();
+        // 이벤트 리스너 등록 (포인트 변경 감지 등)
+        window.addEventListener('storage', loadData);
+        return () => window.removeEventListener('storage', loadData);
+    }, [role]);
 
     const handleCompleteQuest = (quest) => {
         completeQuest(quest.id);
@@ -56,7 +69,7 @@ function Dashboard({ role }) {
     };
 
     return (
-        <div className="page">
+        <div className="page dashboard">
             <div className="container">
                 {/* 헤더 */}
                 <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
@@ -162,10 +175,7 @@ function Dashboard({ role }) {
                         }}
                     >
                         <div className="icon">
-                            {isHazardQuestCompleted ?
-                                '✅' :
-                                <img src="/icon/hazard hunt.ico" alt="Hazard Hunt" style={{ width: '40px', height: '40px' }} />
-                            }
+                            {isHazardQuestCompleted ? '✅' : '⚠️'}
                         </div>
                         <div className="content">
                             <div className="title">
