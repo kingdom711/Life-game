@@ -57,7 +57,7 @@ function Signup({ onSignupComplete }) {
             zIndex: 10
         }}>
             <div className="container" style={{ maxWidth: '400px' }}>
-                <div className="card">
+                <div className="card" style={{ background: 'var(--color-surface)', backdropFilter: 'blur(10px)' }}>
                     <div className="card-header text-center">
                         <h1>📝 회원가입</h1>
                         <p className="text-muted">안전관리 퀘스트 게임에 오신 것을 환영합니다</p>
