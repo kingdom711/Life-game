@@ -74,29 +74,45 @@ function Shop() {
                             <div key={item.id} className="card">
                                 <div className="card-header">
                                     <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
-                                        <div style={{ height: '120px', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <div style={{
+                                            height: '140px',
+                                            marginBottom: '1rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(240,249,255,0.5) 100%)',
+                                            borderRadius: 'var(--radius-lg)',
+                                            padding: '1rem'
+                                        }}>
                                             {item.image ? (
                                                 <img
                                                     src={item.image}
                                                     alt={item.name}
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.style.display = 'none';
+                                                        e.target.nextSibling.style.display = 'block';
+                                                    }}
                                                     style={{
                                                         maxHeight: '100%',
                                                         maxWidth: '100%',
                                                         objectFit: 'contain',
-                                                        filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))'
+                                                        filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))',
+                                                        transition: 'transform 0.3s ease'
                                                     }}
+                                                    onMouseOver={(e) => e.target.style.transform = 'scale(1.1)'}
+                                                    onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
                                                 />
-                                            ) : (
-                                                <div style={{ fontSize: '4rem' }}>
-                                                    {item.category === 'helmet' && '⛑️'}
-                                                    {item.category === 'vest' && '🦺'}
-                                                    {item.category === 'gloves' && '🧤'}
-                                                    {item.category === 'shoes' && '👞'}
-                                                    {item.category === 'glasses' && '🥽'}
-                                                    {item.category === 'belt' && '🔒'}
-                                                    {item.category === 'mask' && '😷'}
-                                                </div>
-                                            )}
+                                            ) : null}
+                                            <div style={{ display: item.image ? 'none' : 'block', fontSize: '4rem' }}>
+                                                {item.category === 'helmet' && '⛑️'}
+                                                {item.category === 'vest' && '🦺'}
+                                                {item.category === 'gloves' && '🧤'}
+                                                {item.category === 'shoes' && '👞'}
+                                                {item.category === 'glasses' && '🥽'}
+                                                {item.category === 'belt' && '🔒'}
+                                                {item.category === 'mask' && '😷'}
+                                            </div>
                                         </div>
                                         <div
                                             className="badge"

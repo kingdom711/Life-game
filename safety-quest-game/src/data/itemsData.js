@@ -46,8 +46,8 @@ export const items = [
         rarity: ITEM_RARITY.COMMON,
         price: 150,
         description: '기본적인 머리 보호 기능을 제공하는 안전모',
-        image: '/helmet_common.png',
-        avatarLayer: '/helmet_common.png', // 아바타 착용 레이어
+        image: '/helmet-common.png',
+        avatarLayer: '/helmet-common.png',
         effect: {
             type: 'quest_bonus',
             questType: 'checklist',
@@ -61,8 +61,8 @@ export const items = [
         rarity: ITEM_RARITY.RARE,
         price: 500,
         description: '통풍 기능이 있어 장시간 착용해도 쾌적한 안전모',
-        image: '/helmet_rare.png',
-        avatarLayer: '/helmet_rare.png',
+        image: '/helmet-rare.png',
+        avatarLayer: '/helmet-rare.png',
         effect: {
             type: 'quest_bonus',
             questType: 'checklist',
@@ -91,8 +91,8 @@ export const items = [
         rarity: ITEM_RARITY.LEGENDARY,
         price: 2000,
         description: '센서와 통신 기능이 내장된 최첨단 안전모',
-        image: '/helmet_legendary.png',
-        avatarLayer: '/helmet_legendary.png',
+        image: '/helmet-legendary.png',
+        avatarLayer: '/helmet-legendary.png',
         effect: {
             type: 'quest_bonus',
             questType: 'all',
@@ -108,8 +108,8 @@ export const items = [
         rarity: ITEM_RARITY.COMMON,
         price: 100,
         description: '시인성이 좋은 기본 형광 안전조끼',
-        image: '/vest_common.png',
-        avatarLayer: '/vest_common.png',
+        image: '/vest-common.png',
+        avatarLayer: '/vest-common.png',
         effect: {
             type: 'quest_bonus',
             questType: 'photo',
@@ -123,8 +123,8 @@ export const items = [
         rarity: ITEM_RARITY.RARE,
         price: 400,
         description: '야간에도 잘 보이는 반사띠가 부착된 안전조끼',
-        image: '/vest_rare.png',
-        avatarLayer: '/vest_rare.png',
+        image: '/vest-rare.png',
+        avatarLayer: '/vest-rare.png',
         effect: {
             type: 'quest_bonus',
             questType: 'photo',
@@ -138,8 +138,8 @@ export const items = [
         rarity: ITEM_RARITY.EPIC,
         price: 800,
         description: 'LED 조명이 내장되어 어두운 곳에서도 잘 보이는 안전조끼',
-        image: '/vest_epic.png',
-        avatarLayer: '/vest_epic.png',
+        image: '/vest-legendary.png', // epic 이미지 대체
+        avatarLayer: '/vest-legendary.png',
         effect: {
             type: 'quest_bonus',
             questType: 'all',
@@ -170,8 +170,8 @@ export const items = [
         rarity: ITEM_RARITY.RARE,
         price: 450,
         description: '물에 젖지 않는 방수 기능이 있는 안전장갑',
-        image: '/assets/items/gloves_rare.png',
-        avatarLayer: '/assets/items/gloves_rare.png',
+        image: '/gloves_rare.png',
+        avatarLayer: '/gloves_rare.png',
         effect: {
             type: 'quest_bonus',
             questType: 'checklist',
@@ -185,8 +185,8 @@ export const items = [
         rarity: ITEM_RARITY.EPIC,
         price: 1000,
         description: '전기 작업에 안전한 절연 기능이 있는 고급 장갑',
-        image: '/assets/items/gloves_epic.png',
-        avatarLayer: '/assets/items/gloves_epic.png',
+        image: '/gloves-legendary.png', // epic 이미지 대체
+        avatarLayer: '/gloves-legendary.png',
         effect: {
             type: 'quest_bonus',
             questType: 'all',
@@ -247,8 +247,8 @@ export const items = [
         rarity: ITEM_RARITY.LEGENDARY,
         price: 2500,
         description: '보행 데이터를 수집하고 피로도를 모니터링하는 최첨단 안전화',
-        image: '/assets/items/shoes_legendary.png',
-        avatarLayer: '/assets/items/shoes_legendary.png',
+        image: '/shoes_epic.png', // legendary 이미지 부재로 대체
+        avatarLayer: '/shoes_epic.png',
         effect: {
             type: 'quest_bonus',
             questType: 'all',
@@ -264,8 +264,8 @@ export const items = [
         rarity: ITEM_RARITY.COMMON,
         price: 150,
         description: '눈을 보호하는 기본 보안경',
-        image: '/assets/items/glasses_common.png',
-        avatarLayer: '/assets/items/glasses_common.png',
+        image: '/mask-common.png', // glasses 이미지 부재로 mask 대체 (임시)
+        avatarLayer: '/mask-common.png',
         effect: {
             type: 'quest_bonus',
             questType: 'photo',
@@ -279,8 +279,8 @@ export const items = [
         rarity: ITEM_RARITY.RARE,
         price: 500,
         description: '김서림 방지 코팅이 된 고급 보안경',
-        image: '/assets/items/glasses_rare.png',
-        avatarLayer: '/assets/items/glasses_rare.png',
+        image: '/mask-rare.png', // glasses 이미지 부재로 mask 대체 (임시)
+        avatarLayer: '/mask-rare.png',
         effect: {
             type: 'quest_bonus',
             questType: 'photo',
@@ -294,8 +294,8 @@ export const items = [
         rarity: ITEM_RARITY.EPIC,
         price: 950,
         description: '강한 빛을 차단하는 편광 기능이 있는 보안경',
-        image: '/assets/items/glasses_epic.png',
-        avatarLayer: '/assets/items/glasses_epic.png',
+        image: '/mask-legendary.png', // glasses 이미지 부재로 mask 대체 (임시)
+        avatarLayer: '/mask-legendary.png',
         effect: {
             type: 'quest_bonus',
             questType: 'all',
@@ -311,8 +311,8 @@ export const items = [
         rarity: ITEM_RARITY.COMMON,
         price: 300,
         description: '기본적인 추락 방지 기능이 있는 안전벨트',
-        image: '/belt_common.png',
-        avatarLayer: '/belt_common.png',
+        image: '/belt_rare.png', // common 이미지 부재로 rare 대체
+        avatarLayer: '/belt_rare.png',
         effect: {
             type: 'quest_bonus',
             questType: 'checklist',
@@ -341,8 +341,8 @@ export const items = [
         rarity: ITEM_RARITY.LEGENDARY,
         price: 1800,
         description: '낙하 감지 센서와 자동 알림 기능이 있는 최첨단 안전벨트',
-        image: '/belt_epic.png',
-        avatarLayer: '/belt_epic.png',
+        image: '/Belt-legendary.png',
+        avatarLayer: '/Belt-legendary.png',
         effect: {
             type: 'quest_bonus',
             questType: 'all',
@@ -358,8 +358,8 @@ export const items = [
         rarity: ITEM_RARITY.COMMON,
         price: 180,
         description: '분진으로부터 호흡기를 보호하는 기본 마스크',
-        image: '/assets/items/mask_common.png',
-        avatarLayer: '/assets/items/mask_common.png',
+        image: '/mask-common.png',
+        avatarLayer: '/mask-common.png',
         effect: {
             type: 'quest_bonus',
             questType: 'photo',
@@ -373,8 +373,8 @@ export const items = [
         rarity: ITEM_RARITY.RARE,
         price: 550,
         description: '활성탄 필터로 유해가스까지 차단하는 고급 마스크',
-        image: '/assets/items/mask_rare.png',
-        avatarLayer: '/assets/items/mask_rare.png',
+        image: '/mask-rare.png',
+        avatarLayer: '/mask-rare.png',
         effect: {
             type: 'quest_bonus',
             questType: 'photo',
@@ -388,8 +388,8 @@ export const items = [
         rarity: ITEM_RARITY.EPIC,
         price: 1200,
         description: '전동 팬이 내장되어 편하게 호흡할 수 있는 프리미엄 마스크',
-        image: '/assets/items/mask_epic.png',
-        avatarLayer: '/assets/items/mask_epic.png',
+        image: '/mask-legendary.png',
+        avatarLayer: '/mask-legendary.png',
         effect: {
             type: 'quest_bonus',
             questType: 'all',
