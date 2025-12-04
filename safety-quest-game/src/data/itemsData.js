@@ -264,8 +264,8 @@ export const items = [
         rarity: ITEM_RARITY.COMMON,
         price: 150,
         description: '눈을 보호하는 기본 보안경',
-        image: '/mask-common.png', // glasses 이미지 부재로 mask 대체 (임시)
-        avatarLayer: '/mask-common.png',
+        image: '/grass-common.png',
+        avatarLayer: '/grass-common.png',
         effect: {
             type: 'quest_bonus',
             questType: 'photo',
@@ -279,8 +279,8 @@ export const items = [
         rarity: ITEM_RARITY.RARE,
         price: 500,
         description: '김서림 방지 코팅이 된 고급 보안경',
-        image: '/mask-rare.png', // glasses 이미지 부재로 mask 대체 (임시)
-        avatarLayer: '/mask-rare.png',
+        image: '/grass-rare.png',
+        avatarLayer: '/grass-rare.png',
         effect: {
             type: 'quest_bonus',
             questType: 'photo',
@@ -294,8 +294,8 @@ export const items = [
         rarity: ITEM_RARITY.EPIC,
         price: 950,
         description: '강한 빛을 차단하는 편광 기능이 있는 보안경',
-        image: '/mask-legendary.png', // glasses 이미지 부재로 mask 대체 (임시)
-        avatarLayer: '/mask-legendary.png',
+        image: '/GRASS-legendary.png',
+        avatarLayer: '/GRASS-legendary.png',
         effect: {
             type: 'quest_bonus',
             questType: 'all',
