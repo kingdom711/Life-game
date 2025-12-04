@@ -42,30 +42,6 @@ const LaunchScreen = ({ onStart }) => {
                 opacity: 0.3,
                 zIndex: -1
             }} />
-
-            <div className="logo-container" style={{
-                marginBottom: '3rem',
-                textAlign: 'center',
-                animation: 'bounce 2s infinite'
-            }}>
-                <div style={{ fontSize: '5rem', marginBottom: '1rem' }}>🏗️</div>
-                <h1 style={{
-                    fontSize: '2.5rem',
-                    fontWeight: '800',
-                    background: 'linear-gradient(to right, #38bdf8, #818cf8)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    textShadow: '0 0 20px rgba(56, 189, 248, 0.5)'
-                }}>
-                    중대재해 멈춰!
-                </h1>
-                <p style={{ color: '#94a3b8', fontSize: '1.1rem' }}>안전관리 퀘스트 게임</p>
-            </div>
-
-            <button
-                onClick={handleStart}
-                className="btn btn-primary btn-lg"
-                style={{
                     padding: '1rem 3rem',
                     fontSize: '1.5rem',
                     borderRadius: '50px',
@@ -84,7 +60,7 @@ const LaunchScreen = ({ onStart }) => {
             }}>
                 © 2024 Safety Quest Game. All rights reserved.
             </div>
-        </div>
+        </div >
     );
 };
 
