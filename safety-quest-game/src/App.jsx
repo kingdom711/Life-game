@@ -29,7 +29,35 @@ function App() {
     const [selectedRole, setSelectedRole] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // ... (useEffect 등 기존 코드 유지)
+    useEffect(() => {
+        const initApp = async () => {
+            try {
+                // 초기화
+                initializeUserData();
+
+                // 퀘스트 리셋 체크
+                checkAndResetQuests();
+
+                // 저장된 데이터 불러오기
+                const savedName = userProfile.getName();
+                const savedRole = userProfile.getRole();
+
+                if (savedName) {
+                    setUser({ name: savedName });
+                }
+
+                if (savedRole) {
+                    setSelectedRole(savedRole);
+                }
+            } catch (error) {
+                console.error("App initialization failed:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        initApp();
+    }, []);
 
     const handleStartGame = () => {
         setShowLaunchScreen(false);
