@@ -72,37 +72,45 @@ function App() {
         );
     }
 
+    console.log("App Render State:", { showLaunchScreen, user, selectedRole });
+
+    import ErrorBoundary from './components/ErrorBoundary';
+
+    // ...
+
     return (
         <BrowserRouter>
-            <div className="app" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-                <BackgroundMusic
-                    src="/sounds/안전의길.mp3"
-                    isPlaying={isPlayingBgm}
-                    volume={0.3}
-                />
+            <ErrorBoundary>
+                <div className="app" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+                    <BackgroundMusic
+                        src="/sounds/안전의길.mp3"
+                        isPlaying={isPlayingBgm}
+                        volume={0.3}
+                    />
 
-                {showLaunchScreen ? (
-                    <LaunchScreen onStart={handleStartGame} />
-                ) : !user ? (
-                    <Signup onSignupComplete={handleSignupComplete} />
-                ) : !selectedRole ? (
-                    <RoleSelector onSelectRole={handleRoleSelect} />
-                ) : (
-                    <>
-                        <Navigation />
-                        <Routes>
-                            <Route path="/" element={<Dashboard role={selectedRole} />} />
-                            <Route path="/daily" element={<DailyQuests role={selectedRole} />} />
-                            <Route path="/weekly" element={<WeeklyQuests role={selectedRole} />} />
-                            <Route path="/monthly" element={<MonthlyQuests role={selectedRole} />} />
-                            <Route path="/shop" element={<Shop />} />
-                            <Route path="/inventory" element={<Inventory />} />
-                            <Route path="/profile" element={<Profile role={selectedRole} />} />
-                            <Route path="*" element={<Navigate to="/" replace />} />
-                        </Routes>
-                    </>
-                )}
-            </div>
+                    {showLaunchScreen ? (
+                        <LaunchScreen onStart={handleStartGame} />
+                    ) : !user ? (
+                        <Signup onSignupComplete={handleSignupComplete} />
+                    ) : !selectedRole ? (
+                        <RoleSelector onSelectRole={handleRoleSelect} />
+                    ) : (
+                        <>
+                            <Navigation />
+                            <Routes>
+                                <Route path="/" element={<Dashboard role={selectedRole} />} />
+                                <Route path="/daily" element={<DailyQuests role={selectedRole} />} />
+                                <Route path="/weekly" element={<WeeklyQuests role={selectedRole} />} />
+                                <Route path="/monthly" element={<MonthlyQuests role={selectedRole} />} />
+                                <Route path="/shop" element={<Shop />} />
+                                <Route path="/inventory" element={<Inventory />} />
+                                <Route path="/profile" element={<Profile role={selectedRole} />} />
+                                <Route path="*" element={<Navigate to="/" replace />} />
+                            </Routes>
+                        </>
+                    )}
+                </div>
+            </ErrorBoundary>
         </BrowserRouter>
     );
 }
