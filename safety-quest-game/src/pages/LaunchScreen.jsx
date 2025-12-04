@@ -50,7 +50,7 @@ const LaunchScreen = ({ onStart }) => {
             }}>
                 <div style={{ marginBottom: '1rem' }}>
                     <img
-                        src="/safety_road_logo.png"
+                        src="/safety_road_logo2.png"
                         alt="안전의 길 로고"
                         style={{
                             width: '180px',
