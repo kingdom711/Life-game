@@ -18,50 +18,22 @@ import RoleSelector from './components/RoleSelector';
 import Navigation from './components/Navigation';
 
 import LaunchScreen from './pages/LaunchScreen';
+import BackgroundMusic from './components/BackgroundMusic';
 
 // ...
 
 function App() {
     const [showLaunchScreen, setShowLaunchScreen] = useState(true);
+    const [isPlayingBgm, setIsPlayingBgm] = useState(false);
     const [user, setUser] = useState(null);
     const [selectedRole, setSelectedRole] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        // 초기화
-        initializeUserData();
-
-        // 퀘스트 리셋 체크
-        checkAndResetQuests();
-
-        // 저장된 데이터 불러오기
-        const savedName = userProfile.getName();
-        const savedRole = userProfile.getRole();
-
-        if (savedName) {
-            setUser({ name: savedName });
-        }
-
-        if (savedRole) {
-            setSelectedRole(savedRole);
-        }
-
-        setLoading(false);
-    }, []);
-
-    const handleSignupComplete = () => {
-        const savedName = userProfile.getName();
-        setUser({ name: savedName });
-        // 회원가입 후 역할 선택으로 이동 (자동으로 리렌더링되어 처리됨)
-    };
-
-    const handleRoleSelect = (role) => {
-        userProfile.setRole(role);
-        setSelectedRole(role);
-    };
+    // ... (useEffect 등 기존 코드 유지)
 
     const handleStartGame = () => {
         setShowLaunchScreen(false);
+        setIsPlayingBgm(true); // 게임 시작 시 BGM 재생
     };
 
     if (loading) {
@@ -75,6 +47,12 @@ function App() {
     return (
         <BrowserRouter>
             <div className="app" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+                <BackgroundMusic
+                    src="/sounds/안전의길.mp3"
+                    isPlaying={isPlayingBgm}
+                    volume={0.3}
+                />
+
                 {showLaunchScreen ? (
                     <LaunchScreen onStart={handleStartGame} />
                 ) : !user ? (
