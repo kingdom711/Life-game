@@ -162,7 +162,10 @@ function Dashboard({ role }) {
                         }}
                     >
                         <div className="icon">
-                            {isHazardQuestCompleted ? '✅' : '⚠️'}
+                            {isHazardQuestCompleted ?
+                                '✅' :
+                                <img src="/icon/hazard hunt.ico" alt="Hazard Hunt" style={{ width: '40px', height: '40px' }} />
+                            }
                         </div>
                         <div className="content">
                             <div className="title">
