@@ -1,4 +1,5 @@
 import { getRoleById } from '../data/rolesData';
+import { ITEM_CATEGORY } from '../data/itemsData';
 
 const Avatar = ({ equippedItems, size = 300, roleId }) => {
     const roleInfo = roleId ? getRoleById(roleId) : null;
