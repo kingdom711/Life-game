@@ -102,8 +102,9 @@ function Dashboard({ role }) {
                         <div className="card-body" style={{ textAlign: 'center', padding: '1rem' }}>
                             <StreakButton
                                 onCheckIn={(result) => {
+                                    // 출석 체크 퀘스트 완료 트리거
+                                    triggerQuestAction('daily_login', role);
                                     loadData(); // 데이터 새로고침
-                                    // alert 제거됨
                                 }}
                             />
                         </div>
