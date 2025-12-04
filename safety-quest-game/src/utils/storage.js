@@ -374,7 +374,7 @@ export const dailyQuestInstances = {
                 id: crypto.randomUUID(),
                 userId: userId,
                 questDate: today,
-                photoUrl: '/bg_bright_construction.png', // 기본 이미지
+                photoUrl: '/hazzard/hazzard1.png', // 기본 이미지
                 isCompleted: false,
                 attemptCount: 0,
                 completionTimestamp: null
