@@ -8,6 +8,7 @@ import { QUEST_TYPE } from '../data/questsData';
 import QuestCard from '../components/QuestCard';
 import Avatar from '../components/Avatar';
 import HazardQuestModal from '../components/HazardQuestModal';
+import RiskSolutionModal from '../components/RiskSolutionModal';
 import StreakButton from '../components/StreakButton';
 import { completeQuest, triggerQuestAction } from '../utils/questManager';
 
@@ -24,44 +25,32 @@ function Dashboard({ role }) {
     const [equippedItems, setEquippedItems] = useState({});
     const [dailyQuests, setDailyQuests] = useState([]);
     const [isHazardModalOpen, setIsHazardModalOpen] = useState(false);
+    const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
     const [isAvatarWindowOpen, setIsAvatarWindowOpen] = useState(false);
     const [isHazardQuestCompleted, setIsHazardQuestCompleted] = useState(false);
 
+    useEffect(() => {
+        loadData();
+    }, [role]);
+
     const loadData = () => {
         const currentPoints = points.get();
-        const currentLevel = level.get();
+        const currentLevel = calculateLevel(currentPoints);
         const currentStreak = streak.get();
-
-        // 출석 체크 상태와 퀘스트 동기화 (누락 방지)
-        if (streak.isCheckedInToday()) {
-            triggerQuestAction('daily_login', role);
-        }
+        const equipped = getAllEquippedItems();
+        const quests = getQuestsByTypeAndRole(QUEST_TYPE.DAILY, role);
 
         setPlayerStats({
             points: currentPoints,
-            level: {
-                name: calculateLevel(currentLevel.current).name,
-                progress: Math.floor((currentLevel.exp / currentLevel.expToNext) * 100)
-            },
+            level: currentLevel,
             streak: currentStreak
         });
-
-        setEquippedItems(getAllEquippedItems());
-
-        // 퀘스트 로드
-        const quests = getQuestsByTypeAndRole(QUEST_TYPE.DAILY, role);
+        setEquippedItems(equipped);
         setDailyQuests(quests.slice(0, 3)); // 처음 3개만 표시
 
         const todayInstance = dailyQuestInstances.getTodayInstance(userProfile.getName() || 'guest');
         setIsHazardQuestCompleted(todayInstance.isCompleted);
     };
-
-    useEffect(() => {
-        loadData();
-        // 이벤트 리스너 등록 (포인트 변경 감지 등)
-        window.addEventListener('storage', loadData);
-        return () => window.removeEventListener('storage', loadData);
-    }, [role]);
 
     const handleCompleteQuest = (quest) => {
         completeQuest(quest.id);
@@ -69,7 +58,7 @@ function Dashboard({ role }) {
     };
 
     return (
-        <div className="page dashboard">
+        <div className="page">
             <div className="container">
                 {/* 헤더 */}
                 <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
@@ -175,7 +164,10 @@ function Dashboard({ role }) {
                         }}
                     >
                         <div className="icon">
-                            {isHazardQuestCompleted ? '✅' : '⚠️'}
+                            {isHazardQuestCompleted ?
+                                '✅' :
+                                <img src="/icon/hazard hunt.ico" alt="Hazard Hunt" style={{ width: '40px', height: '40px' }} />
+                            }
                         </div>
                         <div className="content">
                             <div className="title">
@@ -186,6 +178,32 @@ function Dashboard({ role }) {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* GEMS AI 위험 솔루션 버튼 */}
+                <div className="mb-xl" style={{ textAlign: 'center' }}>
+                    <button
+                        className="btn btn-secondary full-width"
+                        style={{
+                            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                            border: '1px solid #3b82f6',
+                            padding: '1rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem',
+                            boxShadow: '0 4px 6px rgba(59, 130, 246, 0.1)'
+                        }}
+                        onClick={() => setIsRiskModalOpen(true)}
+                    >
+                        <span style={{ fontSize: '1.5rem' }}>🤖</span>
+                        <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#60a5fa' }}>
+                            안전 지능 시스템
+                        </span>
+                    </button>
+                    <p style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#64748b' }}>
+                        현장의 위험 상황을 AI가 분석하고 조치 방안을 제시합니다.
+                    </p>
                 </div>
 
                 {/* 오늘의 퀘스트 */}
@@ -251,6 +269,15 @@ function Dashboard({ role }) {
                     triggerQuestAction('check_risk', role);
 
                     loadData(); // 포인트 및 퀘스트 상태 업데이트 반영
+                }}
+            />
+
+            <RiskSolutionModal
+                isOpen={isRiskModalOpen}
+                onClose={() => setIsRiskModalOpen(false)}
+                onComplete={(result) => {
+                    console.log('GEMS Analysis Completed:', result);
+                    // 필요 시 추가 액션 (예: 포인트 지급 등)
                 }}
             />
 

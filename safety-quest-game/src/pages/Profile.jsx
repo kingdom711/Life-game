@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { points, level, streak, userProfile } from '../utils/storage';
 import { calculateLevel } from '../utils/pointsCalculator';
 import { getRoleById } from '../data/rolesData';
@@ -39,6 +40,11 @@ function Profile({ role }) {
     return (
         <div className="page">
             <div className="container">
+                <div style={{ marginBottom: '1rem' }}>
+                    <Link to="/" className="btn btn-secondary btn-sm">
+                        ← 대시보드로 돌아가기
+                    </Link>
+                </div>
                 <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
                     <div style={{ fontSize: '5rem', marginBottom: '1rem', height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {roleInfo?.image ? (

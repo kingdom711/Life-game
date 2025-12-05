@@ -429,6 +429,57 @@ export const hazardIdentificationLogs = {
     }
 };
 
+// 조치 기록 (ActionRecord)
+export const actionRecords = {
+    get: () => {
+        return storage.get('safety_quest_action_records', []);
+    },
+
+    add: (record) => {
+        const records = actionRecords.get();
+        const newRecord = {
+            id: crypto.randomUUID(),
+            ...record,
+            status: record.status || 'draft', // draft, completed
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        records.push(newRecord);
+        storage.set('safety_quest_action_records', records);
+        return newRecord;
+    },
+
+    update: (id, updates) => {
+        const records = actionRecords.get();
+        const index = records.findIndex(r => r.id === id);
+        if (index !== -1) {
+            records[index] = { ...records[index], ...updates, updatedAt: new Date().toISOString() };
+            storage.set('safety_quest_action_records', records);
+            return records[index];
+        }
+        return null;
+    }
+};
+
+// GEMS 분석 로그 (GEMSAnalysisLog)
+export const gemsAnalysisLogs = {
+    get: () => {
+        return storage.get('safety_quest_gems_logs', []);
+    },
+
+    add: (log) => {
+        const logs = gemsAnalysisLogs.get();
+        const newLog = {
+            id: crypto.randomUUID(),
+            ...log,
+            analyzedAt: new Date().toISOString()
+        };
+        logs.push(newLog);
+        storage.set('safety_quest_gems_logs', logs);
+        return newLog;
+    }
+};
+
 export default {
     userProfile,
     points,
@@ -439,5 +490,7 @@ export default {
     equippedItems,
     hazardLogs,
     dailyQuestInstances,
-    hazardIdentificationLogs
+    hazardIdentificationLogs,
+    actionRecords,
+    gemsAnalysisLogs
 };

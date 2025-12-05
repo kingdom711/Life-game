@@ -76,8 +76,8 @@ export const items = [
         rarity: ITEM_RARITY.EPIC,
         price: 900,
         description: '추운 날씨에도 머리를 따뜻하게 보호하는 고급 안전모',
-        image: '/item/helmet_epic.png',
-        avatarLayer: '/item/helmet_epic.png',
+        image: '/item/helmet_epic.png?v=1',
+        avatarLayer: '/item/helmet_epic.png?v=1',
         effect: {
             type: 'quest_bonus',
             questType: 'all',
@@ -232,8 +232,8 @@ export const items = [
         rarity: ITEM_RARITY.EPIC,
         price: 1100,
         description: '추운 환경에서 발을 따뜻하게 보호하는 안전화',
-        image: '/item/shoes_epic.png',
-        avatarLayer: '/item/shoes_epic.png',
+        image: '/item/shoes_epic.png?v=1',
+        avatarLayer: '/item/shoes_epic.png?v=1',
         effect: {
             type: 'quest_bonus',
             questType: 'all',
@@ -247,8 +247,8 @@ export const items = [
         rarity: ITEM_RARITY.LEGENDARY,
         price: 2500,
         description: '보행 데이터를 수집하고 피로도를 모니터링하는 최첨단 안전화',
-        image: '/item/shoes_epic.png', // legendary 이미지 부재로 대체
-        avatarLayer: '/item/shoes_epic.png',
+        image: '/item/shoes_legendary.png',
+        avatarLayer: '/item/shoes_legendary.png',
         effect: {
             type: 'quest_bonus',
             questType: 'all',
@@ -264,8 +264,8 @@ export const items = [
         rarity: ITEM_RARITY.COMMON,
         price: 150,
         description: '눈을 보호하는 기본 보안경',
-        image: '/item/grass-common.png',
-        avatarLayer: '/item/grass-common.png',
+        image: '/item/grass-common.png?v=1',
+        avatarLayer: '/item/grass-common.png?v=1',
         effect: {
             type: 'quest_bonus',
             questType: 'photo',

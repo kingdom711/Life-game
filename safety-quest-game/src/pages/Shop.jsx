@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { items, ITEM_CATEGORY, ITEM_RARITY, CATEGORY_NAMES, RARITY_NAMES, getRarityColor } from '../data/itemsData';
 import { purchaseItem } from '../utils/inventoryManager';
 import { points as pointsStorage, inventory as inventoryStorage } from '../utils/storage';
@@ -35,6 +36,11 @@ function Shop() {
     return (
         <div className="page">
             <div className="container">
+                <div style={{ marginBottom: '1rem' }}>
+                    <Link to="/" className="btn btn-secondary btn-sm">
+                        ← 대시보드로 돌아가기
+                    </Link>
+                </div>
                 <div style={{ marginBottom: '2rem' }}>
                     <h1>🛒 아이템 상점</h1>
                     <p className="text-muted">포인트로 안전용품을 구매하세요</p>
