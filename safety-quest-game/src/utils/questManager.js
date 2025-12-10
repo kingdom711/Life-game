@@ -1,5 +1,25 @@
-import { questProgress, points, level } from './storage';
+import { questProgress, points, level, attendanceLogs, weeklyQuestProgress, streak } from './storage';
 import { getQuestById, dailyQuests, weeklyQuests, monthlyQuests, allQuests } from '../data/questsData';
+
+// KST 날짜 헬퍼
+const getKSTDate = () => {
+    const now = new Date();
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const kstOffset = 9 * 60 * 60 * 1000;
+    return new Date(utc + kstOffset);
+};
+
+const getKSTDateString = () => {
+    return getKSTDate().toISOString().split('T')[0];
+};
+
+const getWeekNumber = (d) => {
+    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return parseInt(`${d.getUTCFullYear()}${weekNo.toString().padStart(2, '0')}`);
+};
 
 // 퀘스트 진행도 업데이트
 export const updateQuestProgress = (questId, increment = 1) => {
@@ -69,7 +89,72 @@ export const triggerQuestAction = (action, role, amount = 1) => {
         }
     });
 
+    // 주간 퀘스트 누적 로직 (SRS 연동)
+    // action을 quest_type으로 매핑
+    let questType = null;
+    if (action === 'submit_checklist') questType = 'SAFETY_CHECKLIST';
+    if (action === 'report_risk') questType = 'REPORT_RISK';
+    if (action === 'attend_tbm') questType = 'TBM_ATTENDANCE';
+
+    if (questType) {
+        const kstNow = getKSTDate();
+        const weekNum = getWeekNumber(kstNow);
+        weeklyQuestProgress.update(weekNum, questType, amount, 5); // 목표 5회 가정
+    }
+
     return completedQuests;
+};
+
+// 출석 체크 로직 (KST 기준, Streak 계산)
+export const checkAttendance = (userId) => {
+    const kstNow = getKSTDate();
+    const todayStr = kstNow.toISOString().split('T')[0];
+
+    // 어제 날짜 계산
+    const yesterday = new Date(kstNow);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+    const lastLog = attendanceLogs.getLastLog();
+
+    // 이미 오늘 출석했는지 확인
+    if (lastLog && lastLog.attendance_date === todayStr) {
+        return { success: false, message: '이미 출석했습니다.', consecutiveDays: lastLog.consecutive_days };
+    }
+
+    let consecutiveDays = 1;
+
+    if (lastLog) {
+        if (lastLog.attendance_date === yesterdayStr) {
+            // 연속 출석
+            consecutiveDays = lastLog.consecutive_days + 1;
+        } else {
+            // 결석으로 인한 초기화
+            consecutiveDays = 1;
+        }
+    }
+
+    // 로그 저장
+    attendanceLogs.add({
+        user_id: userId,
+        attendance_date: todayStr,
+        consecutive_days: consecutiveDays,
+        reward_status: 'PENDING'
+    });
+
+    // 기존 streak 스토리지 업데이트 (UI 호환성 유지)
+    streak.set({
+        current: consecutiveDays,
+        longest: Math.max(streak.get().longest, consecutiveDays),
+        lastLoginDate: kstNow.toISOString()
+    });
+
+    // 보상 지급 (기본 20P + 연속 출석 보너스)
+    let bonus = 0;
+    if (consecutiveDays % 7 === 0) bonus = 100; // 7일마다 보너스
+    points.add(20 + bonus);
+
+    return { success: true, message: '출석 완료!', consecutiveDays, bonus };
 };
 
 // 일간 퀘스트 리셋
@@ -90,10 +175,10 @@ export const resetMonthlyQuests = () => {
     questProgress.resetQuests(questIds);
 };
 
-// 리셋 시간 체크 및 자동 리셋
+// 리셋 시간 체크 및 자동 리셋 (KST 적용)
 export const checkAndResetQuests = () => {
     const lastReset = localStorage.getItem('safety_quest_last_reset');
-    const now = new Date();
+    const now = getKSTDate(); // KST 사용
 
     if (!lastReset) {
         localStorage.setItem('safety_quest_last_reset', JSON.stringify({
@@ -158,5 +243,6 @@ export default {
     resetMonthlyQuests,
     checkAndResetQuests,
     isQuestCompleted,
-    getQuestProgress
+    getQuestProgress,
+    checkAttendance // Export added
 };

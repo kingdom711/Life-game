@@ -116,6 +116,12 @@ const HazardQuestModal = ({ isOpen, onClose, onComplete }) => {
         const rewardPoints = 100 + (markers.length * 10); // 기본 100 + 개당 10
         points.add(rewardPoints);
 
+        // Also complete the daily quest entry if it exists
+        // This ensures the card in the list also shows as completed
+        import('../utils/questManager').then(({ updateQuestProgress }) => {
+            updateQuestProgress('daily_hazard_1', 1);
+        });
+
         setIsSubmitting(false);
         setShowSuccess(true);
 

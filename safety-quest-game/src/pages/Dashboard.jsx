@@ -10,7 +10,9 @@ import Avatar from '../components/Avatar';
 import HazardQuestModal from '../components/HazardQuestModal';
 import RiskSolutionModal from '../components/RiskSolutionModal';
 import StreakButton from '../components/StreakButton';
-import { completeQuest, triggerQuestAction } from '../utils/questManager';
+import DailyCheckInModal from '../components/DailyCheckInModal';
+import WeeklyQuestTracker from '../components/WeeklyQuestTracker';
+import { completeQuest, triggerQuestAction, checkAttendance } from '../utils/questManager';
 
 import AvatarWindow from '../components/AvatarWindow';
 import AvatarGearDisplay from '../components/AvatarGearDisplay';
@@ -28,6 +30,8 @@ function Dashboard({ role }) {
     const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
     const [isAvatarWindowOpen, setIsAvatarWindowOpen] = useState(false);
     const [isHazardQuestCompleted, setIsHazardQuestCompleted] = useState(false);
+    const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
+    const [checkInResult, setCheckInResult] = useState({ streak: 0, bonus: 0 });
 
     useEffect(() => {
         loadData();
@@ -53,6 +57,14 @@ function Dashboard({ role }) {
     };
 
     const handleCompleteQuest = (quest) => {
+        if (quest.id === 'daily_hazard_1') {
+            if (isHazardQuestCompleted) {
+                alert("오늘은 이미 퀘스트를 완료했습니다. 내일 다시 도전해 주세요!");
+                return;
+            }
+            setIsHazardModalOpen(true);
+            return;
+        }
         completeQuest(quest.id);
         loadData(); // 새로고침
     };
@@ -103,10 +115,16 @@ function Dashboard({ role }) {
                         </div>
                         <div className="card-body" style={{ textAlign: 'center', padding: '1rem' }}>
                             <StreakButton
-                                onCheckIn={(result) => {
-                                    // 출석 체크 퀘스트 완료 트리거
-                                    triggerQuestAction('daily_login', role);
-                                    loadData(); // 데이터 새로고침
+                                onCheckIn={() => {
+                                    const result = checkAttendance(userProfile.getName() || 'guest');
+                                    if (result.success) {
+                                        triggerQuestAction('daily_login', role);
+                                        setCheckInResult({ streak: result.consecutiveDays, bonus: result.bonus });
+                                        setIsCheckInModalOpen(true);
+                                        loadData();
+                                    } else {
+                                        alert(result.message);
+                                    }
                                 }}
                             />
                         </div>
@@ -148,6 +166,11 @@ function Dashboard({ role }) {
                             * 아바타를 클릭하여 장비를 관리하세요
                         </div>
                     </div>
+                </div>
+
+                {/* 주간 퀘스트 트래커 */}
+                <div className="mb-xl">
+                    <WeeklyQuestTracker />
                 </div>
 
 
@@ -279,6 +302,13 @@ function Dashboard({ role }) {
                     console.log('GEMS Analysis Completed:', result);
                     // 필요 시 추가 액션 (예: 포인트 지급 등)
                 }}
+            />
+
+            <DailyCheckInModal
+                isOpen={isCheckInModalOpen}
+                onClose={() => setIsCheckInModalOpen(false)}
+                streakCount={checkInResult.streak}
+                bonus={checkInResult.bonus}
             />
 
             <AvatarWindow

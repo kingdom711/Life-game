@@ -480,6 +480,67 @@ export const gemsAnalysisLogs = {
     }
 };
 
+// 출석 기록 (Attendance_Log)
+export const attendanceLogs = {
+    get: () => {
+        return storage.get('safety_quest_attendance_logs', []);
+    },
+
+    add: (log) => {
+        const logs = attendanceLogs.get();
+        const newLog = {
+            id: Date.now(), // Simple ID
+            ...log,
+            rewardStatus: log.rewardStatus || 'PENDING'
+        };
+        logs.push(newLog);
+        storage.set('safety_quest_attendance_logs', logs);
+        return newLog;
+    },
+
+    getLastLog: () => {
+        const logs = attendanceLogs.get();
+        if (logs.length === 0) return null;
+        return logs[logs.length - 1];
+    }
+};
+
+// 주간 퀘스트 진행도 (Weekly_Quest_Progress)
+export const weeklyQuestProgress = {
+    get: () => {
+        return storage.get('safety_quest_weekly_progress', []);
+    },
+
+    getByWeekAndType: (weekNumber, questType) => {
+        const progressList = weeklyQuestProgress.get();
+        return progressList.find(p => p.weekNumber === weekNumber && p.questType === questType);
+    },
+
+    update: (weekNumber, questType, increment = 1, targetCount = 5) => {
+        const progressList = weeklyQuestProgress.get();
+        let progress = progressList.find(p => p.weekNumber === weekNumber && p.questType === questType);
+
+        if (progress) {
+            progress.currentCount += increment;
+            progress.isCompleted = progress.currentCount >= progress.targetCount;
+        } else {
+            progress = {
+                id: Date.now(),
+                userId: userProfile.get().name || 'guest', // Simple user mapping
+                weekNumber,
+                questType,
+                currentCount: increment,
+                targetCount,
+                isCompleted: increment >= targetCount
+            };
+            progressList.push(progress);
+        }
+
+        storage.set('safety_quest_weekly_progress', progressList);
+        return progress;
+    }
+};
+
 export default {
     userProfile,
     points,
@@ -492,5 +553,7 @@ export default {
     dailyQuestInstances,
     hazardIdentificationLogs,
     actionRecords,
-    gemsAnalysisLogs
+    gemsAnalysisLogs,
+    attendanceLogs,
+    weeklyQuestProgress
 };

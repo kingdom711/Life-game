@@ -17,6 +17,24 @@ export const QUEST_CATEGORY = {
 // 일간 퀘스트
 export const dailyQuests = [
     {
+        id: 'daily_hazard_1',
+        type: QUEST_TYPE.DAILY,
+        category: QUEST_CATEGORY.PHOTO,
+        role: 'technician',
+        title: '찾아라 위험!',
+        description: '오늘의 현장 사진에서 숨겨진 위험 요인 5개를 찾아내세요.',
+        icon: '⚠️',
+        requirement: {
+            type: 'action', // 'count' 대신 'action'으로 변경하여 모달 연동
+            target: 1,
+            action: 'complete_hazard_hunt'
+        },
+        reward: {
+            points: 100,
+            exp: 30
+        }
+    },
+    {
         id: 'daily_checklist_1',
         type: QUEST_TYPE.DAILY,
         category: QUEST_CATEGORY.CHECKLIST,
