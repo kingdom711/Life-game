@@ -5,7 +5,10 @@ function RoleSelector({ onSelectRole }) {
         <div className="page" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
             <div className="container">
                 <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                    <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>🛡️ 안전의 길</h1>
+                    <h1 style={{ fontSize: '3rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
+                        <img src="/assets/safety_road_logo-removebg-preview.png" alt="안전의 길" style={{ width: '60px', height: '60px', objectFit: 'contain' }} />
+                        안전의 길
+                    </h1>
                     <p className="text-muted" style={{ fontSize: '1.25rem' }}>
                         역할을 선택하여 안전관리 퀘스트를 시작하세요
                     </p>

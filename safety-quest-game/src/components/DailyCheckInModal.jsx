@@ -33,7 +33,7 @@ const DailyCheckInModal = ({ isOpen, onClose, streakCount, bonus }) => {
                 <div className="check-in-body">
                     <div className="shield-container">
                         <div className={`shield level-${shieldLevel}`}>
-                            🛡️
+                            <img src="/assets/safety_road_logo-removebg-preview.png" alt="안전의 길" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
                         </div>
                         {shieldLevel > 0 && <div className="shield-label">Level {shieldLevel} Shield</div>}
                     </div>
