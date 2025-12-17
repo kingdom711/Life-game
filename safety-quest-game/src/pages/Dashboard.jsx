@@ -8,7 +8,6 @@ import { QUEST_TYPE } from '../data/questsData';
 import QuestCard from '../components/QuestCard';
 import Avatar from '../components/Avatar';
 import HazardQuestModal from '../components/HazardQuestModal';
-import RiskSolutionModal from '../components/RiskSolutionModal';
 import StreakButton from '../components/StreakButton';
 import DailyCheckInModal from '../components/DailyCheckInModal';
 import WeeklyQuestTracker from '../components/WeeklyQuestTracker';
@@ -27,7 +26,6 @@ function Dashboard({ role }) {
     const [equippedItems, setEquippedItems] = useState({});
     const [dailyQuests, setDailyQuests] = useState([]);
     const [isHazardModalOpen, setIsHazardModalOpen] = useState(false);
-    const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
     const [isAvatarWindowOpen, setIsAvatarWindowOpen] = useState(false);
     const [isHazardQuestCompleted, setIsHazardQuestCompleted] = useState(false);
     const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
@@ -205,25 +203,28 @@ function Dashboard({ role }) {
 
                 {/* GEMS AI 위험 솔루션 버튼 */}
                 <div className="mb-xl" style={{ textAlign: 'center' }}>
-                    <button
-                        className="btn btn-secondary full-width"
-                        style={{
-                            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-                            border: '1px solid #3b82f6',
-                            padding: '1rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '0.5rem',
-                            boxShadow: '0 4px 6px rgba(59, 130, 246, 0.1)'
-                        }}
-                        onClick={() => setIsRiskModalOpen(true)}
-                    >
-                        <span style={{ fontSize: '1.5rem' }}>🤖</span>
-                        <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#60a5fa' }}>
-                            안전 지능 시스템
-                        </span>
-                    </button>
+                    <Link to="/risk-solution" style={{ textDecoration: 'none' }}>
+                        <button
+                            className="btn btn-secondary full-width"
+                            style={{
+                                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                                border: '1px solid #3b82f6',
+                                padding: '1rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.5rem',
+                                boxShadow: '0 4px 6px rgba(59, 130, 246, 0.1)',
+                                width: '100%',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            <span style={{ fontSize: '1.5rem' }}>🤖</span>
+                            <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#60a5fa' }}>
+                                안전 지능 시스템
+                            </span>
+                        </button>
+                    </Link>
                     <p style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#64748b' }}>
                         현장의 위험 상황을 AI가 분석하고 조치 방안을 제시합니다.
                     </p>
@@ -292,15 +293,6 @@ function Dashboard({ role }) {
                     triggerQuestAction('check_risk', role);
 
                     loadData(); // 포인트 및 퀘스트 상태 업데이트 반영
-                }}
-            />
-
-            <RiskSolutionModal
-                isOpen={isRiskModalOpen}
-                onClose={() => setIsRiskModalOpen(false)}
-                onComplete={(result) => {
-                    console.log('GEMS Analysis Completed:', result);
-                    // 필요 시 추가 액션 (예: 포인트 지급 등)
                 }}
             />
 

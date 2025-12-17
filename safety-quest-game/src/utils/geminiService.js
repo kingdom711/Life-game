@@ -1,11 +1,17 @@
 /**
- * GEMS-Safety Advisor AI 시뮬레이션 서비스
- * 실제 Google Gemini API 연동 전, 프론트엔드 MVP를 위한 모의 서비스입니다.
+ * GEMS-Safety Advisor AI 서비스
+ * 백엔드 API 연동 버전
  */
 
 import { gemsAnalysisLogs, actionRecords } from './storage';
 
-// 모의 응답 데이터
+// 백엔드 API 기본 URL
+const API_BASE_URL = 'http://localhost:8080';
+
+// Mock 모드 설정 (백엔드 서버가 없을 때 true로 설정)
+const USE_MOCK = false;
+
+// 모의 응답 데이터 (백엔드 서버 미연결 시 폴백용)
 const MOCK_RESPONSES = [
     {
         riskFactor: '고소 작업 중 안전대 미체결',
@@ -36,9 +42,29 @@ const MOCK_RESPONSES = [
     }
 ];
 
+/**
+ * Mock 응답 생성 (폴백용)
+ */
+const getMockResponse = () => {
+    return new Promise((resolve) => {
+        const delay = Math.floor(Math.random() * 2000) + 1000;
+        setTimeout(() => {
+            const mockResponse = MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)];
+            resolve({
+                success: true,
+                riskFactor: mockResponse.riskFactor,
+                remediationSteps: mockResponse.remediation,
+                referenceCode: mockResponse.referenceCode,
+                riskLevel: 'HIGH',
+                analysisId: `mock-${Date.now()}`
+            });
+        }, delay);
+    });
+};
+
 export const geminiService = {
     /**
-     * 위험 요인 분석 요청 (Simulated)
+     * 위험 요인 분석 요청
      * @param {string} text - 위험 상황 설명
      * @param {string} photoId - (Optional) 사진 ID
      * @param {object} context - 현장 컨텍스트 (작업유형 등)
@@ -52,35 +78,111 @@ export const geminiService = {
             status: 'PENDING'
         });
 
-        // 2. AI 처리 지연 시뮬레이션 (3~5초)
-        const delay = Math.floor(Math.random() * 2000) + 3000;
+        // Mock 모드인 경우 Mock 응답 반환
+        if (USE_MOCK) {
+            console.log('[GEMS] Using Mock Response (USE_MOCK=true)');
+            const mockResult = await getMockResponse();
+            
+            // 조치 기록 초안 생성
+            const actionRecord = actionRecords.add({
+                riskFactor: mockResult.riskFactor,
+                remediationDraft: mockResult.remediationSteps.join('\n'),
+                isAiAssisted: true,
+                aiReferenceCode: mockResult.referenceCode,
+                originalLogId: log.id,
+                status: 'draft'
+            });
+            
+            return {
+                ...mockResult,
+                actionRecordId: actionRecord.id
+            };
+        }
 
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                // 3. 랜덤 응답 선택 (또는 입력 텍스트 기반 간단 매칭)
-                const mockResponse = MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)];
+        // 실제 백엔드 API 호출
+        try {
+            console.log('[GEMS] Calling Backend API:', `${API_BASE_URL}/api/v1/business-plan/generate`);
+            
+            const response = await fetch(`${API_BASE_URL}/api/v1/business-plan/generate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // 인증 토큰이 있는 경우 추가
+                    // 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                },
+                body: JSON.stringify({
+                    inputType: photoId ? 'PHOTO' : 'TEXT',
+                    inputText: text,
+                    photoId: photoId,
+                    context: context
+                })
+            });
 
-                // 4. 조치 기록 초안 생성
-                const actionRecord = actionRecords.add({
-                    riskFactor: mockResponse.riskFactor,
-                    remediationDraft: mockResponse.remediation.join('\n'),
-                    isAiAssisted: true,
-                    aiReferenceCode: mockResponse.referenceCode,
-                    originalLogId: log.id,
-                    status: 'draft'
-                });
+            // 응답 상태 확인
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('[GEMS] API Error Response:', response.status, errorText);
+                throw new Error(`API 요청 실패: ${response.status} ${response.statusText}`);
+            }
 
-                // 5. 로그 업데이트 (성공)
-                // 실제 구현에서는 update 메서드가 필요하지만 MVP에서는 생략하거나 추가 구현
+            // 응답 데이터 파싱
+            const data = await response.json();
+            console.log('[GEMS] API Response:', data);
 
-                resolve({
-                    success: true,
-                    riskFactor: mockResponse.riskFactor,
-                    remediationSteps: mockResponse.remediation,
-                    referenceCode: mockResponse.referenceCode,
-                    actionRecordId: actionRecord.id
-                });
-            }, delay);
-        });
+            // 백엔드 응답 형식에 따라 데이터 변환
+            // 백엔드가 다른 형식으로 응답할 경우 여기서 매핑
+            const result = {
+                success: true,
+                riskFactor: data.riskFactor || data.risk_factor || data.title || '위험 요인 분석 완료',
+                remediationSteps: data.remediationSteps || data.remediation_steps || data.steps || data.actions || [],
+                referenceCode: data.referenceCode || data.reference_code || data.code || 'KOSHA-AI-2024',
+                riskLevel: data.riskLevel || data.risk_level || 'MEDIUM',
+                analysisId: data.analysisId || data.analysis_id || data.id || `analysis-${Date.now()}`,
+                // 원본 응답 데이터도 포함 (디버깅용)
+                rawResponse: data
+            };
+
+            // 조치 기록 초안 생성
+            const actionRecord = actionRecords.add({
+                riskFactor: result.riskFactor,
+                remediationDraft: Array.isArray(result.remediationSteps) 
+                    ? result.remediationSteps.join('\n') 
+                    : result.remediationSteps,
+                isAiAssisted: true,
+                aiReferenceCode: result.referenceCode,
+                originalLogId: log.id,
+                status: 'draft'
+            });
+
+            return {
+                ...result,
+                actionRecordId: actionRecord.id
+            };
+
+        } catch (error) {
+            console.error('[GEMS] API Call Failed:', error);
+            
+            // 백엔드 연결 실패 시 Mock 응답으로 폴백
+            console.warn('[GEMS] Falling back to Mock Response due to API error');
+            
+            const mockResult = await getMockResponse();
+            
+            // 조치 기록 초안 생성
+            const actionRecord = actionRecords.add({
+                riskFactor: mockResult.riskFactor,
+                remediationDraft: mockResult.remediationSteps.join('\n'),
+                isAiAssisted: true,
+                aiReferenceCode: mockResult.referenceCode,
+                originalLogId: log.id,
+                status: 'draft'
+            });
+            
+            return {
+                ...mockResult,
+                actionRecordId: actionRecord.id,
+                fallback: true,
+                error: error.message
+            };
+        }
     }
 };

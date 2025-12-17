@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { geminiService } from '../utils/geminiService';
 import GEMSResultCard from './GEMSResultCard';
 
+// 디버깅용 기본 placeholder 텍스트 (완결된 문장 형태)
+const DEFAULT_RISK_TEXT = '건설 현장 2층 비계 작업 중 안전난간이 심하게 흔들리고 있습니다. 작업자 3명이 해당 구역에서 철골 용접 작업을 진행 중이며, 안전대 체결 상태가 불량하여 추락 사고 위험이 매우 높은 상황입니다.';
+
 const RiskSolutionModal = ({ isOpen, onClose, onComplete }) => {
     const [step, setStep] = useState('input'); // input, analyzing, result
     const [inputText, setInputText] = useState('');
@@ -11,16 +14,14 @@ const RiskSolutionModal = ({ isOpen, onClose, onComplete }) => {
     if (!isOpen) return null;
 
     const handleSubmit = async () => {
-        if (inputText.length < 10) {
-            setError('위험 상황을 10자 이상 구체적으로 설명해주세요.');
-            return;
-        }
+        // 입력이 비어있으면 placeholder 텍스트 사용 (디버깅 모드)
+        const textToSubmit = inputText.trim() || DEFAULT_RISK_TEXT;
 
         setStep('analyzing');
         setError(null);
 
         try {
-            const result = await geminiService.analyzeRisk(inputText);
+            const result = await geminiService.analyzeRisk(textToSubmit);
             setAnalysisResult(result);
             setStep('result');
             if (onComplete) onComplete(result);
@@ -56,11 +57,14 @@ const RiskSolutionModal = ({ isOpen, onClose, onComplete }) => {
 
                             <textarea
                                 className="risk-input"
-                                placeholder="예: 2층 비계 작업 중 안전난간이 흔들리고 있어 추락 위험이 있습니다."
+                                placeholder={DEFAULT_RISK_TEXT}
                                 value={inputText}
                                 onChange={(e) => setInputText(e.target.value)}
                                 rows={5}
                             />
+                            <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '-0.5rem', marginBottom: '1rem' }}>
+                                💡 빈 칸으로 제출하면 위 예시 문장으로 테스트됩니다.
+                            </p>
 
                             {error && <div className="error-message">{error}</div>}
 

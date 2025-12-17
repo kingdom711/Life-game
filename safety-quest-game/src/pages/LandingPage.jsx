@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import safetyEducationVideo from '../assets/안전_교육_영상.mp4';
 
-const LandingPage = ({ onEnter, onShowTeam }) => {
+const LandingPage = ({ onEnter, onShowTeam, onLogin }) => {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -56,6 +56,73 @@ const LandingPage = ({ onEnter, onShowTeam }) => {
             color: 'white',
             overflowX: 'hidden'
         }}>
+            {/* 상단 네비게이션 바 */}
+            <nav style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                padding: '1rem 2rem',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                zIndex: 100,
+                background: 'linear-gradient(180deg, rgba(26, 26, 46, 0.95) 0%, rgba(26, 26, 46, 0) 100%)',
+                backdropFilter: 'blur(10px)'
+            }}>
+                {/* 로고 */}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                }}>
+                    <img 
+                        src="/assets/safety_road_logo-removebg-preview.png" 
+                        alt="안전의 길" 
+                        style={{ width: '36px', height: '36px', objectFit: 'contain' }} 
+                    />
+                    <span style={{ 
+                        fontWeight: '700', 
+                        color: '#fbbf24',
+                        fontSize: '1.1rem'
+                    }}>
+                        안전의 길
+                    </span>
+                </div>
+
+                {/* 로그인 버튼 */}
+                <button
+                    onClick={onLogin}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.75rem 1.5rem',
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.3)',
+                        borderRadius: '50px',
+                        color: 'white',
+                        fontSize: '0.95rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        backdropFilter: 'blur(10px)'
+                    }}
+                    onMouseOver={(e) => {
+                        e.currentTarget.style.background = 'rgba(251, 191, 36, 0.2)';
+                        e.currentTarget.style.borderColor = '#fbbf24';
+                        e.currentTarget.style.color = '#fbbf24';
+                    }}
+                    onMouseOut={(e) => {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                        e.currentTarget.style.color = 'white';
+                    }}
+                >
+                    🔐 로그인
+                </button>
+            </nav>
+
             {/* Hero Section - 게이미피케이션 메인 */}
             <section style={{
                 minHeight: '100vh',
@@ -64,6 +131,7 @@ const LandingPage = ({ onEnter, onShowTeam }) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: '2rem',
+                paddingTop: '5rem',
                 textAlign: 'center',
                 position: 'relative'
             }}>

@@ -15,6 +15,7 @@ import Signup from './pages/Signup';
 import LandingPage from './pages/LandingPage';
 import TeamPage from './pages/TeamPage';
 import PricingPage from './pages/PricingPage';
+import RiskSolutionPage from './pages/RiskSolutionPage';
 
 // Components
 import RoleSelector from './components/RoleSelector';
@@ -87,6 +88,12 @@ function App() {
         setShowLandingPage(true);
     };
 
+    const handleLogin = () => {
+        setShowLandingPage(false);
+        // setShowLaunchScreen(true); // LaunchScreen 건너뛰기
+        setIsPlayingBgm(true); // 바로 게임 시작
+    };
+
     const handleSelectPlan = ({ plan, userData }) => {
         // 회원가입 처리
         setUser(userData);
@@ -99,7 +106,8 @@ function App() {
         }
         
         setShowPricingPage(false);
-        setShowLaunchScreen(true);
+        // setShowLaunchScreen(true); // LaunchScreen 건너뛰기
+        setIsPlayingBgm(true); // 바로 게임 시작
     };
 
     const handleStartGame = () => {
@@ -138,7 +146,7 @@ function App() {
                     />
 
                     {showLandingPage ? (
-                        <LandingPage onEnter={handleEnterFromLanding} onShowTeam={handleShowTeam} />
+                        <LandingPage onEnter={handleEnterFromLanding} onShowTeam={handleShowTeam} onLogin={handleLogin} />
                     ) : showTeamPage ? (
                         <TeamPage onBack={handleBackFromTeam} />
                     ) : showPricingPage ? (
@@ -160,6 +168,7 @@ function App() {
                                 <Route path="/shop" element={<Shop />} />
                                 <Route path="/inventory" element={<Inventory />} />
                                 <Route path="/profile" element={<Profile role={selectedRole} />} />
+                                <Route path="/risk-solution" element={<RiskSolutionPage />} />
                                 <Route path="*" element={<Navigate to="/" replace />} />
                             </Routes>
                         </>
