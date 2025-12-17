@@ -1,5 +1,12 @@
 # 🤖 안전 지능 시스템 (GEMS) AI API 명세서
 
+> 📚 **관련 문서**
+> - [🔗 통합 가이드 (BACKEND_INTEGRATION_GUIDE.md)](./BACKEND_INTEGRATION_GUIDE.md) - 모든 백엔드 정보 통합
+> - [🗄️ 백엔드 가이드 (Backend.md)](./Backend.md) - DB 스키마, 프로젝트 구조, 체크리스트
+> - [🔌 API 구조 (API_STRUCTURE.md)](./API_STRUCTURE.md) - 프론트엔드 API 구조 및 엔드포인트 목록
+
+---
+
 ## 개요
 
 안전의 길 프로젝트의 **안전 지능 시스템(GEMS - Generative Emergency Management System)**은 현장의 위험 상황을 AI가 분석하고 표준 조치 방안을 제시하는 핵심 기능입니다.

@@ -1,5 +1,12 @@
 # 🗄️ 안전의 길 - 백엔드 & 데이터베이스 도입 가이드
 
+> 📚 **관련 문서**
+> - [🔗 통합 가이드 (BACKEND_INTEGRATION_GUIDE.md)](./BACKEND_INTEGRATION_GUIDE.md) - 모든 백엔드 정보 통합
+> - [🔌 API 구조 (API_STRUCTURE.md)](./API_STRUCTURE.md) - 프론트엔드 API 구조 및 엔드포인트 목록
+> - [🤖 AI API 명세 (AI_GENERATION_API_SUBMIT.md)](./AI_GENERATION_API_SUBMIT.md) - GEMS AI 분석 API 상세 명세
+
+---
+
 ## 📊 현재 데이터 구조 분석
 
 현재 프로젝트는 **localStorage**를 사용하는 순수 프론트엔드 앱입니다.
