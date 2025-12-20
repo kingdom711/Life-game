@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* ==================== CSS Variables ==================== */
 :root {
   /* Colors - Safety Theme (Bright & Vibrant) */
@@ -126,7 +130,7 @@ body {
   position: relative;
 }
 
-/* 게임?�러??백그?�운???�티???�과 */
+/* 게임?�러??백그?�운???�티???�과 */
 body::before {
   content: '';
   position: fixed;
@@ -218,7 +222,7 @@ a:hover {
   flex: 1;
   padding: var(--spacing-md) 0;
   padding-bottom: calc(80px + var(--spacing-md));
-  /* ?�단 ?�비게이??공간 */
+  /* ?�단 ?�비게이??공간 */
   animation: fadeIn var(--transition-base);
 }
 
@@ -323,7 +327,7 @@ a:hover {
   justify-content: center;
   gap: var(--spacing-sm);
   padding: 0.875rem 1.25rem;
-  /* ?????�치 ?�역 */
+  /* ?????�치 ?�역 */
   border: none;
   border-radius: var(--radius-lg);
   font-family: var(--font-family);
@@ -334,7 +338,7 @@ a:hover {
   text-align: center;
   white-space: nowrap;
   min-height: 48px;
-  /* 최소 ?�치 ?�역 */
+  /* 최소 ?�치 ?�역 */
 }
 
 .btn:disabled {
@@ -703,6 +707,10 @@ a:hover {
   100% {
     transform: translateX(100%);
   }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
 }
 
 @keyframes bounce {

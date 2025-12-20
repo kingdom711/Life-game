@@ -159,18 +159,41 @@ function App() {
                         <RoleSelector onSelectRole={handleRoleSelect} />
                     ) : (
                         <>
+                            {/* 전역 배경 효과 */}
+                            <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+                                {/* 동적 배경 오브 */}
+                                <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] 
+                                  bg-gradient-to-br from-blue-400/20 via-indigo-400/15 to-purple-400/20 
+                                  rounded-full blur-[120px] animate-float" />
+                                <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] 
+                                  bg-gradient-to-br from-indigo-400/20 to-cyan-400/20 
+                                  rounded-full blur-[100px] animate-float-slow" />
+                                
+                                {/* 그리드 패턴 */}
+                                <div className="absolute inset-0 opacity-[0.02]"
+                                    style={{
+                                        backgroundImage: `
+                                            linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+                                            linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px)
+                                        `,
+                                        backgroundSize: '60px 60px'
+                                    }} />
+                            </div>
+                            
                             <Navigation />
-                            <Routes>
-                                <Route path="/" element={<Dashboard role={selectedRole} />} />
-                                <Route path="/daily" element={<DailyQuests role={selectedRole} />} />
-                                <Route path="/weekly" element={<WeeklyQuests role={selectedRole} />} />
-                                <Route path="/monthly" element={<MonthlyQuests role={selectedRole} />} />
-                                <Route path="/shop" element={<Shop />} />
-                                <Route path="/inventory" element={<Inventory />} />
-                                <Route path="/profile" element={<Profile role={selectedRole} />} />
-                                <Route path="/risk-solution" element={<RiskSolutionPage />} />
-                                <Route path="*" element={<Navigate to="/" replace />} />
-                            </Routes>
+                            <div className="relative z-10">
+                                <Routes>
+                                    <Route path="/" element={<Dashboard role={selectedRole} />} />
+                                    <Route path="/daily" element={<DailyQuests role={selectedRole} />} />
+                                    <Route path="/weekly" element={<WeeklyQuests role={selectedRole} />} />
+                                    <Route path="/monthly" element={<MonthlyQuests role={selectedRole} />} />
+                                    <Route path="/shop" element={<Shop />} />
+                                    <Route path="/inventory" element={<Inventory />} />
+                                    <Route path="/profile" element={<Profile role={selectedRole} />} />
+                                    <Route path="/risk-solution" element={<RiskSolutionPage />} />
+                                    <Route path="*" element={<Navigate to="/" replace />} />
+                                </Routes>
+                            </div>
                         </>
                     )}
                 </div>

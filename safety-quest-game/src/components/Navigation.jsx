@@ -12,15 +12,41 @@ function Navigation() {
     ];
 
     return (
-        <nav className="mobile-nav">
+        <nav className="mobile-nav backdrop-blur-2xl bg-white/80 border-t border-white/50 
+          shadow-2xl shadow-slate-900/10">
             {navItems.map(item => (
                 <Link
                     key={item.path}
                     to={item.path}
-                    className={`mobile-nav-item ${item.active ? 'active' : ''}`}
+                    className={`
+                        mobile-nav-item flex flex-col items-center justify-center p-3 rounded-xl
+                        transition-all duration-300 relative group min-w-[60px]
+                        ${item.active 
+                          ? 'bg-gradient-to-br from-blue-500/20 to-indigo-500/20 text-blue-600' 
+                          : 'text-slate-600 hover:bg-slate-100/50'
+                        }
+                    `}
                 >
-                    <div className="mobile-nav-icon">{item.icon}</div>
-                    <div className="mobile-nav-label">{item.label}</div>
+                    {/* 활성 인디케이터 */}
+                    {item.active && (
+                        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-1 h-1 
+                          bg-blue-500 rounded-full shadow-lg shadow-blue-500/50" />
+                    )}
+                    
+                    <div className="mobile-nav-icon text-2xl mb-1 group-hover:scale-110 
+                      transition-transform duration-300">
+                        {item.icon}
+                    </div>
+                    <div className="mobile-nav-label text-xs font-semibold">
+                        {item.label}
+                    </div>
+                    
+                    {/* 호버 효과 */}
+                    {!item.active && (
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 
+                          to-indigo-500/5 rounded-xl opacity-0 group-hover:opacity-100 
+                          transition-opacity duration-300" />
+                    )}
                 </Link>
             ))}
         </nav>
