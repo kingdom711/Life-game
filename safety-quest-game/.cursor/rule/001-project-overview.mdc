@@ -1,0 +1,49 @@
+---
+description: Safety Quest Game 프로젝트 개요 및 비전
+globs: ["**/*"]
+alwaysApply: true
+---
+# PROJECT OVERVIEW: Safety Quest Game (안전의 길)
+
+## Vision
+산업 현장의 안전 교육을 게이미피케이션으로 혁신하여 작업자들의 안전 의식과 실천력을 향상시키는 B2B SaaS 플랫폼.
+
+## 프로젝트 개요
+- **프로젝트명:** Safety Quest Game (안전의 길)
+- **유형:** B2B 안전 교육 게이미피케이션 플랫폼
+- **배포 형태:** Web SPA + RESTful Backend
+
+## Core Features
+- **일일/주간/월간 퀘스트:** 단계별 안전 미션 수행 시스템
+- **GEMS (안전 지능 시스템):** AI 기반 위험 상황 분석 및 조치 방안 제시
+- **캐릭터 성장 시스템:** 아바타, 장비, 레벨업 등 게이미피케이션 요소
+- **출석 체크 & 스트릭:** 지속적인 참여 유도
+- **인벤토리 & 상점:** 획득한 아이템 관리 및 교환
+
+## Target Audience
+- **기업 안전 관리자:** 팀원들의 안전 교육 참여도 관리
+- **현장 작업자:** 게임처럼 재미있게 안전 교육 수행
+- **건설/제조업 기업:** 산업안전보건법 준수 및 안전 문화 구축
+
+## 요금 체계 (B2B)
+| 플랜 | 대상 | 특징 |
+|------|------|------|
+| Free | 개인 사용자 | 기본 기능 무료 |
+| LITE | 50인 이상 | 팀 관리 기능 |
+| PREMIUM | 200인 이상 | 고급 분석 + AI 기능 |
+| ULTRA | 1000인 이상 | 맞춤형 솔루션 |
+
+## Success Metrics
+- **DAU/MAU:** 일간/월간 활성 사용자 비율
+- **퀘스트 완료율:** 사용자별 미션 완료 통계
+- **스트릭 유지율:** 연속 참여 일수
+
+## Project Philosophy
+- **안전 제일:** 모든 기능은 안전 의식 향상에 기여
+- **재미있는 학습:** 지루한 안전 교육을 게임처럼 즐겁게
+- **데이터 기반:** KOSHA 가이드 등 공인된 안전 기준 활용
+
+## See also:
+- [002-tech-stack.mdc](002-tech-stack.mdc) - 기술 스택
+- [003-development-guidelines.mdc](003-development-guidelines.mdc) - 개발 가이드라인
+- [Docs/BACKEND_INTEGRATION_GUIDE.md](../../Docs/BACKEND_INTEGRATION_GUIDE.md) - 백엔드 연동 가이드

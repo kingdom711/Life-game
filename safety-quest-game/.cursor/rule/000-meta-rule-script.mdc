@@ -1,0 +1,52 @@
+---
+description: Safety Quest Game 프로젝트 원칙 및 AI Agent 메타 규칙
+globs: ["**/*"]
+alwaysApply: true
+---
+# META RULES: SAFETY QUEST GAME 프로젝트 원칙
+
+## 1. 프로젝트 핵심 가치
+- **안전 최우선:** 모든 기능은 안전 의식 향상에 기여해야 함
+- **사용자 경험:** 게이미피케이션을 통한 재미있는 학습 경험 제공
+- **데이터 신뢰성:** KOSHA 가이드 등 공인된 안전 기준 활용
+
+## 2. 개발 철학
+- **심플함 유지:** 과도한 엔지니어링 지양, 필요한 기능만 구현
+- **점진적 개선:** MVP 우선, 이후 기능 확장
+- **문서화:** 주요 결정사항 및 API 스펙은 Docs/ 폴더에 기록
+
+## 3. AI Agent 작업 원칙
+- **코드 수정 전:** 반드시 관련 파일을 먼저 읽고 이해할 것
+- **테스트 우선:** 변경 후 영향 범위 확인
+- **한국어 응답:** 사용자 응답은 항상 한국어로
+- **문서 참조:** 백엔드 연동 시 `Docs/BACKEND_INTEGRATION_GUIDE.md` 확인
+
+## 4. 코드 품질 기준
+- **명확한 네이밍:** 변수/함수명은 의도가 드러나도록
+- **컴포넌트 분리:** 재사용 가능한 단위로 분리
+- **에러 처리:** API 호출 시 적절한 fallback 제공
+
+## 5. 폴더 구조 원칙
+```
+.cursor/rule/     → AI Agent 규칙
+Docs/             → 개발 문서
+src/api/          → API 클라이언트
+src/components/   → React 컴포넌트
+src/pages/        → 페이지 컴포넌트
+src/config/       → 환경 설정
+```
+
+## 6. 문서 간 참조
+- **프로젝트 개요:** [001-project-overview.mdc](001-project-overview.mdc)
+- **기술 스택:** [002-tech-stack.mdc](002-tech-stack.mdc)
+- **개발 가이드:** [003-development-guidelines.mdc](003-development-guidelines.mdc)
+- **백엔드 연동:** [Docs/BACKEND_INTEGRATION_GUIDE.md](../../Docs/BACKEND_INTEGRATION_GUIDE.md)
+
+## 7. 에러 해결 프로세스
+1. 현상 파악 → 2. 관련 파일 확인 → 3. 원인 분석 → 4. 수정 → 5. 테스트
+- 자세한 내용: [100-error-fixing-process.mdc](100-error-fixing-process.mdc)
+
+## 8. Git 워크플로우
+- **Conventional Commits** 형식 사용
+- **Feature Branch** 전략
+- 자세한 내용: [200-git-commit-push-pr.mdc](200-git-commit-push-pr.mdc)

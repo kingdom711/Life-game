@@ -1,0 +1,22 @@
+---
+description: "[미사용] Python/FastAPI 규칙 - 현재 프로젝트에서 사용하지 않음"
+globs: []
+alwaysApply: false
+---
+# Python & FastAPI Development Rules
+
+> ⚠️ **NOTE:** 현재 Safety Quest Game 프로젝트에서는 Python/FastAPI를 사용하지 않습니다.
+> 백엔드는 Spring Boot (Java)로 구현되어 있습니다.
+> 
+> 관련 규칙: [301-spring-boot-java-rules.mdc](301-spring-boot-java-rules.mdc)
+
+## 향후 사용 시 (참고용)
+
+### FastAPI 기본 구조
+- Router: `app/routers/` 모듈 분리
+- Validation: Pydantic v2 모델 사용
+- Async: 비동기 핸들러 권장
+
+### AI 서비스 연동
+- 현재 AI 분석은 Spring Boot 백엔드를 통해 Google Gemini API 호출
+- 별도 Python 서비스 구축 시 이 규칙 참고

@@ -1,0 +1,85 @@
+---
+description: React/Vite 프론트엔드 개발 규칙
+globs: ["src/**/*.jsx", "src/**/*.js", "src/**/*.css"]
+alwaysApply: false
+---
+# React & Vite Frontend Development Rules
+
+## 1. 컴포넌트 규칙
+- **함수형 컴포넌트:** 클래스 컴포넌트 대신 함수형 사용
+- **Hooks 활용:** useState, useEffect, useContext 등
+- **파일명:** PascalCase (예: `Dashboard.jsx`, `QuestCard.jsx`)
+- **한 파일 한 컴포넌트:** 주요 컴포넌트는 개별 파일로 분리
+
+## 2. 폴더 구조
+```
+src/
+├── api/           # API 클라이언트 모듈
+├── components/    # 재사용 가능한 컴포넌트
+├── pages/         # 라우트별 페이지 컴포넌트
+├── config/        # 환경 설정 (environment.js)
+├── utils/         # 유틸리티 함수
+├── data/          # 정적 데이터 (퀘스트, 아이템 등)
+└── styles/        # 글로벌 스타일
+```
+
+## 3. 스타일링
+- **인라인 스타일:** 컴포넌트별 스타일 객체 사용
+- **CSS 변수:** 색상, 그라데이션 등 공통 값은 변수화
+- **반응형:** 필요시 미디어 쿼리 또는 조건부 스타일 적용
+
+```jsx
+const styles = {
+  container: {
+    padding: '1rem',
+    background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+  }
+};
+```
+
+## 4. API 호출 패턴
+- **apiClient.js 사용:** fetch 직접 사용 대신 래퍼 활용
+- **에러 처리:** try-catch로 감싸고 사용자에게 피드백 제공
+- **로딩 상태:** isLoading 상태로 UI 피드백
+
+```jsx
+import { gemsApi } from '../api';
+
+const handleSubmit = async () => {
+  setLoading(true);
+  try {
+    const result = await gemsApi.analyzeRisk({ inputText });
+    setResult(result);
+  } catch (error) {
+    setError('서버 연결에 실패했습니다.');
+  } finally {
+    setLoading(false);
+  }
+};
+```
+
+## 5. 상태 관리
+- **로컬 상태:** useState (컴포넌트 내부)
+- **전역 상태:** props drilling 또는 Context API
+- **영속 상태:** localStorage (storage.js 유틸 활용)
+
+## 6. 라우팅 (React Router DOM)
+- **BrowserRouter:** 최상위 App에서 설정
+- **Route 정의:** `/dashboard`, `/inventory`, `/risk-solution` 등
+- **Link/useNavigate:** 페이지 이동 시 사용
+
+## 7. 성능 최적화
+- **React.memo:** 불필요한 리렌더링 방지
+- **useCallback/useMemo:** 함수/값 메모이제이션
+- **이미지 최적화:** public 폴더에 압축된 이미지 사용
+
+## 8. 개발 서버
+```bash
+npm run dev       # Vite 개발 서버 (http://localhost:5173)
+npm run build     # 프로덕션 빌드 (dist/)
+npm run preview   # 빌드 결과 미리보기
+```
+
+## See also:
+- [002-tech-stack.mdc](002-tech-stack.mdc) - 전체 기술 스택
+- [304-api-rest-design-rules.mdc](304-api-rest-design-rules.mdc) - API 설계 규칙

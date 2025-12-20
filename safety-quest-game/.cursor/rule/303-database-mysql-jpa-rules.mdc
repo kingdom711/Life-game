@@ -1,0 +1,92 @@
+---
+description: 데이터베이스 설계 및 JPA 사용 규칙 (H2/MySQL)
+globs: ["**/*.java", "**/*.sql", "**/*.yml"]
+alwaysApply: false
+---
+# Database & JPA Rules
+
+## 1. 데이터베이스 환경
+| 환경 | DB | 용도 |
+|------|-----|------|
+| 개발/테스트 | H2 In-Memory | 빠른 개발 및 테스트 |
+| 운영 | MySQL 8.x | 실제 데이터 저장 |
+
+### H2 설정 (application.yml)
+```yaml
+spring:
+  datasource:
+    url: jdbc:h2:mem:safetyquest;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+```
+
+## 2. 테이블 설계 규칙
+- **테이블명:** snake_case, 복수형 (예: `users`, `quest_progress`)
+- **컬럼명:** snake_case (예: `user_id`, `created_at`)
+- **Primary Key:** UUID 또는 BigInt Auto Increment
+- **감사 컬럼:** 모든 테이블에 `created_at`, `updated_at` 필수
+
+## 3. 주요 엔티티
+```
+users              # 사용자 정보
+inventory          # 보유 아이템
+quest_progress     # 퀘스트 진행 상황
+attendance_logs    # 출석 기록
+gems_analysis_logs # AI 분석 기록
+hazard_logs        # 위험 요소 기록
+```
+
+## 4. JPA Best Practices
+- **Fetch 전략:** `@ManyToOne`, `@OneToOne`은 명시적으로 `LAZY` 설정
+- **N+1 문제 방지:** `JOIN FETCH` 또는 `@EntityGraph` 사용
+- **트랜잭션:**
+  - 읽기: `@Transactional(readOnly = true)`
+  - 쓰기: `@Transactional`
+
+## 5. Entity 예시
+```java
+@Entity
+@Table(name = "users")
+@Getter
+@NoArgsConstructor
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+    
+    @Column(nullable = false, unique = true)
+    private String email;
+    
+    private String nickname;
+    private String role;
+    private Integer level = 1;
+    private Integer points = 0;
+    
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at")  
+    private LocalDateTime updatedAt;
+}
+```
+
+## 6. Repository 패턴
+```java
+public interface UserRepository extends JpaRepository<User, String> {
+    Optional<User> findByEmail(String email);
+    List<User> findByRole(String role);
+}
+```
+
+## 7. 마이그레이션
+- **도구:** Flyway 또는 Liquibase
+- **규칙:** 기존 마이그레이션 파일 수정 금지, 새 버전 파일 생성
+
+## See also:
+- [301-spring-boot-java-rules.mdc](301-spring-boot-java-rules.mdc) - Spring Boot 규칙
+- [Docs/BACKEND_INTEGRATION_GUIDE.md](../../Docs/BACKEND_INTEGRATION_GUIDE.md) - 백엔드 가이드

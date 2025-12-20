@@ -1,0 +1,83 @@
+---
+description: Spring Boot & Java 백엔드 개발 규칙
+globs: ["**/*.java"]
+alwaysApply: false
+---
+# Spring Boot & Java Development Rules
+
+## 1. 코딩 컨벤션
+- **클래스명:** PascalCase (예: `UserService`, `QuestController`)
+- **메서드/변수:** camelCase (예: `findUserById`, `questProgress`)
+- **상수:** UPPER_SNAKE_CASE (예: `MAX_LEVEL`, `DEFAULT_POINTS`)
+- **Lombok:** `@Data`, `@Builder`, `@RequiredArgsConstructor` 활용
+- **포맷:** Google Java Style Guide (4 spaces indentation)
+
+## 2. 레이어드 아키텍처
+```
+Controller → Service → Repository → Entity
+    ↓           ↓
+   DTO        Domain Logic
+```
+
+- **Controller:** HTTP 요청/응답 처리, DTO 변환
+- **Service:** 비즈니스 로직, 트랜잭션 관리
+- **Repository:** Spring Data JPA 인터페이스
+
+## 3. DTO 패턴
+- **필수:** Entity를 Controller에 직접 노출하지 않음
+- **Request/Response DTO 분리**
+```java
+// Request
+public record RiskAnalysisRequest(
+    String inputType,
+    String inputText,
+    Map<String, Object> context
+) {}
+
+// Response
+public record RiskAnalysisResponse(
+    String riskFactor,
+    List<String> remediationSteps,
+    String referenceCode
+) {}
+```
+
+## 4. 예외 처리
+- **Global Handler:** `@RestControllerAdvice` 사용
+- **커스텀 예외:** 도메인별 예외 클래스 정의
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException e) {
+        return ResponseEntity.status(404).body(new ErrorResponse("NOT_FOUND", e.getMessage()));
+    }
+}
+```
+
+## 5. API 응답 형식
+```java
+public record ApiResponse<T>(
+    boolean success,
+    T data,
+    ErrorInfo error
+) {
+    public static <T> ApiResponse<T> success(T data) {
+        return new ApiResponse<>(true, data, null);
+    }
+}
+```
+
+## 6. 의존성 주입
+- **생성자 주입** 사용 (`@RequiredArgsConstructor`)
+- 필드 `@Autowired` 사용 금지
+
+## 7. 테스트
+- **단위 테스트:** JUnit 5 + Mockito
+- **통합 테스트:** `@SpringBootTest` + H2
+- **네이밍:** `클래스명Test` / `메서드명_시나리오_기대결과`
+
+## See also:
+- [303-database-mysql-jpa-rules.mdc](303-database-mysql-jpa-rules.mdc) - DB/JPA 규칙
+- [304-api-rest-design-rules.mdc](304-api-rest-design-rules.mdc) - API 설계 규칙
+- [Docs/BACKEND_INTEGRATION_GUIDE.md](../../Docs/BACKEND_INTEGRATION_GUIDE.md) - 연동 가이드

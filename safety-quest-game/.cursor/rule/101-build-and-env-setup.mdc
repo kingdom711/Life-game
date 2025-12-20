@@ -1,0 +1,69 @@
+---
+description: Safety Quest Game 빌드 및 환경 설정 가이드
+globs: ["package.json", "vite.config.js", "*.yml", ".env*"]
+alwaysApply: false
+---
+# BUILD & ENVIRONMENT SETUP
+
+## 프론트엔드 (Vite + React)
+
+### 의존성 설치 및 실행
+```bash
+npm install          # 패키지 설치
+npm run dev          # 개발 서버 (http://localhost:5173)
+npm run build        # 프로덕션 빌드
+npm run preview      # 빌드 결과 미리보기
+```
+
+### 환경 설정 파일
+- **위치:** `src/config/environment.js`
+- **주요 변수:**
+  - `API_BASE_URL`: 백엔드 API 주소 (기본: `http://localhost:8080/api/v1`)
+  - `USE_MOCK`: Mock 모드 (true: 서버 없이 테스트)
+  - `API_TIMEOUT`: 요청 타임아웃 (기본: 30초)
+
+### Vite 프록시 설정 (vite.config.js)
+```javascript
+server: {
+  proxy: {
+    '/api': {
+      target: 'http://localhost:8080',
+      changeOrigin: true
+    }
+  }
+}
+```
+
+## 백엔드 (Spring Boot) - 별도 레포지토리
+
+### 실행 방법
+```bash
+./mvnw spring-boot:run   # Maven
+./gradlew bootRun        # Gradle
+```
+
+### H2 콘솔 접속
+- URL: `http://localhost:8080/h2-console`
+- JDBC URL: `jdbc:h2:mem:safetyquest`
+
+### 주요 환경 변수 (application.yml)
+```yaml
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:h2:mem:safetyquest
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000
+```
+
+## 배포
+
+### 프론트엔드 (Vercel)
+- `vercel.json` 설정 파일 포함
+- `npm run build` → `dist/` 폴더 배포
+
+## See also:
+- [003-development-guidelines.mdc](003-development-guidelines.mdc) - 개발 가이드
+- [Docs/BACKEND_INTEGRATION_GUIDE.md](../../Docs/BACKEND_INTEGRATION_GUIDE.md) - 백엔드 연동

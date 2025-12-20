@@ -1,0 +1,62 @@
+---
+description: Safety Quest Game 개발 표준 및 가이드라인
+globs: ["**/*"]
+alwaysApply: true
+---
+# Development Guidelines
+Referenced in: [001-project-overview.mdc](001-project-overview.mdc), [002-tech-stack.mdc](002-tech-stack.mdc)
+
+## Version Control
+- **System:** Git
+- **Repository:** GitHub
+- **Branching:** Git Flow (main, develop, feature/*, fix/*)
+- **Commit Policy:** Conventional Commits 형식
+
+## 프로젝트 실행
+```bash
+# 프론트엔드 (Vite)
+npm install
+npm run dev          # http://localhost:5173
+
+# 백엔드 (Spring Boot) - 별도 레포
+./mvnw spring-boot:run  # http://localhost:8080
+```
+
+## 환경 설정
+- **프론트엔드:** `src/config/environment.js`
+  - `API_BASE_URL`: 백엔드 API 주소
+  - `USE_MOCK`: Mock 모드 활성화 여부
+- **백엔드:** `application.yml`
+  - H2/MySQL 설정
+  - JWT 시크릿
+
+## API 연동 구조
+```
+src/api/
+├── apiClient.js    # 공통 HTTP 클라이언트
+├── authApi.js      # 인증 API
+├── userApi.js      # 사용자 API
+├── questApi.js     # 퀘스트 API
+├── inventoryApi.js # 인벤토리 API
+├── gemsApi.js      # GEMS AI API
+└── index.js        # 통합 Export
+```
+
+## 코딩 컨벤션
+- **JavaScript:** camelCase (변수/함수), PascalCase (컴포넌트)
+- **CSS:** kebab-case 또는 인라인 스타일
+- **파일명:** PascalCase (컴포넌트), camelCase (유틸)
+
+## 테스트 우선순위
+1. GEMS AI API 연동 테스트
+2. 인증/로그인 플로우
+3. 퀘스트 완료 및 보상 시스템
+
+## 문서 위치
+- **API 연동:** `Docs/BACKEND_INTEGRATION_GUIDE.md`
+- **AI API 스펙:** `Docs/AI_GENERATION_API_SUBMIT.md`
+- **API 구조:** `Docs/API_STRUCTURE.md`
+
+## See also:
+- [304-api-rest-design-rules.mdc](304-api-rest-design-rules.mdc) - REST API 규칙
+- [200-git-commit-push-pr.mdc](200-git-commit-push-pr.mdc) - Git 워크플로우
