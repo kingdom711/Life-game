@@ -1,6 +1,11 @@
-import { points, level } from './storage';
-import { equippedItems } from './storage';
-import { getItemEffect } from '../data/itemsData';
+import { points, level, equippedItems, userInventoryInstances } from './storage';
+import { getItemEffect, getItemById, getItemBaseStats } from '../data/itemsData';
+import { 
+    calculateActiveSetBonuses, 
+    sumSetBonusStats, 
+    getActiveVisualAura,
+    getNextSetBonusInfo 
+} from '../data/setsData';
 
 // 티어 정보
 export const TIERS = {
@@ -89,16 +94,145 @@ export const getPointsToNextLevel = () => {
     return currentLevel.max - currentLevel.points;
 };
 
-// 포인트 추가 (아이템 보너스 포함)
+// ===== [New] 착용 아이템 스탯 정보 가져오기 (검교정 레벨 반영) =====
+export const getEquippedItemsWithStats = () => {
+    const equipped = equippedItems.get();
+    const result = {};
+
+    Object.entries(equipped).forEach(([category, data]) => {
+        const itemId = typeof data === 'string' ? data : data?.itemId;
+        if (!itemId) return;
+
+        const item = getItemById(itemId);
+        if (!item) return;
+
+        // 인스턴스에서 검교정된 스탯 가져오기
+        const instance = userInventoryInstances.getByItemId(itemId);
+        const activeStats = instance?.activeStats || item.baseStats || { 
+            pointBoost: 0, 
+            xpAccelerator: 0, 
+            streakSaver: 0 
+        };
+
+        result[category] = {
+            itemId,
+            item,
+            instanceId: instance?.instanceId || null,
+            calibrationLevel: instance?.currentCalibrationLevel || 0,
+            setId: item.setId,
+            activeStats
+        };
+    });
+
+    return result;
+};
+
+// ===== [New] 모든 장착 아이템의 총 활성 스탯 계산 =====
+export const calculateTotalActiveStats = () => {
+    const equippedWithStats = getEquippedItemsWithStats();
+    
+    const totalStats = {
+        pointBoost: 0,
+        xpAccelerator: 0,
+        streakSaver: 0
+    };
+
+    Object.values(equippedWithStats).forEach(equipped => {
+        if (equipped?.activeStats) {
+            totalStats.pointBoost += equipped.activeStats.pointBoost || 0;
+            totalStats.xpAccelerator += equipped.activeStats.xpAccelerator || 0;
+            totalStats.streakSaver += equipped.activeStats.streakSaver || 0;
+        }
+    });
+
+    return totalStats;
+};
+
+// ===== [New] 세트 효과 계산 =====
+export const calculateSetBonuses = () => {
+    const equippedWithStats = getEquippedItemsWithStats();
+    
+    // 세트 계산용 객체 변환
+    const forSetCalc = {};
+    Object.entries(equippedWithStats).forEach(([category, data]) => {
+        forSetCalc[category] = { setId: data.setId };
+    });
+
+    return calculateActiveSetBonuses(forSetCalc);
+};
+
+// ===== [New] 세트 보너스 스탯 합계 =====
+export const getSetBonusStats = () => {
+    const activeBonuses = calculateSetBonuses();
+    return sumSetBonusStats(activeBonuses);
+};
+
+// ===== [New] 총 스탯 (아이템 + 세트 효과) =====
+export const getTotalCombinedStats = () => {
+    const itemStats = calculateTotalActiveStats();
+    const setStats = getSetBonusStats();
+
+    return {
+        pointBoost: Math.round((itemStats.pointBoost + setStats.pointBoost) * 100) / 100,
+        xpAccelerator: Math.round((itemStats.xpAccelerator + setStats.xpAccelerator) * 100) / 100,
+        streakSaver: Math.round((itemStats.streakSaver + setStats.streakSaver) * 100) / 100
+    };
+};
+
+// ===== [New] 현재 시각 효과(아우라) 가져오기 =====
+export const getVisualAura = () => {
+    const activeBonuses = calculateSetBonuses();
+    return getActiveVisualAura(activeBonuses);
+};
+
+// ===== [New] HUD용 전체 스탯 정보 =====
+export const getActiveStatsForHUD = () => {
+    const itemStats = calculateTotalActiveStats();
+    const setStats = getSetBonusStats();
+    const totalStats = getTotalCombinedStats();
+    const activeBonuses = calculateSetBonuses();
+    const visualAura = getActiveVisualAura(activeBonuses);
+
+    return {
+        // 개별 스탯
+        itemStats,
+        setStats,
+        
+        // 총합
+        totalPointBoost: totalStats.pointBoost,
+        totalXpAccelerator: totalStats.xpAccelerator,
+        totalStreakSaver: totalStats.streakSaver,
+        
+        // 세트 효과
+        activeSetBonuses: activeBonuses.map(b => ({
+            setId: b.setId,
+            setName: b.setName,
+            tier: b.tier,
+            pieceCount: b.pieceCount,
+            maxPieces: b.maxPieces,
+            bonusName: b.bonus.name,
+            bonusDescription: b.bonus.description
+        })),
+        
+        // 시각 효과
+        visualAura: visualAura?.id || null,
+        visualAuraName: visualAura?.name || null,
+        visualAuraCssClass: visualAura?.cssClass || null
+    };
+};
+
+// 포인트 추가 (아이템 보너스 + 세트 효과 포함) [Updated]
 export const addPoints = (basePoints, questType = 'all') => {
-    const bonus = calculateItemBonus(questType);
-    const totalPoints = Math.round(basePoints * (1 + bonus / 100));
+    // 새로운 스탯 시스템 사용
+    const totalStats = getTotalCombinedStats();
+    const bonusPercent = totalStats.pointBoost;
+    const totalPoints = Math.round(basePoints * (1 + bonusPercent / 100));
 
     points.add(totalPoints);
 
     return {
         basePoints,
-        bonus,
+        bonus: bonusPercent,
         totalPoints,
         newTotal: points.get()
     };
@@ -121,12 +255,13 @@ export const subtractPoints = (amount) => {
     };
 };
 
-// 아이템 착용 보너스 계산
+// 아이템 착용 보너스 계산 (Legacy 호환성 유지)
 export const calculateItemBonus = (questType = 'all') => {
     const equipped = equippedItems.get();
     let totalBonus = 0;
 
-    Object.values(equipped).forEach(itemId => {
+    Object.values(equipped).forEach(data => {
+        const itemId = typeof data === 'string' ? data : data?.itemId;
         if (!itemId) return;
 
         const effect = getItemEffect(itemId);
@@ -146,7 +281,8 @@ export const getEquippedItemEffects = () => {
     const equipped = equippedItems.get();
     const effects = [];
 
-    Object.entries(equipped).forEach(([category, itemId]) => {
+    Object.entries(equipped).forEach(([category, data]) => {
+        const itemId = typeof data === 'string' ? data : data?.itemId;
         if (!itemId) return;
 
         const effect = getItemEffect(itemId);
@@ -162,24 +298,30 @@ export const getEquippedItemEffects = () => {
     return effects;
 };
 
-// 총 보너스 퍼센트 계산
+// 총 보너스 퍼센트 계산 [Updated: 새 시스템 통합]
 export const getTotalBonusPercent = () => {
-    const effects = getEquippedItemEffects();
-    return effects.reduce((total, effect) => total + effect.bonus, 0);
+    const totalStats = getTotalCombinedStats();
+    return totalStats.pointBoost;
 };
 
-// 경험치 추가
+// 경험치 추가 (XP 가속기 적용) [Updated]
 export const addExperience = (expAmount) => {
+    const totalStats = getTotalCombinedStats();
+    const xpBonus = totalStats.xpAccelerator;
+    const boostedExp = Math.round(expAmount * (1 + xpBonus / 100));
+
     const levelData = level.get();
     const oldLevel = levelData.current;
 
-    level.addExp(expAmount);
+    level.addExp(boostedExp);
 
     const newLevelData = level.get();
     const leveledUp = newLevelData.current > oldLevel;
 
     return {
         exp: expAmount,
+        boostedExp,
+        xpBonus,
         leveledUp,
         oldLevel,
         newLevel: newLevelData.current,
@@ -201,19 +343,35 @@ export const getLevelUpReward = (newLevel) => {
     };
 };
 
-// 통계 정보 가져오기
+// 스트릭 보호 체크 [New]
+export const checkStreakProtection = () => {
+    const totalStats = getTotalCombinedStats();
+    const protectionChance = totalStats.streakSaver / 100;
+    
+    if (protectionChance <= 0) return false;
+    
+    const roll = Math.random();
+    return roll < protectionChance;
+};
+
+// 통계 정보 가져오기 [Updated]
 export const getPlayerStats = () => {
     const currentPoints = points.get();
     const currentLevel = calculateLevel(currentPoints);
     const levelData = level.get();
-    const itemBonus = getTotalBonusPercent();
+    const totalStats = getTotalCombinedStats();
+    const activeHUD = getActiveStatsForHUD();
 
     return {
         points: currentPoints,
         level: currentLevel,
         experience: levelData,
-        itemBonus,
-        pointsToNextLevel: getPointsToNextLevel()
+        itemBonus: totalStats.pointBoost,
+        xpBonus: totalStats.xpAccelerator,
+        streakProtection: totalStats.streakSaver,
+        pointsToNextLevel: getPointsToNextLevel(),
+        activeSetBonuses: activeHUD.activeSetBonuses,
+        visualAura: activeHUD.visualAura
     };
 };
 
@@ -227,5 +385,14 @@ export default {
     getTotalBonusPercent,
     addExperience,
     getLevelUpReward,
-    getPlayerStats
+    getPlayerStats,
+    // [New] Stats 2.0
+    getEquippedItemsWithStats,
+    calculateTotalActiveStats,
+    calculateSetBonuses,
+    getSetBonusStats,
+    getTotalCombinedStats,
+    getVisualAura,
+    getActiveStatsForHUD,
+    checkStreakProtection
 };

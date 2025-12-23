@@ -4,6 +4,8 @@ const STORAGE_KEYS = {
     QUEST_PROGRESS: 'safety_quest_quest_progress',
     INVENTORY: 'safety_quest_inventory',
     EQUIPPED_ITEMS: 'safety_quest_equipped_items',
+    INVENTORY_INSTANCES: 'safety_quest_inventory_instances', // [New] 아이템 인스턴스
+    CALIBRATION_LOGS: 'safety_quest_calibration_logs', // [New] 검교정 로그
     POINTS: 'safety_quest_points',
     LEVEL: 'safety_quest_level',
     STREAK: 'safety_quest_streak',
@@ -203,6 +205,175 @@ export const equippedItems = {
         const equipped = equippedItems.get();
         delete equipped[category];
         return equippedItems.set(equipped);
+    }
+};
+
+// ===== [New] 아이템 인스턴스 관리 (Item System 2.0) =====
+// instanceId 기반으로 개별 아이템의 검교정 레벨과 활성 스탯 추적
+export const userInventoryInstances = {
+    get: () => {
+        return storage.get(STORAGE_KEYS.INVENTORY_INSTANCES, []);
+    },
+
+    set: (instances) => {
+        return storage.set(STORAGE_KEYS.INVENTORY_INSTANCES, instances);
+    },
+
+    // instanceId로 아이템 인스턴스 조회
+    getByInstanceId: (instanceId) => {
+        const instances = userInventoryInstances.get();
+        return instances.find(inst => inst.instanceId === instanceId) || null;
+    },
+
+    // itemId로 아이템 인스턴스 조회
+    getByItemId: (itemId) => {
+        const instances = userInventoryInstances.get();
+        return instances.find(inst => inst.itemId === itemId) || null;
+    },
+
+    // 새 아이템 인스턴스 생성 (아이템 획득 시)
+    createInstance: (itemId, baseStats, setId = null) => {
+        const instances = userInventoryInstances.get();
+        
+        // 이미 같은 itemId의 인스턴스가 있는지 확인
+        const existing = instances.find(inst => inst.itemId === itemId);
+        if (existing) {
+            return existing; // 이미 존재하면 기존 인스턴스 반환
+        }
+
+        const newInstance = {
+            instanceId: crypto.randomUUID(),
+            itemId: itemId,
+            currentCalibrationLevel: 0,
+            setId: setId,
+            // 활성 스탯 (baseStats와 동일하게 시작)
+            activeStats: {
+                pointBoost: baseStats?.pointBoost || 0,
+                xpAccelerator: baseStats?.xpAccelerator || 0,
+                streakSaver: baseStats?.streakSaver || 0
+            },
+            // 메타데이터
+            acquiredAt: new Date().toISOString(),
+            lastCalibratedAt: null,
+            totalCalibrationAttempts: 0,
+            successfulCalibrations: 0
+        };
+
+        instances.push(newInstance);
+        userInventoryInstances.set(instances);
+        return newInstance;
+    },
+
+    // 인스턴스 업데이트 (검교정 후)
+    updateInstance: (instanceId, updates) => {
+        const instances = userInventoryInstances.get();
+        const index = instances.findIndex(inst => inst.instanceId === instanceId);
+        
+        if (index === -1) return null;
+
+        instances[index] = {
+            ...instances[index],
+            ...updates,
+            lastModifiedAt: new Date().toISOString()
+        };
+
+        userInventoryInstances.set(instances);
+        return instances[index];
+    },
+
+    // 검교정 레벨 업데이트 및 스탯 재계산
+    updateCalibrationLevel: (instanceId, newLevel, newActiveStats) => {
+        const instances = userInventoryInstances.get();
+        const index = instances.findIndex(inst => inst.instanceId === instanceId);
+        
+        if (index === -1) return null;
+
+        instances[index] = {
+            ...instances[index],
+            currentCalibrationLevel: newLevel,
+            activeStats: newActiveStats,
+            lastCalibratedAt: new Date().toISOString()
+        };
+
+        userInventoryInstances.set(instances);
+        return instances[index];
+    },
+
+    // 검교정 시도 기록
+    recordCalibrationAttempt: (instanceId, isSuccess) => {
+        const instances = userInventoryInstances.get();
+        const index = instances.findIndex(inst => inst.instanceId === instanceId);
+        
+        if (index === -1) return null;
+
+        instances[index].totalCalibrationAttempts += 1;
+        if (isSuccess) {
+            instances[index].successfulCalibrations += 1;
+        }
+
+        userInventoryInstances.set(instances);
+        return instances[index];
+    },
+
+    // 인스턴스 삭제 (아이템 판매 등)
+    removeInstance: (instanceId) => {
+        let instances = userInventoryInstances.get();
+        instances = instances.filter(inst => inst.instanceId !== instanceId);
+        return userInventoryInstances.set(instances);
+    },
+
+    // 모든 장착 중인 아이템의 인스턴스 가져오기
+    getEquippedInstances: () => {
+        const equipped = equippedItems.get();
+        const instances = userInventoryInstances.get();
+        const result = {};
+
+        Object.entries(equipped).forEach(([category, data]) => {
+            const itemId = typeof data === 'string' ? data : data?.itemId;
+            if (itemId) {
+                const instance = instances.find(inst => inst.itemId === itemId);
+                if (instance) {
+                    result[category] = instance;
+                }
+            }
+        });
+
+        return result;
+    }
+};
+
+// ===== [New] 검교정 로그 (Calibration History) =====
+export const calibrationLogs = {
+    get: () => {
+        return storage.get(STORAGE_KEYS.CALIBRATION_LOGS, []);
+    },
+
+    add: (log) => {
+        const logs = calibrationLogs.get();
+        const newLog = {
+            id: crypto.randomUUID(),
+            ...log,
+            timestamp: new Date().toISOString()
+        };
+        logs.push(newLog);
+        
+        // 최근 100개만 유지
+        if (logs.length > 100) {
+            logs.shift();
+        }
+        
+        storage.set(STORAGE_KEYS.CALIBRATION_LOGS, logs);
+        return newLog;
+    },
+
+    getByInstanceId: (instanceId) => {
+        const logs = calibrationLogs.get();
+        return logs.filter(log => log.instanceId === instanceId);
+    },
+
+    getRecent: (count = 10) => {
+        const logs = calibrationLogs.get();
+        return logs.slice(-count).reverse();
     }
 };
 
@@ -693,6 +864,8 @@ export default {
     questProgress,
     inventory,
     equippedItems,
+    userInventoryInstances,
+    calibrationLogs,
     hazardLogs,
     dailyQuestInstances,
     hazardIdentificationLogs,

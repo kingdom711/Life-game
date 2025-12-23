@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { initializeUserData, userProfile } from './utils/storage';
 import { checkAndResetQuests } from './utils/questManager';
+import { checkAndRunMigration } from './utils/dataMigration';
 
 // Pages
 import Dashboard from './pages/Dashboard';
@@ -43,6 +44,9 @@ function App() {
             try {
                 // 초기화
                 initializeUserData();
+
+                // 데이터 마이그레이션 체크 (Item System 2.0)
+                checkAndRunMigration();
 
                 // 퀘스트 리셋 체크
                 checkAndResetQuests();

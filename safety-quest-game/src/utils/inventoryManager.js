@@ -1,5 +1,6 @@
-import { inventory, equippedItems, points } from './storage';
+import { inventory, equippedItems, points, userInventoryInstances } from './storage';
 import { getItemById, getItemPrice, ITEM_CATEGORY } from '../data/itemsData';
+import { ensureItemInstance } from './calibrationService';
 
 // 아이템 구매
 export const purchaseItem = (itemId) => {
@@ -33,10 +34,14 @@ export const purchaseItem = (itemId) => {
     points.subtract(itemPrice);
     inventory.addItem(itemId);
 
+    // [New] 아이템 인스턴스 생성 (Item System 2.0)
+    const instance = ensureItemInstance(itemId);
+
     return {
         success: true,
         message: `${item.name}을(를) 구매했습니다!`,
         item,
+        instance,
         remainingPoints: points.get()
     };
 };
@@ -60,16 +65,21 @@ export const equipItem = (itemId) => {
         };
     }
 
+    // [New] 인스턴스 확인 및 생성
+    const instance = ensureItemInstance(itemId);
+    const calibrationLevel = instance?.currentCalibrationLevel || 0;
+
     // 이전에 착용 중인 아이템 확인
     const previousItem = equippedItems.getEquipped(item.category);
 
-    // 착용 처리 (기본 강화 레벨 0)
-    equippedItems.equip(item.category, itemId, 0);
+    // 착용 처리 (검교정 레벨 포함)
+    equippedItems.equip(item.category, itemId, calibrationLevel);
 
     return {
         success: true,
         message: `${item.name}을(를) 착용했습니다!`,
         item,
+        calibrationLevel,
         previousItem: previousItem ? getItemById(previousItem) : null
     };
 };
@@ -106,7 +116,7 @@ export const getEquippedItemData = (category) => {
     return equippedItems.getEquippedData(category);
 };
 
-// 모든 착용 중인 아이템 가져오기
+// 모든 착용 중인 아이템 가져오기 [Updated: 인스턴스 정보 포함]
 export const getAllEquippedItems = () => {
     const equipped = equippedItems.get();
     const items = {};
@@ -115,9 +125,15 @@ export const getAllEquippedItems = () => {
         const itemId = typeof data === 'string' ? data : data.itemId;
         const item = getItemById(itemId);
         if (item) {
+            // 인스턴스에서 검교정 레벨 가져오기
+            const instance = userInventoryInstances.getByItemId(itemId);
+            
             items[category] = {
                 ...item,
-                enhancementLevel: typeof data === 'string' ? 0 : data.enhancementLevel
+                enhancementLevel: instance?.currentCalibrationLevel || (typeof data === 'string' ? 0 : data.enhancementLevel),
+                calibrationLevel: instance?.currentCalibrationLevel || 0,
+                activeStats: instance?.activeStats || item.baseStats,
+                instanceId: instance?.instanceId || null
             };
         }
     });
@@ -129,6 +145,23 @@ export const getAllEquippedItems = () => {
 export const getInventoryItems = () => {
     const itemIds = inventory.get();
     return itemIds.map(id => getItemById(id)).filter(item => item !== undefined);
+};
+
+// [New] 인벤토리의 모든 아이템 가져오기 (인스턴스 정보 포함)
+export const getInventoryItemsWithInstances = () => {
+    const itemIds = inventory.get();
+    return itemIds.map(id => {
+        const item = getItemById(id);
+        if (!item) return null;
+        
+        const instance = userInventoryInstances.getByItemId(id);
+        return {
+            ...item,
+            instanceId: instance?.instanceId || null,
+            calibrationLevel: instance?.currentCalibrationLevel || 0,
+            activeStats: instance?.activeStats || item.baseStats
+        };
+    }).filter(item => item !== null);
 };
 
 // 특정 카테고리의 인벤토리 아이템 가져오기
@@ -148,7 +181,7 @@ export const isItemEquipped = (itemId) => {
     });
 };
 
-// 인벤토리 통계
+// 인벤토리 통계 [Updated: 검교정 정보 포함]
 export const getInventoryStats = () => {
     const items = getInventoryItems();
     const totalValue = items.reduce((sum, item) => sum + item.price, 0);
@@ -164,11 +197,18 @@ export const getInventoryStats = () => {
         categoryCounts[item.category] = (categoryCounts[item.category] || 0) + 1;
     });
 
+    // [New] 검교정 통계
+    const instances = userInventoryInstances.get();
+    const totalCalibrationLevels = instances.reduce((sum, inst) => sum + (inst.currentCalibrationLevel || 0), 0);
+    const calibratedItems = instances.filter(inst => inst.currentCalibrationLevel > 0).length;
+
     return {
         totalItems: items.length,
         totalValue,
         equippedCount,
-        categoryCounts
+        categoryCounts,
+        calibratedItems,
+        totalCalibrationLevels
     };
 };
 
@@ -193,6 +233,7 @@ export default {
     getEquippedItem,
     getAllEquippedItems,
     getInventoryItems,
+    getInventoryItemsWithInstances,
     getInventoryItemsByCategory,
     isItemEquipped,
     getInventoryStats,

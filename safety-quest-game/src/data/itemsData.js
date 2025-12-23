@@ -36,6 +36,38 @@ export const RARITY_NAMES = {
     [ITEM_RARITY.LEGENDARY]: '전설'
 };
 
+// 등급별 검교정(강화) 기본 설정
+export const CALIBRATION_CONFIGS = {
+    [ITEM_RARITY.COMMON]: {
+        maxLevel: 5,
+        costPerLevel: 200,
+        successRateBase: 0.95,
+        successRateDecay: 0.05,  // 레벨당 성공률 감소
+        statIncrement: 1.0       // 레벨당 스탯 증가폭 (%)
+    },
+    [ITEM_RARITY.RARE]: {
+        maxLevel: 7,
+        costPerLevel: 400,
+        successRateBase: 0.90,
+        successRateDecay: 0.05,
+        statIncrement: 1.5
+    },
+    [ITEM_RARITY.EPIC]: {
+        maxLevel: 10,
+        costPerLevel: 600,
+        successRateBase: 0.85,
+        successRateDecay: 0.05,
+        statIncrement: 2.0
+    },
+    [ITEM_RARITY.LEGENDARY]: {
+        maxLevel: 15,
+        costPerLevel: 1000,
+        successRateBase: 0.80,
+        successRateDecay: 0.04,
+        statIncrement: 2.5
+    }
+};
+
 // 안전용품 아이템 데이터
 export const items = [
     // ===== 안전모 (Helmet) =====
@@ -48,11 +80,19 @@ export const items = [
         description: '기본적인 머리 보호 기능을 제공하는 안전모',
         image: '/item/helmet-common.png',
         avatarLayer: '/item/helmet-common.png',
+        // [Legacy] 기존 호환성 유지
         effect: {
             type: 'quest_bonus',
             questType: 'checklist',
             bonus: 5
-        }
+        },
+        // [New] 스탯 시스템 2.0
+        baseStats: {
+            pointBoost: 5,
+            xpAccelerator: 0,
+            streakSaver: 0
+        },
+        setId: 'set_standard_worker'
     },
     {
         id: 'helmet_rare_1',
@@ -67,7 +107,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'checklist',
             bonus: 10
-        }
+        },
+        baseStats: {
+            pointBoost: 8,
+            xpAccelerator: 2,
+            streakSaver: 0
+        },
+        setId: 'set_ventilation_pro'
     },
     {
         id: 'helmet_epic_1',
@@ -82,7 +128,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'all',
             bonus: 15
-        }
+        },
+        baseStats: {
+            pointBoost: 12,
+            xpAccelerator: 5,
+            streakSaver: 3
+        },
+        setId: 'set_winter_guardian'
     },
     {
         id: 'helmet_legendary_1',
@@ -97,7 +149,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'all',
             bonus: 25
-        }
+        },
+        baseStats: {
+            pointBoost: 20,
+            xpAccelerator: 10,
+            streakSaver: 10
+        },
+        setId: 'set_neon_guardian'
     },
 
     // ===== 안전조끼 (Vest) =====
@@ -114,7 +172,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'photo',
             bonus: 5
-        }
+        },
+        baseStats: {
+            pointBoost: 5,
+            xpAccelerator: 0,
+            streakSaver: 0
+        },
+        setId: 'set_standard_worker'
     },
     {
         id: 'vest_rare_1',
@@ -129,7 +193,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'photo',
             bonus: 10
-        }
+        },
+        baseStats: {
+            pointBoost: 8,
+            xpAccelerator: 2,
+            streakSaver: 0
+        },
+        setId: 'set_ventilation_pro'
     },
     {
         id: 'vest_epic_1',
@@ -138,13 +208,19 @@ export const items = [
         rarity: ITEM_RARITY.EPIC,
         price: 800,
         description: 'LED 조명이 내장되어 어두운 곳에서도 잘 보이는 안전조끼',
-        image: '/item/vest-legendary.png', // epic 이미지 대체
+        image: '/item/vest-legendary.png',
         avatarLayer: '/item/vest-legendary.png',
         effect: {
             type: 'quest_bonus',
             questType: 'all',
             bonus: 12
-        }
+        },
+        baseStats: {
+            pointBoost: 10,
+            xpAccelerator: 4,
+            streakSaver: 2
+        },
+        setId: 'set_neon_guardian'
     },
 
     // ===== 안전장갑 (Gloves) =====
@@ -161,7 +237,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'checklist',
             bonus: 3
-        }
+        },
+        baseStats: {
+            pointBoost: 3,
+            xpAccelerator: 0,
+            streakSaver: 0
+        },
+        setId: 'set_standard_worker'
     },
     {
         id: 'gloves_rare_1',
@@ -176,7 +258,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'checklist',
             bonus: 8
-        }
+        },
+        baseStats: {
+            pointBoost: 6,
+            xpAccelerator: 2,
+            streakSaver: 0
+        },
+        setId: 'set_ventilation_pro'
     },
     {
         id: 'gloves_epic_1',
@@ -185,13 +273,19 @@ export const items = [
         rarity: ITEM_RARITY.EPIC,
         price: 1000,
         description: '전기 작업에 안전한 절연 기능이 있는 고급 장갑',
-        image: '/item/gloves-legendary.png', // epic 이미지 대체
+        image: '/item/gloves-legendary.png',
         avatarLayer: '/item/gloves-legendary.png',
         effect: {
             type: 'quest_bonus',
             questType: 'all',
             bonus: 15
-        }
+        },
+        baseStats: {
+            pointBoost: 12,
+            xpAccelerator: 5,
+            streakSaver: 3
+        },
+        setId: 'set_winter_guardian'
     },
 
     // ===== 안전화 (Shoes) =====
@@ -208,7 +302,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'checklist',
             bonus: 5
-        }
+        },
+        baseStats: {
+            pointBoost: 5,
+            xpAccelerator: 0,
+            streakSaver: 0
+        },
+        setId: 'set_standard_worker'
     },
     {
         id: 'shoes_rare_1',
@@ -223,7 +323,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'checklist',
             bonus: 10
-        }
+        },
+        baseStats: {
+            pointBoost: 8,
+            xpAccelerator: 2,
+            streakSaver: 0
+        },
+        setId: 'set_ventilation_pro'
     },
     {
         id: 'shoes_epic_1',
@@ -238,7 +344,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'all',
             bonus: 15
-        }
+        },
+        baseStats: {
+            pointBoost: 12,
+            xpAccelerator: 5,
+            streakSaver: 3
+        },
+        setId: 'set_winter_guardian'
     },
     {
         id: 'shoes_legendary_1',
@@ -253,7 +365,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'all',
             bonus: 30
-        }
+        },
+        baseStats: {
+            pointBoost: 25,
+            xpAccelerator: 12,
+            streakSaver: 8
+        },
+        setId: 'set_neon_guardian'
     },
 
     // ===== 보안경 (Glasses) =====
@@ -270,7 +388,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'photo',
             bonus: 5
-        }
+        },
+        baseStats: {
+            pointBoost: 5,
+            xpAccelerator: 0,
+            streakSaver: 0
+        },
+        setId: 'set_standard_worker'
     },
     {
         id: 'glasses_rare_1',
@@ -285,7 +409,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'photo',
             bonus: 10
-        }
+        },
+        baseStats: {
+            pointBoost: 8,
+            xpAccelerator: 2,
+            streakSaver: 0
+        },
+        setId: 'set_ventilation_pro'
     },
     {
         id: 'glasses_epic_1',
@@ -300,7 +430,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'all',
             bonus: 13
-        }
+        },
+        baseStats: {
+            pointBoost: 10,
+            xpAccelerator: 4,
+            streakSaver: 2
+        },
+        setId: 'set_neon_guardian'
     },
 
     // ===== 안전벨트 (Belt) =====
@@ -311,13 +447,19 @@ export const items = [
         rarity: ITEM_RARITY.COMMON,
         price: 300,
         description: '기본적인 추락 방지 기능이 있는 안전벨트',
-        image: '/item/belt_rare.png', // common 이미지 부재로 rare 대체
+        image: '/item/belt_rare.png',
         avatarLayer: '/item/belt_rare.png',
         effect: {
             type: 'quest_bonus',
             questType: 'checklist',
             bonus: 8
-        }
+        },
+        baseStats: {
+            pointBoost: 6,
+            xpAccelerator: 2,
+            streakSaver: 0
+        },
+        setId: 'set_standard_worker'
     },
     {
         id: 'belt_rare_1',
@@ -332,7 +474,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'checklist',
             bonus: 12
-        }
+        },
+        baseStats: {
+            pointBoost: 10,
+            xpAccelerator: 3,
+            streakSaver: 2
+        },
+        setId: 'set_ventilation_pro'
     },
     {
         id: 'belt_legendary_1',
@@ -347,7 +495,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'all',
             bonus: 20
-        }
+        },
+        baseStats: {
+            pointBoost: 18,
+            xpAccelerator: 8,
+            streakSaver: 10
+        },
+        setId: 'set_neon_guardian'
     },
 
     // ===== 방진마스크 (Mask) =====
@@ -364,7 +518,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'photo',
             bonus: 5
-        }
+        },
+        baseStats: {
+            pointBoost: 5,
+            xpAccelerator: 0,
+            streakSaver: 0
+        },
+        setId: 'set_standard_worker'
     },
     {
         id: 'mask_rare_1',
@@ -379,7 +539,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'photo',
             bonus: 10
-        }
+        },
+        baseStats: {
+            pointBoost: 8,
+            xpAccelerator: 2,
+            streakSaver: 0
+        },
+        setId: 'set_ventilation_pro'
     },
     {
         id: 'mask_epic_1',
@@ -394,7 +560,13 @@ export const items = [
             type: 'quest_bonus',
             questType: 'all',
             bonus: 15
-        }
+        },
+        baseStats: {
+            pointBoost: 12,
+            xpAccelerator: 5,
+            streakSaver: 3
+        },
+        setId: 'set_winter_guardian'
     }
 ];
 
@@ -411,6 +583,10 @@ export const getItemsByRarity = (rarity) => {
     return items.filter(item => item.rarity === rarity);
 };
 
+export const getItemsBySetId = (setId) => {
+    return items.filter(item => item.setId === setId);
+};
+
 export const getItemPrice = (itemId) => {
     const item = getItemById(itemId);
     return item ? item.price : 0;
@@ -421,6 +597,17 @@ export const getItemEffect = (itemId) => {
     return item ? item.effect : null;
 };
 
+export const getItemBaseStats = (itemId) => {
+    const item = getItemById(itemId);
+    return item?.baseStats || { pointBoost: 0, xpAccelerator: 0, streakSaver: 0 };
+};
+
+export const getCalibrationConfig = (itemId) => {
+    const item = getItemById(itemId);
+    if (!item) return null;
+    return CALIBRATION_CONFIGS[item.rarity];
+};
+
 export const getRarityColor = (rarity) => {
     const colors = {
         [ITEM_RARITY.COMMON]: '#94a3b8',
@@ -429,4 +616,21 @@ export const getRarityColor = (rarity) => {
         [ITEM_RARITY.LEGENDARY]: '#eab308'
     };
     return colors[rarity] || '#64748b';
+};
+
+// 검교정 비용 계산 (현재 레벨 기준)
+export const getCalibrationCost = (itemId, currentLevel) => {
+    const config = getCalibrationConfig(itemId);
+    if (!config) return 0;
+    // 레벨이 올라갈수록 비용 증가 (레벨 * 기본비용)
+    return config.costPerLevel * (currentLevel + 1);
+};
+
+// 검교정 성공 확률 계산 (현재 레벨 기준)
+export const getCalibrationSuccessRate = (itemId, currentLevel) => {
+    const config = getCalibrationConfig(itemId);
+    if (!config) return 0;
+    // 레벨이 올라갈수록 성공률 감소
+    const rate = config.successRateBase - (config.successRateDecay * currentLevel);
+    return Math.max(0.1, rate); // 최소 10% 보장
 };
