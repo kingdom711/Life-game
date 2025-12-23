@@ -74,7 +74,11 @@ const AvatarGearDisplay = ({ equippedItems, size = 200, slotSize = 50, onSlotCli
                 {/* 중앙 아바타 */}
                 <div className="avatar-center" style={{
                     position: 'relative',
-                    padding: '0.5rem',
+                    width: `${size}px`,
+                    height: `${size}px`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     flexShrink: 0
                 }}>
                     <Avatar equippedItems={equippedItems} size={size} roleId={roleId} />

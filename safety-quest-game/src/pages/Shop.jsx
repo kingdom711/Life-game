@@ -42,11 +42,15 @@ function Shop() {
                     </Link>
                 </div>
                 <div className="mb-12">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-slate-800 
-                      via-blue-600 to-slate-800 bg-clip-text text-transparent">
+                    <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{
+                        background: 'linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 50%, #ec4899 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text'
+                    }}>
                         🛒 아이템 상점
                     </h1>
-                    <p className="text-slate-600 text-lg mb-4">포인트로 안전용품을 구매하세요</p>
+                    <p className="text-lg mb-4" style={{ color: '#94a3b8' }}>포인트로 안전용품을 구매하세요</p>
                     <div className="mt-4">
                         <div className="points-badge">
                             💰 보유 포인트: <span className="font-bold">{currentPoints.toLocaleString()}P</span>
@@ -87,8 +91,7 @@ function Shop() {
                         };
 
                         return (
-                            <div key={item.id} className="card backdrop-blur-xl bg-gradient-to-br from-white/70 
-                              via-white/50 to-white/30 border border-white/40 rounded-2xl overflow-hidden 
+                            <div key={item.id} className="card backdrop-blur-xl rounded-2xl overflow-hidden 
                               shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 
                               group relative">
                                 {/* 희귀도별 테두리 글로우 */}
@@ -97,9 +100,9 @@ function Shop() {
                                 
                                 <div className="card-header p-4 relative z-10">
                                     <div className="text-center mb-2">
-                                        <div className="relative w-full aspect-square bg-gradient-to-br from-slate-50 to-blue-50 
+                                        <div className="relative w-full aspect-square bg-gradient-to-br from-slate-800 to-slate-900 
                                           rounded-xl mb-4 overflow-hidden transition-transform 
-                                          duration-300 flex items-center justify-center">
+                                          duration-300 flex items-center justify-center border border-slate-700">
                                             <div className="absolute inset-0 bg-gradient-to-r from-transparent 
                                               via-white/20 to-transparent -translate-x-full group-hover:translate-x-full 
                                               transition-transform duration-1000" />
@@ -127,21 +130,21 @@ function Shop() {
                                             {RARITY_NAMES[item.rarity]}
                                         </div>
                                     </div>
-                                    <h4 className="card-title text-center text-lg font-bold text-slate-800 mb-1">
+                                    <h4 className="card-title text-center text-lg font-bold mb-1" style={{ color: '#f1f5f9' }}>
                                         {item.name}
                                     </h4>
-                                    <p className="card-subtitle text-center text-sm text-slate-600">
+                                    <p className="card-subtitle text-center text-sm" style={{ color: '#94a3b8' }}>
                                         {CATEGORY_NAMES[item.category]}
                                     </p>
                                 </div>
 
                                 <div className="card-body px-4 pb-4 relative z-10">
-                                    <p className="text-sm text-slate-700 mb-4 leading-relaxed">
+                                    <p className="text-sm mb-4 leading-relaxed" style={{ color: '#cbd5e1' }}>
                                         {item.description}
                                     </p>
 
                                     <div className="mb-4">
-                                        <div className="text-slate-500 text-xs mb-2 font-semibold">
+                                        <div className="text-xs mb-2 font-semibold" style={{ color: '#94a3b8' }}>
                                             효과
                                         </div>
                                         <div className="badge badge-success bg-gradient-to-r from-emerald-500 
@@ -154,7 +157,7 @@ function Shop() {
 
                                 <div className="card-footer p-4 pt-0 relative z-10">
                                     <div className="flex justify-between items-center mb-4">
-                                        <span className="font-bold text-2xl text-slate-800">
+                                        <span className="font-bold text-2xl" style={{ color: '#f1f5f9' }}>
                                             💰 {item.price.toLocaleString()}P
                                         </span>
                                     </div>

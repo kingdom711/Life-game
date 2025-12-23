@@ -87,8 +87,15 @@ function Inventory() {
                     </Link>
                 </div>
                 <div style={{ marginBottom: '2rem' }}>
-                    <h1>🎒 인벤토리</h1>
-                    <p className="text-muted">보유 중인 안전용품을 관리하세요</p>
+                    <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{
+                        background: 'linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 50%, #ec4899 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text'
+                    }}>
+                        🎒 인벤토리
+                    </h1>
+                    <p className="text-lg" style={{ color: '#94a3b8' }}>보유 중인 안전용품을 관리하세요</p>
                 </div>
 
                 {/* 활성 스탯 HUD */}
@@ -100,20 +107,20 @@ function Inventory() {
                 <div className="grid grid-3 mb-xl">
                     <div className="card">
                         <div className="card-body text-center">
-                            <div className="text-muted mb-sm">보유 아이템</div>
-                            <div style={{ fontSize: '2rem', fontWeight: '700' }}>{stats.totalItems}</div>
+                            <div className="mb-sm" style={{ color: '#94a3b8' }}>보유 아이템</div>
+                            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#f1f5f9' }}>{stats.totalItems}</div>
                         </div>
                     </div>
                     <div className="card">
                         <div className="card-body text-center">
-                            <div className="text-muted mb-sm">착용 중</div>
-                            <div style={{ fontSize: '2rem', fontWeight: '700' }}>{stats.equippedCount}</div>
+                            <div className="mb-sm" style={{ color: '#94a3b8' }}>착용 중</div>
+                            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#f1f5f9' }}>{stats.equippedCount}</div>
                         </div>
                     </div>
                     <div className="card">
                         <div className="card-body text-center">
-                            <div className="text-muted mb-sm">총 가치</div>
-                            <div style={{ fontSize: '2rem', fontWeight: '700' }}>{stats.totalValue?.toLocaleString()}P</div>
+                            <div className="mb-sm" style={{ color: '#94a3b8' }}>총 가치</div>
+                            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#f1f5f9' }}>{stats.totalValue?.toLocaleString()}P</div>
                         </div>
                     </div>
                 </div>
@@ -123,7 +130,7 @@ function Inventory() {
                     <div className="card">
                         <div className="card-body text-center">
                             <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📦</div>
-                            <p className="text-muted">보유 중인 아이템이 없습니다.</p>
+                            <p style={{ color: '#94a3b8' }}>보유 중인 아이템이 없습니다.</p>
                             <Link to="/shop">
                                 <button className="btn btn-primary mt-md">상점으로 이동</button>
                             </Link>

@@ -165,24 +165,28 @@ function App() {
                         <RoleSelector onSelectRole={handleRoleSelect} />
                     ) : (
                         <>
-                            {/* 전역 배경 효과 */}
+                            {/* 전역 배경 효과 - Dark Theme */}
                             <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-                                {/* 동적 배경 오브 */}
-                                <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] 
-                                  bg-gradient-to-br from-blue-400/20 via-indigo-400/15 to-purple-400/20 
-                                  rounded-full blur-[120px] animate-float" />
-                                <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] 
-                                  bg-gradient-to-br from-indigo-400/20 to-cyan-400/20 
-                                  rounded-full blur-[100px] animate-float-slow" />
+                                {/* 동적 배경 오브 - 어두운 테마용 */}
+                                <div className="absolute top-1/4 left-1/4 w-[700px] h-[700px] 
+                                  bg-gradient-to-br from-blue-500/20 via-indigo-500/15 to-purple-500/20 
+                                  rounded-full blur-[140px] animate-float" />
+                                <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] 
+                                  bg-gradient-to-br from-indigo-500/20 via-purple-500/15 to-pink-500/20 
+                                  rounded-full blur-[120px] animate-float-slow" />
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] 
+                                  bg-gradient-to-br from-cyan-500/15 via-blue-500/12 to-indigo-500/15 
+                                  rounded-full blur-[100px] animate-float" 
+                                  style={{ animationDelay: '1s', animationDuration: '8s' }} />
                                 
-                                {/* 그리드 패턴 */}
-                                <div className="absolute inset-0 opacity-[0.02]"
+                                {/* 미묘한 그리드 패턴 */}
+                                <div className="absolute inset-0 opacity-[0.03]"
                                     style={{
                                         backgroundImage: `
-                                            linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
-                                            linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px)
+                                            linear-gradient(rgba(59, 130, 246, 0.15) 1px, transparent 1px),
+                                            linear-gradient(90deg, rgba(59, 130, 246, 0.15) 1px, transparent 1px)
                                         `,
-                                        backgroundSize: '60px 60px'
+                                        backgroundSize: '50px 50px'
                                     }} />
                             </div>
                             
