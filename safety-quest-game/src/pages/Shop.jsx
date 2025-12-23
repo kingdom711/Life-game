@@ -41,50 +41,34 @@ function Shop() {
                         ← 대시보드로 돌아가기
                     </Link>
                 </div>
-                <div className="mb-8">
+                <div className="mb-12">
                     <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-slate-800 
                       via-blue-600 to-slate-800 bg-clip-text text-transparent">
                         🛒 아이템 상점
                     </h1>
                     <p className="text-slate-600 text-lg mb-4">포인트로 안전용품을 구매하세요</p>
                     <div className="mt-4">
-                        <div className="badge badge-primary bg-gradient-to-r from-blue-500 to-indigo-500 
-                          text-white border-0 shadow-xl shadow-blue-500/30 text-lg px-4 py-2 rounded-full 
-                          inline-flex items-center gap-2">
+                        <div className="points-badge">
                             💰 보유 포인트: <span className="font-bold">{currentPoints.toLocaleString()}P</span>
                         </div>
                     </div>
                 </div>
 
                 {/* 필터 */}
-                <div className="mb-8 flex gap-3 flex-wrap">
+                <div className="filter-buttons">
                     <button
                         onClick={() => setFilter('all')}
-                        className={`px-5 py-2.5 rounded-2xl font-bold text-sm transition-all duration-300 relative overflow-hidden group
-                          ${filter === 'all' 
-                            ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-xl shadow-blue-500/40 border-0' 
-                            : 'backdrop-blur-xl bg-white/80 hover:bg-white/90 border border-white/50 text-slate-800 shadow-lg hover:shadow-xl hover:-translate-y-1'
-                          }`}
+                        className={`filter-btn ${filter === 'all' ? 'active' : 'inactive'}`}
                     >
-                        {filter === 'all' && (
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                        )}
-                        <span className="relative z-10">전체</span>
+                        전체
                     </button>
                     {Object.entries(CATEGORY_NAMES).map(([key, name]) => (
                         <button
                             key={key}
                             onClick={() => setFilter(key)}
-                            className={`px-5 py-2.5 rounded-2xl font-bold text-sm transition-all duration-300 relative overflow-hidden group
-                              ${filter === key 
-                                ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-xl shadow-blue-500/40 border-0' 
-                                : 'backdrop-blur-xl bg-white/80 hover:bg-white/90 border border-white/50 text-slate-800 shadow-lg hover:shadow-xl hover:-translate-y-1'
-                              }`}
+                            className={`filter-btn ${filter === key ? 'active' : 'inactive'}`}
                         >
-                            {filter === key && (
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                            )}
-                            <span className="relative z-10">{name}</span>
+                            {name}
                         </button>
                     ))}
                 </div>
@@ -109,12 +93,12 @@ function Shop() {
                               group relative">
                                 {/* 희귀도별 테두리 글로우 */}
                                 <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 
-                                  transition-opacity duration-500 ${rarityGlow[item.rarity]}`} />
+                                  transition-opacity duration-500 pointer-events-none z-0 ${rarityGlow[item.rarity]}`} />
                                 
-                                <div className="card-header p-4">
+                                <div className="card-header p-4 relative z-10">
                                     <div className="text-center mb-2">
                                         <div className="relative w-full aspect-square bg-gradient-to-br from-slate-50 to-blue-50 
-                                          rounded-xl mb-4 overflow-hidden group-hover:scale-105 transition-transform 
+                                          rounded-xl mb-4 overflow-hidden transition-transform 
                                           duration-300 flex items-center justify-center">
                                             <div className="absolute inset-0 bg-gradient-to-r from-transparent 
                                               via-white/20 to-transparent -translate-x-full group-hover:translate-x-full 
@@ -151,7 +135,7 @@ function Shop() {
                                     </p>
                                 </div>
 
-                                <div className="card-body px-4 pb-4">
+                                <div className="card-body px-4 pb-4 relative z-10">
                                     <p className="text-sm text-slate-700 mb-4 leading-relaxed">
                                         {item.description}
                                     </p>
@@ -168,37 +152,32 @@ function Shop() {
                                     </div>
                                 </div>
 
-                                <div className="card-footer p-4 pt-0">
-                                    <div className="flex justify-between items-center mb-3">
-                                        <span className="font-bold text-xl bg-gradient-to-r from-blue-600 
-                                          to-indigo-600 bg-clip-text text-transparent">
+                                <div className="card-footer p-4 pt-0 relative z-10">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <span className="font-bold text-2xl text-slate-800">
                                             💰 {item.price.toLocaleString()}P
                                         </span>
                                     </div>
 
-                                    {owned ? (
-                                        <button className="w-full py-3 bg-slate-200 text-slate-500 rounded-lg 
-                                          font-bold cursor-not-allowed shadow-none">
-                                            ✓ 보유 중
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={() => handlePurchase(item)}
-                                            className={`w-full py-3 rounded-lg font-bold transition-all duration-300 relative overflow-hidden group ${
-                                              canAfford
-                                                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 text-white hover:from-blue-500 hover:via-indigo-500 hover:to-blue-500 shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/40 hover:-translate-y-0.5'
-                                                : 'bg-slate-400 text-slate-200 cursor-not-allowed'
-                                            }`}
-                                            disabled={!canAfford}
-                                        >
-                                            {canAfford && (
-                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                                            )}
-                                            <span className="relative z-10">
+                                    <div className="flex justify-center">
+                                        {owned ? (
+                                            <button className="shop-btn shop-btn-disabled">
+                                                ✓ 보유 중
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => handlePurchase(item)}
+                                                className={`shop-btn ${
+                                                  canAfford
+                                                    ? 'shop-btn-primary'
+                                                    : 'shop-btn-disabled'
+                                                }`}
+                                                disabled={!canAfford}
+                                            >
                                                 {canAfford ? '구매하기' : '포인트 부족'}
-                                            </span>
-                                        </button>
-                                    )}
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         );

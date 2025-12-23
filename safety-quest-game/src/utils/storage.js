@@ -505,6 +505,138 @@ export const attendanceLogs = {
     }
 };
 
+// 월간 출석 보상 데이터
+export const MONTHLY_REWARDS = [
+    { day: 1, type: 'points', amount: 30, name: '30 포인트' },
+    { day: 2, type: 'points', amount: 40, name: '40 포인트' },
+    { day: 3, type: 'points', amount: 50, name: '50 포인트' },
+    { day: 4, type: 'points', amount: 60, name: '60 포인트' },
+    { day: 5, type: 'points', amount: 70, name: '70 포인트' },
+    { day: 6, type: 'points', amount: 80, name: '80 포인트' },
+    { day: 7, type: 'points', amount: 90, name: '90 포인트' },
+    { day: 8, type: 'points', amount: 100, name: '100 포인트' },
+    { day: 9, type: 'box', boxType: 'common', name: '일반 아이템 상자' },
+    { day: 10, type: 'points', amount: 150, name: '150 포인트' },
+    { day: 11, type: 'points', amount: 200, name: '200 포인트' },
+    { day: 12, type: 'box', boxType: 'rare', name: '고급 아이템 상자' },
+    { day: 13, type: 'points', amount: 250, name: '250 포인트' },
+    { day: 14, type: 'points', amount: 300, name: '300 포인트' },
+    { day: 15, type: 'box', boxType: 'epic', name: '희귀 아이템 상자' },
+    { day: 16, type: 'points', amount: 350, name: '350 포인트' },
+    { day: 17, type: 'points', amount: 400, name: '400 포인트' },
+    { day: 18, type: 'points', amount: 450, name: '450 포인트' },
+    { day: 19, type: 'box', boxType: 'legendary', name: '전설 아이템 상자' },
+    { day: 20, type: 'points', amount: 500, name: '500 포인트' },
+    { day: 21, type: 'points', amount: 600, name: '600 포인트' },
+    { day: 22, type: 'points', amount: 700, name: '700 포인트' },
+    { day: 23, type: 'points', amount: 800, name: '800 포인트' },
+    { day: 24, type: 'points', amount: 1000, name: '1000 포인트' },
+    { day: 25, type: 'box', boxType: 'special', name: '특별 아이템 상자' },
+    { day: 26, type: 'grand', amount: 2000, name: '만근 대보상 (2000P + 전설 아이템)' }
+];
+
+// 월간 출석 관리
+export const monthlyAttendance = {
+    getStorageKey: () => 'safety_quest_monthly_attendance',
+
+    getCurrentMonth: () => {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    },
+
+    get: () => {
+        const data = storage.get('safety_quest_monthly_attendance', {
+            currentMonth: null,
+            attendedDays: [],
+            claimedRewards: [],
+            totalAttendance: 0
+        });
+
+        // 월이 바뀌었으면 초기화
+        const currentMonth = monthlyAttendance.getCurrentMonth();
+        if (data.currentMonth !== currentMonth) {
+            return {
+                currentMonth: currentMonth,
+                attendedDays: [],
+                claimedRewards: [],
+                totalAttendance: 0
+            };
+        }
+
+        return data;
+    },
+
+    set: (data) => {
+        return storage.set('safety_quest_monthly_attendance', data);
+    },
+
+    // 오늘 출석 기록
+    recordAttendance: () => {
+        const data = monthlyAttendance.get();
+        const today = new Date().getDate();
+
+        if (!data.attendedDays.includes(today)) {
+            data.attendedDays.push(today);
+            data.totalAttendance = data.attendedDays.length;
+            data.currentMonth = monthlyAttendance.getCurrentMonth();
+            monthlyAttendance.set(data);
+        }
+
+        return data;
+    },
+
+    // 보상 수령
+    claimReward: (rewardDay) => {
+        const data = monthlyAttendance.get();
+
+        // 이미 수령한 보상인지 확인
+        if (data.claimedRewards.includes(rewardDay)) {
+            return { success: false, message: '이미 수령한 보상입니다.' };
+        }
+
+        // 출석일 수가 충분한지 확인
+        if (data.totalAttendance < rewardDay) {
+            return { success: false, message: '출석일이 부족합니다.' };
+        }
+
+        const reward = MONTHLY_REWARDS.find(r => r.day === rewardDay);
+        if (!reward) {
+            return { success: false, message: '보상을 찾을 수 없습니다.' };
+        }
+
+        // 보상 지급
+        if (reward.type === 'points') {
+            points.add(reward.amount);
+        } else if (reward.type === 'grand') {
+            points.add(reward.amount);
+            // 전설 아이템은 랜덤으로 지급 (예시)
+            // inventory.addItem('legendary_item');
+        }
+        // box 타입은 별도 처리 필요 (아이템 상자 시스템)
+
+        data.claimedRewards.push(rewardDay);
+        monthlyAttendance.set(data);
+
+        return { success: true, reward: reward };
+    },
+
+    // 수령 가능한 보상 목록
+    getClaimableRewards: () => {
+        const data = monthlyAttendance.get();
+        return MONTHLY_REWARDS.filter(reward =>
+            data.totalAttendance >= reward.day &&
+            !data.claimedRewards.includes(reward.day)
+        );
+    },
+
+    // 오늘 출석했는지 확인
+    hasAttendedToday: () => {
+        const data = monthlyAttendance.get();
+        const today = new Date().getDate();
+        return data.attendedDays.includes(today);
+    }
+};
+
 // 주간 퀘스트 진행도 (Weekly_Quest_Progress)
 export const weeklyQuestProgress = {
     get: () => {
@@ -555,5 +687,7 @@ export default {
     actionRecords,
     gemsAnalysisLogs,
     attendanceLogs,
-    weeklyQuestProgress
+    weeklyQuestProgress,
+    monthlyAttendance,
+    MONTHLY_REWARDS
 };

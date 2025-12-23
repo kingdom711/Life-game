@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getQuestsByTypeAndRole, QUEST_TYPE } from '../data/questsData';
 import QuestCard from '../components/QuestCard';
 import { completeQuest } from '../utils/questManager';
@@ -21,6 +22,11 @@ function DailyQuests({ role }) {
     return (
         <div className="page">
             <div className="container">
+                <div style={{ marginBottom: '1rem' }}>
+                    <Link to="/" className="btn btn-secondary btn-sm">
+                        ← 대시보드로 돌아가기
+                    </Link>
+                </div>
                 <div style={{ marginBottom: '2rem' }}>
                     <h1>📅 일간 퀘스트</h1>
                     <p className="text-muted">매일 자정에 리셋됩니다</p>

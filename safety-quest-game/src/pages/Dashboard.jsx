@@ -11,6 +11,7 @@ import HazardQuestModal from '../components/HazardQuestModal';
 import StreakButton from '../components/StreakButton';
 import DailyCheckInModal from '../components/DailyCheckInModal';
 import WeeklyQuestTracker from '../components/WeeklyQuestTracker';
+import MonthlyAttendanceModal from '../components/MonthlyAttendanceModal';
 import { completeQuest, triggerQuestAction, checkAttendance } from '../utils/questManager';
 
 import AvatarWindow from '../components/AvatarWindow';
@@ -31,6 +32,7 @@ function Dashboard({ role }) {
     const [isHazardQuestCompleted, setIsHazardQuestCompleted] = useState(false);
     const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
     const [checkInResult, setCheckInResult] = useState({ streak: 0, bonus: 0 });
+    const [isMonthlyModalOpen, setIsMonthlyModalOpen] = useState(false);
 
     useEffect(() => {
         loadData();
@@ -49,7 +51,7 @@ function Dashboard({ role }) {
             streak: currentStreak
         });
         setEquippedItems(equipped);
-        setDailyQuests(quests.slice(0, 3)); // 처음 3개만 표시
+        setDailyQuests(quests.slice(0, 4)); // 처음 4개 표시
 
         const todayInstance = dailyQuestInstances.getTodayInstance(userProfile.getName() || 'guest');
         setIsHazardQuestCompleted(todayInstance.isCompleted);
@@ -163,6 +165,7 @@ function Dashboard({ role }) {
                                         alert(result.message);
                                     }
                                 }}
+                                onShowMonthlyRewards={() => setIsMonthlyModalOpen(true)}
                             />
                         </div>
                     </div>
@@ -221,7 +224,7 @@ function Dashboard({ role }) {
 
                 {/* 주간 퀘스트 트래커 */}
                 <div className="mb-xl">
-                    <WeeklyQuestTracker />
+                    <WeeklyQuestTracker role={role} />
                 </div>
 
 
@@ -372,6 +375,11 @@ function Dashboard({ role }) {
                 onClose={() => setIsCheckInModalOpen(false)}
                 streakCount={checkInResult.streak}
                 bonus={checkInResult.bonus}
+            />
+
+            <MonthlyAttendanceModal
+                isOpen={isMonthlyModalOpen}
+                onClose={() => setIsMonthlyModalOpen(false)}
             />
 
             <AvatarWindow

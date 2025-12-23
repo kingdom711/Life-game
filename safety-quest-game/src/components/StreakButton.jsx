@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { streak } from '../utils/storage';
+import { streak, monthlyAttendance } from '../utils/storage';
 
-const StreakButton = ({ onCheckIn }) => {
+const StreakButton = ({ onCheckIn, onShowMonthlyRewards }) => {
     const [isCheckedIn, setIsCheckedIn] = useState(false);
     const [showAnimation, setShowAnimation] = useState(false);
     const [streakCount, setStreakCount] = useState(0);
@@ -34,13 +34,27 @@ const StreakButton = ({ onCheckIn }) => {
             setStreakCount(result.streak);
             setShowAnimation(true);
 
+            // 월간 출석도 기록
+            monthlyAttendance.recordAttendance();
+
             // 상위 컴포넌트에 알림
             if (onCheckIn) onCheckIn(result);
 
-            // 애니메이션 종료 후 상태 초기화
+            // 애니메이션 종료 후 월간 보상 모달 표시
             setTimeout(() => {
                 setShowAnimation(false);
+                // 월간 보상 모달 표시
+                if (onShowMonthlyRewards) onShowMonthlyRewards();
             }, 2000);
+        }
+    };
+
+    // 이미 출석한 경우 클릭 시 월간 보상 모달 표시
+    const handleClick = () => {
+        if (isCheckedIn) {
+            if (onShowMonthlyRewards) onShowMonthlyRewards();
+        } else {
+            handleCheckIn();
         }
     };
 
@@ -48,8 +62,7 @@ const StreakButton = ({ onCheckIn }) => {
         <div className="streak-button-container">
             <button
                 className={`btn-streak ${isCheckedIn ? 'checked-in' : ''}`}
-                onClick={handleCheckIn}
-                disabled={isCheckedIn}
+                onClick={handleClick}
             >
                 <div className="streak-content">
                     <span className="icon">🔥</span>

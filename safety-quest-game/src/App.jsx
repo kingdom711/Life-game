@@ -28,7 +28,8 @@ import ErrorBoundary from './components/ErrorBoundary';
 // ...
 
 function App() {
-    const [showLandingPage, setShowLandingPage] = useState(true);
+    // 랜딩페이지는 보관하되 기본적으로 비활성화 (필요시 true로 변경하여 활성화 가능)
+    const [showLandingPage, setShowLandingPage] = useState(false);
     const [showTeamPage, setShowTeamPage] = useState(false);
     const [showPricingPage, setShowPricingPage] = useState(false);
     const [showLaunchScreen, setShowLaunchScreen] = useState(false);
@@ -145,6 +146,7 @@ function App() {
                         volume={0.3}
                     />
 
+                    {/* 랜딩페이지 관련 코드 (보관용 - 필요시 showLandingPage를 true로 변경하여 활성화 가능) */}
                     {showLandingPage ? (
                         <LandingPage onEnter={handleEnterFromLanding} onShowTeam={handleShowTeam} onLogin={handleLogin} />
                     ) : showTeamPage ? (
