@@ -1,14 +1,28 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { points, level, streak, userProfile } from '../utils/storage';
-import { calculateLevel } from '../utils/pointsCalculator';
+import { calculateLevel, getPointsToNextLevel, TIERS } from '../utils/pointsCalculator';
 import { getRoleById } from '../data/rolesData';
 import { getInventoryStats } from '../utils/inventoryManager';
 
 function Profile({ role }) {
     const [stats, setStats] = useState({
         points: 0,
-        level: { name: 'Bronze', current: 1 },
+        level: { 
+            name: 'Bronze III', 
+            current: 1, 
+            color: '#cd7f32',
+            min: 0,
+            max: 10000,
+            progress: 0,
+            tier: 'bronze',
+            tierName: 'Bronze',
+            tierIcon: '🥉',
+            rank: 1,
+            subRank: 3,
+            totalRanks: 15,
+            tierRanks: 3
+        },
         streak: { current: 0, longest: 0 },
         inventory: {},
         profile: {}
@@ -89,13 +103,20 @@ function Profile({ role }) {
                         </h3>
                     </div>
                     <div className="card-body relative z-10">
-                        <div className="flex justify-between mb-8">
+                        {/* 티어 및 레벨 정보 */}
+                        <div className="flex justify-between items-start mb-6">
                             <div>
                                 <div className="text-slate-600 mb-2 text-sm font-semibold">현재 레벨</div>
-                                <div className="badge badge-primary bg-gradient-to-r from-indigo-500 to-blue-500 
-                                  text-white border-0 shadow-xl shadow-indigo-500/30 text-lg px-4 py-2 
-                                  rounded-full inline-flex items-center">
-                                    {stats.level.name}
+                                <div className="flex items-center gap-3">
+                                    <span className="text-4xl">{stats.level.tierIcon}</span>
+                                    <div>
+                                        <div className="text-2xl font-extrabold" style={{ color: stats.level.color }}>
+                                            {stats.level.name}
+                                        </div>
+                                        <div className="text-sm text-slate-500">
+                                            Rank {stats.level.rank} / {stats.level.totalRanks}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div className="text-right">
@@ -107,19 +128,75 @@ function Profile({ role }) {
                             </div>
                         </div>
 
+                        {/* 티어 진행도 */}
+                        <div className="mb-6">
+                            <div className="text-slate-600 mb-3 text-sm font-semibold">티어 진행도</div>
+                            <div className="flex gap-2">
+                                {Object.entries(TIERS).map(([tierKey, tierInfo]) => {
+                                    const isCurrentTier = stats.level.tier === tierKey;
+                                    const isPastTier = Object.keys(TIERS).indexOf(tierKey) < Object.keys(TIERS).indexOf(stats.level.tier);
+                                    return (
+                                        <div 
+                                            key={tierKey}
+                                            className={`flex-1 p-3 rounded-lg text-center transition-all duration-300 ${
+                                                isCurrentTier 
+                                                    ? 'ring-2 ring-offset-2 shadow-lg' 
+                                                    : isPastTier 
+                                                        ? 'opacity-100' 
+                                                        : 'opacity-40'
+                                            }`}
+                                            style={{ 
+                                                backgroundColor: isPastTier || isCurrentTier ? `${tierInfo.color}20` : '#f1f5f9',
+                                                borderColor: tierInfo.color,
+                                                ringColor: isCurrentTier ? tierInfo.color : 'transparent'
+                                            }}
+                                        >
+                                            <div className="text-2xl mb-1">{tierInfo.icon}</div>
+                                            <div className="text-xs font-semibold" style={{ color: isPastTier || isCurrentTier ? tierInfo.color : '#94a3b8' }}>
+                                                {tierInfo.name}
+                                            </div>
+                                            {isCurrentTier && (
+                                                <div className="text-xs text-slate-500 mt-1">
+                                                    {4 - stats.level.subRank}/3
+                                                </div>
+                                            )}
+                                            {isPastTier && (
+                                                <div className="text-xs text-emerald-500 mt-1">✓</div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* 다음 레벨까지 진행도 */}
                         <div>
                             <div className="flex justify-between mb-2">
-                                <span className="text-slate-600 text-sm font-semibold">다음 레벨까지</span>
-                                <span className="font-bold text-indigo-600">{stats.level.progress}%</span>
+                                <span className="text-slate-600 text-sm font-semibold">
+                                    다음 레벨까지
+                                </span>
+                                <span className="font-bold text-indigo-600">
+                                    {stats.level.max !== Infinity 
+                                        ? `${(stats.level.max - stats.points).toLocaleString()}P 남음`
+                                        : '최고 레벨 달성!'
+                                    }
+                                </span>
                             </div>
                             <div className="progress h-4 bg-slate-200 rounded-full overflow-hidden 
                               shadow-inner">
-                                <div className="progress-bar h-full bg-gradient-to-r from-indigo-500 
-                                  via-blue-500 to-indigo-500 rounded-full relative overflow-hidden" 
-                                  style={{ width: `${stats.level.progress}%` }}>
+                                <div className="progress-bar h-full rounded-full relative overflow-hidden" 
+                                  style={{ 
+                                      width: `${stats.level.progress}%`,
+                                      background: `linear-gradient(90deg, ${stats.level.color}, ${stats.level.color}cc)`
+                                  }}>
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent 
                                       via-white/30 to-transparent animate-shimmer" />
                                 </div>
+                            </div>
+                            <div className="flex justify-between mt-1 text-xs text-slate-500">
+                                <span>{stats.level.min.toLocaleString()}P</span>
+                                <span className="font-semibold">{stats.level.progress}%</span>
+                                <span>{stats.level.max !== Infinity ? stats.level.max.toLocaleString() + 'P' : '∞'}</span>
                             </div>
                         </div>
                     </div>

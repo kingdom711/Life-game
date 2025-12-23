@@ -356,6 +356,18 @@ export const hazardLogs = {
     }
 };
 
+// 위험요인 발굴 퀘스트 이미지 목록
+const HAZARD_QUEST_IMAGES = [
+    '/hazzard/hazzard1.png',
+    '/assets/중장비.png'
+];
+
+// 랜덤 이미지 선택 함수
+const getRandomHazardImage = () => {
+    const randomIndex = Math.floor(Math.random() * HAZARD_QUEST_IMAGES.length);
+    return HAZARD_QUEST_IMAGES[randomIndex];
+};
+
 // 일일 퀘스트 인스턴스 (Daily_Quest_Instance)
 export const dailyQuestInstances = {
     get: () => {
@@ -374,7 +386,7 @@ export const dailyQuestInstances = {
                 id: crypto.randomUUID(),
                 userId: userId,
                 questDate: today,
-                photoUrl: '/hazzard/hazzard1.png', // 기본 이미지
+                photoUrl: getRandomHazardImage(), // 랜덤 이미지 선택
                 isCompleted: false,
                 attemptCount: 0,
                 completionTimestamp: null

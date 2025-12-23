@@ -21,7 +21,14 @@ function Dashboard({ role }) {
     const navigate = useNavigate();
     const [playerStats, setPlayerStats] = useState({
         points: 0,
-        level: { name: 'Bronze', progress: 0 },
+        level: { 
+            name: 'Bronze III', 
+            progress: 0,
+            color: '#cd7f32',
+            tierIcon: '🥉',
+            rank: 1,
+            totalRanks: 15
+        },
         streak: { current: 0 }
     });
 
@@ -121,14 +128,22 @@ function Dashboard({ role }) {
                             </h4>
                         </div>
                         <div className="card-body relative z-10">
-                            <div className="text-xl font-bold mb-4 text-center text-black">
-                                {playerStats.level.name}
+                            <div className="flex items-center justify-center gap-2 mb-4">
+                                <span className="text-2xl">{playerStats.level.tierIcon}</span>
+                                <div className="text-xl font-bold text-center" style={{ color: playerStats.level.color }}>
+                                    {playerStats.level.name}
+                                </div>
+                            </div>
+                            <div className="text-center text-xs text-slate-500 mb-2">
+                                Rank {playerStats.level.rank} / {playerStats.level.totalRanks}
                             </div>
                             <div className="progress h-3 bg-slate-200 rounded-full overflow-hidden 
                               shadow-inner mb-2">
-                                <div className="progress-bar h-full bg-gradient-to-r from-indigo-500 
-                                  via-blue-500 to-indigo-500 rounded-full relative overflow-hidden" 
-                                  style={{ width: `${playerStats.level.progress}%` }}>
+                                <div className="progress-bar h-full rounded-full relative overflow-hidden" 
+                                  style={{ 
+                                      width: `${playerStats.level.progress}%`,
+                                      background: `linear-gradient(90deg, ${playerStats.level.color}, ${playerStats.level.color}cc)`
+                                  }}>
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent 
                                       via-white/30 to-transparent animate-shimmer" />
                                 </div>
