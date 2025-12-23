@@ -57,28 +57,34 @@ function Shop() {
                 </div>
 
                 {/* 필터 */}
-                <div className="mb-8 flex gap-2 flex-wrap">
+                <div className="mb-8 flex gap-3 flex-wrap">
                     <button
                         onClick={() => setFilter('all')}
-                        className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300
+                        className={`px-5 py-2.5 rounded-2xl font-bold text-sm transition-all duration-300 relative overflow-hidden group
                           ${filter === 'all' 
-                            ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg shadow-blue-500/30' 
-                            : 'backdrop-blur-sm bg-white/70 hover:bg-white/90 border border-slate-300/50 text-slate-700 shadow-md hover:shadow-lg'
+                            ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-xl shadow-blue-500/40 border-0' 
+                            : 'backdrop-blur-xl bg-white/80 hover:bg-white/90 border border-white/50 text-slate-800 shadow-lg hover:shadow-xl hover:-translate-y-1'
                           }`}
                     >
-                        전체
+                        {filter === 'all' && (
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                        )}
+                        <span className="relative z-10">전체</span>
                     </button>
                     {Object.entries(CATEGORY_NAMES).map(([key, name]) => (
                         <button
                             key={key}
                             onClick={() => setFilter(key)}
-                            className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300
+                            className={`px-5 py-2.5 rounded-2xl font-bold text-sm transition-all duration-300 relative overflow-hidden group
                               ${filter === key 
-                                ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg shadow-blue-500/30' 
-                                : 'backdrop-blur-sm bg-white/70 hover:bg-white/90 border border-slate-300/50 text-slate-700 shadow-md hover:shadow-lg'
+                                ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-xl shadow-blue-500/40 border-0' 
+                                : 'backdrop-blur-xl bg-white/80 hover:bg-white/90 border border-white/50 text-slate-800 shadow-lg hover:shadow-xl hover:-translate-y-1'
                               }`}
                         >
-                            {name}
+                            {filter === key && (
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                            )}
+                            <span className="relative z-10">{name}</span>
                         </button>
                     ))}
                 </div>
@@ -120,25 +126,12 @@ function Shop() {
                                                     onError={(e) => {
                                                         e.target.onerror = null;
                                                         e.target.style.display = 'none';
-                                                        if (e.target.nextSibling) {
-                                                            e.target.nextSibling.style.display = 'block';
-                                                        }
                                                     }}
                                                     className="w-4/5 h-4/5 object-contain 
                                                       drop-shadow-lg transition-transform duration-300 
                                                       group-hover:scale-110"
                                                 />
                                             ) : null}
-                                            <div className={`text-6xl flex items-center justify-center absolute inset-0
-                                              ${item.image ? 'hidden' : 'block'}`}>
-                                                {item.category === 'helmet' && '⛑️'}
-                                                {item.category === 'vest' && '🦺'}
-                                                {item.category === 'gloves' && '🧤'}
-                                                {item.category === 'shoes' && '👞'}
-                                                {item.category === 'glasses' && '🥽'}
-                                                {item.category === 'belt' && '🔒'}
-                                                {item.category === 'mask' && '😷'}
-                                            </div>
                                         </div>
                                         <div
                                             className="badge inline-flex items-center px-3 py-1 rounded-full text-white 

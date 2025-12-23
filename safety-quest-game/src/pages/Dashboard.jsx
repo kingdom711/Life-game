@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { points, level, streak, dailyQuestInstances, userProfile } from '../utils/storage';
 import { calculateLevel } from '../utils/pointsCalculator';
 import { getQuestsByTypeAndRole } from '../data/questsData';
@@ -17,6 +17,7 @@ import AvatarWindow from '../components/AvatarWindow';
 import AvatarGearDisplay from '../components/AvatarGearDisplay';
 
 function Dashboard({ role }) {
+    const navigate = useNavigate();
     const [playerStats, setPlayerStats] = useState({
         points: 0,
         level: { name: 'Bronze', progress: 0 },
@@ -72,7 +73,7 @@ function Dashboard({ role }) {
             <div className="container">
                 {/* 헤더 */}
                 <div className="mb-8 text-center">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-slate-800 via-blue-600 to-slate-800 bg-clip-text text-transparent">
+                    <h1 className="text-4xl md:text-5xl font-bold mb-3 text-black">
                         안전관리 대시보드
                     </h1>
                     <p className="text-slate-600 text-lg">오늘도 안전한 하루를 만들어가세요!</p>
@@ -89,14 +90,12 @@ function Dashboard({ role }) {
                           blur-3xl -translate-y-1/2 translate-x-1/2 opacity-0 group-hover:opacity-100 
                           transition-opacity duration-500" />
                         <div className="card-header relative z-10 mb-4">
-                            <h4 className="card-title text-lg font-bold bg-gradient-to-r from-slate-800 
-                              via-blue-600 to-slate-800 bg-clip-text text-transparent">
+                            <h4 className="card-title text-lg font-bold text-black">
                               💰 포인트
                             </h4>
                         </div>
                         <div className="card-body text-center relative z-10">
-                            <div className="text-4xl font-extrabold mb-2 bg-gradient-to-r from-blue-600 
-                              to-indigo-600 bg-clip-text text-transparent">
+                            <div className="text-4xl font-extrabold mb-2 text-black">
                                 {playerStats.points.toLocaleString()}
                             </div>
                             <div className="badge badge-primary bg-gradient-to-r from-blue-500 to-indigo-500 
@@ -115,14 +114,12 @@ function Dashboard({ role }) {
                           blur-3xl -translate-y-1/2 translate-x-1/2 opacity-0 group-hover:opacity-100 
                           transition-opacity duration-500" />
                         <div className="card-header relative z-10 mb-4">
-                            <h4 className="card-title text-lg font-bold bg-gradient-to-r from-indigo-600 
-                              to-blue-600 bg-clip-text text-transparent">
+                            <h4 className="card-title text-lg font-bold text-black">
                               📈 레벨 진행도
                             </h4>
                         </div>
                         <div className="card-body relative z-10">
-                            <div className="text-xl font-bold mb-4 text-center bg-gradient-to-r from-indigo-600 
-                              to-blue-600 bg-clip-text text-transparent">
+                            <div className="text-xl font-bold mb-4 text-center text-black">
                                 {playerStats.level.name}
                             </div>
                             <div className="progress h-3 bg-slate-200 rounded-full overflow-hidden 
@@ -149,8 +146,7 @@ function Dashboard({ role }) {
                           blur-3xl -translate-y-1/2 translate-x-1/2 opacity-0 group-hover:opacity-100 
                           transition-opacity duration-500" />
                         <div className="card-header relative z-10 mb-4">
-                            <h4 className="card-title text-lg font-bold bg-gradient-to-r from-orange-600 
-                              to-red-600 bg-clip-text text-transparent">
+                            <h4 className="card-title text-lg font-bold text-black">
                               🔥 연속 로그인
                             </h4>
                         </div>
@@ -180,8 +176,7 @@ function Dashboard({ role }) {
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-transparent 
                       to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="card-header flex justify-between items-center mb-4 relative z-10">
-                        <h3 className="card-title text-xl font-bold bg-gradient-to-r from-purple-600 
-                          to-blue-600 bg-clip-text text-transparent">
+                        <h3 className="card-title text-xl font-bold text-black">
                           👤 내 아바타
                         </h3>
                         <div className="flex gap-2">
@@ -271,8 +266,7 @@ function Dashboard({ role }) {
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-transparent 
                               to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                             <span className="text-2xl relative z-10">🤖</span>
-                            <span className="text-lg font-bold bg-gradient-to-r from-blue-400 via-cyan-400 
-                              to-blue-400 bg-clip-text text-transparent relative z-10">
+                            <span className="text-lg font-bold text-black relative z-10">
                                 안전 지능 시스템
                             </span>
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 
@@ -307,8 +301,7 @@ function Dashboard({ role }) {
 
                 {/* 빠른 액세스 */}
                 <div>
-                    <h3 className="mb-6 text-2xl font-bold bg-gradient-to-r from-slate-800 via-blue-600 
-                      to-slate-800 bg-clip-text text-transparent">
+                    <h3 className="mb-6 text-2xl font-bold text-black">
                         빠른 액세스
                     </h3>
                     <div className="grid grid-4 gap-4">
@@ -388,10 +381,9 @@ function Dashboard({ role }) {
                     loadData(); // 장비 변경 사항 반영
                 }}
                 onEquipRequest={(category) => {
-                    // 인벤토리로 이동하거나 인벤토리 모달을 열 수 있음
-                    // 여기서는 간단히 알림 후 닫기 (추후 구현)
+                    // 빈 슬롯 클릭 시 인벤토리로 이동
                     setIsAvatarWindowOpen(false);
-                    window.location.href = '/inventory';
+                    navigate('/inventory');
                 }}
                 roleId={role}
             />

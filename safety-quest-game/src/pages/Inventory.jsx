@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getInventoryItems, equipItem, unequipItem, isItemEquipped, getInventoryStats } from '../utils/inventoryManager';
 import { CATEGORY_NAMES, getRarityColor, RARITY_NAMES } from '../data/itemsData';
 
@@ -36,6 +37,11 @@ function Inventory() {
     return (
         <div className="page">
             <div className="container">
+                <div style={{ marginBottom: '1rem' }}>
+                    <Link to="/" className="btn btn-secondary btn-sm">
+                        ← 대시보드로 돌아가기
+                    </Link>
+                </div>
                 <div style={{ marginBottom: '2rem' }}>
                     <h1>🎒 인벤토리</h1>
                     <p className="text-muted">보유 중인 안전용품을 관리하세요</p>
@@ -69,9 +75,9 @@ function Inventory() {
                         <div className="card-body text-center">
                             <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📦</div>
                             <p className="text-muted">보유 중인 아이템이 없습니다.</p>
-                            <a href="/shop">
+                            <Link to="/shop">
                                 <button className="btn btn-primary mt-md">상점으로 이동</button>
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 ) : (
