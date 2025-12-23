@@ -1,0 +1,79 @@
+# 안전의 길 (Safety Quest) 프로젝트 규칙
+
+## 프로젝트 개요
+- React + Vite 기반 안전 교육 게이미피케이션 앱
+- LocalStorage 기반 데이터 저장 (백엔드 연동 예정)
+- Tailwind CSS + 커스텀 CSS 스타일링
+
+## 언어 규칙
+- 사용자 응답은 항상 한국어로 작성
+- 코드 주석은 한국어 허용
+- Git 커밋 메시지는 한국어 사용 가능 (UTF-8 인코딩)
+
+---
+
+## 핵심 시스템 규칙
+
+### 레벨 시스템
+- **15단계 구성**: Bronze III ~ Diamond I
+- **티어 순서**: III → II → I (I이 가장 높음)
+- **5개 티어**: Bronze, Silver, Gold, Platinum, Diamond
+- **관련 파일**: `src/utils/pointsCalculator.js`, `src/pages/Profile.jsx`, `src/pages/Dashboard.jsx`
+- **상세 문서**: `Docs/LEVEL_SYSTEM.md`
+
+### 출석 보상 시스템
+- **월간 26일 출석**으로 전체 보상 수령 가능
+- **매월 1일 자동 리셋**
+- **점진적 보상 증가**: 출석일이 늘수록 보상 가치 상승
+- **관련 파일**: `src/utils/storage.js`, `src/components/StreakButton.jsx`, `src/components/MonthlyAttendanceModal.jsx`
+- **상세 문서**: `Docs/ATTENDANCE_SYSTEM.md`
+
+### 퀘스트 시스템
+- **일일 퀘스트**: 매일 자정 리셋
+- **주간 퀘스트**: 매주 월요일 리셋
+- **월간 퀘스트**: 매월 1일 리셋
+- **역할별 퀘스트**: technician, supervisor, safety_manager
+- **관련 파일**: `src/data/questsData.js`, `src/utils/questManager.js`
+
+---
+
+## 코드 스타일
+
+### React 컴포넌트
+- 함수형 컴포넌트 + Hooks 사용
+- Props는 구조 분해 할당으로 받기
+- 컴포넌트 파일명은 PascalCase
+
+### 상태 관리
+- 전역 상태는 `src/utils/storage.js` 사용
+- LocalStorage 키 접두사: `safety_quest_`
+
+### CSS
+- Tailwind CSS 클래스 우선 사용
+- 복잡한 스타일은 인라인 스타일 객체 사용
+- `style jsx`는 사용하지 않음 (Vite 미지원)
+
+---
+
+## 파일 구조
+
+```
+src/
+├── api/          # API 클라이언트 (백엔드 연동용)
+├── components/   # 재사용 컴포넌트
+├── config/       # 환경 설정
+├── data/         # 정적 데이터 (퀘스트, 아이템, 역할)
+├── pages/        # 페이지 컴포넌트
+├── styles/       # CSS 파일
+└── utils/        # 유틸리티 함수
+```
+
+---
+
+## 주의사항
+
+1. **레벨 수정 시**: `pointsCalculator.js`의 LEVELS 객체와 Profile/Dashboard UI 동시 수정
+2. **퀘스트 추가 시**: `questsData.js`에 추가하고 역할별 필터링 확인
+3. **보상 변경 시**: `storage.js`의 보상 데이터와 모달 UI 동시 수정
+4. **새 이미지 추가 시**: `public/` 폴더에 저장
+
