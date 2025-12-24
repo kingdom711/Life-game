@@ -76,8 +76,8 @@ function Profile({ role }) {
                             </span>
                         )}
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-slate-800 
-                      via-blue-600 to-slate-800 bg-clip-text text-transparent">
+                    <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-green-600 
+                      via-teal-600 to-green-600 bg-clip-text text-transparent">
                         {stats.profile.name}
                     </h1>
                     <p className="text-slate-600 text-lg">{roleInfo?.name}</p>

@@ -27,8 +27,11 @@ function MonthlyQuests({ role }) {
                     </Link>
                 </div>
                 <div style={{ marginBottom: '2rem' }}>
-                    <h1>🏆 월간 퀘스트</h1>
-                    <p className="text-muted">매월 1일에 리셋됩니다</p>
+                    <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-orange-600 
+                      via-amber-600 to-orange-600 bg-clip-text text-transparent">
+                        🏆 월간 퀘스트
+                    </h1>
+                    <p className="text-slate-600 text-lg">매월 1일에 리셋됩니다</p>
                 </div>
 
                 <div className="grid grid-2">

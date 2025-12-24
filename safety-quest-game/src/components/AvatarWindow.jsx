@@ -77,7 +77,7 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
     // 아우라 색상 결정
     const getAuraStyles = () => {
         if (!activeAura) return {};
-        
+
         const auraColors = {
             'AURA_BLUE_GLOW': {
                 gradient: 'radial-gradient(circle at center, rgba(56, 189, 248, 0.3) 0%, transparent 70%)',
@@ -215,7 +215,7 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
                         {leftSlots.map(category => {
                             const item = equippedItems[category];
                             const calibLevel = getItemCalibrationLevel(item);
-                            
+
                             return (
                                 <div key={category} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                     <span style={{ color: '#94a3b8', fontSize: '0.8rem', width: '60px', textAlign: 'right' }}>
@@ -252,7 +252,6 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
                     {/* 중앙 아바타 */}
                     <div className={`avatar-center ${activeAura?.cssClass || ''}`} style={{
                         position: 'relative',
-                        padding: '1rem',
                         background: auraStyles.gradient || 'radial-gradient(circle at center, rgba(56, 189, 248, 0.1) 0%, transparent 70%)'
                     }}>
                         {/* 아우라 이펙트 레이어 */}
@@ -277,7 +276,7 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
                                 }} />
                             </>
                         )}
-                        
+
                         <Avatar equippedItems={equippedItems} size={300} roleId={roleId} />
 
                         {/* 아우라 이름 표시 */}
@@ -306,7 +305,7 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
                             transform: 'translateX(-50%)',
                             width: '200px',
                             height: '20px',
-                            background: activeAura 
+                            background: activeAura
                                 ? `radial-gradient(ellipse at center, ${activeAura.color || 'rgba(56, 189, 248, 0.4)'}80 0%, transparent 70%)`
                                 : 'radial-gradient(ellipse at center, rgba(56, 189, 248, 0.4) 0%, transparent 70%)',
                             borderRadius: '50%',
@@ -319,7 +318,7 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
                         {rightSlots.map(category => {
                             const item = equippedItems[category];
                             const calibLevel = getItemCalibrationLevel(item);
-                            
+
                             return (
                                 <div key={category} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                     <div style={{ position: 'relative' }}>
@@ -375,9 +374,9 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
                                     legendary: '#eab308'
                                 };
                                 const color = rarityColors[setData?.rarity] || '#94a3b8';
-                                
+
                                 return (
-                                    <div 
+                                    <div
                                         key={index}
                                         style={{
                                             padding: '0.5rem 1rem',

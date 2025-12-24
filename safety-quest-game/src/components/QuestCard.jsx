@@ -16,10 +16,10 @@ function QuestCard({ quest, onComplete }) {
     return (
         <div className={`
             quest-card
-            backdrop-blur-xl bg-white/70 border border-white/50 rounded-xl p-6
+            backdrop-blur-xl bg-slate-800/70 border border-slate-600/50 rounded-xl p-6
             transition-all duration-300 hover:-translate-y-1 hover:shadow-xl
-            ${isCompleted 
-                ? 'border-emerald-500 shadow-emerald-500/30' 
+            ${isCompleted
+                ? 'border-emerald-500 shadow-emerald-500/30'
                 : 'hover:border-blue-400/50'
             }
             ${isCompleted ? 'completed' : ''}
@@ -31,20 +31,20 @@ function QuestCard({ quest, onComplete }) {
             <div className="quest-header flex justify-between items-center mb-4 relative z-10">
                 <div className="flex items-center gap-3">
                     <span className="text-3xl">{quest.icon}</span>
-                    <h3 className="quest-title text-xl font-bold text-slate-800">{quest.title}</h3>
+                    <h3 className="quest-title text-xl font-bold text-slate-100">{quest.title}</h3>
                 </div>
                 {isCompleted ? (
                     <div className="completed-badge-icon bg-emerald-500/20 rounded-full w-10 h-10 flex items-center justify-center shadow-lg shadow-emerald-500/40">
                         <span className="glowing-checkmark text-emerald-500 text-2xl font-bold">✓</span>
                     </div>
                 ) : (
-                    <span className="quest-reward bg-blue-500/20 text-blue-600 px-3 py-1 rounded-full text-sm font-bold">
+                    <span className="quest-reward bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-sm font-bold">
                         +{quest.reward.points} P
                     </span>
                 )}
             </div>
 
-            <p className="quest-description text-slate-600 text-sm mb-6 leading-relaxed relative z-10">
+            <p className="quest-description text-slate-300 text-sm mb-6 leading-relaxed relative z-10">
                 {quest.description}
             </p>
 
@@ -67,7 +67,7 @@ function QuestCard({ quest, onComplete }) {
             </div>
 
             {isCompleted ? (
-                <button 
+                <button
                     className="btn-action completed w-full py-3 bg-slate-700 text-slate-400 border border-slate-600 rounded-lg font-bold cursor-not-allowed shadow-none relative z-10"
                     disabled
                 >
