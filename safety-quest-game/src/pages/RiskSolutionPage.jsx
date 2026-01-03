@@ -22,13 +22,22 @@ const RiskSolutionPage = () => {
 
         try {
             console.log('[RiskSolutionPage] 분석 요청 시작:', {
+                originalInput: inputText,
+                trimmedInput: inputText.trim(),
+                textToSubmit: textToSubmit,
+                isEmpty: !inputText.trim(),
                 textLength: textToSubmit.length,
-                textPreview: textToSubmit.substring(0, 50) + '...'
+                textPreview: textToSubmit.substring(0, 50) + '...',
+                fullText: textToSubmit // 전체 텍스트 확인용
             });
             
             const result = await geminiService.analyzeRisk(textToSubmit);
             
             console.log('[RiskSolutionPage] 분석 결과:', result);
+            console.log('[RiskSolutionPage] 결과 위험요인:', result.riskFactor);
+            console.log('[RiskSolutionPage] 결과 조치방안:', result.remediationSteps);
+            console.log('[RiskSolutionPage] 결과 위험수준:', result.riskLevel);
+            console.log('[RiskSolutionPage] Mock 여부:', result.fallback || result.isMock);
             
             setAnalysisResult(result);
             setStep('result');
@@ -38,7 +47,8 @@ const RiskSolutionPage = () => {
                 message: err.message,
                 status: err.status,
                 data: err.data,
-                stack: err.stack
+                stack: err.stack,
+                name: err.name
             });
             
             // 에러 메시지 구체화

@@ -70,6 +70,14 @@ const handleResponse = async (response) => {
         throw new ApiError(`서버 응답 형식 오류: ${text}`, response.status);
     }
     
+    // 응답 형식 로깅 (개발 모드)
+    if (config.DEV_MODE) {
+        console.log('[API] Parsed Response:', apiResponse);
+        console.log('[API] Response has success:', apiResponse.success !== undefined);
+        console.log('[API] Response has data:', apiResponse.data !== undefined);
+        console.log('[API] Response keys:', Object.keys(apiResponse));
+    }
+    
     // 백엔드 ApiResponse 형식 확인
     if (apiResponse.success === false) {
         // 백엔드 에러 응답 형식: { success: false, error: { code, message, details } }
@@ -84,7 +92,15 @@ const handleResponse = async (response) => {
     
     // 성공 응답: { success: true, data: T }
     // data 필드가 있으면 data를 반환, 없으면 전체 응답 반환
-    return apiResponse.data !== undefined ? apiResponse.data : apiResponse;
+    const result = apiResponse.data !== undefined ? apiResponse.data : apiResponse;
+    
+    if (config.DEV_MODE) {
+        console.log('[API] Extracted Result:', result);
+        console.log('[API] Result Type:', typeof result);
+        console.log('[API] Result Keys:', result && typeof result === 'object' ? Object.keys(result) : 'N/A');
+    }
+    
+    return result;
 };
 
 /**
@@ -161,7 +177,9 @@ const request = async (endpoint, options = {}, retryCount = 0) => {
     if (config.DEV_MODE) {
         console.log(`[API] ${options.method || 'GET'} ${url}`, {
             headers: mergedOptions.headers,
-            body: options.body ? JSON.parse(options.body) : undefined
+            body: options.body ? JSON.parse(options.body) : undefined,
+            baseUrl: config.API_BASE_URL,
+            endpoint: endpoint
         });
     }
     
@@ -207,7 +225,11 @@ const request = async (endpoint, options = {}, retryCount = 0) => {
         
         // 응답 로깅 (개발 모드)
         if (config.DEV_MODE) {
-            console.log(`[API] Response:`, data);
+            console.log(`[API] Response Status: ${response.status}`);
+            console.log(`[API] Response Headers:`, Object.fromEntries(response.headers.entries()));
+            console.log(`[API] Response Data:`, data);
+            console.log(`[API] Response Data Type:`, typeof data);
+            console.log(`[API] Response Data Keys:`, data && typeof data === 'object' ? Object.keys(data) : 'N/A');
         }
         
         return data;
@@ -218,8 +240,16 @@ const request = async (endpoint, options = {}, retryCount = 0) => {
             throw new ApiError('요청 시간이 초과되었습니다.', 408);
         }
         
-        // 네트워크 에러
-        if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        // 네트워크 에러 (다양한 케이스 처리)
+        const isNetworkError = 
+            (error instanceof TypeError && error.message === 'Failed to fetch') ||
+            error.message?.includes('Failed to fetch') ||
+            error.message?.includes('NetworkError') ||
+            error.message?.includes('ERR_CONNECTION_REFUSED') ||
+            error.message?.includes('ERR_NETWORK') ||
+            error.message?.includes('ERR_INTERNET_DISCONNECTED');
+        
+        if (isNetworkError) {
             throw new ApiError('서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.', 0);
         }
         

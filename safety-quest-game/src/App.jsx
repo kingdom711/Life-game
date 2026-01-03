@@ -145,7 +145,7 @@ function App() {
             <ErrorBoundary>
                 <div className="app" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
                     <BackgroundMusic
-                        src="/sounds/안전의길.mp3"
+                        src="/sounds/안전의 길 Rev.1.mp3"
                         isPlaying={isPlayingBgm}
                         volume={0.3}
                     />
