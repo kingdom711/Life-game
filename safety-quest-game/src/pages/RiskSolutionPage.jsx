@@ -21,11 +21,31 @@ const RiskSolutionPage = () => {
         setError(null);
 
         try {
+            console.log('[RiskSolutionPage] 분석 요청 시작:', {
+                textLength: textToSubmit.length,
+                textPreview: textToSubmit.substring(0, 50) + '...'
+            });
+            
             const result = await geminiService.analyzeRisk(textToSubmit);
+            
+            console.log('[RiskSolutionPage] 분석 결과:', result);
+            
             setAnalysisResult(result);
             setStep('result');
         } catch (err) {
-            setError('AI 분석 중 오류가 발생했습니다. 다시 시도해주세요.');
+            console.error('[RiskSolutionPage] Analysis error:', err);
+            console.error('[RiskSolutionPage] Error details:', {
+                message: err.message,
+                status: err.status,
+                data: err.data,
+                stack: err.stack
+            });
+            
+            // 에러 메시지 구체화
+            const errorMessage = err.message || 'AI 분석 중 오류가 발생했습니다.';
+            setError(errorMessage.includes('연결') || errorMessage.includes('네트워크') 
+                ? '서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.'
+                : errorMessage);
             setStep('input');
         }
     };

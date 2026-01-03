@@ -29,7 +29,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 // ...
 
 function App() {
-    // 랜딩페이지는 보관하되 기본적으로 비활성화 (필요시 true로 변경하여 활성화 가능)
+    // 랜딩페이지 비활성화
     const [showLandingPage, setShowLandingPage] = useState(false);
     const [showTeamPage, setShowTeamPage] = useState(false);
     const [showPricingPage, setShowPricingPage] = useState(false);

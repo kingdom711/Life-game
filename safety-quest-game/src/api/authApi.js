@@ -15,11 +15,12 @@ const authApi = {
     
     /**
      * 로그인
-     * @param {object} credentials - { email, password }
+     * @param {object} credentials - { username, password }
      */
     login: async (credentials) => {
         const response = await apiClient.post('/auth/login', credentials);
         
+        // 백엔드 응답 형식: { accessToken, refreshToken, tokenType, user }
         // 토큰 저장
         if (response.accessToken) {
             apiClient.token.setTokens(response.accessToken, response.refreshToken);
@@ -49,13 +50,22 @@ const authApi = {
             throw new Error('Refresh token not found');
         }
         
+        // 백엔드 요청 형식: { refreshToken }
         const response = await apiClient.post('/auth/refresh', { refreshToken });
         
+        // 백엔드 응답 형식: { accessToken, refreshToken, tokenType, user }
         if (response.accessToken) {
             apiClient.token.setTokens(response.accessToken, response.refreshToken);
         }
         
         return response;
+    },
+    
+    /**
+     * 내 정보 조회
+     */
+    getMe: async () => {
+        return apiClient.get('/auth/me');
     },
     
     /**

@@ -114,7 +114,13 @@ const gemsApi = {
         }
         
         try {
-            console.log('[GEMS API] Calling POST /api/v1/business-plan/generate');
+            const apiUrl = config.getApiUrl('/business-plan/generate');
+            console.log('[GEMS API] Calling POST', apiUrl);
+            console.log('[GEMS API] Config:', {
+                API_BASE_URL: config.API_BASE_URL,
+                USE_MOCK: config.USE_MOCK,
+                API_VERSION: config.API_VERSION
+            });
             
             // 요청 데이터 구성
             const requestBody = {
@@ -128,17 +134,19 @@ const gemsApi = {
             
             // 실제 API 호출
             // 엔드포인트: POST /api/v1/business-plan/generate
+            // 백엔드에서 Gemini API를 호출하여 위험 분석 수행
             const response = await apiClient.post('/business-plan/generate', requestBody);
             
             console.log('[GEMS API] Raw Response:', response);
             
             // 백엔드 응답 형식: { success: true, data: { riskFactor, remediationSteps, ... } }
-            // 응답 데이터 추출 (data 필드가 있으면 사용, 없으면 직접 접근)
-            const responseData = response.data || response;
+            // apiClient.post는 이미 data 필드를 추출하여 반환하므로 response가 data임
+            const responseData = response;
             
             // 응답 데이터 정규화
+            // 백엔드에서 반환하는 형식: { riskFactor, remediationSteps, referenceCode, riskLevel, ... }
             const normalizedResponse = {
-                success: response.success !== undefined ? response.success : true,
+                success: true,
                 riskFactor: responseData.riskFactor || responseData.risk_factor || '위험 요인 분석 완료',
                 remediationSteps: responseData.remediationSteps || responseData.remediation_steps || [],
                 referenceCode: responseData.referenceCode || responseData.reference_code || 'KOSHA-AI-2024',
@@ -146,6 +154,8 @@ const gemsApi = {
                 actionRecordId: responseData.actionRecordId || responseData.action_record_id || null,
                 analysisId: responseData.analysisId || responseData.analysis_id || `analysis-${Date.now()}`,
                 analyzedAt: responseData.analyzedAt || responseData.analyzed_at || new Date().toISOString(),
+                // Gemini API 사용량 정보 (백엔드에서 제공하는 경우)
+                usage: responseData.usage || null,
                 rawResponse: response
             };
             
@@ -155,16 +165,51 @@ const gemsApi = {
             
         } catch (error) {
             console.error('[GEMS API] Error:', error);
+            console.error('[GEMS API] Error details:', {
+                message: error.message,
+                status: error.status,
+                data: error.data,
+                name: error.name,
+                stack: error.stack,
+                isApiError: error instanceof ApiError,
+                errorType: error.constructor.name
+            });
             
             // 서버 연결 실패 시 Mock으로 폴백
             if (error instanceof ApiError && (error.status === 0 || error.status >= 500)) {
-                console.warn('[GEMS API] Falling back to Mock Response due to server error');
+                console.warn('[GEMS API] Falling back to Mock Response due to server error:', {
+                    status: error.status,
+                    message: error.message,
+                    apiUrl: config.getApiUrl('/business-plan/generate')
+                });
                 const mockResult = await getMockResponse();
                 return {
                     ...mockResult,
                     fallback: true,
-                    fallbackReason: error.message
+                    fallbackReason: error.message || '서버 연결 실패'
                 };
+            }
+            
+            // 네트워크 에러도 폴백 처리
+            if (!(error instanceof ApiError) && (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError'))) {
+                console.warn('[GEMS API] Falling back to Mock Response due to network error:', {
+                    message: error.message
+                });
+                const mockResult = await getMockResponse();
+                return {
+                    ...mockResult,
+                    fallback: true,
+                    fallbackReason: '네트워크 연결 실패: ' + (error.message || '알 수 없는 오류')
+                };
+            }
+            
+            // 400, 401, 403 등 클라이언트 에러는 그대로 throw
+            if (error instanceof ApiError) {
+                console.error('[GEMS API] Client error (not falling back):', {
+                    status: error.status,
+                    message: error.message,
+                    data: error.data
+                });
             }
             
             throw error;

@@ -9,6 +9,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       port: 3000,
+      host: true, // 모든 네트워크 인터페이스에서 접근 가능 (IPv4 + IPv6)
       open: true,
       // 백엔드 API 프록시 설정 (CORS 우회)
       proxy: {

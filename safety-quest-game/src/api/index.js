@@ -9,6 +9,11 @@ import questApi from './questApi';
 import inventoryApi from './inventoryApi';
 import shopApi from './shopApi';
 import gemsApi from './gemsApi';
+import checklistApi from './checklistApi';
+import templateApi from './templateApi';
+import reviewApi from './reviewApi';
+import riskApi from './riskApi';
+import aiApi from './aiApi';
 import config from '../config/environment';
 
 // 모든 API를 하나의 객체로 통합
@@ -20,6 +25,11 @@ const api = {
     inventory: inventoryApi,
     shop: shopApi,
     gems: gemsApi,
+    checklist: checklistApi,
+    template: templateApi,
+    review: reviewApi,
+    risk: riskApi,
+    ai: aiApi,
     config,
 };
 
@@ -33,6 +43,11 @@ export {
     inventoryApi,
     shopApi,
     gemsApi,
+    checklistApi,
+    templateApi,
+    reviewApi,
+    riskApi,
+    aiApi,
     config,
 };
 

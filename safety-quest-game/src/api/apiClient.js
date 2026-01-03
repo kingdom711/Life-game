@@ -51,6 +51,7 @@ const getDefaultHeaders = () => {
 
 /**
  * 응답 처리
+ * 백엔드 ApiResponse 형식에 맞게 처리: { success: boolean, data: T, error: { code, message, details } }
  */
 const handleResponse = async (response) => {
     // 응답 본문이 없는 경우 (204 No Content 등)
@@ -59,28 +60,87 @@ const handleResponse = async (response) => {
     }
     
     // 응답 본문 파싱
-    let data;
+    let apiResponse;
     const contentType = response.headers.get('content-type');
     
     if (contentType && contentType.includes('application/json')) {
-        data = await response.json();
+        apiResponse = await response.json();
     } else {
-        data = await response.text();
+        const text = await response.text();
+        throw new ApiError(`서버 응답 형식 오류: ${text}`, response.status);
     }
     
-    // 에러 응답 처리
-    if (!response.ok) {
-        const errorMessage = data?.message || data?.error || `API Error: ${response.status}`;
-        throw new ApiError(errorMessage, response.status, data);
+    // 백엔드 ApiResponse 형식 확인
+    if (apiResponse.success === false) {
+        // 백엔드 에러 응답 형식: { success: false, error: { code, message, details } }
+        const error = apiResponse.error || {};
+        const errorMessage = error.message || `API Error: ${response.status}`;
+        throw new ApiError(errorMessage, response.status, {
+            code: error.code,
+            message: error.message,
+            details: error.details
+        });
     }
     
-    return data;
+    // 성공 응답: { success: true, data: T }
+    // data 필드가 있으면 data를 반환, 없으면 전체 응답 반환
+    return apiResponse.data !== undefined ? apiResponse.data : apiResponse;
+};
+
+/**
+ * 토큰 갱신 시도
+ */
+let isRefreshing = false;
+let refreshPromise = null;
+
+const attemptTokenRefresh = async () => {
+    if (isRefreshing) {
+        return refreshPromise;
+    }
+    
+    isRefreshing = true;
+    refreshPromise = (async () => {
+        try {
+            const refreshToken = tokenManager.getRefreshToken();
+            if (!refreshToken) {
+                throw new Error('Refresh token not found');
+            }
+            
+            const url = config.getApiUrl('/auth/refresh');
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ refreshToken }),
+            });
+            
+            const apiResponse = await response.json();
+            
+            if (apiResponse.success && apiResponse.data) {
+                const { accessToken, refreshToken: newRefreshToken } = apiResponse.data;
+                tokenManager.setTokens(accessToken, newRefreshToken);
+                return { accessToken, refreshToken: newRefreshToken };
+            } else {
+                throw new Error(apiResponse.error?.message || 'Token refresh failed');
+            }
+        } catch (error) {
+            tokenManager.clearTokens();
+            throw error;
+        } finally {
+            isRefreshing = false;
+            refreshPromise = null;
+        }
+    })();
+    
+    return refreshPromise;
 };
 
 /**
  * API 요청 함수
+ * 401 에러 시 자동 토큰 갱신 시도
  */
-const request = async (endpoint, options = {}) => {
+const request = async (endpoint, options = {}, retryCount = 0) => {
     const url = config.getApiUrl(endpoint);
     
     const defaultOptions = {
@@ -116,6 +176,32 @@ const request = async (endpoint, options = {}) => {
         });
         
         clearTimeout(timeoutId);
+        
+        // 401 에러 처리 (토큰 만료 또는 유효하지 않음)
+        if (response.status === 401 && retryCount === 0) {
+            // 인증 엔드포인트는 재시도하지 않음
+            if (endpoint.includes('/auth/login') || endpoint.includes('/auth/refresh')) {
+                const data = await handleResponse(response);
+                return data;
+            }
+            
+            // 토큰 갱신 시도
+            try {
+                await attemptTokenRefresh();
+                
+                // 토큰 갱신 성공 시 원래 요청 재시도
+                const newHeaders = getDefaultHeaders();
+                mergedOptions.headers = {
+                    ...mergedOptions.headers,
+                    ...newHeaders,
+                };
+                
+                return request(endpoint, mergedOptions, retryCount + 1);
+            } catch (refreshError) {
+                // 토큰 갱신 실패 시 에러 throw
+                throw new ApiError('인증이 만료되었습니다. 다시 로그인해주세요.', 401);
+            }
+        }
         
         const data = await handleResponse(response);
         

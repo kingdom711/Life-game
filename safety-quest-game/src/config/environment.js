@@ -8,7 +8,7 @@ const config = {
     API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
     
     // Mock 모드 (백엔드 서버 없을 때 true)
-    USE_MOCK: import.meta.env.VITE_USE_MOCK === 'true' || false,
+    USE_MOCK: import.meta.env.VITE_USE_MOCK === 'true',
     
     // API 타임아웃 (밀리초)
     API_TIMEOUT: parseInt(import.meta.env.VITE_API_TIMEOUT) || 30000,

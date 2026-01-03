@@ -244,8 +244,18 @@ function Dashboard({ role }) {
                 </div>
 
 
-                {/* 찾아라 위험! 일일 퀘스트 */}
-                <div className="mb-xl" style={{ textAlign: 'center' }}>
+                {/* 찾아라 위험! 일일 퀘스트 & 안전 지능 시스템 */}
+                <div className="mb-xl" style={{ 
+                    display: 'flex', 
+                    gap: '1rem', 
+                    justifyContent: 'center', 
+                    alignItems: 'stretch',
+                    flexWrap: 'wrap',
+                    width: '100%',
+                    margin: '0 auto',
+                    textAlign: 'center'
+                }}>
+                    {/* 찾아라 위험! 버튼 */}
                     <div
                         className={`quest-trigger-card ${isHazardQuestCompleted ? 'completed' : ''}`}
                         onClick={() => {
@@ -254,6 +264,12 @@ function Dashboard({ role }) {
                                 return;
                             }
                             setIsHazardModalOpen(true);
+                        }}
+                        style={{
+                            flex: '0 0 auto',
+                            width: '400px',
+                            maxWidth: '400px',
+                            margin: '0'
                         }}
                     >
                         <div className="icon">
@@ -271,31 +287,89 @@ function Dashboard({ role }) {
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {/* GEMS AI 위험 솔루션 버튼 */}
-                <div className="mb-xl text-center">
-                    <Link to="/risk-solution" className="no-underline">
-                        <button
-                            className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 
-                              to-slate-900 border border-blue-500/30 shadow-2xl shadow-blue-500/20 
-                              hover:shadow-blue-500/40 hover:border-blue-500/50 transition-all duration-500 
-                              hover:-translate-y-1 relative overflow-hidden group flex items-center justify-center gap-3"
+                    {/* GEMS AI 안전 지능 시스템 버튼 */}
+                    <Link to="/risk-solution" className="no-underline" style={{ 
+                        flex: '0 0 auto',
+                        width: '400px',
+                        maxWidth: '400px',
+                        display: 'flex',
+                        margin: '0'
+                    }}>
+                        <div
+                            className="gemini-quest-card"
+                            style={{
+                                position: 'relative',
+                                width: '100%',
+                                padding: '1.5rem',
+                                background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.9) 0%, rgba(99, 102, 241, 0.8) 100%)',
+                                border: '2px solid #8b5cf6',
+                                borderRadius: '16px',
+                                color: '#ffffff',
+                                cursor: 'pointer',
+                                overflow: 'hidden',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '1rem',
+                                boxShadow: '0 4px 6px -1px rgba(139, 92, 246, 0.1), 0 2px 4px -1px rgba(139, 92, 246, 0.06)',
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+                                e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(139, 92, 246, 0.2), 0 4px 6px -2px rgba(139, 92, 246, 0.1)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(139, 92, 246, 0.1), 0 2px 4px -1px rgba(139, 92, 246, 0.06)';
+                            }}
                         >
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-transparent 
-                              to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            <span className="text-2xl relative z-10">🤖</span>
-                            <span className="text-lg font-bold relative z-10" style={{ color: '#f1f5f9' }}>
-                                안전 지능 시스템
-                            </span>
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 
-                              to-transparent -translate-x-full group-hover:translate-x-full 
-                              transition-transform duration-1000" />
-                        </button>
+                            {/* Shimmer 효과 */}
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    background: 'linear-gradient(45deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)',
+                                    transform: 'translateX(-100%)',
+                                    transition: 'transform 0.6s',
+                                }}
+                                className="gemini-shimmer"
+                            />
+                            
+                            {/* 아이콘 */}
+                            <div style={{
+                                fontSize: '2rem',
+                                filter: 'drop-shadow(0 0 5px rgba(139, 92, 246, 0.5))',
+                                animation: 'bounce-slow 2s infinite'
+                            }}>
+                                🤖
+                            </div>
+                            
+                            {/* 콘텐츠 */}
+                            <div style={{ textAlign: 'left' }}>
+                                <div style={{
+                                    fontSize: '1.25rem',
+                                    fontWeight: 800,
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.05em',
+                                    marginBottom: '0.25rem',
+                                    textShadow: '0 0 10px rgba(139, 92, 246, 0.3)'
+                                }}>
+                                    안전 지능 시스템
+                                </div>
+                                <div style={{
+                                    fontSize: '0.875rem',
+                                    color: 'rgba(196, 181, 253, 0.9)',
+                                    fontWeight: 500
+                                }}>
+                                    AI 위험 분석 • Gemini
+                                </div>
+                            </div>
+                        </div>
                     </Link>
-                    <p className="mt-2 text-sm" style={{ color: '#94a3b8' }}>
-                        현장의 위험 상황을 AI가 분석하고 조치 방안을 제시합니다.
-                    </p>
                 </div>
 
                 {/* 오늘의 퀘스트 */}

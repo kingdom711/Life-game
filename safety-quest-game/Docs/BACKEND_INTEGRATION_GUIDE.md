@@ -207,9 +207,14 @@ spring.flyway.enabled=true
 ### 🔷 추후 구현 예정
 - [ ] 회원가입 API
 - [ ] 로그아웃 API
-- [ ] Gemini API 실제 연동
+- [ ] **Gemini API 실제 연동** ⭐ (가이드: [GEMINI_INTEGRATION_PROMPT.md](./GEMINI_INTEGRATION_PROMPT.md))
 - [ ] 분석 로그 DB 저장
 - [ ] 알림 API
+
+### 📝 Gemini API 연동 가이드
+- **프론트엔드 준비**: ✅ 완료 (`src/api/gemsApi.js`, `src/pages/RiskSolutionPage.jsx`)
+- **백엔드 필요 작업**: [GEMINI_INTEGRATION_PROMPT.md](./GEMINI_INTEGRATION_PROMPT.md) 참조
+- **필요사항 요약**: [GEMINI_BACKEND_REQUIREMENTS.md](./GEMINI_BACKEND_REQUIREMENTS.md) 참조
 
 ---
 
