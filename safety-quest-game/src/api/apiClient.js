@@ -4,6 +4,9 @@
  */
 
 import config from '../config/environment';
+import { logRequest, logResponse, logError } from '../Frontend_codebase/apiLogger';
+import { getSessionRequestId } from '../utils/requestIdManager';
+
 
 /**
  * API 에러 클래스
@@ -35,17 +38,20 @@ const tokenManager = {
 
 /**
  * 기본 헤더 생성
+ * X-Request-ID: 세션 단위 ULID로 전구간 로그 추적에 활용
  */
 const getDefaultHeaders = () => {
     const headers = {
         'Content-Type': 'application/json',
+        // ULID는 시간 정보를 포함하므로 정렬에 유리함
+        'X-Request-ID': getSessionRequestId(),
     };
-    
+
     const token = tokenManager.getAccessToken();
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     return headers;
 };
 
@@ -58,18 +64,18 @@ const handleResponse = async (response) => {
     if (response.status === 204) {
         return { success: true };
     }
-    
+
     // 응답 본문 파싱
     let apiResponse;
     const contentType = response.headers.get('content-type');
-    
+
     if (contentType && contentType.includes('application/json')) {
         apiResponse = await response.json();
     } else {
         const text = await response.text();
         throw new ApiError(`서버 응답 형식 오류: ${text}`, response.status);
     }
-    
+
     // 응답 형식 로깅 (개발 모드)
     if (config.DEV_MODE) {
         console.log('[API] Parsed Response:', apiResponse);
@@ -77,7 +83,7 @@ const handleResponse = async (response) => {
         console.log('[API] Response has data:', apiResponse.data !== undefined);
         console.log('[API] Response keys:', Object.keys(apiResponse));
     }
-    
+
     // 백엔드 ApiResponse 형식 확인
     if (apiResponse.success === false) {
         // 백엔드 에러 응답 형식: { success: false, error: { code, message, details } }
@@ -89,17 +95,17 @@ const handleResponse = async (response) => {
             details: error.details
         });
     }
-    
+
     // 성공 응답: { success: true, data: T }
     // data 필드가 있으면 data를 반환, 없으면 전체 응답 반환
     const result = apiResponse.data !== undefined ? apiResponse.data : apiResponse;
-    
+
     if (config.DEV_MODE) {
         console.log('[API] Extracted Result:', result);
         console.log('[API] Result Type:', typeof result);
         console.log('[API] Result Keys:', result && typeof result === 'object' ? Object.keys(result) : 'N/A');
     }
-    
+
     return result;
 };
 
@@ -113,7 +119,7 @@ const attemptTokenRefresh = async () => {
     if (isRefreshing) {
         return refreshPromise;
     }
-    
+
     isRefreshing = true;
     refreshPromise = (async () => {
         try {
@@ -121,7 +127,7 @@ const attemptTokenRefresh = async () => {
             if (!refreshToken) {
                 throw new Error('Refresh token not found');
             }
-            
+
             const url = config.getApiUrl('/auth/refresh');
             const response = await fetch(url, {
                 method: 'POST',
@@ -130,9 +136,9 @@ const attemptTokenRefresh = async () => {
                 },
                 body: JSON.stringify({ refreshToken }),
             });
-            
+
             const apiResponse = await response.json();
-            
+
             if (apiResponse.success && apiResponse.data) {
                 const { accessToken, refreshToken: newRefreshToken } = apiResponse.data;
                 tokenManager.setTokens(accessToken, newRefreshToken);
@@ -148,7 +154,7 @@ const attemptTokenRefresh = async () => {
             refreshPromise = null;
         }
     })();
-    
+
     return refreshPromise;
 };
 
@@ -158,12 +164,12 @@ const attemptTokenRefresh = async () => {
  */
 const request = async (endpoint, options = {}, retryCount = 0) => {
     const url = config.getApiUrl(endpoint);
-    
+
     const defaultOptions = {
         headers: getDefaultHeaders(),
         timeout: config.API_TIMEOUT,
     };
-    
+
     const mergedOptions = {
         ...defaultOptions,
         ...options,
@@ -172,29 +178,24 @@ const request = async (endpoint, options = {}, retryCount = 0) => {
             ...options.headers,
         },
     };
-    
-    // 요청 로깅 (개발 모드)
-    if (config.DEV_MODE) {
-        console.log(`[API] ${options.method || 'GET'} ${url}`, {
-            headers: mergedOptions.headers,
-            body: options.body ? JSON.parse(options.body) : undefined,
-            baseUrl: config.API_BASE_URL,
-            endpoint: endpoint
-        });
-    }
-    
+
+    // 요청 로깅 (apiLogger 사용)
+    const method = options.method || 'GET';
+    const requestBody = options.body ? JSON.parse(options.body) : undefined;
+    const startTime = logRequest(method, url, requestBody, mergedOptions.headers);
+
     try {
         // AbortController를 사용한 타임아웃 처리
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), mergedOptions.timeout);
-        
+
         const response = await fetch(url, {
             ...mergedOptions,
             signal: controller.signal,
         });
-        
+
         clearTimeout(timeoutId);
-        
+
         // 401 에러 처리 (토큰 만료 또는 유효하지 않음)
         if (response.status === 401 && retryCount === 0) {
             // 인증 엔드포인트는 재시도하지 않음
@@ -202,62 +203,60 @@ const request = async (endpoint, options = {}, retryCount = 0) => {
                 const data = await handleResponse(response);
                 return data;
             }
-            
+
             // 토큰 갱신 시도
             try {
                 await attemptTokenRefresh();
-                
+
                 // 토큰 갱신 성공 시 원래 요청 재시도
                 const newHeaders = getDefaultHeaders();
                 mergedOptions.headers = {
                     ...mergedOptions.headers,
                     ...newHeaders,
                 };
-                
+
                 return request(endpoint, mergedOptions, retryCount + 1);
             } catch (refreshError) {
                 // 토큰 갱신 실패 시 에러 throw
                 throw new ApiError('인증이 만료되었습니다. 다시 로그인해주세요.', 401);
             }
         }
-        
+
         const data = await handleResponse(response);
-        
-        // 응답 로깅 (개발 모드)
-        if (config.DEV_MODE) {
-            console.log(`[API] Response Status: ${response.status}`);
-            console.log(`[API] Response Headers:`, Object.fromEntries(response.headers.entries()));
-            console.log(`[API] Response Data:`, data);
-            console.log(`[API] Response Data Type:`, typeof data);
-            console.log(`[API] Response Data Keys:`, data && typeof data === 'object' ? Object.keys(data) : 'N/A');
-        }
-        
+
+        // 응답 로깅 (apiLogger 사용)
+        logResponse(method, url, response.status, data, startTime, response.statusText);
+
         return data;
-        
+
     } catch (error) {
+        // 에러 로깅 (apiLogger 사용)
+        const errorStatus = error instanceof ApiError ? error.status : undefined;
+        logError(method, url, error, startTime, errorStatus);
+
         // 타임아웃 에러
         if (error.name === 'AbortError') {
             throw new ApiError('요청 시간이 초과되었습니다.', 408);
         }
-        
+
         // 네트워크 에러 (다양한 케이스 처리)
-        const isNetworkError = 
+        const isNetworkError =
             (error instanceof TypeError && error.message === 'Failed to fetch') ||
             error.message?.includes('Failed to fetch') ||
             error.message?.includes('NetworkError') ||
             error.message?.includes('ERR_CONNECTION_REFUSED') ||
             error.message?.includes('ERR_NETWORK') ||
             error.message?.includes('ERR_INTERNET_DISCONNECTED');
-        
+
         if (isNetworkError) {
             throw new ApiError('서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.', 0);
         }
-        
+
         // 이미 ApiError인 경우 그대로 throw
         if (error instanceof ApiError) {
             throw error;
         }
-        
+
         // 기타 에러
         throw new ApiError(error.message || '알 수 없는 오류가 발생했습니다.', 500);
     }
@@ -273,7 +272,7 @@ const apiClient = {
     get: (endpoint, options = {}) => {
         return request(endpoint, { ...options, method: 'GET' });
     },
-    
+
     /**
      * POST 요청
      */
@@ -284,7 +283,7 @@ const apiClient = {
             body: JSON.stringify(data),
         });
     },
-    
+
     /**
      * PUT 요청
      */
@@ -295,7 +294,7 @@ const apiClient = {
             body: JSON.stringify(data),
         });
     },
-    
+
     /**
      * PATCH 요청
      */
@@ -306,19 +305,19 @@ const apiClient = {
             body: JSON.stringify(data),
         });
     },
-    
+
     /**
      * DELETE 요청
      */
     delete: (endpoint, options = {}) => {
         return request(endpoint, { ...options, method: 'DELETE' });
     },
-    
+
     /**
      * 토큰 관리
      */
     token: tokenManager,
-    
+
     /**
      * 설정
      */
