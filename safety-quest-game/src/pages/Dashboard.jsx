@@ -16,6 +16,7 @@ import { completeQuest, triggerQuestAction, checkAttendance } from '../utils/que
 
 import AvatarWindow from '../components/AvatarWindow';
 import AvatarGearDisplay from '../components/AvatarGearDisplay';
+import PointsHistoryModal from '../components/PointsHistoryModal';
 
 function Dashboard({ role }) {
     const navigate = useNavigate();
@@ -40,6 +41,7 @@ function Dashboard({ role }) {
     const [isCheckInModalOpen, setIsCheckInModalOpen] = useState(false);
     const [checkInResult, setCheckInResult] = useState({ streak: 0, bonus: 0 });
     const [isMonthlyModalOpen, setIsMonthlyModalOpen] = useState(false);
+    const [isPointsHistoryModalOpen, setIsPointsHistoryModalOpen] = useState(false);
 
     useEffect(() => {
         loadData();
@@ -96,9 +98,12 @@ function Dashboard({ role }) {
                 {/* 통계 카드 */}
                 <div className="grid grid-3 mb-xl gap-6">
                     {/* 포인트 카드 */}
-                    <div className="card backdrop-blur-xl rounded-2xl p-6 shadow-xl shadow-blue-500/20 
-                      hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-500 
-                      hover:-translate-y-1 group relative overflow-hidden">
+                    <div 
+                        className="card backdrop-blur-xl rounded-2xl p-6 shadow-xl shadow-blue-500/20 
+                          hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-500 
+                          hover:-translate-y-1 group relative overflow-hidden cursor-pointer"
+                        onClick={() => setIsPointsHistoryModalOpen(true)}
+                    >
                         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full 
                           blur-3xl -translate-y-1/2 translate-x-1/2 opacity-0 group-hover:opacity-100 
                           transition-opacity duration-500" />
@@ -114,6 +119,9 @@ function Dashboard({ role }) {
                             <div className="badge badge-primary bg-gradient-to-r from-blue-500 to-indigo-500 
                               text-white border-0 shadow-lg shadow-blue-500/30 inline-flex items-center px-3 py-1 rounded-full">
                                 {playerStats.level.name}
+                            </div>
+                            <div className="mt-2 text-xs" style={{ color: '#94a3b8' }}>
+                                클릭하여 획득 내역 보기
                             </div>
                         </div>
                     </div>
@@ -480,6 +488,12 @@ function Dashboard({ role }) {
                     navigate('/inventory');
                 }}
                 roleId={role}
+            />
+
+            {/* 포인트 획득 내역 모달 */}
+            <PointsHistoryModal
+                isOpen={isPointsHistoryModalOpen}
+                onClose={() => setIsPointsHistoryModalOpen(false)}
             />
         </div>
     );

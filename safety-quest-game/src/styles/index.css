@@ -1542,6 +1542,7 @@ a:hover {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
   z-index: 1;
   transition: all 0.3s;
+  pointer-events: none;
 }
 
 .btn-streak.checked-in .streak-bg {
@@ -2458,7 +2459,7 @@ a:hover {
   bottom: 0;
   right: 0;
   background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
-  color: white;
+  color: #ef4444;
   font-size: 0.875rem;
   font-weight: 700;
   padding: 4px 10px;
@@ -3166,7 +3167,7 @@ a:hover {
   top: 0.75rem;
   left: 0.75rem;
   background: linear-gradient(135deg, var(--rarity-color) 0%, var(--rarity-color) 100%);
-  color: white;
+  color: #ef4444;
   font-size: 0.75rem;
   font-weight: 700;
   padding: 4px 8px;
@@ -3176,7 +3177,7 @@ a:hover {
 }
 
 .calibration-level-inline {
-  color: #0ea5e9;
+  color: #ef4444;
   font-weight: 700;
 }
 

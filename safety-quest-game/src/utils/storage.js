@@ -7,6 +7,7 @@ const STORAGE_KEYS = {
     INVENTORY_INSTANCES: 'safety_quest_inventory_instances', // [New] 아이템 인스턴스
     CALIBRATION_LOGS: 'safety_quest_calibration_logs', // [New] 검교정 로그
     POINTS: 'safety_quest_points',
+    POINTS_HISTORY: 'safety_quest_points_history',
     LEVEL: 'safety_quest_level',
     STREAK: 'safety_quest_streak',
     LAST_LOGIN: 'safety_quest_last_login'
@@ -400,6 +401,50 @@ export const points = {
 
     canAfford: (amount) => {
         return points.get() >= amount;
+    }
+};
+
+// 포인트 히스토리
+export const pointsHistory = {
+    get: () => {
+        return storage.get(STORAGE_KEYS.POINTS_HISTORY, []);
+    },
+
+    set: (history) => {
+        // 최대 500개까지만 저장
+        const limitedHistory = history.slice(-500);
+        return storage.set(STORAGE_KEYS.POINTS_HISTORY, limitedHistory);
+    },
+
+    add: (entry) => {
+        const history = pointsHistory.get();
+        const newEntry = {
+            id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+            timestamp: new Date().toISOString(),
+            amount: entry.amount,
+            source: entry.source || '기타',
+            sourceDetail: entry.sourceDetail || '',
+            balance: entry.balance || points.get()
+        };
+        history.push(newEntry);
+        pointsHistory.set(history);
+        return newEntry;
+    },
+
+    getRecent: (count = 100) => {
+        const history = pointsHistory.get();
+        return history.slice(-count).reverse();
+    },
+
+    getTotalBySource: () => {
+        const history = pointsHistory.get();
+        const totals = {};
+        history.forEach(entry => {
+            if (entry.amount > 0) {
+                totals[entry.source] = (totals[entry.source] || 0) + entry.amount;
+            }
+        });
+        return totals;
     }
 };
 

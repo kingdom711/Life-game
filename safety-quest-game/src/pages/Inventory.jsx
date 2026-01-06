@@ -12,6 +12,7 @@ function Inventory() {
     const [stats, setStats] = useState({});
     const [calibrationModal, setCalibrationModal] = useState({ isOpen: false, itemId: null });
     const [itemInstances, setItemInstances] = useState({});
+    const [imageErrors, setImageErrors] = useState({});
 
     useEffect(() => {
         loadData();
@@ -65,6 +66,14 @@ function Inventory() {
     };
 
     const handleCalibrationComplete = (result) => {
+        // 강화 후 이미지 에러 상태 초기화 (이미지 재로드를 위해)
+        if (result.success && calibrationModal.itemId) {
+            setImageErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[calibrationModal.itemId];
+                return newErrors;
+            });
+        }
         loadData();
         // 성공 시 약간의 딜레이 후 모달 닫기
         if (result.success) {
@@ -152,30 +161,24 @@ function Inventory() {
                                         </div>
                                     )}
 
-                                    {/* 검교정 레벨 표시 */}
-                                    {calibrationLevel > 0 && (
-                                        <div 
-                                            className="calibration-level-badge"
-                                            style={{ 
-                                                '--rarity-color': getRarityColor(item.rarity) 
-                                            }}
-                                        >
-                                            +{calibrationLevel}
-                                        </div>
-                                    )}
-
                                     <div className="card-header">
-                                        <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+                                        <div style={{ textAlign: 'center', marginBottom: '0.5rem', position: 'relative' }}>
                                             <div style={{ height: '120px', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                                                {item.image ? (
+                                                {item.image && !imageErrors[item.id] ? (
                                                     <img
+                                                        key={`${item.id}-${calibrationLevel}`}
                                                         src={item.image}
                                                         alt={item.name}
                                                         style={{
                                                             maxHeight: '100%',
                                                             maxWidth: '100%',
+                                                            width: 'auto',
+                                                            height: 'auto',
                                                             objectFit: 'contain',
                                                             filter: `drop-shadow(0 4px 6px rgba(0,0,0,0.3)) ${calibrationLevel > 0 ? `drop-shadow(0 0 ${calibrationLevel * 2}px ${getRarityColor(item.rarity)})` : ''}`
+                                                        }}
+                                                        onError={() => {
+                                                            setImageErrors(prev => ({ ...prev, [item.id]: true }));
                                                         }}
                                                     />
                                                 ) : (

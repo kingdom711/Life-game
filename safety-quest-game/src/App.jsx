@@ -62,6 +62,11 @@ function App() {
                 if (savedRole) {
                     setSelectedRole(savedRole);
                 }
+
+                // 기존 사용자는 BGM 자동 재생
+                if (savedName && savedRole) {
+                    setIsPlayingBgm(true);
+                }
             } catch (error) {
                 console.error("App initialization failed:", error);
             } finally {
@@ -145,7 +150,7 @@ function App() {
             <ErrorBoundary>
                 <div className="app" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
                     <BackgroundMusic
-                        src="/sounds/안전의 길 Rev.1.mp3"
+                        src="/sounds/안전의_길_Rev.1.mp3"
                         isPlaying={isPlayingBgm}
                         volume={0.3}
                     />

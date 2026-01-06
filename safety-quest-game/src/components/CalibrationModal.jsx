@@ -64,8 +64,8 @@ const CalibrationModal = ({ isOpen, onClose, itemId, onCalibrationComplete }) =>
 
                 {/* 헤더 */}
                 <div className="calibration-header">
-                    <h2>CALIBRATION LAB</h2>
-                    <p>장비 검교정 시스템</p>
+                    <h2>장비 검교정 시스템</h2>
+                    <p>장비 강화</p>
                 </div>
 
                 {calibrationInfo && (
@@ -211,11 +211,11 @@ const CalibrationModal = ({ isOpen, onClose, itemId, onCalibrationComplete }) =>
                                     {isCalibrating ? (
                                         <span className="calibrating-text">
                                             <span className="spinner"></span>
-                                            CALIBRATING...
+                                            강화 중...
                                         </span>
                                     ) : (
                                         <>
-                                            CALIBRATE
+                                            강화
                                             <span className="btn-cost">[{calibrationInfo.cost?.toLocaleString()}P]</span>
                                         </>
                                     )}

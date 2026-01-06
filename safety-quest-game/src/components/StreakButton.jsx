@@ -26,9 +26,15 @@ const StreakButton = ({ onCheckIn, onShowMonthlyRewards }) => {
     }, []);
 
     const handleCheckIn = () => {
-        if (isCheckedIn) return;
+        if (isCheckedIn) {
+            console.log('Already checked in');
+            return;
+        }
 
+        console.log('Attempting check-in...');
         const result = streak.checkIn();
+        console.log('Check-in result:', result);
+        
         if (result.success) {
             setIsCheckedIn(true);
             setStreakCount(result.streak);
@@ -38,7 +44,10 @@ const StreakButton = ({ onCheckIn, onShowMonthlyRewards }) => {
             monthlyAttendance.recordAttendance();
 
             // 상위 컴포넌트에 알림
-            if (onCheckIn) onCheckIn(result);
+            if (onCheckIn) {
+                console.log('Calling onCheckIn callback');
+                onCheckIn(result);
+            }
 
             // 애니메이션 종료 후 월간 보상 모달 표시
             setTimeout(() => {
@@ -46,12 +55,27 @@ const StreakButton = ({ onCheckIn, onShowMonthlyRewards }) => {
                 // 월간 보상 모달 표시
                 if (onShowMonthlyRewards) onShowMonthlyRewards();
             }, 2000);
+        } else {
+            // 이미 출석한 경우 상태 업데이트
+            if (result.message && result.message.includes('이미 출석')) {
+                console.log('Already checked in today, updating state');
+                setIsCheckedIn(true);
+                const streakData = streak.get();
+                setStreakCount(streakData.current);
+            } else {
+                console.error('Check-in failed:', result.message);
+            }
         }
     };
 
     // 이미 출석한 경우 클릭 시 월간 보상 모달 표시
-    const handleClick = () => {
+    const handleClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('StreakButton clicked', { isCheckedIn });
+        
         if (isCheckedIn) {
+            console.log('Already checked in, showing monthly rewards');
             if (onShowMonthlyRewards) onShowMonthlyRewards();
         } else {
             handleCheckIn();
