@@ -29,8 +29,8 @@ import ErrorBoundary from './components/ErrorBoundary';
 // ...
 
 function App() {
-    // 랜딩페이지 비활성화
-    const [showLandingPage, setShowLandingPage] = useState(false);
+    // 랜딩페이지 활성화
+    const [showLandingPage, setShowLandingPage] = useState(true);
     const [showTeamPage, setShowTeamPage] = useState(false);
     const [showPricingPage, setShowPricingPage] = useState(false);
     const [showLaunchScreen, setShowLaunchScreen] = useState(false);
@@ -108,13 +108,13 @@ function App() {
         // 회원가입 처리
         setUser(userData);
         userProfile.setName(userData.name);
-        
+
         // 요금제 정보 저장 (추후 사용을 위해)
         localStorage.setItem('selectedPlan', JSON.stringify(plan));
         if (userData.companyName) {
             localStorage.setItem('companyName', userData.companyName);
         }
-        
+
         setShowPricingPage(false);
         // setShowLaunchScreen(true); // LaunchScreen 건너뛰기
         setIsPlayingBgm(true); // 바로 게임 시작
@@ -181,9 +181,9 @@ function App() {
                                   rounded-full blur-[120px] animate-float-slow" />
                                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] 
                                   bg-gradient-to-br from-cyan-500/15 via-blue-500/12 to-indigo-500/15 
-                                  rounded-full blur-[100px] animate-float" 
-                                  style={{ animationDelay: '1s', animationDuration: '8s' }} />
-                                
+                                  rounded-full blur-[100px] animate-float"
+                                    style={{ animationDelay: '1s', animationDuration: '8s' }} />
+
                                 {/* 미묘한 그리드 패턴 */}
                                 <div className="absolute inset-0 opacity-[0.03]"
                                     style={{
@@ -194,7 +194,7 @@ function App() {
                                         backgroundSize: '50px 50px'
                                     }} />
                             </div>
-                            
+
                             <Navigation />
                             <div className="relative z-10">
                                 <Routes>
