@@ -477,6 +477,11 @@ export const level = {
     }
 };
 
+// 로컬 시간대 기준 날짜 문자열 생성 헬퍼 함수
+const getLocalDateString = (date = new Date()) => {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+};
+
 // 스트릭 (연속 로그인) - 수동 체크인 방식
 export const streak = {
     get: () => {
@@ -494,7 +499,7 @@ export const streak = {
     // 수동 출석 체크
     checkIn: () => {
         const now = new Date();
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString().split('T')[0];
+        const today = getLocalDateString(now);
 
         const streakData = streak.get();
         const lastLoginDate = streakData.lastLoginDate ? streakData.lastLoginDate.split('T')[0] : null;
@@ -505,7 +510,7 @@ export const streak = {
 
         const yesterday = new Date(now);
         yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = yesterday.toISOString().split('T')[0];
+        const yesterdayStr = getLocalDateString(yesterday);
 
         if (lastLoginDate === yesterdayStr) {
             // 연속 출석
@@ -531,7 +536,7 @@ export const streak = {
         const streakData = streak.get();
         if (!streakData.lastLoginDate) return false;
 
-        const today = new Date().toISOString().split('T')[0];
+        const today = getLocalDateString();
         const lastLogin = streakData.lastLoginDate.split('T')[0];
         return today === lastLogin;
     }
