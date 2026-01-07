@@ -80,168 +80,161 @@ function Dashboard({ role }) {
     };
 
     return (
-        <div className="page">
+        <div className="page dashboard-page">
             <div className="container">
-                {/* 헤더 */}
-                <div className="mb-8 text-center">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{ 
-                        background: 'linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 50%, #ec4899 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text'
-                    }}>
+                {/* 헤더 - 프리미엄 디자인 */}
+                <div className="dashboard-header mb-12 text-center">
+                    <div className="header-glow" />
+                    <h1 className="dashboard-title">
                         안전관리 대시보드
                     </h1>
-                    <p className="text-lg" style={{ color: '#94a3b8' }}>오늘도 안전한 하루를 만들어가세요!</p>
+                    <p className="dashboard-subtitle">
+                        오늘도 안전한 하루를 만들어가세요!
+                    </p>
                 </div>
 
-                {/* 통계 카드 */}
-                <div className="grid grid-3 mb-xl gap-6">
+                {/* 통계 카드 - 프리미엄 디자인 */}
+                <div className="stats-grid mb-xl">
                     {/* 포인트 카드 */}
                     <div 
-                        className="card backdrop-blur-xl rounded-2xl p-6 shadow-xl shadow-blue-500/20 
-                          hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-500 
-                          hover:-translate-y-1 group relative overflow-hidden cursor-pointer"
+                        className="stat-card stat-card-points"
                         onClick={() => setIsPointsHistoryModalOpen(true)}
                     >
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full 
-                          blur-3xl -translate-y-1/2 translate-x-1/2 opacity-0 group-hover:opacity-100 
-                          transition-opacity duration-500" />
-                        <div className="card-header relative z-10 mb-4">
-                            <h4 className="card-title text-lg font-bold" style={{ color: '#f1f5f9' }}>
-                              💰 포인트
-                            </h4>
-                        </div>
-                        <div className="card-body text-center relative z-10">
-                            <div className="text-4xl font-extrabold mb-2" style={{ color: '#f1f5f9' }}>
-                                {playerStats.points.toLocaleString()}
+                        <div className="stat-card-glow" />
+                        <div className="stat-card-pattern" />
+                        <div className="stat-card-content">
+                            <div className="stat-header">
+                                <div className="stat-icon">💰</div>
+                                <h4 className="stat-title">포인트</h4>
                             </div>
-                            <div className="badge badge-primary bg-gradient-to-r from-blue-500 to-indigo-500 
-                              text-white border-0 shadow-lg shadow-blue-500/30 inline-flex items-center px-3 py-1 rounded-full">
-                                {playerStats.level.name}
+                            <div className="stat-value-wrapper">
+                                <div className="stat-value" data-value={playerStats.points}>
+                                    {playerStats.points.toLocaleString()}
+                                </div>
+                                <div className="stat-badge">
+                                    {playerStats.level.name}
+                                </div>
                             </div>
-                            <div className="mt-2 text-xs" style={{ color: '#94a3b8' }}>
-                                클릭하여 획득 내역 보기
+                            <div className="stat-footer">
+                                <span className="stat-hint">클릭하여 획득 내역 보기</span>
                             </div>
                         </div>
                     </div>
 
                     {/* 레벨 진행도 카드 */}
-                    <div className="card backdrop-blur-xl rounded-2xl p-6 shadow-xl 
-                      shadow-indigo-500/20 hover:shadow-2xl transition-all duration-500 
-                      hover:-translate-y-1 group relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full 
-                          blur-3xl -translate-y-1/2 translate-x-1/2 opacity-0 group-hover:opacity-100 
-                          transition-opacity duration-500" />
-                        <div className="card-header relative z-10 mb-4">
-                            <h4 className="card-title text-lg font-bold" style={{ color: '#f1f5f9' }}>
-                              📈 레벨 진행도
-                            </h4>
-                        </div>
-                        <div className="card-body relative z-10">
-                            <div className="flex items-center justify-center gap-2 mb-4">
-                                <span className="text-2xl">{playerStats.level.tierIcon}</span>
-                                <div className="text-xl font-bold text-center" style={{ color: playerStats.level.color }}>
-                                    {playerStats.level.name}
+                    <div className="stat-card stat-card-level">
+                        <div className="stat-card-glow" />
+                        <div className="stat-card-pattern" />
+                        <div className="stat-card-content">
+                            <div className="stat-header">
+                                <div className="stat-icon">📈</div>
+                                <h4 className="stat-title">레벨 진행도</h4>
+                            </div>
+                            <div className="level-display">
+                                <div className="level-icon-wrapper">
+                                    <span className="level-icon">{playerStats.level.tierIcon}</span>
+                                    <div className="level-glow" />
+                                </div>
+                                <div className="level-info">
+                                    <div className="level-name" style={{ color: playerStats.level.color }}>
+                                        {playerStats.level.name}
+                                    </div>
+                                    <div className="level-rank">
+                                        Rank {playerStats.level.rank} / {playerStats.level.totalRanks}
+                                    </div>
                                 </div>
                             </div>
-                            <div className="text-center text-xs mb-2" style={{ color: '#94a3b8' }}>
-                                Rank {playerStats.level.rank} / {playerStats.level.totalRanks}
-                            </div>
-                            <div className="progress h-3 rounded-full overflow-hidden 
-                              shadow-inner mb-2">
-                                <div className="progress-bar h-full rounded-full relative overflow-hidden" 
-                                  style={{ 
-                                      width: `${playerStats.level.progress}%`,
-                                      background: `linear-gradient(90deg, ${playerStats.level.color}, ${playerStats.level.color}cc)`
-                                  }}>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent 
-                                      via-white/30 to-transparent animate-shimmer" />
+                            <div className="progress-wrapper">
+                                <div className="progress-bar-advanced">
+                                    <div 
+                                        className="progress-fill"
+                                        style={{ 
+                                            width: `${playerStats.level.progress}%`,
+                                            background: `linear-gradient(90deg, ${playerStats.level.color}, ${playerStats.level.color}dd, ${playerStats.level.color})`
+                                        }}
+                                    >
+                                        <div className="progress-shine" />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="text-center text-sm font-semibold" style={{ color: '#cbd5e1' }}>
-                                {playerStats.level.progress}%
+                                <div className="progress-text">
+                                    {playerStats.level.progress}%
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* 연속 로그인 카드 */}
-                    <div className="card backdrop-blur-xl rounded-2xl p-6 shadow-xl 
-                      shadow-orange-500/20 hover:shadow-2xl transition-all duration-500 
-                      hover:-translate-y-1 group relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 rounded-full 
-                          blur-3xl -translate-y-1/2 translate-x-1/2 opacity-0 group-hover:opacity-100 
-                          transition-opacity duration-500" />
-                        <div className="card-header relative z-10 mb-4">
-                            <h4 className="card-title text-lg font-bold" style={{ color: '#f1f5f9' }}>
-                              🔥 연속 로그인
-                            </h4>
-                        </div>
-                        <div className="card-body text-center relative z-10 p-4">
-                            <StreakButton
-                                onCheckIn={() => {
-                                    const result = checkAttendance(userProfile.getName() || 'guest');
-                                    if (result.success) {
-                                        triggerQuestAction('daily_login', role);
-                                        setCheckInResult({ streak: result.consecutiveDays, bonus: result.bonus });
-                                        setIsCheckInModalOpen(true);
-                                        loadData();
-                                    } else {
-                                        alert(result.message);
-                                    }
-                                }}
-                                onShowMonthlyRewards={() => setIsMonthlyModalOpen(true)}
-                            />
+                    <div className="stat-card stat-card-streak">
+                        <div className="stat-card-glow" />
+                        <div className="stat-card-pattern" />
+                        <div className="stat-card-content">
+                            <div className="stat-header">
+                                <div className="stat-icon">🔥</div>
+                                <h4 className="stat-title">연속 로그인</h4>
+                            </div>
+                            <div className="streak-content-wrapper">
+                                <StreakButton
+                                    onCheckIn={() => {
+                                        const result = checkAttendance(userProfile.getName() || 'guest');
+                                        if (result.success) {
+                                            triggerQuestAction('daily_login', role);
+                                            setCheckInResult({ streak: result.consecutiveDays, bonus: result.bonus });
+                                            setIsCheckInModalOpen(true);
+                                            loadData();
+                                        } else {
+                                            alert(result.message);
+                                        }
+                                    }}
+                                    onShowMonthlyRewards={() => setIsMonthlyModalOpen(true)}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* 아바타 섹션 */}
-                <div className="card backdrop-blur-xl rounded-2xl p-6 mb-xl shadow-xl 
-                  shadow-purple-500/20 hover:shadow-2xl transition-all duration-500 relative 
-                  overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-transparent 
-                      to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="card-header flex justify-between items-center mb-4 relative z-10">
-                        <h3 className="card-title text-xl font-bold" style={{ color: '#f1f5f9' }}>
-                          👤 내 아바타
-                        </h3>
-                        <div className="flex gap-2">
-                            <button
-                                className="btn btn-primary btn-sm bg-gradient-to-r from-blue-500 to-indigo-500 
-                                  hover:from-blue-400 hover:to-indigo-400 text-white border-0 shadow-lg 
-                                  shadow-blue-500/30 hover:shadow-xl transition-all duration-300"
+                {/* 아바타 섹션 - 프리미엄 디자인 */}
+                <div className="avatar-section-card mb-xl">
+                    <div className="avatar-section-glow" />
+                    <div className="avatar-section-content">
+                        <div className="avatar-section-header">
+                            <h3 className="avatar-section-title">
+                                <span className="avatar-section-icon">👤</span>
+                                내 아바타
+                            </h3>
+                            <div className="avatar-section-actions">
+                                <button
+                                    className="btn btn-primary btn-sm btn-gradient"
+                                    onClick={() => setIsAvatarWindowOpen(true)}
+                                >
+                                    장비 관리
+                                </button>
+                                <Link to="/inventory">
+                                    <button className="btn btn-secondary btn-sm btn-glass">
+                                        인벤토리
+                                    </button>
+                                </Link>
+                            </div>
+                        </div>
+                        <div className="avatar-display-wrapper">
+                            <div 
+                                className="avatar-display"
                                 onClick={() => setIsAvatarWindowOpen(true)}
                             >
-                                장비 관리
-                            </button>
-                            <Link to="/inventory">
-                                <button className="btn btn-secondary btn-sm backdrop-blur-sm bg-slate-700/70 
-                                  hover:bg-slate-600/80 border border-slate-500/50 shadow-md hover:shadow-lg 
-                                  transition-all duration-300">
-                                  인벤토리
-                                </button>
-                            </Link>
-                        </div>
-                    </div>
-                    <div className="card-body relative z-10">
-                        <div
-                            className="flex justify-center items-center p-4 cursor-pointer hover:scale-105 
-                              transition-transform duration-300"
-                            onClick={() => setIsAvatarWindowOpen(true)}
-                        >
-                            <div className="avatar-container max-w-full h-auto">
+                                <div className="avatar-glow-ring" />
                                 <AvatarGearDisplay
                                     equippedItems={equippedItems}
                                     size={200}
                                     slotSize={45}
                                     onSlotClick={() => setIsAvatarWindowOpen(true)}
+                                    onImageClick={(category, item) => {
+                                        navigate('/inventory');
+                                    }}
                                     roleId={role}
                                 />
                             </div>
-                        </div>
-                        <div className="text-center mt-4 text-sm" style={{ color: '#94a3b8' }}>
-                            * 아바타를 클릭하여 장비를 관리하세요
+                            <div className="avatar-hint">
+                                * 아바타를 클릭하여 장비를 관리하세요
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -325,39 +318,28 @@ function Dashboard({ role }) {
                             }}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-                                e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(139, 92, 246, 0.2), 0 4px 6px -2px rgba(139, 92, 246, 0.1)';
+                                e.currentTarget.style.boxShadow = '0 6px 16px rgba(139, 92, 246, 0.4), 0 4px 8px rgba(139, 92, 246, 0.25)';
+                                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(99, 102, 241, 0.1) 100%)';
                             }}
                             onMouseLeave={(e) => {
                                 e.currentTarget.style.transform = 'translateY(0) scale(1)';
                                 e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(139, 92, 246, 0.1), 0 2px 4px -1px rgba(139, 92, 246, 0.06)';
+                                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(139, 92, 246, 0.9) 0%, rgba(99, 102, 241, 0.8) 100%)';
                             }}
                         >
-                            {/* Shimmer 효과 */}
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    width: '100%',
-                                    height: '100%',
-                                    background: 'linear-gradient(45deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%)',
-                                    transform: 'translateX(-100%)',
-                                    transition: 'transform 0.6s',
-                                }}
-                                className="gemini-shimmer"
-                            />
-                            
                             {/* 아이콘 */}
                             <div style={{
                                 fontSize: '2rem',
                                 filter: 'drop-shadow(0 0 5px rgba(139, 92, 246, 0.5))',
-                                animation: 'bounce-slow 2s infinite'
+                                animation: 'bounce-slow 2s infinite',
+                                position: 'relative',
+                                zIndex: 2
                             }}>
                                 🤖
                             </div>
                             
                             {/* 콘텐츠 */}
-                            <div style={{ textAlign: 'left' }}>
+                            <div style={{ textAlign: 'left', position: 'relative', zIndex: 2 }}>
                                 <div style={{
                                     fontSize: '1.25rem',
                                     fontWeight: 800,
