@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { items, ITEM_CATEGORY, ITEM_RARITY, CATEGORY_NAMES, RARITY_NAMES, getRarityColor } from '../data/itemsData';
 import { purchaseItem } from '../utils/inventoryManager';
 import { points as pointsStorage, inventory as inventoryStorage } from '../utils/storage';
 
 function Shop() {
+    const navigate = useNavigate();
     const [currentPoints, setCurrentPoints] = useState(0);
     const [filter, setFilter] = useState('all');
     const [ownedItems, setOwnedItems] = useState([]);
@@ -164,8 +165,11 @@ function Shop() {
 
                                     <div className="flex justify-center">
                                         {owned ? (
-                                            <button className="shop-btn shop-btn-disabled">
-                                                ✓ 보유 중
+                                            <button 
+                                                className="shop-btn shop-btn-equip"
+                                                onClick={() => navigate('/inventory')}
+                                            >
+                                                착용하기
                                             </button>
                                         ) : (
                                             <button
