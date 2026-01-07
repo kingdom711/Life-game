@@ -270,7 +270,7 @@ function Inventory() {
                                             ) : (
                                                 <button
                                                     onClick={() => handleEquip(item)}
-                                                    className="btn btn-primary"
+                                                    className="btn btn-equip"
                                                     style={{ flex: 1 }}
                                                 >
                                                     착용하기
