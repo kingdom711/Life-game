@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import safetyEducationVideo from '../assets/안전_교육_영상.mp4';
+import { analytics } from '../utils/analytics';
 
 const LandingPage = ({ onEnter, onShowTeam, onLogin }) => {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
         setIsVisible(true);
+        // GA4 페이지뷰 추적
+        analytics.pageView('/landing', 'Landing Page - 안전의 길');
     }, []);
 
     const gameFeatures = [
@@ -76,13 +79,13 @@ const LandingPage = ({ onEnter, onShowTeam, onLogin }) => {
                     alignItems: 'center',
                     gap: '0.5rem'
                 }}>
-                    <img 
-                        src="/assets/safety_road_logo-removebg-preview.png" 
-                        alt="안전의 길" 
-                        style={{ width: '36px', height: '36px', objectFit: 'contain' }} 
+                    <img
+                        src="/assets/safety_road_logo-removebg-preview.png"
+                        alt="안전의 길"
+                        style={{ width: '36px', height: '36px', objectFit: 'contain' }}
                     />
-                    <span style={{ 
-                        fontWeight: '700', 
+                    <span style={{
+                        fontWeight: '700',
                         color: '#fbbf24',
                         fontSize: '1.1rem'
                     }}>

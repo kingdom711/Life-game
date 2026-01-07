@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userProfile } from '../utils/storage';
+import { analytics } from '../utils/analytics';
 
 function Signup({ onSignupComplete }) {
     const [formData, setFormData] = useState({
@@ -10,6 +11,11 @@ function Signup({ onSignupComplete }) {
         isOver14: false
     });
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        // GA4 페이지뷰 추적
+        analytics.pageView('/signup', 'Signup - 회원가입');
+    }, []);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -39,6 +45,9 @@ function Signup({ onSignupComplete }) {
         // 실제로는 이메일/비밀번호도 저장하거나 서버로 보내야 하지만, 
         // 현재 로컬 스토리지 구조상 이름만 저장하고 넘어갑니다.
         // 추후 확장을 위해 로직은 남겨둡니다.
+
+        // GA4 회원가입 완료 이벤트
+        analytics.conversion.signupComplete('free');
 
         // alert('회원가입이 완료되었습니다!'); // 제거됨
         if (onSignupComplete) {

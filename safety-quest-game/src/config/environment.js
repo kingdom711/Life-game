@@ -6,19 +6,23 @@
 const config = {
     // API 서버 URL
     API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
-    
+
     // Mock 모드 (백엔드 서버 없을 때 true)
     USE_MOCK: import.meta.env.VITE_USE_MOCK === 'true',
-    
+
     // API 타임아웃 (밀리초)
     API_TIMEOUT: parseInt(import.meta.env.VITE_API_TIMEOUT) || 30000,
-    
+
     // 개발 모드
     DEV_MODE: import.meta.env.VITE_DEV_MODE === 'true' || import.meta.env.DEV || false,
-    
+
+    // Google Analytics 설정
+    GA_MEASUREMENT_ID: import.meta.env.VITE_GA_MEASUREMENT_ID || '',
+    GA_DEBUG_MODE: import.meta.env.VITE_GA_DEBUG_MODE === 'true',
+
     // API 버전
     API_VERSION: 'v1',
-    
+
     // 전체 API URL 생성 헬퍼
     getApiUrl: (endpoint) => {
         const baseUrl = config.API_BASE_URL;

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { analytics } from '../utils/analytics';
 
 const PricingPage = ({ onSelectPlan, onBack }) => {
     const [selectedPlan, setSelectedPlan] = useState(null);
@@ -14,6 +15,11 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
         agreeTerms: false
     });
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        // GA4 페이지뷰 추적
+        analytics.pageView('/pricing', 'Pricing Page - 요금제');
+    }, []);
 
     const plans = [
         {
@@ -120,7 +126,10 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
     const handlePlanSelect = (plan) => {
         setSelectedPlan(plan);
         setShowSignupForm(true);
-        
+
+        // GA4 플랜 선택 이벤트
+        analytics.conversion.planSelected(plan.id, plan.priceValue);
+
         // 기업 규모에 맞는 인원수 기본값 설정
         if (plan.id === 'free') {
             setFormData(prev => ({ ...prev, employeeCount: '1' }));
@@ -169,6 +178,9 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
             setError(`${selectedPlan.name} 요금제는 ${selectedPlan.minUsers}명 ~ ${selectedPlan.maxUsers ? selectedPlan.maxUsers + '명' : '무제한'} 입니다.`);
             return;
         }
+
+        // GA4 가입 완료 이벤트
+        analytics.conversion.signupComplete(selectedPlan.id);
 
         // 회원가입 완료 처리
         onSelectPlan({
@@ -289,8 +301,8 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
                                 <div
                                     key={plan.id}
                                     style={{
-                                        background: selectedPlan?.id === plan.id 
-                                            ? `${plan.color}15` 
+                                        background: selectedPlan?.id === plan.id
+                                            ? `${plan.color}15`
                                             : 'rgba(255, 255, 255, 0.03)',
                                         border: `2px solid ${selectedPlan?.id === plan.id ? plan.color : plan.color + '40'}`,
                                         borderRadius: '24px',
@@ -366,9 +378,9 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
                                                 fontSize: '0.8rem',
                                                 margin: 0
                                             }}>
-                                                {plan.minUsers === 1 ? '개인 사용자' : 
-                                                 plan.maxUsers ? `${plan.minUsers}~${plan.maxUsers}명` : 
-                                                 `${plan.minUsers}명 이상`}
+                                                {plan.minUsers === 1 ? '개인 사용자' :
+                                                    plan.maxUsers ? `${plan.minUsers}~${plan.maxUsers}명` :
+                                                        `${plan.minUsers}명 이상`}
                                             </p>
                                         </div>
                                     </div>
@@ -430,13 +442,13 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
                                         style={{
                                             width: '100%',
                                             padding: '1rem',
-                                            background: selectedPlan?.id === plan.id 
-                                                ? plan.color 
+                                            background: selectedPlan?.id === plan.id
+                                                ? plan.color
                                                 : 'transparent',
                                             border: `2px solid ${plan.color}`,
                                             borderRadius: '12px',
-                                            color: selectedPlan?.id === plan.id 
-                                                ? '#1a1a2e' 
+                                            color: selectedPlan?.id === plan.id
+                                                ? '#1a1a2e'
                                                 : plan.color,
                                             fontSize: '1rem',
                                             fontWeight: '700',
