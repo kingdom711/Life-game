@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Avatar from './Avatar';
 import GearSlot from './GearSlot';
 import { ITEM_CATEGORY, CATEGORY_NAMES, getRarityColor } from '../data/itemsData';
@@ -8,6 +9,7 @@ import { userInventoryInstances } from '../utils/storage';
 import { VISUAL_AURAS, ITEM_SETS } from '../data/setsData';
 
 const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
+    const navigate = useNavigate();
     const [equippedItems, setEquippedItems] = useState({});
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [activeAura, setActiveAura] = useState(null);
@@ -50,6 +52,12 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
                 onEquipRequest(category);
             }
         }
+    };
+
+    const handleImageClick = (category, item) => {
+        // 아이템 이미지 클릭 시 인벤토리로 이동
+        onClose();
+        navigate('/inventory');
     };
 
     const getItemCalibrationLevel = (item) => {
@@ -227,6 +235,7 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
                                             item={item}
                                             isEquipped={!!item}
                                             onClick={() => handleSlotClick(category)}
+                                            onImageClick={handleImageClick}
                                         />
                                         {calibLevel > 0 && (
                                             <div style={{
@@ -327,6 +336,7 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
                                             item={item}
                                             isEquipped={!!item}
                                             onClick={() => handleSlotClick(category)}
+                                            onImageClick={handleImageClick}
                                         />
                                         {calibLevel > 0 && (
                                             <div style={{

@@ -3,7 +3,7 @@ import Avatar from './Avatar';
 import GearSlot from './GearSlot';
 import { ITEM_CATEGORY } from '../data/itemsData';
 
-const AvatarGearDisplay = ({ equippedItems, size = 200, slotSize = 50, onSlotClick, roleId }) => {
+const AvatarGearDisplay = ({ equippedItems, size = 200, slotSize = 50, onSlotClick, onImageClick, roleId }) => {
     // 슬롯 배치 정의 (좌우 대칭을 위해 3개씩)
     const leftSlots = [
         ITEM_CATEGORY.VEST,
@@ -35,6 +35,7 @@ const AvatarGearDisplay = ({ equippedItems, size = 200, slotSize = 50, onSlotCli
                     isEquipped={!!equippedItems[centerTopSlot]}
                     size={slotSize}
                     onClick={() => onSlotClick && onSlotClick(centerTopSlot)}
+                    onImageClick={onImageClick}
                     showEnhancement={true}
                 />
             </div>
@@ -66,6 +67,7 @@ const AvatarGearDisplay = ({ equippedItems, size = 200, slotSize = 50, onSlotCli
                             isEquipped={!!equippedItems[category]}
                             size={slotSize}
                             onClick={() => onSlotClick && onSlotClick(category)}
+                            onImageClick={onImageClick}
                             showEnhancement={true}
                         />
                     ))}
@@ -114,6 +116,7 @@ const AvatarGearDisplay = ({ equippedItems, size = 200, slotSize = 50, onSlotCli
                             isEquipped={!!equippedItems[category]}
                             size={slotSize}
                             onClick={() => onSlotClick && onSlotClick(category)}
+                            onImageClick={onImageClick}
                             showEnhancement={true}
                         />
                     ))}

@@ -6,6 +6,7 @@ const GearSlot = ({
     category,
     isEquipped,
     onClick,
+    onImageClick,
     size = 60,
     showEnhancement = true
 }) => {
@@ -51,12 +52,19 @@ const GearSlot = ({
                 <img
                     src={item.image}
                     alt={item.name}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (onImageClick) {
+                            onImageClick(category, item);
+                        }
+                    }}
                     style={{
                         width: '80%',
                         height: '80%',
                         objectFit: 'contain',
                         zIndex: 2,
-                        filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+                        filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+                        cursor: onImageClick ? 'pointer' : 'default'
                     }}
                 />
             ) : (
