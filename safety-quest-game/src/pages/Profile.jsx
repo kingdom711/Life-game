@@ -106,23 +106,23 @@ function Profile({ role }) {
                         {/* 티어 및 레벨 정보 */}
                         <div className="flex justify-between items-start mb-6">
                             <div>
-                                <div className="text-slate-600 mb-2 text-sm font-semibold">현재 레벨</div>
+                                <div className="text-slate-300 mb-2 text-sm font-semibold">현재 레벨</div>
                                 <div className="flex items-center gap-3">
                                     <span className="text-4xl">{stats.level.tierIcon}</span>
                                     <div>
                                         <div className="text-2xl font-extrabold" style={{ color: stats.level.color }}>
                                             {stats.level.name}
                                         </div>
-                                        <div className="text-sm text-slate-500">
+                                        <div className="text-sm text-slate-400">
                                             Rank {stats.level.rank} / {stats.level.totalRanks}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <div className="text-slate-600 mb-2 text-sm font-semibold">총 포인트</div>
-                                <div className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 
-                                  to-indigo-600 bg-clip-text text-transparent">
+                                <div className="text-slate-300 mb-2 text-sm font-semibold">총 포인트</div>
+                                <div className="text-3xl font-extrabold bg-gradient-to-r from-blue-500 
+                                  to-indigo-500 bg-clip-text text-transparent">
                                     {stats.points.toLocaleString()}P
                                 </div>
                             </div>
@@ -130,7 +130,7 @@ function Profile({ role }) {
 
                         {/* 티어 진행도 */}
                         <div className="mb-6">
-                            <div className="text-slate-600 mb-3 text-sm font-semibold">티어 진행도</div>
+                            <div className="text-slate-300 mb-3 text-sm font-semibold">티어 진행도</div>
                             <div className="flex gap-2">
                                 {Object.entries(TIERS).map(([tierKey, tierInfo]) => {
                                     const isCurrentTier = stats.level.tier === tierKey;
@@ -172,10 +172,10 @@ function Profile({ role }) {
                         {/* 다음 레벨까지 진행도 */}
                         <div>
                             <div className="flex justify-between mb-2">
-                                <span className="text-slate-600 text-sm font-semibold">
+                                <span className="text-slate-300 text-sm font-semibold">
                                     다음 레벨까지
                                 </span>
-                                <span className="font-bold text-indigo-600">
+                                <span className="font-bold text-indigo-400">
                                     {stats.level.max !== Infinity 
                                         ? `${(stats.level.max - stats.points).toLocaleString()}P 남음`
                                         : '최고 레벨 달성!'
@@ -219,15 +219,15 @@ function Profile({ role }) {
                         </div>
                         <div className="card-body relative z-10">
                             <div className="mb-6">
-                                <div className="text-slate-600 mb-2 text-sm font-semibold">현재 연속 출석</div>
-                                <div className="text-4xl font-extrabold bg-gradient-to-r from-orange-600 
-                                  to-red-600 bg-clip-text text-transparent">
+                                <div className="text-slate-300 mb-2 text-sm font-semibold">현재 연속 출석</div>
+                                <div className="text-4xl font-extrabold bg-gradient-to-r from-orange-500 
+                                  to-red-500 bg-clip-text text-transparent">
                                     {stats.streak.current}일
                                 </div>
                             </div>
                             <div>
-                                <div className="text-slate-600 mb-2 text-sm font-semibold">최장 연속 출석</div>
-                                <div className="text-2xl font-bold text-slate-800">
+                                <div className="text-slate-300 mb-2 text-sm font-semibold">최장 연속 출석</div>
+                                <div className="text-2xl font-bold text-orange-400">
                                     {stats.streak.longest}일
                                 </div>
                             </div>
@@ -250,15 +250,15 @@ function Profile({ role }) {
                         </div>
                         <div className="card-body relative z-10">
                             <div className="mb-6">
-                                <div className="text-slate-600 mb-2 text-sm font-semibold">보유 아이템</div>
-                                <div className="text-4xl font-extrabold bg-gradient-to-r from-emerald-600 
-                                  to-teal-600 bg-clip-text text-transparent">
+                                <div className="text-slate-300 mb-2 text-sm font-semibold">보유 아이템</div>
+                                <div className="text-4xl font-extrabold bg-gradient-to-r from-emerald-500 
+                                  to-teal-500 bg-clip-text text-transparent">
                                     {stats.inventory.totalItems || 0}개
                                 </div>
                             </div>
                             <div>
-                                <div className="text-slate-600 mb-2 text-sm font-semibold">총 가치</div>
-                                <div className="text-2xl font-bold text-slate-800">
+                                <div className="text-slate-300 mb-2 text-sm font-semibold">총 가치</div>
+                                <div className="text-2xl font-bold text-emerald-400">
                                     {(stats.inventory.totalValue || 0).toLocaleString()}P
                                 </div>
                             </div>

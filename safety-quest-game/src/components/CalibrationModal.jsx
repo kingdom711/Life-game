@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getCalibrationInfo, attemptCalibration, ensureItemInstance } from '../utils/calibrationService';
 import { points } from '../utils/storage';
-import { getRarityColor, RARITY_NAMES } from '../data/itemsData';
+import { getRarityColor, RARITY_NAMES, getItemById } from '../data/itemsData';
 
 /**
  * 검교정(강화) 모달 - High-Tech Lab 컨셉
@@ -77,7 +77,7 @@ const CalibrationModal = ({ isOpen, onClose, itemId, onCalibrationComplete }) =>
                                     '--rarity-color': getRarityColor(calibrationInfo.rarity) 
                                 }} />
                                 <img 
-                                    src={calibrationInfo.preview?.currentStats ? `/item/${itemId.split('_').slice(0, 2).join('-')}.png` : '/item/helmet-common.png'}
+                                    src={getItemById(itemId)?.image || '/item/helmet-common.png'}
                                     alt={calibrationInfo.itemName}
                                     className="calibration-item-image"
                                     onError={(e) => {
