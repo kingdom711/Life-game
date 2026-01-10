@@ -45,5 +45,8 @@ if (config.DEV_MODE) {
     });
 }
 
+// [DEBUG] HTTPS 강제 변환 확인용 로그 (배포 후 확인 필수)
+console.log('🚀 [Environment] Final API_BASE_URL:', config.API_BASE_URL);
+
 export default config;
 
