@@ -5,7 +5,8 @@
 
 const config = {
     // API 서버 URL (로컬호스트가 아니면 강제로 HTTPS 적용)
-    API_BASE_URL: (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/^http:\/\/(?!localhost)/, 'https://'),
+    API_BASE_URL: (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080')
+        .replace(/^http:\/\/(?!localhost|127\.0\.0\.1)/, 'https://'),
 
     // Mock 모드 (백엔드 서버 없을 때 true)
     USE_MOCK: import.meta.env.VITE_USE_MOCK === 'true',
