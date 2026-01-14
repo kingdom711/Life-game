@@ -17,6 +17,7 @@ import { completeQuest, triggerQuestAction, checkAttendance } from '../utils/que
 import AvatarWindow from '../components/AvatarWindow';
 import AvatarGearDisplay from '../components/AvatarGearDisplay';
 import PointsHistoryModal from '../components/PointsHistoryModal';
+import { getAlerts } from '../api/alertApi';
 
 function Dashboard({ role }) {
     const navigate = useNavigate();
@@ -42,9 +43,17 @@ function Dashboard({ role }) {
     const [checkInResult, setCheckInResult] = useState({ streak: 0, bonus: 0 });
     const [isMonthlyModalOpen, setIsMonthlyModalOpen] = useState(false);
     const [isPointsHistoryModalOpen, setIsPointsHistoryModalOpen] = useState(false);
+    const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+    
+    // 알림 데이터 (API에서 로드)
+    const [latestAlerts, setLatestAlerts] = useState([]);
+    
+    // 관리자 권한 체크
+    const isAdmin = role === 'supervisor' || role === 'safetyManager';
 
     useEffect(() => {
         loadData();
+        loadAlerts();
     }, [role]);
 
     const loadData = () => {
@@ -64,6 +73,30 @@ function Dashboard({ role }) {
 
         const todayInstance = dailyQuestInstances.getTodayInstance(userProfile.getName() || 'guest');
         setIsHazardQuestCompleted(todayInstance.isCompleted);
+    };
+
+    const loadAlerts = async () => {
+        try {
+            const alerts = await getAlerts();
+            if (alerts && alerts.length > 0) {
+                setLatestAlerts(alerts);
+            } else {
+                // API 연결 안 됐을 때 기본 데이터
+                setLatestAlerts([
+                    { id: 1, type: 'danger', zone: '2구역', message: '낙하물 주의', time: '10분 전', detail: '2구역 상부 작업 중 자재 낙하 위험이 감지되었습니다. 해당 구역 진입 시 안전모 착용을 필수로 하시고, 상부 작업자의 신호를 확인 후 이동하세요.' },
+                    { id: 2, type: 'warning', zone: '5구역', message: '고소작업 진행중', time: '25분 전', detail: '5구역에서 고소작업이 진행 중입니다. 추락 방지 안전대 착용을 확인하시고, 작업 반경 내 출입을 자제해 주세요.' },
+                    { id: 3, type: 'info', zone: '전체', message: '안전점검 예정', time: '1시간 전', detail: '오후 2시부터 전 구역 정기 안전점검이 예정되어 있습니다. 작업 중단 후 안전관리자의 지시에 따라주세요.' }
+                ]);
+            }
+        } catch (error) {
+            console.error('알림 로드 실패:', error);
+            // 에러 시 기본 데이터
+            setLatestAlerts([
+                { id: 1, type: 'danger', zone: '2구역', message: '낙하물 주의', time: '10분 전', detail: '2구역 상부 작업 중 자재 낙하 위험이 감지되었습니다.' },
+                { id: 2, type: 'warning', zone: '5구역', message: '고소작업 진행중', time: '25분 전', detail: '5구역에서 고소작업이 진행 중입니다.' },
+                { id: 3, type: 'info', zone: '전체', message: '안전점검 예정', time: '1시간 전', detail: '오후 2시부터 전 구역 정기 안전점검이 예정되어 있습니다.' }
+            ]);
+        }
     };
 
     const handleCompleteQuest = (quest) => {
@@ -112,15 +145,186 @@ function Dashboard({ role }) {
                 />
             </div>
             <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-                {/* 헤더 - 프리미엄 디자인 */}
-                <div className="dashboard-header mb-12 text-center">
-                    <div className="header-glow" />
-                    <h1 className="dashboard-title">
-                        안전관리 대시보드
-                    </h1>
-                    <p className="dashboard-subtitle">
-                        오늘도 안전한 하루를 만들어가세요!
-                    </p>
+                {/* 헤더 - 프리미엄 디자인 with 실시간 알림 */}
+                <div 
+                    className="dashboard-header mb-12"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'stretch',
+                        justifyContent: 'space-between',
+                        gap: '2rem',
+                        flexWrap: 'wrap'
+                    }}
+                >
+                    {/* 왼쪽 - 제목 영역 (비율 2) */}
+                    <div style={{ 
+                        flex: '2 1 300px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        textAlign: 'center'
+                    }}>
+                        <div className="header-glow" />
+                        <h1 className="dashboard-title">
+                            안전관리 대시보드
+                        </h1>
+                        <p className="dashboard-subtitle">
+                            오늘도 안전한 하루를 만들어가세요!
+                        </p>
+                    </div>
+
+                    {/* 오른쪽 - 실시간 위험 알림 카드 (비율 1) */}
+                    <div 
+                        onClick={() => setIsAlertModalOpen(true)}
+                        style={{
+                            flex: '1 1 280px',
+                            maxWidth: '350px',
+                            background: 'linear-gradient(135deg, rgba(30, 27, 75, 0.9) 0%, rgba(55, 48, 107, 0.85) 100%)',
+                            border: '2px solid rgba(139, 92, 246, 0.4)',
+                            borderRadius: '12px',
+                            padding: '1rem',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.boxShadow = '0 8px 32px rgba(139, 92, 246, 0.3)';
+                            e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.6)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = 'none';
+                            e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.4)';
+                        }}
+                    >
+                        {/* 헤더 */}
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginBottom: '0.75rem',
+                            paddingBottom: '0.5rem',
+                            borderBottom: '1px solid rgba(139, 92, 246, 0.3)'
+                        }}>
+                            <h3 style={{
+                                margin: 0,
+                                fontSize: '0.9rem',
+                                fontWeight: 700,
+                                color: '#e879f9',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.4rem'
+                            }}>
+                                <span style={{ fontSize: '1rem' }}>🔔</span>
+                                실시간 위험 알림
+                            </h3>
+                            <span style={{
+                                fontSize: '0.65rem',
+                                color: 'rgba(203, 213, 225, 0.6)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.2rem'
+                            }}>
+                                <span style={{
+                                    width: '6px',
+                                    height: '6px',
+                                    background: '#ef4444',
+                                    borderRadius: '50%',
+                                    animation: 'pulse 2s infinite'
+                                }} />
+                                LIVE
+                            </span>
+                        </div>
+
+                        {/* 알림 내용 */}
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem'
+                        }}>
+                            {/* 경고 아이콘 */}
+                            <div style={{
+                                flex: '0 0 auto',
+                                width: '44px',
+                                height: '44px',
+                                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                                borderRadius: '10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '1.4rem',
+                                boxShadow: '0 4px 12px rgba(251, 191, 36, 0.3)'
+                            }}>
+                                ⚠️
+                            </div>
+
+                            {/* 텍스트 */}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{
+                                    fontSize: '0.75rem',
+                                    color: '#fbbf24',
+                                    fontWeight: 600,
+                                    marginBottom: '0.15rem'
+                                }}>
+                                    경고:
+                                </div>
+                                <div style={{
+                                    fontSize: '0.9rem',
+                                    color: '#f1f5f9',
+                                    fontWeight: 700,
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis'
+                                }}>
+                                    {latestAlerts[0]?.zone} {latestAlerts[0]?.message}
+                                </div>
+                                <div style={{
+                                    fontSize: '0.65rem',
+                                    color: 'rgba(203, 213, 225, 0.6)',
+                                    marginTop: '0.15rem'
+                                }}>
+                                    {latestAlerts[0]?.time} • 클릭하여 상세 보기
+                                </div>
+                            </div>
+
+                            {/* 구역 미니맵 */}
+                            <div style={{
+                                flex: '0 0 auto',
+                                width: '50px',
+                                height: '40px',
+                                background: 'rgba(139, 92, 246, 0.2)',
+                                borderRadius: '6px',
+                                border: '1px solid rgba(139, 92, 246, 0.3)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                position: 'relative',
+                                overflow: 'hidden'
+                            }}>
+                                {/* 간단한 구역 표시 */}
+                                <div style={{
+                                    position: 'absolute',
+                                    inset: '3px',
+                                    background: `
+                                        linear-gradient(90deg, rgba(139, 92, 246, 0.15) 1px, transparent 1px),
+                                        linear-gradient(rgba(139, 92, 246, 0.15) 1px, transparent 1px)
+                                    `,
+                                    backgroundSize: '8px 8px'
+                                }} />
+                                <div style={{
+                                    width: '14px',
+                                    height: '14px',
+                                    background: 'rgba(239, 68, 68, 0.6)',
+                                    borderRadius: '3px',
+                                    border: '1.5px solid #ef4444',
+                                    animation: 'pulse 1.5s infinite'
+                                }} />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {/* 통계 카드 - 프리미엄 디자인 */}
@@ -507,6 +711,201 @@ function Dashboard({ role }) {
                 isOpen={isPointsHistoryModalOpen}
                 onClose={() => setIsPointsHistoryModalOpen(false)}
             />
+
+            {/* 실시간 위험 알림 모달 */}
+            {isAlertModalOpen && (
+                <div 
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        background: 'rgba(0, 0, 0, 0.85)',
+                        backdropFilter: 'blur(8px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 2000,
+                        padding: '1rem'
+                    }}
+                    onClick={() => setIsAlertModalOpen(false)}
+                >
+                    <div 
+                        style={{
+                            background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
+                            borderRadius: '20px',
+                            width: '100%',
+                            maxWidth: '600px',
+                            maxHeight: '80vh',
+                            overflow: 'hidden',
+                            border: '2px solid rgba(139, 92, 246, 0.4)',
+                            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5), 0 0 60px rgba(139, 92, 246, 0.2)'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* 모달 헤더 */}
+                        <div style={{
+                            padding: '1.5rem',
+                            borderBottom: '1px solid rgba(139, 92, 246, 0.3)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                        }}>
+                            <h2 style={{
+                                margin: 0,
+                                fontSize: '1.5rem',
+                                fontWeight: 800,
+                                color: '#e879f9',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.75rem'
+                            }}>
+                                <span>🔔</span>
+                                실시간 위험 알림
+                            </h2>
+                            <button
+                                onClick={() => setIsAlertModalOpen(false)}
+                                style={{
+                                    background: 'rgba(255, 255, 255, 0.1)',
+                                    border: 'none',
+                                    borderRadius: '50%',
+                                    width: '36px',
+                                    height: '36px',
+                                    color: '#cbd5e1',
+                                    fontSize: '1.25rem',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* 모달 내용 */}
+                        <div style={{
+                            padding: '1.5rem',
+                            maxHeight: 'calc(80vh - 80px)',
+                            overflowY: 'auto'
+                        }}>
+                            {latestAlerts.map((alert, index) => (
+                                <div 
+                                    key={alert.id}
+                                    style={{
+                                        background: alert.type === 'danger' 
+                                            ? 'rgba(239, 68, 68, 0.15)' 
+                                            : alert.type === 'warning' 
+                                            ? 'rgba(251, 191, 36, 0.15)' 
+                                            : 'rgba(56, 189, 248, 0.15)',
+                                        border: `2px solid ${
+                                            alert.type === 'danger' 
+                                            ? 'rgba(239, 68, 68, 0.4)' 
+                                            : alert.type === 'warning' 
+                                            ? 'rgba(251, 191, 36, 0.4)' 
+                                            : 'rgba(56, 189, 248, 0.4)'
+                                        }`,
+                                        borderRadius: '12px',
+                                        padding: '1.25rem',
+                                        marginBottom: index < latestAlerts.length - 1 ? '1rem' : 0
+                                    }}
+                                >
+                                    {/* 알림 헤더 */}
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.75rem',
+                                        marginBottom: '0.75rem'
+                                    }}>
+                                        <span style={{ fontSize: '1.5rem' }}>
+                                            {alert.type === 'danger' ? '🚨' : alert.type === 'warning' ? '⚠️' : 'ℹ️'}
+                                        </span>
+                                        <div>
+                                            <div style={{
+                                                fontSize: '0.75rem',
+                                                color: alert.type === 'danger' 
+                                                    ? '#fca5a5' 
+                                                    : alert.type === 'warning' 
+                                                    ? '#fcd34d' 
+                                                    : '#7dd3fc',
+                                                fontWeight: 600,
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.05em'
+                                            }}>
+                                                {alert.type === 'danger' ? '위험' : alert.type === 'warning' ? '주의' : '안내'}
+                                            </div>
+                                            <div style={{
+                                                fontSize: '1.1rem',
+                                                fontWeight: 700,
+                                                color: '#f1f5f9'
+                                            }}>
+                                                {alert.zone} - {alert.message}
+                                            </div>
+                                        </div>
+                                        <div style={{
+                                            marginLeft: 'auto',
+                                            fontSize: '0.75rem',
+                                            color: 'rgba(203, 213, 225, 0.6)'
+                                        }}>
+                                            {alert.time}
+                                        </div>
+                                    </div>
+
+                                    {/* 상세 내용 */}
+                                    <p style={{
+                                        margin: 0,
+                                        fontSize: '0.9rem',
+                                        color: 'rgba(203, 213, 225, 0.9)',
+                                        lineHeight: 1.6,
+                                        paddingLeft: '2.25rem'
+                                    }}>
+                                        {alert.detail}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* 모달 푸터 */}
+                        <div style={{
+                            padding: '1rem 1.5rem',
+                            borderTop: '1px solid rgba(139, 92, 246, 0.3)',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}>
+                            <p style={{
+                                margin: 0,
+                                fontSize: '0.8rem',
+                                color: 'rgba(203, 213, 225, 0.5)'
+                            }}>
+                                ※ 위험 알림은 실시간으로 업데이트됩니다.
+                            </p>
+                            {isAdmin && (
+                                <button
+                                    onClick={() => {
+                                        setIsAlertModalOpen(false);
+                                        navigate('/alert-management');
+                                    }}
+                                    style={{
+                                        padding: '0.5rem 1rem',
+                                        borderRadius: '8px',
+                                        border: 'none',
+                                        background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                                        color: 'white',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                        fontSize: '0.875rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem'
+                                    }}
+                                >
+                                    ⚙️ 알림 관리
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

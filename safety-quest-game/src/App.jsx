@@ -17,6 +17,7 @@ import LandingPage from './pages/LandingPage';
 import TeamPage from './pages/TeamPage';
 import PricingPage from './pages/PricingPage';
 import RiskSolutionPage from './pages/RiskSolutionPage';
+import AlertManagement from './pages/AlertManagement';
 
 // Components
 import RoleSelector from './components/RoleSelector';
@@ -206,6 +207,7 @@ function App() {
                                     <Route path="/inventory" element={<Inventory />} />
                                     <Route path="/profile" element={<Profile role={selectedRole} />} />
                                     <Route path="/risk-solution" element={<RiskSolutionPage />} />
+                                    <Route path="/alert-management" element={<AlertManagement role={selectedRole} />} />
                                     <Route path="*" element={<Navigate to="/" replace />} />
                                 </Routes>
                             </div>

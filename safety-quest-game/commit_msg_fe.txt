@@ -1,0 +1,4 @@
+feat: AlertManagement 페이지 및 API 추가
+
+- `src/api/alertApi.js` 추가
+- `src/pages/AlertManagement.jsx` 추가
