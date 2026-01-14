@@ -114,7 +114,7 @@ const HazardQuestModal = ({ isOpen, onClose, onComplete }) => {
 
         // Award points
         const rewardPoints = 100 + (markers.length * 10); // 기본 100 + 개당 10
-        points.add(rewardPoints);
+        points.add(rewardPoints, '퀘스트 완료', `위험요인 찾기 (${markers.length}개 발견)`);
 
         // Also complete the daily quest entry if it exists
         // This ensures the card in the list also shows as completed

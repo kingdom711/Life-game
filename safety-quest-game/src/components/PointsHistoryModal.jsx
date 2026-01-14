@@ -137,6 +137,12 @@ const PointsHistoryModal = ({ isOpen, onClose }) => {
                         margin: 0;
                         font-size: 1.5rem;
                         color: #f1f5f9;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        background: transparent;
+                        -webkit-background-clip: unset;
+                        -webkit-text-fill-color: unset;
                     }
 
                     .close-btn {

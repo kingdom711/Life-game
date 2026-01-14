@@ -57,8 +57,39 @@ const LandingPage = ({ onEnter, onShowTeam, onLogin }) => {
             minHeight: '100vh',
             background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
             color: 'white',
-            overflowX: 'hidden'
+            overflowX: 'hidden',
+            position: 'relative'
         }}>
+            {/* 배경 GIF - 화면 중앙 고정 */}
+            <div 
+                style={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '100vw',
+                    height: '100vh',
+                    zIndex: 0,
+                    pointerEvents: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden'
+                }}
+            >
+                <img 
+                    src="/assets/안전_관리_대시보드_배경_영상.gif" 
+                    alt="배경"
+                    style={{
+                        width: 'auto',
+                        height: 'auto',
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        objectFit: 'contain',
+                        opacity: 0.3
+                    }}
+                />
+            </div>
             {/* 상단 네비게이션 바 */}
             <nav style={{
                 position: 'fixed',

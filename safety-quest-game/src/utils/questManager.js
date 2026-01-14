@@ -61,7 +61,7 @@ export const completeQuest = (questId) => {
 // 퀘스트 보상 지급
 const grantQuestReward = (quest) => {
     if (quest.reward.points) {
-        points.add(quest.reward.points);
+        points.add(quest.reward.points, '퀘스트 완료', quest.title || quest.name || '퀘스트');
     }
     if (quest.reward.exp) {
         level.addExp(quest.reward.exp);
@@ -152,7 +152,13 @@ export const checkAttendance = (userId) => {
     // 보상 지급 (기본 20P + 연속 출석 보너스)
     let bonus = 0;
     if (consecutiveDays % 7 === 0) bonus = 100; // 7일마다 보너스
-    points.add(20 + bonus);
+    
+    if (bonus > 0) {
+        points.add(20, '출석 체크', `${consecutiveDays}일 연속 출석`);
+        points.add(bonus, '출석 보너스', `${consecutiveDays}일 연속 출석 보너스`);
+    } else {
+        points.add(20 + bonus, '출석 체크', `${consecutiveDays}일 연속 출석`);
+    }
 
     return { success: true, message: '출석 완료!', consecutiveDays, bonus };
 };

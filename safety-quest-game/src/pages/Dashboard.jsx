@@ -81,7 +81,37 @@ function Dashboard({ role }) {
 
     return (
         <div className="page dashboard-page">
-            <div className="container">
+            {/* 배경 GIF - 화면 중앙 고정 */}
+            <div 
+                style={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '100vw',
+                    height: '100vh',
+                    zIndex: 0,
+                    pointerEvents: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden'
+                }}
+            >
+                <img 
+                    src="/assets/안전_관리_대시보드_배경_영상.gif" 
+                    alt="배경"
+                    style={{
+                        width: 'auto',
+                        height: 'auto',
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        objectFit: 'contain',
+                        opacity: 0.3
+                    }}
+                />
+            </div>
+            <div className="container" style={{ position: 'relative', zIndex: 1 }}>
                 {/* 헤더 - 프리미엄 디자인 */}
                 <div className="dashboard-header mb-12 text-center">
                     <div className="header-glow" />

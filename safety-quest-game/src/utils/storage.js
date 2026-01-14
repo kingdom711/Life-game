@@ -388,15 +388,44 @@ export const points = {
         return storage.set(STORAGE_KEYS.POINTS, pointsValue);
     },
 
-    add: (amount) => {
+    /**
+     * 포인트 추가 및 히스토리 자동 기록
+     * @param {number} amount - 추가할 포인트
+     * @param {string} source - 출처 ('퀘스트 완료', '출석 체크', '출석 보너스', '레벨업 보상', '기타')
+     * @param {string} sourceDetail - 상세 설명 (예: '일일 퀘스트: 안전모 착용 점검')
+     */
+    add: (amount, source = '기타', sourceDetail = '') => {
         const current = points.get();
-        return points.set(current + amount);
+        const newBalance = current + amount;
+        points.set(newBalance);
+        
+        // 히스토리 자동 기록
+        pointsHistory.add({
+            amount: amount,
+            source: source,
+            sourceDetail: sourceDetail,
+            balance: newBalance
+        });
+        
+        return newBalance;
     },
 
-    subtract: (amount) => {
+    subtract: (amount, source = '아이템 구매', sourceDetail = '') => {
         const current = points.get();
         const newPoints = Math.max(0, current - amount);
-        return points.set(newPoints);
+        points.set(newPoints);
+        
+        // 차감도 히스토리에 기록 (음수로)
+        if (amount > 0) {
+            pointsHistory.add({
+                amount: -amount,
+                source: source,
+                sourceDetail: sourceDetail,
+                balance: newPoints
+            });
+        }
+        
+        return newPoints;
     },
 
     canAfford: (amount) => {
@@ -526,7 +555,7 @@ export const streak = {
         streak.set(streakData);
 
         // 포인트 보상 (출석 보상 20포인트)
-        points.add(20);
+        points.add(20, '출석 체크', `${streakData.current}일 연속 출석`);
 
         return { success: true, message: '출석 완료! +1 스트릭', streak: streakData.current };
     },
@@ -839,9 +868,9 @@ export const monthlyAttendance = {
 
         // 보상 지급
         if (reward.type === 'points') {
-            points.add(reward.amount);
+            points.add(reward.amount, '출석 보너스', `${rewardDay}일 출석 보상: ${reward.name}`);
         } else if (reward.type === 'grand') {
-            points.add(reward.amount);
+            points.add(reward.amount, '출석 보너스', `만근 대보상: ${reward.name}`);
             // 전설 아이템은 랜덤으로 지급 (예시)
             // inventory.addItem('legendary_item');
         }

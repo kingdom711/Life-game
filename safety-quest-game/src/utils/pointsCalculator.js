@@ -222,13 +222,13 @@ export const getActiveStatsForHUD = () => {
 };
 
 // 포인트 추가 (아이템 보너스 + 세트 효과 포함) [Updated]
-export const addPoints = (basePoints, questType = 'all') => {
+export const addPoints = (basePoints, questType = 'all', source = '기타', sourceDetail = '') => {
     // 새로운 스탯 시스템 사용
     const totalStats = getTotalCombinedStats();
     const bonusPercent = totalStats.pointBoost;
     const totalPoints = Math.round(basePoints * (1 + bonusPercent / 100));
 
-    points.add(totalPoints);
+    points.add(totalPoints, source, sourceDetail);
 
     return {
         basePoints,
@@ -335,7 +335,7 @@ export const getLevelUpReward = (newLevel) => {
     const baseReward = 100;
     const reward = baseReward * newLevel;
 
-    points.add(reward);
+    points.add(reward, '레벨업 보상', `레벨 ${newLevel} 달성`);
 
     return {
         points: reward,
