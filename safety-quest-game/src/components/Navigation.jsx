@@ -4,11 +4,11 @@ function Navigation() {
     const location = useLocation();
 
     const navItems = [
-        { path: '/', label: '홈', icon: '🏠', active: location.pathname === '/' },
-        { path: '/daily', label: '일간', icon: '📅', active: location.pathname === '/daily' },
-        { path: '/weekly', label: '주간', icon: '📊', active: location.pathname === '/weekly' },
-        { path: '/shop', label: '상점', icon: '🛒', active: location.pathname === '/shop' },
-        { path: '/profile', label: '프로필', icon: '👤', active: location.pathname === '/profile' }
+        { path: '/game', label: '홈', icon: '🏠', active: location.pathname === '/game' || location.pathname === '/game/' },
+        { path: '/game/daily', label: '일간', icon: '📅', active: location.pathname.includes('/daily') },
+        { path: '/game/weekly', label: '주간', icon: '📊', active: location.pathname.includes('/weekly') },
+        { path: '/game/shop', label: '상점', icon: '🛒', active: location.pathname.includes('/shop') },
+        { path: '/game/profile', label: '프로필', icon: '👤', active: location.pathname.includes('/profile') }
     ];
 
     return (
