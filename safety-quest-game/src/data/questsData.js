@@ -11,11 +11,33 @@ export const QUEST_CATEGORY = {
     PHOTO: 'photo',
     REVIEW: 'review',
     SAFETY: 'safety',
-    LOGIN: 'login'
+    LOGIN: 'login',
+    EDUCATION: 'education' // [New] 교육 카테고리
 };
 
 // 일간 퀘스트
 export const dailyQuests = [
+    // [New] 일일 안전 교육 퀘스트 (모든 역할 필수)
+    {
+        id: 'daily_education_1',
+        type: QUEST_TYPE.DAILY,
+        category: QUEST_CATEGORY.EDUCATION,
+        role: 'all',
+        title: '📚 오늘의 안전 교육',
+        description: '10분 교육 영상을 시청하고 퀴즈를 통과하여 작업 권한을 획득하세요.',
+        icon: '📚',
+        requirement: {
+            type: 'action',
+            target: 1,
+            action: 'complete_education'
+        },
+        reward: {
+            points: 100,
+            exp: 30
+        },
+        priority: 1, // 높은 우선순위 (다른 퀘스트보다 먼저 표시)
+        mandatory: true // 필수 퀘스트
+    },
     {
         id: 'daily_hazard_1',
         type: QUEST_TYPE.DAILY,

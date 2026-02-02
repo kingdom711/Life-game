@@ -19,6 +19,10 @@ import AvatarGearDisplay from '../components/AvatarGearDisplay';
 import PointsHistoryModal from '../components/PointsHistoryModal';
 import { getAlerts } from '../api/alertApi';
 
+// [New] 교육 시스템
+import { getTodayEducationContent, hasCompletedTodayEducation, getLegalHoursProgress } from '../utils/educationManager';
+import { CATEGORY_INFO } from '../data/educationData';
+
 function Dashboard({ role }) {
     const navigate = useNavigate();
     const [playerStats, setPlayerStats] = useState({
@@ -47,6 +51,11 @@ function Dashboard({ role }) {
     
     // 알림 데이터 (API에서 로드)
     const [latestAlerts, setLatestAlerts] = useState([]);
+
+    // [New] 교육 시스템 상태
+    const [todayEducation, setTodayEducation] = useState(null);
+    const [educationCompleted, setEducationCompleted] = useState(false);
+    const [legalProgress, setLegalProgress] = useState(null);
     
     // 관리자 권한 체크
     const isAdmin = role === 'supervisor' || role === 'safetyManager';
@@ -73,6 +82,16 @@ function Dashboard({ role }) {
 
         const todayInstance = dailyQuestInstances.getTodayInstance(userProfile.getName() || 'guest');
         setIsHazardQuestCompleted(todayInstance.isCompleted);
+
+        // [New] 교육 데이터 로드
+        try {
+            const education = getTodayEducationContent();
+            setTodayEducation(education);
+            setEducationCompleted(hasCompletedTodayEducation());
+            setLegalProgress(getLegalHoursProgress());
+        } catch (error) {
+            console.error('교육 데이터 로드 실패:', error);
+        }
     };
 
     const loadAlerts = async () => {
@@ -478,6 +497,175 @@ function Dashboard({ role }) {
                     <WeeklyQuestTracker role={role} />
                 </div>
 
+                {/* [New] 오늘의 안전 교육 위젯 */}
+                {todayEducation && (
+                    <div className="mb-xl">
+                        <Link 
+                            to="/education" 
+                            className="no-underline"
+                            style={{ display: 'block' }}
+                        >
+                            <div 
+                                style={{
+                                    background: educationCompleted 
+                                        ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(16, 185, 129, 0.15) 100%)'
+                                        : 'linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%)',
+                                    border: educationCompleted 
+                                        ? '2px solid rgba(34, 197, 94, 0.4)'
+                                        : '2px solid rgba(59, 130, 246, 0.4)',
+                                    borderRadius: '16px',
+                                    padding: '1.5rem',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease',
+                                    position: 'relative',
+                                    overflow: 'hidden'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = educationCompleted 
+                                        ? '0 8px 32px rgba(34, 197, 94, 0.2)'
+                                        : '0 8px 32px rgba(59, 130, 246, 0.2)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = 'none';
+                                }}
+                            >
+                                {/* 배경 패턴 */}
+                                <div style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    right: 0,
+                                    width: '200px',
+                                    height: '100%',
+                                    background: 'linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.03) 100%)',
+                                    pointerEvents: 'none'
+                                }} />
+
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                                    {/* 아이콘 */}
+                                    <div style={{
+                                        width: '70px',
+                                        height: '70px',
+                                        borderRadius: '16px',
+                                        background: educationCompleted 
+                                            ? 'linear-gradient(135deg, #22c55e 0%, #10b981 100%)'
+                                            : `linear-gradient(135deg, ${CATEGORY_INFO[todayEducation.category]?.color || '#3b82f6'} 0%, ${CATEGORY_INFO[todayEducation.category]?.color || '#3b82f6'}dd 100%)`,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '2.5rem',
+                                        boxShadow: educationCompleted 
+                                            ? '0 4px 15px rgba(34, 197, 94, 0.3)'
+                                            : '0 4px 15px rgba(59, 130, 246, 0.3)',
+                                        flexShrink: 0
+                                    }}>
+                                        {educationCompleted ? '✅' : (CATEGORY_INFO[todayEducation.category]?.icon || '📚')}
+                                    </div>
+
+                                    {/* 콘텐츠 */}
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.75rem',
+                                            marginBottom: '0.5rem'
+                                        }}>
+                                            <h3 style={{
+                                                margin: 0,
+                                                fontSize: '1.25rem',
+                                                fontWeight: 700,
+                                                color: educationCompleted ? '#22c55e' : '#f1f5f9'
+                                            }}>
+                                                📚 오늘의 안전 교육
+                                            </h3>
+                                            {!educationCompleted && (
+                                                <span style={{
+                                                    background: 'rgba(239, 68, 68, 0.2)',
+                                                    color: '#f87171',
+                                                    fontSize: '0.7rem',
+                                                    fontWeight: 700,
+                                                    padding: '0.25rem 0.5rem',
+                                                    borderRadius: '4px',
+                                                    animation: 'pulse 2s infinite'
+                                                }}>
+                                                    필수
+                                                </span>
+                                            )}
+                                        </div>
+                                        
+                                        <p style={{
+                                            margin: 0,
+                                            fontSize: '1rem',
+                                            color: '#cbd5e1',
+                                            marginBottom: '0.5rem'
+                                        }}>
+                                            {educationCompleted 
+                                                ? '오늘의 교육을 완료했습니다! 수고하셨습니다.' 
+                                                : todayEducation.title
+                                            }
+                                        </p>
+
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '1rem',
+                                            fontSize: '0.875rem'
+                                        }}>
+                                            {!educationCompleted && (
+                                                <>
+                                                    <span style={{ color: '#94a3b8' }}>
+                                                        ⏱️ {Math.ceil(todayEducation.duration / 60)}분
+                                                    </span>
+                                                    <span style={{ color: '#94a3b8' }}>•</span>
+                                                    <span style={{ color: '#fbbf24' }}>
+                                                        +{todayEducation.points}P
+                                                    </span>
+                                                </>
+                                            )}
+                                            {legalProgress && (
+                                                <>
+                                                    {!educationCompleted && <span style={{ color: '#94a3b8' }}>•</span>}
+                                                    <span style={{ color: '#60a5fa' }}>
+                                                        법정교육 {legalProgress.currentYearHours}h / {legalProgress.requiredHours}h
+                                                    </span>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* 화살표 */}
+                                    <div style={{
+                                        fontSize: '1.5rem',
+                                        color: educationCompleted ? '#22c55e' : '#60a5fa',
+                                        flexShrink: 0
+                                    }}>
+                                        →
+                                    </div>
+                                </div>
+
+                                {/* 진행률 바 (미완료 시) */}
+                                {!educationCompleted && legalProgress && (
+                                    <div style={{ marginTop: '1rem' }}>
+                                        <div style={{
+                                            height: '4px',
+                                            background: 'rgba(255, 255, 255, 0.1)',
+                                            borderRadius: '2px',
+                                            overflow: 'hidden'
+                                        }}>
+                                            <div style={{
+                                                height: '100%',
+                                                width: `${Math.min(100, legalProgress.completionRate)}%`,
+                                                background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+                                                transition: 'width 0.5s ease'
+                                            }} />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </Link>
+                    </div>
+                )}
 
                 {/* 찾아라 위험! 일일 퀘스트 & 안전 지능 시스템 */}
                 <div className="mb-xl" style={{ 

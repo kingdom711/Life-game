@@ -18,6 +18,7 @@ import TeamPage from './pages/TeamPage';
 import PricingPage from './pages/PricingPage';
 import RiskSolutionPage from './pages/RiskSolutionPage';
 import AlertManagement from './pages/AlertManagement';
+import EducationPage from './pages/EducationPage'; // [New] 교육 페이지
 
 // Components
 import RoleSelector from './components/RoleSelector';
@@ -208,6 +209,7 @@ function App() {
                                     <Route path="/profile" element={<Profile role={selectedRole} />} />
                                     <Route path="/risk-solution" element={<RiskSolutionPage />} />
                                     <Route path="/alert-management" element={<AlertManagement role={selectedRole} />} />
+                                    <Route path="/education" element={<EducationPage />} />
                                     <Route path="*" element={<Navigate to="/" replace />} />
                                 </Routes>
                             </div>

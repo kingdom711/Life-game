@@ -10,7 +10,12 @@ const STORAGE_KEYS = {
     POINTS_HISTORY: 'safety_quest_points_history',
     LEVEL: 'safety_quest_level',
     STREAK: 'safety_quest_streak',
-    LAST_LOGIN: 'safety_quest_last_login'
+    LAST_LOGIN: 'safety_quest_last_login',
+    // [New] 마이크로 러닝 교육 시스템
+    EDUCATION_PROGRESS: 'safety_quest_education_progress', // 현재 진행 중인 교육 상태
+    EDUCATION_HISTORY: 'safety_quest_education_history',   // 완료한 교육 이력
+    LEGAL_HOURS: 'safety_quest_legal_hours',               // 누적 법정 교육 시간
+    EDUCATION_QUIZ_ATTEMPTS: 'safety_quest_quiz_attempts'  // 퀴즈 시도 횟수
 };
 
 // LocalStorage 래퍼 함수들
@@ -935,6 +940,290 @@ export const weeklyQuestProgress = {
     }
 };
 
+// ===== [New] 마이크로 러닝 교육 시스템 =====
+
+// 법정 교육 시간 (연간 기준)
+export const LEGAL_EDUCATION_REQUIREMENTS = {
+    ANNUAL_HOURS: 4,           // 연간 법정 의무 교육 시간
+    QUARTERLY_HOURS: 1,        // 분기별 권장 시간
+    MONTHLY_MINIMUM: 0.33      // 월별 최소 권장 시간 (20분)
+};
+
+// 교육 진행 상태 관리
+export const educationProgress = {
+    get: () => {
+        return storage.get(STORAGE_KEYS.EDUCATION_PROGRESS, {
+            currentEducationId: null,
+            watchedTime: 0,
+            maxWatchedTime: 0,
+            videoCompleted: false,
+            quizCompleted: false,
+            quizScore: 0,
+            startedAt: null,
+            lastUpdatedAt: null
+        });
+    },
+
+    set: (progress) => {
+        return storage.set(STORAGE_KEYS.EDUCATION_PROGRESS, progress);
+    },
+
+    // 교육 시작
+    startEducation: (educationId) => {
+        const progress = {
+            currentEducationId: educationId,
+            watchedTime: 0,
+            maxWatchedTime: 0,
+            videoCompleted: false,
+            quizCompleted: false,
+            quizScore: 0,
+            startedAt: new Date().toISOString(),
+            lastUpdatedAt: new Date().toISOString()
+        };
+        educationProgress.set(progress);
+        return progress;
+    },
+
+    // 시청 시간 업데이트
+    updateWatchTime: (watchedTime) => {
+        const progress = educationProgress.get();
+        progress.watchedTime = watchedTime;
+        progress.maxWatchedTime = Math.max(progress.maxWatchedTime, watchedTime);
+        progress.lastUpdatedAt = new Date().toISOString();
+        educationProgress.set(progress);
+        return progress;
+    },
+
+    // 영상 시청 완료 처리
+    completeVideo: () => {
+        const progress = educationProgress.get();
+        progress.videoCompleted = true;
+        progress.lastUpdatedAt = new Date().toISOString();
+        educationProgress.set(progress);
+        return progress;
+    },
+
+    // 퀴즈 완료 처리
+    completeQuiz: (score, passed) => {
+        const progress = educationProgress.get();
+        progress.quizCompleted = passed;
+        progress.quizScore = score;
+        progress.lastUpdatedAt = new Date().toISOString();
+        educationProgress.set(progress);
+        return progress;
+    },
+
+    // 진행 상태 초기화 (다음 교육을 위해)
+    reset: () => {
+        return educationProgress.set({
+            currentEducationId: null,
+            watchedTime: 0,
+            maxWatchedTime: 0,
+            videoCompleted: false,
+            quizCompleted: false,
+            quizScore: 0,
+            startedAt: null,
+            lastUpdatedAt: null
+        });
+    }
+};
+
+// 교육 이력 관리
+export const educationHistory = {
+    get: () => {
+        return storage.get(STORAGE_KEYS.EDUCATION_HISTORY, []);
+    },
+
+    set: (history) => {
+        return storage.set(STORAGE_KEYS.EDUCATION_HISTORY, history);
+    },
+
+    // 완료한 교육 추가
+    addCompleted: (educationData) => {
+        const history = educationHistory.get();
+        const record = {
+            id: crypto.randomUUID(),
+            educationId: educationData.educationId,
+            title: educationData.title,
+            category: educationData.category,
+            watchedTime: educationData.watchedTime,
+            legalHours: educationData.legalHours,
+            quizScore: educationData.quizScore,
+            pointsEarned: educationData.pointsEarned,
+            expEarned: educationData.expEarned,
+            completedAt: new Date().toISOString()
+        };
+        history.push(record);
+        educationHistory.set(history);
+
+        // 법정 교육 시간 누적
+        legalHours.add(educationData.legalHours);
+
+        return record;
+    },
+
+    // 오늘 완료한 교육 확인
+    getTodayCompleted: () => {
+        const history = educationHistory.get();
+        const today = getLocalDateString();
+        return history.filter(record => 
+            record.completedAt.split('T')[0] === today
+        );
+    },
+
+    // 특정 교육 완료 여부 확인 (오늘 기준)
+    hasCompletedToday: (educationId) => {
+        const todayCompleted = educationHistory.getTodayCompleted();
+        return todayCompleted.some(record => record.educationId === educationId);
+    },
+
+    // 이번 달 완료한 교육
+    getThisMonthCompleted: () => {
+        const history = educationHistory.get();
+        const now = new Date();
+        const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        return history.filter(record => 
+            record.completedAt.startsWith(currentMonth)
+        );
+    },
+
+    // 최근 교육 이력 조회
+    getRecent: (count = 20) => {
+        const history = educationHistory.get();
+        return history.slice(-count).reverse();
+    },
+
+    // 카테고리별 통계
+    getStatsByCategory: () => {
+        const history = educationHistory.get();
+        const stats = {};
+        history.forEach(record => {
+            if (!stats[record.category]) {
+                stats[record.category] = {
+                    count: 0,
+                    totalHours: 0,
+                    totalPoints: 0
+                };
+            }
+            stats[record.category].count += 1;
+            stats[record.category].totalHours += record.legalHours;
+            stats[record.category].totalPoints += record.pointsEarned;
+        });
+        return stats;
+    }
+};
+
+// 법정 교육 시간 관리
+export const legalHours = {
+    get: () => {
+        return storage.get(STORAGE_KEYS.LEGAL_HOURS, {
+            totalHours: 0,
+            yearlyHours: {},  // { '2026': 2.5, '2025': 4.0 }
+            quarterlyHours: {}, // { '2026-Q1': 1.2 }
+            lastUpdatedAt: null
+        });
+    },
+
+    set: (data) => {
+        return storage.set(STORAGE_KEYS.LEGAL_HOURS, data);
+    },
+
+    // 교육 시간 추가
+    add: (hours) => {
+        const data = legalHours.get();
+        const now = new Date();
+        const year = now.getFullYear().toString();
+        const quarter = `${year}-Q${Math.ceil((now.getMonth() + 1) / 3)}`;
+
+        data.totalHours += hours;
+        data.yearlyHours[year] = (data.yearlyHours[year] || 0) + hours;
+        data.quarterlyHours[quarter] = (data.quarterlyHours[quarter] || 0) + hours;
+        data.lastUpdatedAt = now.toISOString();
+
+        legalHours.set(data);
+        return data;
+    },
+
+    // 올해 누적 시간 조회
+    getCurrentYearHours: () => {
+        const data = legalHours.get();
+        const year = new Date().getFullYear().toString();
+        return data.yearlyHours[year] || 0;
+    },
+
+    // 이번 분기 누적 시간 조회
+    getCurrentQuarterHours: () => {
+        const data = legalHours.get();
+        const now = new Date();
+        const year = now.getFullYear();
+        const quarter = `${year}-Q${Math.ceil((now.getMonth() + 1) / 3)}`;
+        return data.quarterlyHours[quarter] || 0;
+    },
+
+    // 법정 교육 달성률 (%)
+    getCompletionRate: () => {
+        const currentYearHours = legalHours.getCurrentYearHours();
+        return Math.min(100, (currentYearHours / LEGAL_EDUCATION_REQUIREMENTS.ANNUAL_HOURS) * 100);
+    },
+
+    // 법정 교육 이수 여부
+    hasMetRequirement: () => {
+        return legalHours.getCurrentYearHours() >= LEGAL_EDUCATION_REQUIREMENTS.ANNUAL_HOURS;
+    }
+};
+
+// 퀴즈 시도 횟수 관리 (하루 3회 제한)
+export const quizAttempts = {
+    get: () => {
+        const data = storage.get(STORAGE_KEYS.EDUCATION_QUIZ_ATTEMPTS, {
+            date: null,
+            attempts: {}  // { educationId: attemptCount }
+        });
+
+        // 날짜가 바뀌었으면 초기화
+        const today = getLocalDateString();
+        if (data.date !== today) {
+            return {
+                date: today,
+                attempts: {}
+            };
+        }
+
+        return data;
+    },
+
+    set: (data) => {
+        return storage.set(STORAGE_KEYS.EDUCATION_QUIZ_ATTEMPTS, data);
+    },
+
+    // 시도 횟수 증가
+    increment: (educationId) => {
+        const data = quizAttempts.get();
+        data.attempts[educationId] = (data.attempts[educationId] || 0) + 1;
+        data.date = getLocalDateString();
+        quizAttempts.set(data);
+        return data.attempts[educationId];
+    },
+
+    // 시도 횟수 조회
+    getAttempts: (educationId) => {
+        const data = quizAttempts.get();
+        return data.attempts[educationId] || 0;
+    },
+
+    // 추가 시도 가능 여부 (하루 3회 제한)
+    canAttempt: (educationId, maxAttempts = 3) => {
+        const attempts = quizAttempts.getAttempts(educationId);
+        return attempts < maxAttempts;
+    },
+
+    // 남은 시도 횟수
+    getRemainingAttempts: (educationId, maxAttempts = 3) => {
+        const attempts = quizAttempts.getAttempts(educationId);
+        return Math.max(0, maxAttempts - attempts);
+    }
+};
+
 export default {
     userProfile,
     points,
@@ -953,5 +1242,11 @@ export default {
     attendanceLogs,
     weeklyQuestProgress,
     monthlyAttendance,
-    MONTHLY_REWARDS
+    MONTHLY_REWARDS,
+    // [New] 교육 시스템
+    educationProgress,
+    educationHistory,
+    legalHours,
+    quizAttempts,
+    LEGAL_EDUCATION_REQUIREMENTS
 };
