@@ -240,7 +240,7 @@ export const userInventoryInstances = {
     // 새 아이템 인스턴스 생성 (아이템 획득 시)
     createInstance: (itemId, baseStats, setId = null) => {
         const instances = userInventoryInstances.get();
-        
+
         // 이미 같은 itemId의 인스턴스가 있는지 확인
         const existing = instances.find(inst => inst.itemId === itemId);
         if (existing) {
@@ -274,7 +274,7 @@ export const userInventoryInstances = {
     updateInstance: (instanceId, updates) => {
         const instances = userInventoryInstances.get();
         const index = instances.findIndex(inst => inst.instanceId === instanceId);
-        
+
         if (index === -1) return null;
 
         instances[index] = {
@@ -291,7 +291,7 @@ export const userInventoryInstances = {
     updateCalibrationLevel: (instanceId, newLevel, newActiveStats) => {
         const instances = userInventoryInstances.get();
         const index = instances.findIndex(inst => inst.instanceId === instanceId);
-        
+
         if (index === -1) return null;
 
         instances[index] = {
@@ -309,7 +309,7 @@ export const userInventoryInstances = {
     recordCalibrationAttempt: (instanceId, isSuccess) => {
         const instances = userInventoryInstances.get();
         const index = instances.findIndex(inst => inst.instanceId === instanceId);
-        
+
         if (index === -1) return null;
 
         instances[index].totalCalibrationAttempts += 1;
@@ -362,12 +362,12 @@ export const calibrationLogs = {
             timestamp: new Date().toISOString()
         };
         logs.push(newLog);
-        
+
         // 최근 100개만 유지
         if (logs.length > 100) {
             logs.shift();
         }
-        
+
         storage.set(STORAGE_KEYS.CALIBRATION_LOGS, logs);
         return newLog;
     },
@@ -403,7 +403,7 @@ export const points = {
         const current = points.get();
         const newBalance = current + amount;
         points.set(newBalance);
-        
+
         // 히스토리 자동 기록
         pointsHistory.add({
             amount: amount,
@@ -411,7 +411,7 @@ export const points = {
             sourceDetail: sourceDetail,
             balance: newBalance
         });
-        
+
         return newBalance;
     },
 
@@ -419,7 +419,7 @@ export const points = {
         const current = points.get();
         const newPoints = Math.max(0, current - amount);
         points.set(newPoints);
-        
+
         // 차감도 히스토리에 기록 (음수로)
         if (amount > 0) {
             pointsHistory.add({
@@ -429,7 +429,7 @@ export const points = {
                 balance: newPoints
             });
         }
-        
+
         return newPoints;
     },
 
@@ -968,12 +968,61 @@ export const educationProgress = {
         return storage.set(STORAGE_KEYS.EDUCATION_PROGRESS, progress);
     },
 
+    // 교육별 누적 시청 시간 저장소 키
+    getCumulativeStorageKey: () => 'safety_quest_cumulative_watch_time',
+
+    // 교육별 누적 시청 시간 가져오기
+    getCumulativeWatchTime: (educationId) => {
+        const data = storage.get(educationProgress.getCumulativeStorageKey(), {});
+        return data[educationId] || 0;
+    },
+
+    // 교육별 누적 시청 시간 업데이트
+    updateCumulativeWatchTime: (educationId, watchedTime) => {
+        const data = storage.get(educationProgress.getCumulativeStorageKey(), {});
+        const currentCumulative = data[educationId] || 0;
+        // 이번 세션에서 더 많이 봤다면 그 차이만큼 누적
+        if (watchedTime > currentCumulative) {
+            data[educationId] = watchedTime;
+            storage.set(educationProgress.getCumulativeStorageKey(), data);
+        }
+        return data[educationId];
+    },
+
+    // 세션 시청 시간 추적 (현재 재생 세션에서 시청한 시간)
+    getSessionStorageKey: () => 'safety_quest_session_watch_time',
+
+    getSessionWatchTime: (educationId) => {
+        const data = storage.get(educationProgress.getSessionStorageKey(), {});
+        return data[educationId] || 0;
+    },
+
+    updateSessionWatchTime: (educationId, sessionTime) => {
+        const data = storage.get(educationProgress.getSessionStorageKey(), {});
+        data[educationId] = sessionTime;
+        storage.set(educationProgress.getSessionStorageKey(), data);
+        return sessionTime;
+    },
+
+    resetSessionWatchTime: (educationId) => {
+        const data = storage.get(educationProgress.getSessionStorageKey(), {});
+        data[educationId] = 0;
+        storage.set(educationProgress.getSessionStorageKey(), data);
+    },
+
     // 교육 시작
     startEducation: (educationId) => {
+        // 기존 누적 시청 시간 불러오기
+        const cumulativeTime = educationProgress.getCumulativeWatchTime(educationId);
+
+        // 새 세션 시작 - 세션 시청 시간 초기화
+        educationProgress.resetSessionWatchTime(educationId);
+
         const progress = {
             currentEducationId: educationId,
             watchedTime: 0,
-            maxWatchedTime: 0,
+            maxWatchedTime: 0,  // 세션 내 최대 위치 (빨리감기 방지용)
+            cumulativeWatchedTime: cumulativeTime,  // 누적 시청 시간
             videoCompleted: false,
             quizCompleted: false,
             quizScore: 0,
@@ -987,9 +1036,22 @@ export const educationProgress = {
     // 시청 시간 업데이트
     updateWatchTime: (watchedTime) => {
         const progress = educationProgress.get();
+        const educationId = progress.currentEducationId;
+
         progress.watchedTime = watchedTime;
         progress.maxWatchedTime = Math.max(progress.maxWatchedTime, watchedTime);
+
+        // 세션 시청 시간 업데이트
+        const sessionTime = educationProgress.updateSessionWatchTime(educationId, watchedTime);
+
+        // 누적 시청 시간 계산: 기존 누적 + 이번 세션
+        const previousCumulative = educationProgress.getCumulativeWatchTime(educationId);
+        // 이번 세션에서 새로 본 시간만 추가 (영상 처음부터 다시 보면 추가됨)
+        const newCumulative = previousCumulative + sessionTime;
+
+        progress.cumulativeWatchedTime = newCumulative;
         progress.lastUpdatedAt = new Date().toISOString();
+
         educationProgress.set(progress);
         return progress;
     },
@@ -997,6 +1059,13 @@ export const educationProgress = {
     // 영상 시청 완료 처리
     completeVideo: () => {
         const progress = educationProgress.get();
+        const educationId = progress.currentEducationId;
+
+        // 최종 누적 시간 저장
+        const sessionTime = educationProgress.getSessionWatchTime(educationId);
+        const previousCumulative = educationProgress.getCumulativeWatchTime(educationId);
+        educationProgress.updateCumulativeWatchTime(educationId, previousCumulative + sessionTime);
+
         progress.videoCompleted = true;
         progress.lastUpdatedAt = new Date().toISOString();
         educationProgress.set(progress);
@@ -1019,6 +1088,7 @@ export const educationProgress = {
             currentEducationId: null,
             watchedTime: 0,
             maxWatchedTime: 0,
+            cumulativeWatchedTime: 0,
             videoCompleted: false,
             quizCompleted: false,
             quizScore: 0,
@@ -1066,7 +1136,7 @@ export const educationHistory = {
     getTodayCompleted: () => {
         const history = educationHistory.get();
         const today = getLocalDateString();
-        return history.filter(record => 
+        return history.filter(record =>
             record.completedAt.split('T')[0] === today
         );
     },
@@ -1082,7 +1152,7 @@ export const educationHistory = {
         const history = educationHistory.get();
         const now = new Date();
         const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-        return history.filter(record => 
+        return history.filter(record =>
             record.completedAt.startsWith(currentMonth)
         );
     },

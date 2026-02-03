@@ -1,7 +1,26 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import YouTubeEducationPlayer from './YouTubeEducationPlayer';
 
 /**
- * 교육 비디오 플레이어 컴포넌트
+ * 교육 비디오 플레이어 컴포넌트 (래퍼)
+ * 
+ * YouTube 비디오 ID가 있으면 YouTubeEducationPlayer를 사용하고,
+ * 없으면 기존 로컬 비디오 플레이어를 사용합니다.
+ */
+const EducationVideoPlayer = (props) => {
+    const { youtubeVideoId, ...restProps } = props;
+
+    // YouTube 비디오가 있으면 YouTube 플레이어 사용
+    if (youtubeVideoId) {
+        return <YouTubeEducationPlayer youtubeVideoId={youtubeVideoId} {...restProps} />;
+    }
+
+    // 로컬 비디오 플레이어
+    return <LocalVideoPlayer {...restProps} />;
+};
+
+/**
+ * 로컬 비디오 플레이어 컴포넌트
  * 
  * 특징:
  * - 시청 시간 실시간 추적
@@ -9,7 +28,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
  * - 진행률 표시
  * - 90% 이상 시청 시 완료 처리
  */
-const EducationVideoPlayer = ({
+const LocalVideoPlayer = ({
     videoUrl,
     duration,
     requiredWatchTime,
@@ -152,7 +171,7 @@ const EducationVideoPlayer = ({
     const remainingMinutes = Math.ceil(remainingRequiredTime / 60);
 
     return (
-        <div 
+        <div
             className="relative w-full bg-black rounded-xl overflow-hidden shadow-2xl"
             onMouseMove={handleMouseMove}
             onMouseLeave={() => isPlaying && setShowControls(false)}
@@ -197,28 +216,27 @@ const EducationVideoPlayer = ({
             )}
 
             {/* 컨트롤 오버레이 */}
-            <div 
-                className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 transition-opacity duration-300 ${
-                    showControls ? 'opacity-100' : 'opacity-0'
-                }`}
+            <div
+                className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'
+                    }`}
             >
                 {/* 진행률 바 */}
-                <div 
+                <div
                     className="relative h-2 bg-gray-600 rounded-full mb-4 cursor-pointer group"
                     onClick={handleProgressClick}
                 >
                     {/* 시청 가능 범위 (이미 시청한 부분) */}
-                    <div 
+                    <div
                         className="absolute h-full bg-blue-500/50 rounded-full"
                         style={{ width: `${(maxWatchedTime / duration) * 100}%` }}
                     />
                     {/* 현재 재생 위치 */}
-                    <div 
+                    <div
                         className="absolute h-full bg-blue-500 rounded-full"
                         style={{ width: `${(currentTime / duration) * 100}%` }}
                     />
                     {/* 필수 시청 라인 */}
-                    <div 
+                    <div
                         className="absolute h-full w-0.5 bg-yellow-400"
                         style={{ left: `${(requiredWatchTime / duration) * 100}%` }}
                         title="필수 시청 위치"
@@ -295,7 +313,7 @@ const EducationVideoPlayer = ({
 
             {/* 재생 버튼 (일시정지 상태) */}
             {!isPlaying && (
-                <div 
+                <div
                     className="absolute inset-0 flex items-center justify-center cursor-pointer bg-black/30"
                     onClick={togglePlay}
                 >
@@ -310,10 +328,9 @@ const EducationVideoPlayer = ({
                 <div className="flex items-center gap-2">
                     {/* 시청 진행률 */}
                     <div className="flex-1 h-1 bg-gray-700 rounded-full overflow-hidden">
-                        <div 
-                            className={`h-full transition-all duration-300 ${
-                                isCompleted ? 'bg-green-500' : 'bg-blue-500'
-                            }`}
+                        <div
+                            className={`h-full transition-all duration-300 ${isCompleted ? 'bg-green-500' : 'bg-blue-500'
+                                }`}
                             style={{ width: `${Math.min(100, (maxWatchedTime / requiredWatchTime) * 100)}%` }}
                         />
                     </div>

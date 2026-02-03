@@ -11,10 +11,10 @@
  * - 이수 증명서 생성
  */
 
-import { 
-    educationProgress, 
-    educationHistory, 
-    legalHours, 
+import {
+    educationProgress,
+    educationHistory,
+    legalHours,
     quizAttempts,
     points,
     level,
@@ -22,9 +22,9 @@ import {
     LEGAL_EDUCATION_REQUIREMENTS
 } from './storage';
 
-import { 
-    getTodayEducation, 
-    getEducationById, 
+import {
+    getTodayEducation,
+    getEducationById,
     getAllEducations,
     CATEGORY_INFO
 } from '../data/educationData';
@@ -58,7 +58,7 @@ export const startEducation = (educationId) => {
     }
 
     const progress = educationProgress.startEducation(educationId);
-    
+
     return {
         success: true,
         message: '교육을 시작합니다.',
@@ -75,7 +75,7 @@ export const startEducation = (educationId) => {
  */
 export const updateWatchTime = (currentTime, maxAllowedJump = 5) => {
     const progress = educationProgress.get();
-    
+
     if (!progress.currentEducationId) {
         return { success: false, message: '진행 중인 교육이 없습니다.' };
     }
@@ -92,7 +92,7 @@ export const updateWatchTime = (currentTime, maxAllowedJump = 5) => {
     }
 
     const updatedProgress = educationProgress.updateWatchTime(currentTime);
-    
+
     return {
         success: true,
         progress: updatedProgress
@@ -101,12 +101,12 @@ export const updateWatchTime = (currentTime, maxAllowedJump = 5) => {
 
 /**
  * 영상 시청 완료 검증
- * @param {number} watchedTime - 총 시청 시간 (초)
+ * @param {number} watchedTime - 현재 세션 시청 시간 (초)
  * @returns {Object} 검증 결과
  */
 export const completeVideo = (watchedTime) => {
     const progress = educationProgress.get();
-    
+
     if (!progress.currentEducationId) {
         return { success: false, message: '진행 중인 교육이 없습니다.' };
     }
@@ -116,20 +116,24 @@ export const completeVideo = (watchedTime) => {
         return { success: false, message: '교육 콘텐츠를 찾을 수 없습니다.' };
     }
 
-    // 90% 이상 시청했는지 확인
-    if (watchedTime < education.requiredWatchTime) {
-        const remainingTime = education.requiredWatchTime - watchedTime;
+    // 누적 시청 시간 사용 (여러 번 시청해도 합산)
+    const cumulativeTime = progress.cumulativeWatchedTime || watchedTime;
+
+    // 90% 이상 시청했는지 확인 (누적 기준)
+    if (cumulativeTime < education.requiredWatchTime) {
+        const remainingTime = education.requiredWatchTime - cumulativeTime;
         const remainingMinutes = Math.ceil(remainingTime / 60);
         return {
             success: false,
-            message: `영상을 ${remainingMinutes}분 더 시청해야 합니다.`,
+            message: `영상을 ${remainingMinutes}분 더 시청해야 합니다. (누적 ${Math.floor(cumulativeTime / 60)}분 / 필요 ${Math.floor(education.requiredWatchTime / 60)}분)`,
             requiredTime: education.requiredWatchTime,
-            currentTime: watchedTime
+            currentTime: cumulativeTime,
+            isCumulative: true
         };
     }
 
     educationProgress.completeVideo();
-    
+
     return {
         success: true,
         message: '영상 시청을 완료했습니다. 퀴즈를 풀어주세요.',
@@ -150,7 +154,7 @@ export const submitQuiz = (educationId, answers) => {
     }
 
     const progress = educationProgress.get();
-    
+
     // 영상 시청 완료 확인
     if (!progress.videoCompleted) {
         return { success: false, message: '영상을 먼저 시청해주세요.' };
@@ -174,7 +178,7 @@ export const submitQuiz = (educationId, answers) => {
         const userAnswer = answers[question.id];
         const isCorrect = userAnswer === question.correctAnswer;
         if (isCorrect) correctCount++;
-        
+
         return {
             questionId: question.id,
             question: question.question,
@@ -197,7 +201,7 @@ export const submitQuiz = (educationId, answers) => {
     if (passed) {
         // 교육 완료 처리
         const completionResult = completeEducation(educationId, score);
-        
+
         return {
             success: true,
             passed: true,
@@ -244,7 +248,7 @@ const completeEducation = (educationId, quizScore) => {
 
     // 포인트 지급
     points.add(pointsReward, '교육 완료', `${education.title} 완료`);
-    
+
     // 경험치 지급
     level.addExp(expReward);
 
@@ -292,7 +296,7 @@ export const hasCompletedTodayEducation = () => {
  */
 export const checkWorkPermission = () => {
     const completed = hasCompletedTodayEducation();
-    
+
     if (completed) {
         return {
             hasPermission: true,
@@ -301,7 +305,7 @@ export const checkWorkPermission = () => {
     }
 
     const todayEducation = getTodayEducation();
-    
+
     return {
         hasPermission: false,
         message: '오늘의 안전 교육을 먼저 완료해주세요.',
@@ -345,10 +349,10 @@ export const getEducationStats = () => {
 
     // 총 완료 교육 수
     const totalCompleted = history.length;
-    
+
     // 이번 달 완료 교육 수
     const thisMonthCompleted = educationHistory.getThisMonthCompleted().length;
-    
+
     // 평균 퀴즈 점수
     const avgScore = history.length > 0
         ? Math.round(history.reduce((sum, r) => sum + r.quizScore, 0) / history.length)
@@ -360,7 +364,7 @@ export const getEducationStats = () => {
     // 연속 교육 일수 계산
     let educationStreak = 0;
     const today = new Date();
-    const sortedHistory = [...history].sort((a, b) => 
+    const sortedHistory = [...history].sort((a, b) =>
         new Date(b.completedAt) - new Date(a.completedAt)
     );
 
@@ -368,7 +372,7 @@ export const getEducationStats = () => {
         const recordDate = new Date(sortedHistory[i].completedAt);
         const expectedDate = new Date(today);
         expectedDate.setDate(today.getDate() - i);
-        
+
         if (recordDate.toDateString() === expectedDate.toDateString()) {
             educationStreak++;
         } else {
@@ -393,7 +397,7 @@ export const getEducationStats = () => {
  */
 export const generateCertificate = () => {
     const legalProgress = getLegalHoursProgress();
-    
+
     if (!legalProgress.hasMetRequirement) {
         return {
             success: false,
@@ -404,13 +408,13 @@ export const generateCertificate = () => {
 
     const stats = getEducationStats();
     const now = new Date();
-    
+
     // 증명서 데이터
     const certificate = {
         certificateId: `CERT-${now.getFullYear()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
         issueDate: now.toISOString(),
         validYear: now.getFullYear(),
-        userName: localStorage.getItem('safety_quest_user_profile') 
+        userName: localStorage.getItem('safety_quest_user_profile')
             ? JSON.parse(localStorage.getItem('safety_quest_user_profile')).name || '사용자'
             : '사용자',
         companyName: localStorage.getItem('companyName') || '',
@@ -441,7 +445,7 @@ export const generateCertificate = () => {
  */
 export const getCurrentProgress = () => {
     const progress = educationProgress.get();
-    
+
     if (!progress.currentEducationId) {
         return {
             inProgress: false,
@@ -451,14 +455,14 @@ export const getCurrentProgress = () => {
     }
 
     const education = getEducationById(progress.currentEducationId);
-    
+
     return {
         inProgress: true,
         education: education,
         progress: {
             watchedTime: progress.watchedTime,
             maxWatchedTime: progress.maxWatchedTime,
-            watchProgress: education 
+            watchProgress: education
                 ? Math.round((progress.maxWatchedTime / education.duration) * 100)
                 : 0,
             videoCompleted: progress.videoCompleted,
@@ -475,13 +479,13 @@ export const getCurrentProgress = () => {
 export const getAllEducationsWithStatus = () => {
     const allEducations = getAllEducations();
     const history = educationHistory.get();
-    
+
     return allEducations.map(edu => {
         const completedRecords = history.filter(h => h.educationId === edu.id);
         const lastCompleted = completedRecords.length > 0
             ? completedRecords[completedRecords.length - 1]
             : null;
-        
+
         return {
             ...edu,
             completedCount: completedRecords.length,
@@ -490,6 +494,33 @@ export const getAllEducationsWithStatus = () => {
             categoryInfo: CATEGORY_INFO[edu.category]
         };
     });
+};
+
+/**
+ * 교육별 누적 시청 시간 조회
+ * @param {string} educationId - 교육 ID
+ * @returns {number} 누적 시청 시간 (초)
+ */
+export const getCumulativeWatchTime = (educationId) => {
+    return educationProgress.getCumulativeWatchTime(educationId);
+};
+
+/**
+ * 교육별 누적 시청 시간 저장
+ * @param {string} educationId - 교육 ID
+ * @param {number} totalWatchedTime - 총 누적 시청 시간 (초)
+ */
+export const saveCumulativeWatchTime = (educationId, totalWatchedTime) => {
+    const CUMULATIVE_KEY = 'safety_quest_cumulative_watch_time';
+    const data = JSON.parse(localStorage.getItem(CUMULATIVE_KEY) || '{}');
+
+    // 기존 값보다 크면 업데이트
+    if (totalWatchedTime > (data[educationId] || 0)) {
+        data[educationId] = totalWatchedTime;
+        localStorage.setItem(CUMULATIVE_KEY, JSON.stringify(data));
+    }
+
+    return data[educationId];
 };
 
 export default {

@@ -145,6 +145,7 @@ export const educationContents = [
         title: '고소작업대 안전 작업',
         description: '고소작업대 사용 전 점검사항과 안전한 작업 방법을 학습합니다.',
         videoUrl: '/videos/safety/aerial_work_platform.mp4',
+        youtubeVideoId: '05YnzqKj4mU',  // YouTube 비디오 ID
         thumbnailUrl: '/images/education/aerial_thumbnail.png',
         duration: 600,
         requiredWatchTime: 540,
@@ -755,19 +756,19 @@ export const getTodayEducation = () => {
     const today = new Date();
     const startOfYear = new Date(today.getFullYear(), 0, 1);
     const dayOfYear = Math.floor((today - startOfYear) / (24 * 60 * 60 * 1000)) + 1;
-    
+
     // 주차 계산 (1~52)
     const weekNumber = Math.ceil(dayOfYear / 7) % 5 + 1; // 5주 순환
     // 요일 계산 (1=월요일 ~ 5=금요일, 주말은 1로 처리)
     let dayOfWeek = today.getDay();
     if (dayOfWeek === 0) dayOfWeek = 1; // 일요일 → 월요일
     if (dayOfWeek === 6) dayOfWeek = 1; // 토요일 → 월요일
-    
+
     // 해당 주차와 요일에 맞는 교육 찾기
     const education = educationContents.find(
         edu => edu.weekNumber === weekNumber && edu.dayOfWeek === dayOfWeek
     );
-    
+
     // 없으면 첫 번째 교육 반환
     return education || educationContents[0];
 };

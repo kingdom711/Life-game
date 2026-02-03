@@ -12,7 +12,9 @@ import {
     hasCompletedTodayEducation,
     getLegalHoursProgress,
     getCurrentProgress,
-    getAllEducationsWithStatus
+    getAllEducationsWithStatus,
+    getCumulativeWatchTime,
+    saveCumulativeWatchTime
 } from '../utils/educationManager';
 import { CATEGORY_INFO } from '../data/educationData';
 import { quizAttempts } from '../utils/storage';
@@ -23,7 +25,7 @@ import { quizAttempts } from '../utils/storage';
  */
 const EducationPage = () => {
     const navigate = useNavigate();
-    
+
     // 상태 관리
     const [todayEducation, setTodayEducation] = useState(null);
     const [isEducationStarted, setIsEducationStarted] = useState(false);
@@ -33,6 +35,7 @@ const EducationPage = () => {
     const [legalProgress, setLegalProgress] = useState(null);
     const [watchedTime, setWatchedTime] = useState(0);
     const [maxWatchedTime, setMaxWatchedTime] = useState(0);
+    const [cumulativeWatchedTime, setCumulativeWatchedTime] = useState(0);  // 누적 시청 시간
     const [alreadyCompleted, setAlreadyCompleted] = useState(false);
     const [remainingAttempts, setRemainingAttempts] = useState(3);
     const [allEducations, setAllEducations] = useState([]);
@@ -62,6 +65,13 @@ const EducationPage = () => {
             setIsEducationStarted(true);
             setVideoCompleted(currentProgress.progress.videoCompleted);
             setMaxWatchedTime(currentProgress.progress.maxWatchedTime);
+            // 누적 시청 시간 불러오기
+            const cumulative = getCumulativeWatchTime(education.id);
+            setCumulativeWatchedTime(cumulative);
+        } else if (education) {
+            // 진행 중이 아니어도 기존 누적 시간 불러오기
+            const cumulative = getCumulativeWatchTime(education.id);
+            setCumulativeWatchedTime(cumulative);
         }
 
         // 남은 시도 횟수
@@ -80,7 +90,7 @@ const EducationPage = () => {
         if (!todayEducation) return;
 
         const result = startEducation(todayEducation.id);
-        
+
         if (result.alreadyCompleted) {
             setAlreadyCompleted(true);
             return;
@@ -92,11 +102,18 @@ const EducationPage = () => {
     };
 
     // 시청 시간 업데이트
-    const handleTimeUpdate = useCallback((currentTime, maxTime) => {
+    const handleTimeUpdate = useCallback((currentTime, totalWatchedTime) => {
         setWatchedTime(currentTime);
-        setMaxWatchedTime(maxTime);
+        setMaxWatchedTime(totalWatchedTime);
+        setCumulativeWatchedTime(totalWatchedTime);  // 누적 시간 state 업데이트
+
+        // 누적 시간 localStorage에 저장
+        if (todayEducation) {
+            saveCumulativeWatchTime(todayEducation.id, totalWatchedTime);
+        }
+
         updateWatchTime(currentTime);
-    }, []);
+    }, [todayEducation]);
 
     // 영상 시청 완료
     const handleVideoComplete = useCallback(() => {
@@ -117,7 +134,7 @@ const EducationPage = () => {
         if (!todayEducation) return;
 
         const result = submitQuiz(todayEducation.id, answers);
-        
+
         if (result.passed) {
             // 교육 완료 - 데이터 새로고침
             loadEducationData();
@@ -161,24 +178,26 @@ const EducationPage = () => {
 
             {/* 법정 교육 시간 진행률 */}
             {legalProgress && (
-                <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-xl p-4 mb-6 border border-blue-500/30">
-                    <div className="flex justify-between items-center mb-2">
+                <div
+                    className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-xl p-6 mb-6 border border-blue-500/30"
+                    style={{ width: 'fit-content', minWidth: '400px', margin: '0 auto 1.5rem auto' }}
+                >
+                    <div className="flex justify-center items-center gap-4 mb-3">
                         <span className="text-gray-400 text-sm">법정 교육 시간 진행률</span>
                         <span className="text-white font-bold">
                             {legalProgress.currentYearHours}h / {legalProgress.requiredHours}h
                         </span>
                     </div>
                     <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
-                        <div 
-                            className={`h-full transition-all duration-500 ${
-                                legalProgress.hasMetRequirement 
-                                    ? 'bg-gradient-to-r from-green-500 to-emerald-400' 
-                                    : 'bg-gradient-to-r from-blue-500 to-purple-500'
-                            }`}
+                        <div
+                            className={`h-full transition-all duration-500 ${legalProgress.hasMetRequirement
+                                ? 'bg-gradient-to-r from-green-500 to-emerald-400'
+                                : 'bg-gradient-to-r from-blue-500 to-purple-500'
+                                }`}
                             style={{ width: `${Math.min(100, legalProgress.completionRate)}%` }}
                         />
                     </div>
-                    <div className="flex justify-between mt-2">
+                    <div className="flex justify-center items-center gap-4 mt-3">
                         <span className="text-xs text-gray-500">
                             {legalProgress.hasMetRequirement ? '✓ 연간 의무 교육 완료' : `${legalProgress.remainingHours}시간 남음`}
                         </span>
@@ -190,30 +209,22 @@ const EducationPage = () => {
             )}
 
             {/* 탭 메뉴 */}
-            <div className="flex gap-2 mb-6">
+            <div className="flex gap-sm mb-lg" style={{ justifyContent: 'center' }}>
                 <button
                     onClick={() => setSelectedTab('today')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                        selectedTab === 'today'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                    }`}
+                    className={`btn btn-sm ${selectedTab === 'today' ? 'btn-primary' : 'btn-secondary'}`}
                 >
                     오늘의 교육
                 </button>
                 <button
                     onClick={() => setSelectedTab('all')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                        selectedTab === 'all'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                    }`}
+                    className={`btn btn-sm ${selectedTab === 'all' ? 'btn-primary' : 'btn-secondary'}`}
                 >
                     전체 교육
                 </button>
                 <button
                     onClick={() => setShowHistoryModal(true)}
-                    className="px-4 py-2 rounded-lg font-medium bg-gray-800 text-gray-400 hover:bg-gray-700 transition-colors"
+                    className="btn btn-sm btn-secondary"
                 >
                     이력/증명서
                 </button>
@@ -221,22 +232,22 @@ const EducationPage = () => {
 
             {/* 오늘의 교육 탭 */}
             {selectedTab === 'today' && todayEducation && (
-                <div className="space-y-6">
+                <div className="space-y-6" style={{ width: '66.67%', margin: '0 auto' }}>
                     {/* 교육 정보 카드 */}
                     <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700">
                         <div className="flex items-start gap-4 mb-4">
-                            <div 
+                            <div
                                 className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl"
                                 style={{ backgroundColor: `${categoryInfo?.color}20` }}
                             >
                                 {categoryInfo?.icon}
                             </div>
                             <div className="flex-1">
-                                <span 
+                                <span
                                     className="text-xs px-2 py-1 rounded-full font-medium"
-                                    style={{ 
+                                    style={{
                                         backgroundColor: `${categoryInfo?.color}20`,
-                                        color: categoryInfo?.color 
+                                        color: categoryInfo?.color
                                     }}
                                 >
                                     {categoryInfo?.name}
@@ -285,7 +296,7 @@ const EducationPage = () => {
                             </p>
                             <button
                                 onClick={() => navigate('/')}
-                                className="mt-4 px-6 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg transition-colors"
+                                className="btn btn-success mt-md"
                             >
                                 대시보드로 이동
                             </button>
@@ -297,12 +308,12 @@ const EducationPage = () => {
                                 <div className="space-y-4">
                                     <EducationVideoPlayer
                                         videoUrl={todayEducation.videoUrl}
+                                        youtubeVideoId={todayEducation.youtubeVideoId}
+                                        educationId={todayEducation.id}
                                         duration={todayEducation.duration}
                                         requiredWatchTime={todayEducation.requiredWatchTime}
                                         onTimeUpdate={handleTimeUpdate}
                                         onVideoComplete={handleVideoComplete}
-                                        onSeekAttempt={handleSeekAttempt}
-                                        initialWatchedTime={maxWatchedTime}
                                     />
 
                                     {/* 퀴즈 시작 버튼 */}
@@ -310,11 +321,8 @@ const EducationPage = () => {
                                         <button
                                             onClick={() => setShowQuizModal(true)}
                                             disabled={remainingAttempts === 0}
-                                            className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
-                                                remainingAttempts === 0
-                                                    ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                                                    : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white'
-                                            }`}
+                                            className={`btn btn-lg ${remainingAttempts === 0 ? 'btn-secondary' : 'btn-primary'}`}
+                                            style={{ width: '100%' }}
                                         >
                                             {remainingAttempts === 0
                                                 ? '오늘 시도 횟수를 모두 사용했습니다'
@@ -336,9 +344,10 @@ const EducationPage = () => {
                                 /* 교육 시작 버튼 */
                                 <button
                                     onClick={handleStartEducation}
-                                    className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold text-lg rounded-xl transition-all flex items-center justify-center gap-3"
+                                    className="btn btn-lg btn-primary"
+                                    style={{ width: '100%', gap: '0.75rem' }}
                                 >
-                                    <span className="text-2xl">▶️</span>
+                                    <span style={{ fontSize: '1.5rem' }}>▶️</span>
                                     <span>교육 시작하기</span>
                                 </button>
                             )}
@@ -353,12 +362,12 @@ const EducationPage = () => {
                     {allEducations.map((edu) => {
                         const catInfo = CATEGORY_INFO[edu.category];
                         return (
-                            <div 
+                            <div
                                 key={edu.id}
                                 className="bg-gray-800/50 rounded-xl p-4 border border-gray-700"
                             >
                                 <div className="flex items-center gap-4">
-                                    <div 
+                                    <div
                                         className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"
                                         style={{ backgroundColor: `${catInfo?.color}20` }}
                                     >
