@@ -1,9 +1,1 @@
-feat: YouTube 교육 영상 통합 및 시청 시간 누적 시스템 구현
-
-- YouTubeEducationPlayer 컴포넌트 신규 추가 (YouTube IFrame API 연동)
-- EducationVideoPlayer 래퍼 컴포넌트 분기 처리 (YouTube / 로컬)
-- 교육별 누적 시청 시간 저장 및 불러오기 로직 구현 (localStorage)
-- 새로고침 시에도 누적 시청 시간이 유지되도록 버그 수정
-- 교육 완료 판정 로직을 누적 시청 시간 기준으로 개선
-- 교육 페이지 UI 레이아웃 최적화 (2/3 너비 제한)
-- 프로젝트 문서(진행현황, 구현 플랜) 업데이트
+feat: 교육 영상 YouTube 링크 추가 및 진행 현황 업데이트 (개구부 및 단차 추락 예방)

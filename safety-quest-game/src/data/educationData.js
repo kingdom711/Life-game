@@ -204,6 +204,7 @@ export const educationContents = [
         title: '개구부 및 단차 추락 예방',
         description: '바닥 개구부와 단차에서의 추락 위험과 예방 대책을 학습합니다.',
         videoUrl: '/videos/safety/opening_fall_prevention.mp4',
+        youtubeVideoId: 'BjHSnovgBQI',  // YouTube 비디오 ID
         thumbnailUrl: '/images/education/opening_thumbnail.png',
         duration: 480, // 8분
         requiredWatchTime: 432,
