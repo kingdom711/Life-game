@@ -93,7 +93,7 @@ YouTube URL을 저장할 수 있도록 데이터 스키마 확장:
     // 기존 필드
     videoUrl: '/videos/safety/ladder_safety.mp4',  // 로컬 비디오 (fallback)
     // 새 필드
-    youtubeVideoId: 'xxxxxxxxxx',  // YouTube 비디오 ID (우선 사용)
+    youtubeVideoId: '3wzOfsyEvow',  // YouTube 비디오 ID (우선 사용)
     // ...
 }
 ```
@@ -200,3 +200,38 @@ npm run dev
 1. **오프라인 대비**: YouTube 연결 실패 시 로컬 비디오로 fallback
 2. **모바일 호환성**: iOS Safari에서 자동 재생 제한 처리
 3. **접근성**: 자막(CC) 활성화 옵션 제공
+
+---
+
+## YouTube 교육 영상 매핑표 (2026-02-09 반영)
+
+> 각 교육 항목에 연결된 YouTube 영상 목록입니다.
+> `youtubeVideoId`는 `educationData.js`에 반영되어 있으며, YouTube IFrame API를 통해 재생됩니다.
+> 인터넷 연결 불가 시 `videoUrl`(로컬 MP4)로 자동 폴백됩니다.
+
+| 교육 ID | 카테고리 | 교육 제목 | YouTube ID | YouTube 영상 제목 | 채널 | 길이 | 조회수 |
+|:-------:|:-------:|----------|:----------:|------------------|------|:----:|------:|
+| edu_001 | 추락 예방 | 사다리 작업 안전 수칙 | `3wzOfsyEvow` | [산업안전VR] 사다리 추락! 안전하게 사다리를 설치할 수 있다! | 안전보건공단 | 4:57 | 10만 |
+| edu_002 | 추락 예방 | 고소작업대 안전 작업 | `n_uUre9nWQE` | [영상 안전백서] 움직이는 고소작업대 | 삼물가게 / 삼성물산 건설부문 | 4:49 | 9.7천 |
+| edu_003 | 추락 예방 | 개구부 및 단차 추락 예방 | `EwfcoDngbSI` | [내 일은 안전 Ep.1] '추락재해'편 | 삼물가게 / 삼성물산 건설부문 | 6:13 | 3만 |
+| edu_004 | 끼임 예방 | 기계 작업 끼임 예방 | `sOxSFMUZ8Uk` | 기계 움직이는데 끼임사고, 왜 일어나? KBS 뉴스 | KBS 뉴스 | 9:51 | 2만 |
+| edu_005 | 부딪힘 예방 | 지게차 충돌 예방 | `adQHFaQ0S8g` | [VR] 지게차 사례예방 VR안전교육 | 안전보건공단 | 6:03 | 1만 |
+| edu_006 | 개인보호구 | 안전모 올바른 착용법 | `3gQpoOe9RWs` | 안전모 미착용, 노무사와 변호사의 이야기 | 사이다안전 | 11:54 | 4천 |
+| edu_007 | 개인보호구 | 안전대 착용 및 점검 | `wA_H9Hb_4n4` | 안전대 안전고리 사용 시 유의해야 될 사항 | MINJUN LEE | 5:23 | 2만 |
+| edu_008 | 화재 안전 | 소화기 사용법 | `BgJ2p9zdXJk` | [소방안전자료] 소화기 사용법, 정말 제대로 알고 계신가요? | 국립소방연구원 | 4:24 | 3만 |
+| edu_009 | 전기 안전 | 전기 안전 기본 | `0UjrtwwaCl4` | [내 일은 안전 Ep.5] '감전 재해'편 | 삼물가게 / 삼성물산 건설부문 | 10:48 | 1만 |
+| edu_010 | 밀폐공간 | 밀폐공간 작업 안전 | `fBiwQvg22tk` | (안전교육) 밀폐공간 작업 안전 | KOEN 한국남동발전 | 11:27 | 1.7천 |
+
+### 영상 선정 기준
+- **YouTube Data API v3** 검색 결과 중 **조회수 1위** 영상을 선정
+- 어린이/키즈 대상 콘텐츠는 산업안전 교육 목적에 부적합하여 제외
+- 검색 키워드: 각 교육 제목 + "교육" (예: "사다리 작업 안전 수칙 교육")
+- 검색 도구: `scripts/youtube_search.py` (Google YouTube Data API v3 기반)
+
+### 영상 교체 방법
+1. `scripts/youtube_search.py`를 실행하여 새 영상 검색
+   ```bash
+   python scripts/youtube_search.py -q "검색 키워드" -n 5
+   ```
+2. `src/data/educationData.js`에서 해당 교육 항목의 `youtubeVideoId` 값을 변경
+3. 본 문서의 매핑표를 함께 업데이트

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAlerts, createAlert, updateAlert, deleteAlert } from '../api/alertApi';
+import { getAlerts, getAllAlerts, createAlert, updateAlert, deleteAlert } from '../api/alertApi';
 
 /**
  * 알림 관리 페이지
@@ -20,6 +20,7 @@ function AlertManagement({ role }) {
         message: '',
         detail: ''
     });
+    const [saveStatus, setSaveStatus] = useState(null); // { type: 'success'|'error', message: '' }
 
     // 권한 체크 - 관리자가 아니면 대시보드로 리다이렉트
     useEffect(() => {
@@ -36,11 +37,12 @@ function AlertManagement({ role }) {
     const loadAlerts = async () => {
         setLoading(true);
         try {
-            const data = await getAlerts();
+            // 관리자 페이지에서는 모든 알림 조회 (활성/비활성 포함)
+            const data = await getAllAlerts();
             setAlerts(data || []);
         } catch (error) {
             console.error('알림 로드 실패:', error);
-            // 개발용 샘플 데이터
+            // 백엔드 미연결 시 샘플 데이터
             setAlerts([
                 { id: 1, type: 'danger', zone: '2구역', message: '낙하물 주의', time: '10분 전', detail: '2구역 상부 작업 중 자재 낙하 위험이 감지되었습니다.' },
                 { id: 2, type: 'warning', zone: '5구역', message: '고소작업 진행중', time: '25분 전', detail: '5구역에서 고소작업이 진행 중입니다.' },
@@ -58,36 +60,27 @@ function AlertManagement({ role }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+        setSaveStatus(null);
+
         try {
             if (editingAlert) {
                 await updateAlert(editingAlert.id, formData);
-                setAlerts(prev => prev.map(a => 
-                    a.id === editingAlert.id ? { ...a, ...formData } : a
-                ));
+                setSaveStatus({ type: 'success', message: '알림이 수정되었습니다.' });
             } else {
-                const newAlert = await createAlert(formData);
-                // API 연결 안 됐을 때 로컬에서 추가
-                const localAlert = newAlert || {
-                    id: Date.now(),
-                    ...formData,
-                    time: '방금 전'
-                };
-                setAlerts(prev => [localAlert, ...prev]);
+                await createAlert(formData);
+                setSaveStatus({ type: 'success', message: '알림이 등록되었습니다.' });
             }
-            
+            // 저장 성공 후 백엔드에서 최신 목록 다시 로드
+            await loadAlerts();
             resetForm();
         } catch (error) {
             console.error('알림 저장 실패:', error);
-            // 로컬에서라도 추가
-            const localAlert = {
-                id: Date.now(),
-                ...formData,
-                time: '방금 전'
-            };
-            setAlerts(prev => [localAlert, ...prev]);
-            resetForm();
+            const errorMsg = error?.message || '서버 연결에 실패했습니다.';
+            setSaveStatus({ type: 'error', message: `저장 실패: ${errorMsg}` });
         }
+
+        // 3초 후 상태 메시지 자동 제거
+        setTimeout(() => setSaveStatus(null), 3000);
     };
 
     const handleEdit = (alert) => {
@@ -179,6 +172,24 @@ function AlertManagement({ role }) {
                         새 알림 작성
                     </button>
                 </div>
+
+                {/* 저장 결과 메시지 */}
+                {saveStatus && (
+                    <div style={{
+                        padding: '0.75rem 1rem',
+                        borderRadius: '10px',
+                        marginBottom: '1rem',
+                        fontWeight: 600,
+                        fontSize: '0.9rem',
+                        background: saveStatus.type === 'success'
+                            ? 'rgba(34, 197, 94, 0.15)'
+                            : 'rgba(239, 68, 68, 0.15)',
+                        border: `1px solid ${saveStatus.type === 'success' ? 'rgba(34, 197, 94, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`,
+                        color: saveStatus.type === 'success' ? '#4ade80' : '#f87171'
+                    }}>
+                        {saveStatus.type === 'success' ? '✅' : '❌'} {saveStatus.message}
+                    </div>
+                )}
 
                 {/* 알림 작성/수정 폼 */}
                 {isFormOpen && (
