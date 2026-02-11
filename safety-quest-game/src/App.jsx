@@ -19,6 +19,8 @@ import PricingPage from './pages/PricingPage';
 import RiskSolutionPage from './pages/RiskSolutionPage';
 import AlertManagement from './pages/AlertManagement';
 import EducationPage from './pages/EducationPage'; // [New] 교육 페이지
+import SpecializationPage from './pages/SpecializationPage'; // [New] 전직 센터
+import SpecializationTrainingPage from './pages/SpecializationTrainingPage'; // [New] 전직 교육
 
 // Components
 import RoleSelector from './components/RoleSelector';
@@ -210,6 +212,8 @@ function App() {
                                     <Route path="/risk-solution" element={<RiskSolutionPage />} />
                                     <Route path="/alert-management" element={<AlertManagement role={selectedRole} />} />
                                     <Route path="/education" element={<EducationPage />} />
+                                    <Route path="/specialization" element={<SpecializationPage role={selectedRole} />} />
+                                    <Route path="/specialization/training/:specId" element={<SpecializationTrainingPage />} />
                                     <Route path="*" element={<Navigate to="/" replace />} />
                                 </Routes>
                             </div>

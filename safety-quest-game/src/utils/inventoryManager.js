@@ -1,6 +1,7 @@
 import { inventory, equippedItems, points, userInventoryInstances } from './storage';
 import { getItemById, getItemPrice, ITEM_CATEGORY } from '../data/itemsData';
 import { ensureItemInstance } from './calibrationService';
+import userApi from '../api/userApi';
 
 // 아이템 구매
 export const purchaseItem = (itemId) => {
@@ -33,6 +34,14 @@ export const purchaseItem = (itemId) => {
     // 구매 처리
     points.subtract(itemPrice);
     inventory.addItem(itemId);
+
+    // 백엔드 동기화 (Supabase)
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+        userApi.spendPoints(itemPrice, '아이템 구매', `${item.name} 구매`).catch(err => {
+            console.warn('[InventorySync] 아이템 구매 백엔드 동기화 실패:', err.message);
+        });
+    }
 
     // [New] 아이템 인스턴스 생성 (Item System 2.0)
     const instance = ensureItemInstance(itemId);
@@ -127,7 +136,7 @@ export const getAllEquippedItems = () => {
         if (item) {
             // 인스턴스에서 검교정 레벨 가져오기
             const instance = userInventoryInstances.getByItemId(itemId);
-            
+
             items[category] = {
                 ...item,
                 enhancementLevel: instance?.currentCalibrationLevel || (typeof data === 'string' ? 0 : data.enhancementLevel),
@@ -153,7 +162,7 @@ export const getInventoryItemsWithInstances = () => {
     return itemIds.map(id => {
         const item = getItemById(id);
         if (!item) return null;
-        
+
         const instance = userInventoryInstances.getByItemId(id);
         return {
             ...item,

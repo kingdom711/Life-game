@@ -15,7 +15,11 @@ const STORAGE_KEYS = {
     EDUCATION_PROGRESS: 'safety_quest_education_progress', // 현재 진행 중인 교육 상태
     EDUCATION_HISTORY: 'safety_quest_education_history',   // 완료한 교육 이력
     LEGAL_HOURS: 'safety_quest_legal_hours',               // 누적 법정 교육 시간
-    EDUCATION_QUIZ_ATTEMPTS: 'safety_quest_quiz_attempts'  // 퀴즈 시도 횟수
+    EDUCATION_QUIZ_ATTEMPTS: 'safety_quest_quiz_attempts',  // 퀴즈 시도 횟수
+    // [New] 전직(특수역할) 시스템
+    SPECIALIZATION_DATA: 'safety_quest_specialization',         // 전직 상태 (활성 전직, 해금 목록)
+    SPECIALIZATION_PROGRESS: 'safety_quest_spec_progress',      // 전직 교육 진행 상황
+    SPECIALIZATION_QUIZ_ATTEMPTS: 'safety_quest_spec_quiz_attempts'  // 전직 퀴즈 시도 횟수
 };
 
 // LocalStorage 래퍼 함수들
@@ -1294,6 +1298,158 @@ export const quizAttempts = {
     }
 };
 
+// ===== [New] 전직(특수역할) 시스템 =====
+
+// 전직 상태 관리
+export const specializationData = {
+    get: () => {
+        return storage.get(STORAGE_KEYS.SPECIALIZATION_DATA, {
+            activeSpecialization: null,      // 현재 활성 전직 ID
+            unlockedSpecializations: [],     // 해금된 전직 ID 목록
+            classChangeHistory: []           // 전직 이력
+        });
+    },
+
+    set: (data) => {
+        return storage.set(STORAGE_KEYS.SPECIALIZATION_DATA, data);
+    },
+
+    // 현재 활성 전직 조회
+    getActive: () => {
+        const data = specializationData.get();
+        return data.activeSpecialization;
+    },
+
+    // 활성 전직 설정
+    setActive: (specId) => {
+        const data = specializationData.get();
+        data.activeSpecialization = specId;
+        return specializationData.set(data);
+    },
+
+    // 전직 해금
+    unlock: (specId) => {
+        const data = specializationData.get();
+        if (!data.unlockedSpecializations.includes(specId)) {
+            data.unlockedSpecializations.push(specId);
+            data.classChangeHistory.push({
+                specId,
+                unlockedAt: new Date().toISOString()
+            });
+        }
+        data.activeSpecialization = specId;
+        return specializationData.set(data);
+    },
+
+    // 전직 해금 여부 확인
+    isUnlocked: (specId) => {
+        const data = specializationData.get();
+        return data.unlockedSpecializations.includes(specId);
+    },
+
+    // 해금된 전직 목록 조회
+    getUnlocked: () => {
+        const data = specializationData.get();
+        return data.unlockedSpecializations;
+    },
+
+    // 전직 이력 조회
+    getHistory: () => {
+        const data = specializationData.get();
+        return data.classChangeHistory;
+    }
+};
+
+// 전직 교육 진행 상황 관리
+export const specializationProgress = {
+    get: () => {
+        return storage.get(STORAGE_KEYS.SPECIALIZATION_PROGRESS, {});
+    },
+
+    set: (progress) => {
+        return storage.set(STORAGE_KEYS.SPECIALIZATION_PROGRESS, progress);
+    },
+
+    // 특정 전직의 교육 진행 상황 조회
+    getBySpecialization: (specId) => {
+        const allProgress = specializationProgress.get();
+        return allProgress[specId] || {};
+    },
+
+    // 특정 교육 완료 기록
+    completeEducation: (specId, eduId, score) => {
+        const allProgress = specializationProgress.get();
+        if (!allProgress[specId]) {
+            allProgress[specId] = {};
+        }
+        allProgress[specId][eduId] = {
+            completed: true,
+            score,
+            completedAt: new Date().toISOString()
+        };
+        return specializationProgress.set(allProgress);
+    },
+
+    // 특정 교육 완료 여부 확인
+    isEducationCompleted: (specId, eduId) => {
+        const specProgress = specializationProgress.getBySpecialization(specId);
+        return specProgress[eduId]?.completed === true;
+    },
+
+    // 전직의 모든 필수 교육 완료 여부 확인
+    areAllEducationsCompleted: (specId, requiredEduIds) => {
+        const specProgress = specializationProgress.getBySpecialization(specId);
+        return requiredEduIds.every(eduId => specProgress[eduId]?.completed === true);
+    },
+
+    // 전직 교육 진행률 (%)
+    getCompletionRate: (specId, requiredEduIds) => {
+        const specProgress = specializationProgress.getBySpecialization(specId);
+        const completed = requiredEduIds.filter(
+            eduId => specProgress[eduId]?.completed === true
+        ).length;
+        return Math.round((completed / requiredEduIds.length) * 100);
+    }
+};
+
+// 전직 퀴즈 시도 횟수 관리 (하루 3회 제한)
+export const specQuizAttempts = {
+    get: () => {
+        const data = storage.get(STORAGE_KEYS.SPECIALIZATION_QUIZ_ATTEMPTS, {
+            date: null,
+            attempts: {}
+        });
+
+        const today = getLocalDateString();
+        if (data.date !== today) {
+            return { date: today, attempts: {} };
+        }
+        return data;
+    },
+
+    set: (data) => {
+        return storage.set(STORAGE_KEYS.SPECIALIZATION_QUIZ_ATTEMPTS, data);
+    },
+
+    increment: (eduId) => {
+        const data = specQuizAttempts.get();
+        data.attempts[eduId] = (data.attempts[eduId] || 0) + 1;
+        data.date = getLocalDateString();
+        specQuizAttempts.set(data);
+        return data.attempts[eduId];
+    },
+
+    canAttempt: (eduId, maxAttempts = 3) => {
+        const data = specQuizAttempts.get();
+        return (data.attempts[eduId] || 0) < maxAttempts;
+    },
+
+    getRemainingAttempts: (eduId, maxAttempts = 3) => {
+        const data = specQuizAttempts.get();
+        return Math.max(0, maxAttempts - (data.attempts[eduId] || 0));
+    }
+};
+
 export default {
     userProfile,
     points,
@@ -1318,5 +1474,9 @@ export default {
     educationHistory,
     legalHours,
     quizAttempts,
-    LEGAL_EDUCATION_REQUIREMENTS
+    LEGAL_EDUCATION_REQUIREMENTS,
+    // [New] 전직 시스템
+    specializationData,
+    specializationProgress,
+    specQuizAttempts
 };

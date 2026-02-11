@@ -4,6 +4,7 @@ import { points, level, streak, userProfile } from '../utils/storage';
 import { calculateLevel, getPointsToNextLevel, TIERS } from '../utils/pointsCalculator';
 import { getRoleById } from '../data/rolesData';
 import { getInventoryStats } from '../utils/inventoryManager';
+import { getActiveSpecialization, getUnlockedSpecializations } from '../utils/specializationManager';
 
 function Profile({ role }) {
     const [stats, setStats] = useState({
@@ -288,6 +289,76 @@ function Profile({ role }) {
                         </div>
                     </div>
                 )}
+
+                {/* [New] 전직 정보 - 기술인만 */}
+                {role === 'technician' && (() => {
+                    const activeSpec = getActiveSpecialization();
+                    const unlockedSpecs = getUnlockedSpecializations();
+                    return (
+                        <div className="card" style={{ marginTop: '1.5rem' }}>
+                            <div className="card-header">
+                                <h3 className="card-title">⚔️ 전직 정보</h3>
+                            </div>
+                            <div className="card-body">
+                                {activeSpec ? (
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.75rem',
+                                        padding: '0.75rem',
+                                        borderRadius: '0.5rem',
+                                        background: `${activeSpec.color}10`,
+                                        border: `1px solid ${activeSpec.color}30`,
+                                        marginBottom: '1rem'
+                                    }}>
+                                        <span style={{ fontSize: '2rem' }}>{activeSpec.icon}</span>
+                                        <div>
+                                            <div style={{ fontWeight: 700, color: activeSpec.color }}>{activeSpec.name}</div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
+                                                포인트 x{activeSpec.bonuses.pointMultiplier} 보너스 적용 중
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p style={{ color: 'var(--color-text-tertiary)', marginBottom: '1rem', fontSize: '0.875rem' }}>
+                                        아직 전직하지 않았습니다
+                                    </p>
+                                )}
+                                {unlockedSpecs.length > 0 && (
+                                    <div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', marginBottom: '0.5rem' }}>
+                                            해금된 전직 ({unlockedSpecs.length}개)
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                            {unlockedSpecs.map(spec => (
+                                                <span key={spec.id} style={{
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.25rem',
+                                                    padding: '0.2rem 0.5rem',
+                                                    borderRadius: '999px',
+                                                    fontSize: '0.75rem',
+                                                    background: `${spec.color}15`,
+                                                    border: `1px solid ${spec.color}30`,
+                                                    color: spec.color
+                                                }}>
+                                                    {spec.icon} {spec.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                <Link
+                                    to="/specialization"
+                                    className="btn btn-secondary btn-sm"
+                                    style={{ marginTop: '1rem', display: 'inline-block' }}
+                                >
+                                    전직 센터 바로가기 →
+                                </Link>
+                            </div>
+                        </div>
+                    );
+                })()}
 
                 {/* 초기화 버튼 */}
                 <div className="card mt-xl" style={{ borderColor: 'var(--color-danger)' }}>

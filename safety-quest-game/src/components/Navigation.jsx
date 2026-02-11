@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { hasCompletedTodayEducation } from '../utils/educationManager';
+import { userProfile } from '../utils/storage';
 
 function Navigation() {
     const location = useLocation();
@@ -17,17 +18,20 @@ function Navigation() {
         };
 
         checkEducation();
-        
+
         // 페이지 변경 시마다 체크
         const interval = setInterval(checkEducation, 5000);
         return () => clearInterval(interval);
     }, [location.pathname]);
 
+    const currentRole = userProfile.getRole();
+    const isTechnician = currentRole === 'technician';
+
     const navItems = [
         { path: '/', label: '홈', icon: '🏠', active: location.pathname === '/' },
         { path: '/education', label: '교육', icon: '📚', active: location.pathname === '/education', badge: !educationCompleted },
+        ...(isTechnician ? [{ path: '/specialization', label: '전직', icon: '⚔️', active: location.pathname.startsWith('/specialization') }] : []),
         { path: '/daily', label: '일간', icon: '📅', active: location.pathname === '/daily' },
-        { path: '/shop', label: '상점', icon: '🛒', active: location.pathname === '/shop' },
         { path: '/profile', label: '프로필', icon: '👤', active: location.pathname === '/profile' }
     ];
 

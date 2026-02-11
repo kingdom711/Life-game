@@ -18,6 +18,7 @@ import AvatarWindow from '../components/AvatarWindow';
 import AvatarGearDisplay from '../components/AvatarGearDisplay';
 import PointsHistoryModal from '../components/PointsHistoryModal';
 import { getAlerts } from '../api/alertApi';
+import userApi from '../api/userApi';
 
 // [New] 교육 시스템
 import { getTodayEducationContent, hasCompletedTodayEducation, getLegalHoursProgress } from '../utils/educationManager';
@@ -65,7 +66,8 @@ function Dashboard({ role }) {
         loadAlerts();
     }, [role]);
 
-    const loadData = () => {
+    const loadData = async () => {
+        // localStorage에서 즉시 로드 (빠른 UI 표시)
         const currentPoints = points.get();
         const currentLevel = calculateLevel(currentPoints);
         const currentStreak = streak.get();
@@ -91,6 +93,43 @@ function Dashboard({ role }) {
             setLegalProgress(getLegalHoursProgress());
         } catch (error) {
             console.error('교육 데이터 로드 실패:', error);
+        }
+
+        // 백엔드에서 최신 데이터 동기화 (로그인 상태일 때)
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            try {
+                const [pointsData, streakData] = await Promise.allSettled([
+                    userApi.getPoints(),
+                    userApi.getStreak()
+                ]);
+
+                let syncedPoints = currentPoints;
+                let syncedStreak = currentStreak;
+
+                if (pointsData.status === 'fulfilled' && pointsData.value) {
+                    syncedPoints = pointsData.value.balance;
+                    points.set(syncedPoints);
+                }
+
+                if (streakData.status === 'fulfilled' && streakData.value) {
+                    syncedStreak = {
+                        current: streakData.value.currentStreak,
+                        longest: streakData.value.longestStreak,
+                        lastLoginDate: streakData.value.lastCheckInDate
+                    };
+                    streak.set(syncedStreak);
+                }
+
+                setPlayerStats(prev => ({
+                    ...prev,
+                    points: syncedPoints,
+                    level: calculateLevel(syncedPoints),
+                    streak: syncedStreak
+                }));
+            } catch (err) {
+                console.log('[Dashboard] API sync failed, using localStorage:', err.message);
+            }
         }
     };
 
@@ -662,6 +701,49 @@ function Dashboard({ role }) {
                                         </div>
                                     </div>
                                 )}
+                            </div>
+                        </Link>
+                    </div>
+                )}
+
+                {/* [New] 전직 카드 - 기술인 역할일 때만 표시 */}
+                {role === 'technician' && (
+                    <div className="mb-xl">
+                        <Link
+                            to="/specialization"
+                            style={{ textDecoration: 'none', display: 'block' }}
+                        >
+                            <div
+                                style={{
+                                    padding: '1rem 1.5rem',
+                                    borderRadius: '1rem',
+                                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.05))',
+                                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '1rem',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={e => {
+                                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(99, 102, 241, 0.1))';
+                                    e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.4)';
+                                }}
+                                onMouseLeave={e => {
+                                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.05))';
+                                    e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.2)';
+                                }}
+                            >
+                                <span style={{ fontSize: '2rem' }}>⚔️</span>
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ fontWeight: 700, fontSize: '1rem', color: '#a78bfa' }}>
+                                        전직 센터
+                                    </div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
+                                        특수 교육을 이수하고 유도원 · 신호수 · 밀폐담당자로 전직하세요
+                                    </div>
+                                </div>
+                                <span style={{ color: '#a78bfa', fontSize: '1.25rem' }}>→</span>
                             </div>
                         </Link>
                     </div>

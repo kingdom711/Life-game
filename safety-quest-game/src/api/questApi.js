@@ -72,11 +72,12 @@ const questApi = {
     },
     
     /**
-     * 출석 기록 조회
-     * @param {number} days - 조회할 일수 (기본 30일)
+     * 출석 기록 조회 (달력용)
+     * @param {string} startDate - 시작일 (YYYY-MM-DD)
+     * @param {string} endDate - 종료일 (YYYY-MM-DD)
      */
-    getAttendanceHistory: async (days = 30) => {
-        return apiClient.get(`/quests/attendance/history?days=${days}`);
+    getAttendanceHistory: async (startDate, endDate) => {
+        return apiClient.get(`/quests/attendance/history?startDate=${startDate}&endDate=${endDate}`);
     },
     
     /**

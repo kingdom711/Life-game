@@ -1,7 +1,126 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import authApi from '../api/authApi';
+import gameProfileApi from '../api/gameProfileApi';
 
 const AuthContext = createContext(null);
+
+/**
+ * 서버 게임 데이터를 localStorage에 저장 (크로스 디바이스 동기화)
+ */
+const hydrateLocalStorage = (gameData) => {
+    try {
+        if (gameData.profile) {
+            const { level, exp, expToNext, gameRole, activeSpecialization } = gameData.profile;
+
+            // 레벨 데이터
+            localStorage.setItem('safety_quest_level', JSON.stringify({
+                current: level,
+                exp: exp,
+                expToNext: expToNext
+            }));
+
+            // 유저 프로필 (게임 역할)
+            const existingProfile = JSON.parse(localStorage.getItem('safety_quest_user_profile') || '{}');
+            localStorage.setItem('safety_quest_user_profile', JSON.stringify({
+                ...existingProfile,
+                role: gameRole || existingProfile.role
+            }));
+
+            // 전직 데이터
+            if (gameData.specializations) {
+                const unlockedSpecs = gameData.specializations.map(s => s.specId);
+                localStorage.setItem('safety_quest_specialization', JSON.stringify({
+                    activeSpecialization: activeSpecialization,
+                    unlockedSpecializations: unlockedSpecs
+                }));
+            }
+        }
+
+        if (gameData.points) {
+            localStorage.setItem('safety_quest_points', JSON.stringify({
+                balance: gameData.points.balance,
+                totalEarned: gameData.points.totalEarned,
+                totalSpent: gameData.points.totalSpent
+            }));
+        }
+
+        if (gameData.streak) {
+            localStorage.setItem('safety_quest_streak', JSON.stringify({
+                currentStreak: gameData.streak.currentStreak,
+                longestStreak: gameData.streak.longestStreak,
+                lastCheckInDate: gameData.streak.lastCheckInDate
+            }));
+        }
+
+        console.log('[AuthContext] 서버 게임 데이터 → localStorage 동기화 완료');
+    } catch (err) {
+        console.error('[AuthContext] localStorage 동기화 실패:', err);
+    }
+};
+
+/**
+ * localStorage에서 게임 데이터 수집 (서버 마이그레이션용)
+ */
+const collectLocalData = () => {
+    try {
+        const levelData = JSON.parse(localStorage.getItem('safety_quest_level') || '{}');
+        const profileData = JSON.parse(localStorage.getItem('safety_quest_user_profile') || '{}');
+        const specData = JSON.parse(localStorage.getItem('safety_quest_specialization') || '{}');
+        const pointsData = JSON.parse(localStorage.getItem('safety_quest_points') || '{}');
+        const streakData = JSON.parse(localStorage.getItem('safety_quest_streak') || '{}');
+
+        const specializations = (specData.unlockedSpecializations || []).map(specId => ({
+            specId,
+            unlockedAt: null,
+            educationProgress: null
+        }));
+
+        return {
+            level: levelData.current || 1,
+            exp: levelData.exp || 0,
+            expToNext: levelData.expToNext || 100,
+            gameRole: profileData.role || null,
+            activeSpecialization: specData.activeSpecialization || null,
+            totalQuestsCompleted: 0,
+            specializations,
+            pointsBalance: pointsData.balance || 0,
+            currentStreak: streakData.currentStreak || 0,
+            longestStreak: streakData.longestStreak || 0,
+            lastCheckInDate: streakData.lastCheckInDate || null
+        };
+    } catch (err) {
+        console.error('[AuthContext] localStorage 수집 실패:', err);
+        return null;
+    }
+};
+
+/**
+ * 서버에서 게임 데이터를 가져와 localStorage에 동기화
+ * - 서버에 데이터가 있으면 → localStorage에 저장 (다른 기기에서도 동일 데이터)
+ * - 서버에 데이터가 없으면 → localStorage 데이터를 서버에 업로드 (마이그레이션)
+ */
+const syncGameData = async () => {
+    try {
+        const gameData = await gameProfileApi.fetchFullGameData();
+
+        if (gameData && gameData.profile && gameData.profile.level > 1) {
+            // 서버에 진행된 데이터가 있으면 → localStorage에 반영
+            hydrateLocalStorage(gameData);
+        } else {
+            // 서버에 데이터가 없으면 → localStorage 데이터를 서버에 업로드
+            const localData = collectLocalData();
+            if (localData && (localData.level > 1 || localData.gameRole)) {
+                console.log('[AuthContext] localStorage → 서버 마이그레이션 시작');
+                const syncedData = await gameProfileApi.syncLocalData(localData);
+                if (syncedData) {
+                    hydrateLocalStorage(syncedData);
+                }
+            }
+        }
+    } catch (err) {
+        console.warn('[AuthContext] 게임 데이터 동기화 실패 (오프라인 모드 유지):', err.message);
+    }
+};
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -14,16 +133,13 @@ export const AuthProvider = ({ children }) => {
             try {
                 if (authApi.isAuthenticated()) {
                     const response = await authApi.getMe();
-                    // Assuming getMe returns { user: ... } or just the user object.
-                    // Adjust based on actual API response structure.
-                    // Looking at authApi.js, it calls apiClient.get('/auth/me').
-                    // Usually this returns the data directly if apiClient handles interception.
-                    setUser(response.user || response); 
+                    setUser(response.user || response);
+
+                    // ⭐ 세션 복원 시에도 서버 게임 데이터 동기화
+                    await syncGameData();
                 }
             } catch (err) {
                 console.error("Failed to restore session:", err);
-                // If token is invalid, authApi might throw. We should ensure we are logged out.
-                // However, we don't want to show an error to the user just because they aren't logged in on first load.
             } finally {
                 setLoading(false);
             }
@@ -37,14 +153,16 @@ export const AuthProvider = ({ children }) => {
         setError(null);
         try {
             const response = await authApi.login(credentials);
-            // response should contain { user, accessToken, ... }
             if (response.user) {
                 setUser(response.user);
             } else {
-                // If the user object isn't in the immediate response, fetch it
                 const userResponse = await authApi.getMe();
                 setUser(userResponse.user || userResponse);
             }
+
+            // ⭐ 로그인 성공 후 서버 게임 데이터 동기화 (크로스 디바이스)
+            await syncGameData();
+
             return response;
         } catch (err) {
             setError(err.message || 'Login failed');
@@ -61,7 +179,6 @@ export const AuthProvider = ({ children }) => {
             setUser(null);
         } catch (err) {
             console.error("Logout failed:", err);
-            // Force logout on client side even if server fails
             setUser(null);
         } finally {
             setLoading(false);

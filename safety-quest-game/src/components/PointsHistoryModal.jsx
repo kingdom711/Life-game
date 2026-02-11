@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { pointsHistory } from '../utils/storage';
+import userApi from '../api/userApi';
 import '../styles/index.css';
 
 const PointsHistoryModal = ({ isOpen, onClose }) => {
@@ -9,12 +10,47 @@ const PointsHistoryModal = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const allHistory = pointsHistory.getRecent(100);
-            const totals = pointsHistory.getTotalBySource();
-            setHistory(allHistory);
-            setTotalBySource(totals);
+            loadHistory();
         }
     }, [isOpen]);
+
+    const loadHistory = async () => {
+        // localStorage에서 즉시 표시
+        const allHistory = pointsHistory.getRecent(100);
+        const totals = pointsHistory.getTotalBySource();
+        setHistory(allHistory);
+        setTotalBySource(totals);
+
+        // 백엔드에서 최신 내역 동기화
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            try {
+                const data = await userApi.getPointsHistory(0, 100);
+                if (data && data.content) {
+                    const apiHistory = data.content.map(tx => ({
+                        id: tx.id,
+                        amount: tx.type === 'SPEND' ? -tx.amount : tx.amount,
+                        source: tx.reason,
+                        sourceDetail: tx.description || '',
+                        timestamp: tx.createdAt
+                    }));
+                    if (apiHistory.length > 0) {
+                        setHistory(apiHistory);
+                        // 소스별 합계 계산
+                        const apiTotals = {};
+                        apiHistory.forEach(entry => {
+                            if (entry.amount > 0) {
+                                apiTotals[entry.source] = (apiTotals[entry.source] || 0) + entry.amount;
+                            }
+                        });
+                        setTotalBySource(apiTotals);
+                    }
+                }
+            } catch (err) {
+                console.log('[PointsHistory] API failed, using localStorage:', err.message);
+            }
+        }
+    };
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);

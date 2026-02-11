@@ -39,9 +39,38 @@ const userApi = {
      * 포인트 추가
      * @param {number} amount
      * @param {string} reason
+     * @param {string} description
      */
-    addPoints: async (amount, reason = '') => {
-        return apiClient.post('/users/me/points/add', { amount, reason });
+    addPoints: async (amount, reason = '', description = '') => {
+        return apiClient.post('/users/me/points/add', { amount, reason, description });
+    },
+
+    /**
+     * 포인트 차감
+     * @param {number} amount
+     * @param {string} reason
+     * @param {string} description
+     */
+    spendPoints: async (amount, reason = '', description = '') => {
+        return apiClient.post('/users/me/points/spend', { amount, reason, description });
+    },
+
+    /**
+     * 포인트 거래 내역 조회 (페이징)
+     * @param {number} page
+     * @param {number} size
+     */
+    getPointsHistory: async (page = 0, size = 20) => {
+        return apiClient.get(`/users/me/points/history?page=${page}&size=${size}`);
+    },
+
+    /**
+     * 활동 기록 조회 (페이징)
+     * @param {number} page
+     * @param {number} size
+     */
+    getActivities: async (page = 0, size = 20) => {
+        return apiClient.get(`/users/me/activities?page=${page}&size=${size}`);
     },
     
     /**

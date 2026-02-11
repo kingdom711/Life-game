@@ -4,13 +4,14 @@
  */
 
 import { points, userInventoryInstances, calibrationLogs } from './storage';
-import { 
-    getItemById, 
-    getCalibrationConfig, 
+import {
+    getItemById,
+    getCalibrationConfig,
     getItemBaseStats,
     getCalibrationCost,
-    getCalibrationSuccessRate 
+    getCalibrationSuccessRate
 } from '../data/itemsData';
+import userApi from '../api/userApi';
 
 /**
  * 검교정 결과 타입
@@ -138,6 +139,14 @@ export const attemptCalibration = (instanceId) => {
 
     // 포인트 차감
     points.subtract(cost);
+
+    // 백엔드 동기화 (Supabase)
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+        userApi.spendPoints(cost, '검교정', `${item.name} +${currentCalibrationLevel + 1} 시도`).catch(err => {
+            console.warn('[CalibrationSync] 검교정 백엔드 동기화 실패:', err.message);
+        });
+    }
 
     // 성공 확률 계산
     const successRate = getCalibrationSuccessRate(itemId, currentCalibrationLevel);

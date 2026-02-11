@@ -6,11 +6,13 @@ export const roles = [
         icon: '👷',
         image: '/role_technician.png',
         color: '#3b82f6',
+        hasSpecializations: true, // 전직 시스템 활성화
         features: [
             '체크리스트 작성 및 제출',
             '작업 사진 업로드',
             '안전용품 착용',
-            '일일 안전 점검'
+            '일일 안전 점검',
+            '⚔️ 전직 가능 (유도원·신호수·밀폐담당자)'
         ]
     },
     {
@@ -50,4 +52,9 @@ export const getRoleById = (roleId) => {
 export const getRoleColor = (roleId) => {
     const role = getRoleById(roleId);
     return role ? role.color : '#64748b';
+};
+
+export const hasRoleSpecializations = (roleId) => {
+    const role = getRoleById(roleId);
+    return role?.hasSpecializations === true;
 };

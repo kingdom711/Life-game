@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { streak, monthlyAttendance } from '../utils/storage';
+import questApi from '../api/questApi';
+import userApi from '../api/userApi';
 
 const StreakButton = ({ onCheckIn, onShowMonthlyRewards }) => {
     const [isCheckedIn, setIsCheckedIn] = useState(false);
@@ -7,56 +9,120 @@ const StreakButton = ({ onCheckIn, onShowMonthlyRewards }) => {
     const [streakCount, setStreakCount] = useState(0);
 
     useEffect(() => {
-        // 초기 상태 확인
-        const checkStatus = () => {
+        const checkStatus = async () => {
+            // 먼저 localStorage에서 빠르게 표시
             const checkedIn = streak.isCheckedInToday();
             setIsCheckedIn(checkedIn);
             const currentStreak = streak.get().current;
             setStreakCount(currentStreak);
+
+            // 백엔드에서 최신 스트릭 동기화 (로그인 상태일 때)
+            const token = localStorage.getItem('accessToken');
+            if (token) {
+                try {
+                    const data = await userApi.getStreak();
+                    if (data && typeof data.currentStreak === 'number') {
+                        setStreakCount(data.currentStreak);
+                        // localStorage도 동기화
+                        const today = new Date().toISOString().split('T')[0];
+                        if (data.lastCheckInDate === today) {
+                            setIsCheckedIn(true);
+                        }
+                        streak.set({
+                            current: data.currentStreak,
+                            longest: data.longestStreak,
+                            lastLoginDate: data.lastCheckInDate
+                        });
+                    }
+                } catch (err) {
+                    console.log('[StreakButton] API fallback to localStorage:', err.message);
+                }
+            }
         };
 
         checkStatus();
 
-        // 1분마다 날짜 변경 체크 (자정 지나면 버튼 활성화)
         const interval = setInterval(() => {
-            checkStatus();
+            const checkedIn = streak.isCheckedInToday();
+            setIsCheckedIn(checkedIn);
+            const currentStreak = streak.get().current;
+            setStreakCount(currentStreak);
         }, 60000);
 
         return () => clearInterval(interval);
     }, []);
 
-    const handleCheckIn = () => {
+    const handleCheckIn = async () => {
         if (isCheckedIn) {
             console.log('Already checked in');
             return;
         }
 
         console.log('Attempting check-in...');
+
+        // 백엔드 API 우선 시도
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            try {
+                const data = await questApi.checkIn();
+                console.log('API check-in result:', data);
+
+                setIsCheckedIn(true);
+                setStreakCount(data.currentStreak);
+                setShowAnimation(true);
+
+                // localStorage도 동기화
+                streak.set({
+                    current: data.currentStreak,
+                    longest: data.longestStreak,
+                    lastLoginDate: data.checkInDate
+                });
+                monthlyAttendance.recordAttendance();
+
+                if (onCheckIn) {
+                    onCheckIn({
+                        success: true,
+                        streak: data.currentStreak,
+                        bonus: data.bonusAwarded ? 5 : 0,
+                        pointsEarned: data.pointsEarned
+                    });
+                }
+
+                setTimeout(() => {
+                    setShowAnimation(false);
+                    if (onShowMonthlyRewards) onShowMonthlyRewards();
+                }, 2000);
+                return;
+            } catch (err) {
+                console.log('[StreakButton] API check-in failed, falling back:', err.message);
+                // 이미 출석한 경우 처리
+                if (err.data?.code === 'AT001') {
+                    setIsCheckedIn(true);
+                    return;
+                }
+            }
+        }
+
+        // localStorage 폴백
         const result = streak.checkIn();
-        console.log('Check-in result:', result);
-        
+        console.log('Local check-in result:', result);
+
         if (result.success) {
             setIsCheckedIn(true);
             setStreakCount(result.streak);
             setShowAnimation(true);
-
-            // 월간 출석도 기록
             monthlyAttendance.recordAttendance();
 
-            // 상위 컴포넌트에 알림
             if (onCheckIn) {
                 console.log('Calling onCheckIn callback');
                 onCheckIn(result);
             }
 
-            // 애니메이션 종료 후 월간 보상 모달 표시
             setTimeout(() => {
                 setShowAnimation(false);
-                // 월간 보상 모달 표시
                 if (onShowMonthlyRewards) onShowMonthlyRewards();
             }, 2000);
         } else {
-            // 이미 출석한 경우 상태 업데이트
             if (result.message && result.message.includes('이미 출석')) {
                 console.log('Already checked in today, updating state');
                 setIsCheckedIn(true);
@@ -68,12 +134,11 @@ const StreakButton = ({ onCheckIn, onShowMonthlyRewards }) => {
         }
     };
 
-    // 이미 출석한 경우 클릭 시 월간 보상 모달 표시
     const handleClick = (e) => {
         e.preventDefault();
         e.stopPropagation();
         console.log('StreakButton clicked', { isCheckedIn });
-        
+
         if (isCheckedIn) {
             console.log('Already checked in, showing monthly rewards');
             if (onShowMonthlyRewards) onShowMonthlyRewards();

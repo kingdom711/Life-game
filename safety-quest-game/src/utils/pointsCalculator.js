@@ -1,10 +1,25 @@
 import { points, level, equippedItems, userInventoryInstances } from './storage';
 import { getItemEffect, getItemById, getItemBaseStats } from '../data/itemsData';
-import { 
-    calculateActiveSetBonuses, 
-    sumSetBonusStats, 
+import userApi from '../api/userApi';
+
+// 백엔드 포인트 동기화 (fire-and-forget, 로그인 시에만)
+const syncPointsToBackend = (amount, type, reason, description = '') => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    const apiCall = type === 'EARN'
+        ? userApi.addPoints(amount, reason, description)
+        : userApi.spendPoints(amount, reason, description);
+
+    apiCall.catch(err => {
+        console.warn(`[PointsSync] ${type} 백엔드 동기화 실패:`, err.message);
+    });
+};
+import {
+    calculateActiveSetBonuses,
+    sumSetBonusStats,
     getActiveVisualAura,
-    getNextSetBonusInfo 
+    getNextSetBonusInfo
 } from '../data/setsData';
 
 // 티어 정보
@@ -108,10 +123,10 @@ export const getEquippedItemsWithStats = () => {
 
         // 인스턴스에서 검교정된 스탯 가져오기
         const instance = userInventoryInstances.getByItemId(itemId);
-        const activeStats = instance?.activeStats || item.baseStats || { 
-            pointBoost: 0, 
-            xpAccelerator: 0, 
-            streakSaver: 0 
+        const activeStats = instance?.activeStats || item.baseStats || {
+            pointBoost: 0,
+            xpAccelerator: 0,
+            streakSaver: 0
         };
 
         result[category] = {
@@ -130,7 +145,7 @@ export const getEquippedItemsWithStats = () => {
 // ===== [New] 모든 장착 아이템의 총 활성 스탯 계산 =====
 export const calculateTotalActiveStats = () => {
     const equippedWithStats = getEquippedItemsWithStats();
-    
+
     const totalStats = {
         pointBoost: 0,
         xpAccelerator: 0,
@@ -151,7 +166,7 @@ export const calculateTotalActiveStats = () => {
 // ===== [New] 세트 효과 계산 =====
 export const calculateSetBonuses = () => {
     const equippedWithStats = getEquippedItemsWithStats();
-    
+
     // 세트 계산용 객체 변환
     const forSetCalc = {};
     Object.entries(equippedWithStats).forEach(([category, data]) => {
@@ -197,12 +212,12 @@ export const getActiveStatsForHUD = () => {
         // 개별 스탯
         itemStats,
         setStats,
-        
+
         // 총합
         totalPointBoost: totalStats.pointBoost,
         totalXpAccelerator: totalStats.xpAccelerator,
         totalStreakSaver: totalStats.streakSaver,
-        
+
         // 세트 효과
         activeSetBonuses: activeBonuses.map(b => ({
             setId: b.setId,
@@ -213,7 +228,7 @@ export const getActiveStatsForHUD = () => {
             bonusName: b.bonus.name,
             bonusDescription: b.bonus.description
         })),
-        
+
         // 시각 효과
         visualAura: visualAura?.id || null,
         visualAuraName: visualAura?.name || null,
@@ -230,6 +245,9 @@ export const addPoints = (basePoints, questType = 'all', source = '기타', sour
 
     points.add(totalPoints, source, sourceDetail);
 
+    // 백엔드 동기화 (Supabase)
+    syncPointsToBackend(totalPoints, 'EARN', source, sourceDetail);
+
     return {
         basePoints,
         bonus: bonusPercent,
@@ -239,7 +257,7 @@ export const addPoints = (basePoints, questType = 'all', source = '기타', sour
 };
 
 // 포인트 차감
-export const subtractPoints = (amount) => {
+export const subtractPoints = (amount, reason = '아이템 구매', description = '') => {
     if (!points.canAfford(amount)) {
         return {
             success: false,
@@ -248,6 +266,9 @@ export const subtractPoints = (amount) => {
     }
 
     points.subtract(amount);
+
+    // 백엔드 동기화 (Supabase)
+    syncPointsToBackend(amount, 'SPEND', reason, description);
 
     return {
         success: true,
@@ -337,6 +358,9 @@ export const getLevelUpReward = (newLevel) => {
 
     points.add(reward, '레벨업 보상', `레벨 ${newLevel} 달성`);
 
+    // 백엔드 동기화 (Supabase)
+    syncPointsToBackend(reward, 'EARN', '레벨업 보상', `레벨 ${newLevel} 달성`);
+
     return {
         points: reward,
         message: `레벨 ${newLevel} 달성! ${reward} 포인트를 획득했습니다!`
@@ -347,9 +371,9 @@ export const getLevelUpReward = (newLevel) => {
 export const checkStreakProtection = () => {
     const totalStats = getTotalCombinedStats();
     const protectionChance = totalStats.streakSaver / 100;
-    
+
     if (protectionChance <= 0) return false;
-    
+
     const roll = Math.random();
     return roll < protectionChance;
 };
