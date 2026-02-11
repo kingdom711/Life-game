@@ -29,6 +29,8 @@ import {
     CATEGORY_INFO
 } from '../data/educationData';
 
+import { addPoints, addExperience } from './pointsCalculator';
+
 /**
  * 오늘의 교육 콘텐츠 가져오기
  * @returns {Object} 오늘의 교육 콘텐츠
@@ -246,12 +248,11 @@ const completeEducation = (educationId, quizScore) => {
         expReward = Math.floor(expReward * 1.2);
     }
 
-    // 포인트 지급
-    points.add(pointsReward, '교육 완료', `${education.title} 완료`);
+    // 포인트 지급 (백엔드 동기화 포함)
+    addPoints(pointsReward, '교육 완료', `${education.title} 완료`);
 
-    // 경험치 지급
-    level.addExp(expReward);
-
+    // 경험치 지급 (백엔드 동기화 포함)
+    addExperience(expReward);
     // 교육 이력에 추가
     educationHistory.addCompleted({
         educationId: educationId,

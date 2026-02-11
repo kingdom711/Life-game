@@ -1,6 +1,7 @@
 import { points, level, equippedItems, userInventoryInstances } from './storage';
 import { getItemEffect, getItemById, getItemBaseStats } from '../data/itemsData';
 import userApi from '../api/userApi';
+import gameProfileApi from '../api/gameProfileApi';
 
 // 백엔드 포인트 동기화 (fire-and-forget, 로그인 시에만)
 const syncPointsToBackend = (amount, type, reason, description = '') => {
@@ -335,6 +336,14 @@ export const addExperience = (expAmount) => {
     const oldLevel = levelData.current;
 
     level.addExp(boostedExp);
+
+    // 백엔드 동기화 (GameProfile)
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+        gameProfileApi.addExp(boostedExp).catch(err => {
+            console.warn('[ExpSync] 경험치 백엔드 동기화 실패:', err.message);
+        });
+    }
 
     const newLevelData = level.get();
     const leveledUp = newLevelData.current > oldLevel;
