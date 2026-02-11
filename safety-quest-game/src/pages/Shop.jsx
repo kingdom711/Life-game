@@ -52,10 +52,26 @@ function Shop() {
                         🛒 아이템 상점
                     </h1>
                     <p className="text-lg mb-4" style={{ color: '#94a3b8' }}>포인트로 안전용품을 구매하세요</p>
-                    <div className="mt-4">
+                    <div className="mt-4" style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
                         <div className="points-badge">
                             💰 보유 포인트: <span className="font-bold">{currentPoints.toLocaleString()}P</span>
                         </div>
+                        <Link to="/exchange" style={{
+                            background: 'linear-gradient(135deg, #eab308, #f59e0b)',
+                            color: '#0f172a', border: 'none', borderRadius: 10,
+                            padding: '0.45rem 1rem', fontSize: '0.85rem', fontWeight: 700,
+                            textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4
+                        }}>
+                            💱 골드 교환
+                        </Link>
+                        <Link to="/reward-center" style={{
+                            background: 'linear-gradient(135deg, #a855f7, #8b5cf6)',
+                            color: '#fff', border: 'none', borderRadius: 10,
+                            padding: '0.45rem 1rem', fontSize: '0.85rem', fontWeight: 700,
+                            textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4
+                        }}>
+                            🎁 보상센터
+                        </Link>
                     </div>
                 </div>
 
@@ -98,7 +114,7 @@ function Shop() {
                                 {/* 희귀도별 테두리 글로우 */}
                                 <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 
                                   transition-opacity duration-500 pointer-events-none z-0 ${rarityGlow[item.rarity]}`} />
-                                
+
                                 <div className="card-header p-4 relative z-10">
                                     <div className="text-center mb-2">
                                         <div className="relative w-full aspect-square bg-gradient-to-br from-slate-800 to-slate-900 
@@ -165,7 +181,7 @@ function Shop() {
 
                                     <div className="flex justify-center">
                                         {owned ? (
-                                            <button 
+                                            <button
                                                 className="shop-btn shop-btn-equip"
                                                 onClick={() => navigate('/inventory')}
                                             >
@@ -174,11 +190,10 @@ function Shop() {
                                         ) : (
                                             <button
                                                 onClick={() => handlePurchase(item)}
-                                                className={`shop-btn ${
-                                                  canAfford
-                                                    ? 'shop-btn-primary'
-                                                    : 'shop-btn-disabled'
-                                                }`}
+                                                className={`shop-btn ${canAfford
+                                                        ? 'shop-btn-primary'
+                                                        : 'shop-btn-disabled'
+                                                    }`}
                                                 disabled={!canAfford}
                                             >
                                                 {canAfford ? '구매하기' : '포인트 부족'}

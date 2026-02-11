@@ -21,6 +21,8 @@ import AlertManagement from './pages/AlertManagement';
 import EducationPage from './pages/EducationPage'; // [New] 교육 페이지
 import SpecializationPage from './pages/SpecializationPage'; // [New] 전직 센터
 import SpecializationTrainingPage from './pages/SpecializationTrainingPage'; // [New] 전직 교육
+import Exchange from './pages/Exchange'; // [New] 포인트→골드 교환소
+import RewardCenter from './pages/RewardCenter'; // [New] 보상센터
 
 // Components
 import RoleSelector from './components/RoleSelector';
@@ -207,6 +209,8 @@ function App() {
                                     <Route path="/weekly" element={<WeeklyQuests role={selectedRole} />} />
                                     <Route path="/monthly" element={<MonthlyQuests role={selectedRole} />} />
                                     <Route path="/shop" element={<Shop />} />
+                                    <Route path="/exchange" element={<Exchange />} />
+                                    <Route path="/reward-center" element={<RewardCenter />} />
                                     <Route path="/inventory" element={<Inventory />} />
                                     <Route path="/profile" element={<Profile role={selectedRole} />} />
                                     <Route path="/risk-solution" element={<RiskSolutionPage />} />
