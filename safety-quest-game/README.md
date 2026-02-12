@@ -68,7 +68,7 @@ npm install
 npm run dev
 ```
 
-개발 서버: `http://localhost:5173`
+개발 서버: `http://localhost:3000`
 
 ---
 
