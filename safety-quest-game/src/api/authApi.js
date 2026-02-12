@@ -7,10 +7,17 @@ import apiClient from './apiClient';
 const authApi = {
     /**
      * 회원가입
-     * @param {object} data - { email, password, name, companyName, planType }
+     * @param {object} data - { email, password, name }
      */
     signup: async (data) => {
-        return apiClient.post('/auth/signup', data);
+        const response = await apiClient.post('/auth/signup', data);
+
+        // 회원가입 성공 시 토큰 저장 (즉시 로그인 상태)
+        if (response.accessToken) {
+            apiClient.token.setTokens(response.accessToken, response.refreshToken);
+        }
+
+        return response;
     },
     
     /**

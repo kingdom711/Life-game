@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userProfile } from '../utils/storage';
 import { analytics } from '../utils/analytics';
+import authApi from '../api/authApi';
 
 function Signup({ onSignupComplete }) {
     const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ function Signup({ onSignupComplete }) {
         isOver14: false
     });
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         // GA4 페이지뷰 추적
@@ -25,7 +27,7 @@ function Signup({ onSignupComplete }) {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
@@ -35,23 +37,43 @@ function Signup({ onSignupComplete }) {
             return;
         }
 
+        if (formData.password.length < 6) {
+            setError('비밀번호는 6자 이상이어야 합니다.');
+            return;
+        }
+
         if (!formData.isOver14) {
             alert('만 14세 미만은 법정대리인의 동의가 필요합니다.\n보호자와 함께 가입을 진행해주세요.');
             return;
         }
 
-        // 회원가입 처리 (로컬 스토리지 저장)
-        userProfile.setName(formData.nickname);
-        // 실제로는 이메일/비밀번호도 저장하거나 서버로 보내야 하지만, 
-        // 현재 로컬 스토리지 구조상 이름만 저장하고 넘어갑니다.
-        // 추후 확장을 위해 로직은 남겨둡니다.
+        setIsLoading(true);
 
-        // GA4 회원가입 완료 이벤트
-        analytics.conversion.signupComplete('free');
+        try {
+            // 백엔드 API로 회원가입 요청
+            const response = await authApi.signup({
+                email: formData.email,
+                password: formData.password,
+                name: formData.nickname
+            });
 
-        // alert('회원가입이 완료되었습니다!'); // 제거됨
-        if (onSignupComplete) {
-            onSignupComplete({ name: formData.nickname });
+            // localStorage에도 유저 정보 저장 (기존 앱 흐름 유지)
+            userProfile.setName(formData.nickname);
+
+            // GA4 회원가입 완료 이벤트
+            analytics.conversion.signupComplete('free');
+
+            if (onSignupComplete) {
+                onSignupComplete({ name: formData.nickname });
+            }
+        } catch (err) {
+            if (err.message && err.message.includes('이미 존재')) {
+                setError('이미 가입된 이메일입니다. 로그인 페이지를 이용해주세요.');
+            } else {
+                setError(err.message || '회원가입에 실패했습니다. 다시 시도해주세요.');
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -166,10 +188,11 @@ function Signup({ onSignupComplete }) {
 
                             <button
                                 type="submit"
+                                disabled={isLoading}
                                 className="btn btn-primary btn-lg"
-                                style={{ width: '100%' }}
+                                style={{ width: '100%', opacity: isLoading ? 0.7 : 1 }}
                             >
-                                회원가입 완료
+                                {isLoading ? '가입 처리 중...' : '회원가입 완료'}
                             </button>
                         </form>
                     </div>
