@@ -1,7 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import { questProgress as questProgressStorage } from '../utils/storage';
 import ProgressBar from './ProgressBar';
 
 function QuestCard({ quest, onComplete }) {
+    const navigate = useNavigate();
     const progress = questProgressStorage.getQuestProgress(quest.id);
     const target = quest.requirement.target || 1;
     const percentage = Math.min(100, Math.round((progress.current / target) * 100));
@@ -72,6 +74,13 @@ function QuestCard({ quest, onComplete }) {
                     disabled
                 >
                     보상 지급 완료
+                </button>
+            ) : quest.link ? (
+                <button
+                    onClick={() => navigate(quest.link)}
+                    className="btn-action w-full py-3 rounded-lg font-bold transition-all duration-300 relative z-10 bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:-translate-y-0.5 hover:shadow-lg hover:shadow-purple-500/30"
+                >
+                    바로가기
                 </button>
             ) : (
                 <button

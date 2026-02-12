@@ -118,6 +118,7 @@ export const dailyQuests = [
         title: '일일 위험 요소 제거',
         description: '현장에서 발견된 고위험 항목 1건을 확인하고 조치 완료하세요.',
         icon: '🛡️',
+        link: '/risk-solution', // [New] 바로가기 링크
         requirement: {
             type: 'count',
             target: 1,

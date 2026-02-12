@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { initializeUserData, userProfile } from './utils/storage';
 import { checkAndResetQuests } from './utils/questManager';
 import { checkAndRunMigration } from './utils/dataMigration';
+import { useAuth } from './context/AuthContext';
 
 // Pages
 import Dashboard from './pages/Dashboard';
@@ -13,6 +14,7 @@ import Shop from './pages/Shop';
 import Inventory from './pages/Inventory';
 import Profile from './pages/Profile';
 import Signup from './pages/Signup';
+import Login from './pages/Login';
 import LandingPage from './pages/LandingPage';
 import TeamPage from './pages/TeamPage';
 import PricingPage from './pages/PricingPage';
@@ -39,11 +41,14 @@ function App() {
     const [showLandingPage, setShowLandingPage] = useState(true);
     const [showTeamPage, setShowTeamPage] = useState(false);
     const [showPricingPage, setShowPricingPage] = useState(false);
+    const [showLoginPage, setShowLoginPage] = useState(false);
     const [showLaunchScreen, setShowLaunchScreen] = useState(false);
     const [isPlayingBgm, setIsPlayingBgm] = useState(false);
-    const [user, setUser] = useState(null);
+    // const [user, setUser] = useState(null); // AuthContext로 대체
     const [selectedRole, setSelectedRole] = useState(null);
-    const [loading, setLoading] = useState(true);
+    // const [loading, setLoading] = useState(true); // AuthContext로 대체
+
+    const { user, loading } = useAuth();
 
     useEffect(() => {
         const initApp = async () => {
@@ -58,30 +63,40 @@ function App() {
                 checkAndResetQuests();
 
                 // 저장된 데이터 불러오기
-                const savedName = userProfile.getName();
+                // const savedName = userProfile.getName(); // AuthContext 사용으로 제거/수정
                 const savedRole = userProfile.getRole();
 
-                if (savedName) {
-                    setUser({ name: savedName });
-                }
+                // if (savedName) {
+                //     setUser({ name: savedName });
+                // }
 
                 if (savedRole) {
                     setSelectedRole(savedRole);
                 }
 
                 // 기존 사용자는 BGM 자동 재생
-                if (savedName && savedRole) {
+                if (user && savedRole) {
                     setIsPlayingBgm(true);
                 }
             } catch (error) {
                 console.error("App initialization failed:", error);
             } finally {
-                setLoading(false);
+                // setLoading(false);
             }
         };
 
-        initApp();
-    }, []);
+        if (!loading) {
+            initApp();
+        }
+    }, [loading, user]);
+
+    useEffect(() => {
+        // 유저가 로그인되어 있으면 랜딩 페이지 닫기
+        if (user) {
+            setShowLandingPage(false);
+            setIsPlayingBgm(true);
+        }
+    }, [user]);
 
     const handleEnterFromLanding = () => {
         setShowLandingPage(false);
@@ -106,24 +121,33 @@ function App() {
 
     const handleLogin = () => {
         setShowLandingPage(false);
+        setShowLoginPage(true);
         // setShowLaunchScreen(true); // LaunchScreen 건너뛰기
-        setIsPlayingBgm(true); // 바로 게임 시작
+        // setIsPlayingBgm(true); // 바로 게임 시작
     };
 
     const handleSelectPlan = ({ plan, userData }) => {
-        // 회원가입 처리
-        setUser(userData);
-        userProfile.setName(userData.name);
+        // 회원가입 처리 (Signup 페이지로 이동 또는 로직 수행)
+        // 여기서는 임시로 Signup 페이지로 이동하도록 설정하거나
+        // AuthContext의 signup 기능을 사용할 수 있음
 
-        // 요금제 정보 저장 (추후 사용을 위해)
-        localStorage.setItem('selectedPlan', JSON.stringify(plan));
-        if (userData.companyName) {
-            localStorage.setItem('companyName', userData.companyName);
-        }
+        // setUser(userData);
+        // userProfile.setName(userData.name);
+
+        // // 요금제 정보 저장 (추후 사용을 위해)
+        // localStorage.setItem('selectedPlan', JSON.stringify(plan));
+        // if (userData.companyName) {
+        //     localStorage.setItem('companyName', userData.companyName);
+        // }
 
         setShowPricingPage(false);
         // setShowLaunchScreen(true); // LaunchScreen 건너뛰기
-        setIsPlayingBgm(true); // 바로 게임 시작
+        // setIsPlayingBgm(true); // 바로 게임 시작
+    };
+
+    const handleSignup = () => {
+        setShowLandingPage(false); // Ensure Landing is off
+        setShowLoginPage(false); // Hide Login, falling through to Signup
     };
 
     const handleStartGame = () => {
@@ -132,8 +156,11 @@ function App() {
     };
 
     const handleSignupComplete = (userData) => {
-        setUser(userData);
-        userProfile.set(userData); // 저장
+        // setUser(userData);
+        // userProfile.set(userData); // 저장
+        // Signup 컴포넌트 내부에서 AuthContext login/signup 처리 권장
+        // 만약 여기서 처리해야 한다면 로직 수정 필요
+        // 현재는 Signup 페이지가 AuthContext와 연동되어 있다고 가정
     };
 
     const handleRoleSelect = (roleId) => {
@@ -162,7 +189,7 @@ function App() {
                     />
 
                     {/* 랜딩페이지 관련 코드 (보관용 - 필요시 showLandingPage를 true로 변경하여 활성화 가능) */}
-                    {showLandingPage ? (
+                    {showLandingPage && !user ? (
                         <LandingPage onEnter={handleEnterFromLanding} onShowTeam={handleShowTeam} onLogin={handleLogin} />
                     ) : showTeamPage ? (
                         <TeamPage onBack={handleBackFromTeam} />
@@ -170,8 +197,10 @@ function App() {
                         <PricingPage onSelectPlan={handleSelectPlan} onBack={handleBackFromPricing} />
                     ) : showLaunchScreen ? (
                         <LaunchScreen onStart={handleStartGame} />
+                    ) : showLoginPage && !user ? (
+                        <Login onSignup={handleSignup} />
                     ) : !user ? (
-                        <Signup onSignupComplete={handleSignupComplete} />
+                        <Signup onSignupComplete={handleSignupComplete} onLogin={handleLogin} />
                     ) : !selectedRole ? (
                         <RoleSelector onSelectRole={handleRoleSelect} />
                     ) : (

@@ -1,17 +1,21 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { points, level, streak, userProfile } from '../utils/storage';
 import { calculateLevel, getPointsToNextLevel, TIERS } from '../utils/pointsCalculator';
 import { getRoleById } from '../data/rolesData';
 import { getInventoryStats } from '../utils/inventoryManager';
 import { getActiveSpecialization, getUnlockedSpecializations } from '../utils/specializationManager';
+import { useAuth } from '../context/AuthContext';
 
 function Profile({ role }) {
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
     const [stats, setStats] = useState({
         points: 0,
-        level: { 
-            name: 'Bronze III', 
-            current: 1, 
+        level: {
+            name: 'Bronze III',
+            current: 1,
             color: '#cd7f32',
             min: 0,
             max: 10000,
@@ -50,6 +54,18 @@ function Profile({ role }) {
         });
     };
 
+    const handleLogout = async () => {
+        if (window.confirm('정말 로그아웃 하시겠습니까?')) {
+            try {
+                await logout();
+                navigate('/');
+            } catch (error) {
+                console.error("Logout failed", error);
+                alert("로그아웃 중 오류가 발생했습니다.");
+            }
+        }
+    };
+
     const roleInfo = getRoleById(role);
 
     return (
@@ -60,6 +76,7 @@ function Profile({ role }) {
                         ← 대시보드로 돌아가기
                     </Link>
                 </div>
+                {/* ... existing header code ... */}
                 <div className="mb-8 text-center">
                     <div className="text-7xl mb-4 h-40 flex items-center justify-center relative">
                         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-indigo-500/20 
@@ -100,7 +117,7 @@ function Profile({ role }) {
                     <div className="card-header relative z-10 mb-4">
                         <h3 className="card-title text-xl font-bold bg-gradient-to-r from-indigo-600 
                           to-blue-600 bg-clip-text text-transparent">
-                          📊 레벨 정보
+                            📊 레벨 정보
                         </h3>
                     </div>
                     <div className="card-body relative z-10">
@@ -137,16 +154,15 @@ function Profile({ role }) {
                                     const isCurrentTier = stats.level.tier === tierKey;
                                     const isPastTier = Object.keys(TIERS).indexOf(tierKey) < Object.keys(TIERS).indexOf(stats.level.tier);
                                     return (
-                                        <div 
+                                        <div
                                             key={tierKey}
-                                            className={`flex-1 p-3 rounded-lg text-center transition-all duration-300 ${
-                                                isCurrentTier 
-                                                    ? 'ring-2 ring-offset-2 shadow-lg' 
-                                                    : isPastTier 
-                                                        ? 'opacity-100' 
+                                            className={`flex-1 p-3 rounded-lg text-center transition-all duration-300 ${isCurrentTier
+                                                    ? 'ring-2 ring-offset-2 shadow-lg'
+                                                    : isPastTier
+                                                        ? 'opacity-100'
                                                         : 'opacity-40'
-                                            }`}
-                                            style={{ 
+                                                }`}
+                                            style={{
                                                 backgroundColor: isPastTier || isCurrentTier ? `${tierInfo.color}20` : '#f1f5f9',
                                                 borderColor: tierInfo.color,
                                                 ringColor: isCurrentTier ? tierInfo.color : 'transparent'
@@ -177,7 +193,7 @@ function Profile({ role }) {
                                     다음 레벨까지
                                 </span>
                                 <span className="font-bold text-indigo-400">
-                                    {stats.level.max !== Infinity 
+                                    {stats.level.max !== Infinity
                                         ? `${(stats.level.max - stats.points).toLocaleString()}P 남음`
                                         : '최고 레벨 달성!'
                                     }
@@ -185,11 +201,11 @@ function Profile({ role }) {
                             </div>
                             <div className="progress h-4 bg-slate-200 rounded-full overflow-hidden 
                               shadow-inner">
-                                <div className="progress-bar h-full rounded-full relative overflow-hidden" 
-                                  style={{ 
-                                      width: `${stats.level.progress}%`,
-                                      background: `linear-gradient(90deg, ${stats.level.color}, ${stats.level.color}cc)`
-                                  }}>
+                                <div className="progress-bar h-full rounded-full relative overflow-hidden"
+                                    style={{
+                                        width: `${stats.level.progress}%`,
+                                        background: `linear-gradient(90deg, ${stats.level.color}, ${stats.level.color}cc)`
+                                    }}>
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent 
                                       via-white/30 to-transparent animate-shimmer" />
                                 </div>
@@ -215,7 +231,7 @@ function Profile({ role }) {
                         <div className="card-header relative z-10 mb-4">
                             <h3 className="card-title text-lg font-bold bg-gradient-to-r from-orange-600 
                               to-red-600 bg-clip-text text-transparent">
-                              🔥 출석 정보
+                                🔥 출석 정보
                             </h3>
                         </div>
                         <div className="card-body relative z-10">
@@ -246,7 +262,7 @@ function Profile({ role }) {
                         <div className="card-header relative z-10 mb-4">
                             <h3 className="card-title text-lg font-bold bg-gradient-to-r from-emerald-600 
                               to-teal-600 bg-clip-text text-transparent">
-                              🎒 인벤토리 정보
+                                🎒 인벤토리 정보
                             </h3>
                         </div>
                         <div className="card-body relative z-10">
@@ -360,25 +376,43 @@ function Profile({ role }) {
                     );
                 })()}
 
-                {/* 초기화 버튼 */}
-                <div className="card mt-xl" style={{ borderColor: 'var(--color-danger)' }}>
-                    <div className="card-header">
-                        <h3 className="card-title text-danger">⚠️ 위험 구역</h3>
+                {/* 로그아웃 & 초기화 버튼 */}
+                <div className="grid grid-2 gap-6 mt-xl">
+                    <div className="card" style={{ borderColor: 'var(--color-primary)' }}>
+                        <div className="card-header">
+                            <h3 className="card-title text-primary">🚪 계정 관리</h3>
+                        </div>
+                        <div className="card-body">
+                            <p className="text-muted mb-md">
+                                안전하게 로그아웃하고 메인 화면으로 돌아갑니다.
+                            </p>
+                            <button
+                                onClick={handleLogout}
+                                className="btn btn-secondary w-full"
+                            >
+                                로그아웃
+                            </button>
+                        </div>
                     </div>
-                    <div className="card-body">
-                        <p className="text-muted mb-md">
-                            모든 진행도를 초기화하고 처음부터 다시 시작합니다. 이 작업은 되돌릴 수 없습니다.
-                        </p>
-                        <button
-                            onClick={() => {
-                                // 사용자 요청으로 확인 팝업 제거
-                                localStorage.clear();
-                                window.location.reload();
-                            }}
-                            className="btn btn-danger"
-                        >
-                            전체 초기화
-                        </button>
+
+                    <div className="card" style={{ borderColor: 'var(--color-danger)' }}>
+                        <div className="card-header">
+                            <h3 className="card-title text-danger">⚠️ 위험 구역</h3>
+                        </div>
+                        <div className="card-body">
+                            <p className="text-muted mb-md">
+                                모든 진행도를 초기화하고 처음부터 다시 시작합니다. 이 작업은 되돌릴 수 없습니다.
+                            </p>
+                            <button
+                                onClick={() => {
+                                    localStorage.clear();
+                                    window.location.reload();
+                                }}
+                                className="btn btn-danger w-full"
+                            >
+                                전체 초기화
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

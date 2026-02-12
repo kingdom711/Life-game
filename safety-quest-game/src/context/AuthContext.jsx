@@ -149,7 +149,6 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (credentials) => {
-        setLoading(true);
         setError(null);
         try {
             const response = await authApi.login(credentials);
@@ -167,21 +166,16 @@ export const AuthProvider = ({ children }) => {
         } catch (err) {
             setError(err.message || 'Login failed');
             throw err;
-        } finally {
-            setLoading(false);
         }
     };
 
     const logout = async () => {
-        setLoading(true);
         try {
             await authApi.logout();
-            setUser(null);
         } catch (err) {
             console.error("Logout failed:", err);
-            setUser(null);
         } finally {
-            setLoading(false);
+            setUser(null);
         }
     };
 

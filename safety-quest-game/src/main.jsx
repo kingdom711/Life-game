@@ -7,9 +7,13 @@ import { initializeAnalytics } from './utils/analytics'
 // GA4 초기화
 initializeAnalytics();
 
+import { AuthProvider } from './context/AuthContext';
+
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <App />
+        <AuthProvider>
+            <App />
+        </AuthProvider>
     </React.StrictMode>,
 )
 

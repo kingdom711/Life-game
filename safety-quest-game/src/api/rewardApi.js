@@ -25,6 +25,19 @@ const rewardApi = {
      */
     getMyRewards: async () => {
         return apiClient.get('/rewards/my-rewards');
+    },
+
+    // [New] 본인 인증 관련 API
+    checkVerificationStatus: async () => {
+        return apiClient.get('/auth/verification-status');
+    },
+
+    requestVerification: async (phoneNumber) => {
+        return apiClient.post('/auth/verify/request', { phoneNumber });
+    },
+
+    confirmVerification: async (phoneNumber, code) => {
+        return apiClient.post('/auth/verify/confirm', { phoneNumber, code });
     }
 };
 

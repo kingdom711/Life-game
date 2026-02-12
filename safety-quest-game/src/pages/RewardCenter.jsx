@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import goldApi from '../api/goldApi';
 import rewardApi from '../api/rewardApi';
+import IdentityVerificationModal from '../components/IdentityVerificationModal';
 
 function RewardCenter() {
     const [goldBalance, setGoldBalance] = useState(0);
@@ -13,6 +14,8 @@ function RewardCenter() {
     const [showSuccess, setShowSuccess] = useState(false);
     const [successReward, setSuccessReward] = useState(null);
     const [error, setError] = useState(null);
+    const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+    const [pendingReward, setPendingReward] = useState(null);
 
     const loadData = useCallback(async () => {
         try {
@@ -48,8 +51,29 @@ function RewardCenter() {
             setError('골드가 부족합니다. 포인트 교환소에서 골드를 먼저 교환해주세요!');
             setTimeout(() => setError(null), 3000);
             return;
+            return;
         }
 
+        // 본인 인증 체크
+        try {
+            const { isVerified } = await rewardApi.checkVerificationStatus();
+            if (!isVerified) {
+                // 인증 안됨 -> 모달 띄움
+                setPendingReward(reward);
+                setIsVerificationModalOpen(true);
+                return;
+            }
+
+            // 인증 됨 -> 교환 진행
+            await processExchange(reward);
+        } catch (err) {
+            console.error('인증 상태 확인 실패:', err);
+            // 에러 시에도 일단 진행 시도하거나 에러 표시 (여기서는 에러 표시)
+            setError('본인 인증 상태를 확인할 수 없습니다.');
+        }
+    };
+
+    const processExchange = async (reward) => {
         try {
             setExchanging(reward.id);
             setError(null);
@@ -69,6 +93,13 @@ function RewardCenter() {
             setTimeout(() => setError(null), 3000);
         } finally {
             setExchanging(null);
+            setPendingReward(null);
+        }
+    };
+
+    const handleVerificationSuccess = () => {
+        if (pendingReward) {
+            processExchange(pendingReward);
         }
     };
 
@@ -97,6 +128,11 @@ function RewardCenter() {
 
     return (
         <div className="page">
+            <IdentityVerificationModal
+                isOpen={isVerificationModalOpen}
+                onClose={() => setIsVerificationModalOpen(false)}
+                onVerified={handleVerificationSuccess}
+            />
             <div className="container" style={{ maxWidth: 600, margin: '0 auto', padding: '0 1rem' }}>
                 {/* 뒤로가기 */}
                 <div style={{ marginBottom: '1rem' }}>

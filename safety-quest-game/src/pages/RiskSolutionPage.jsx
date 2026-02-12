@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { geminiService } from '../utils/geminiService';
 import GEMSResultCard from '../components/GEMSResultCard';
+import { triggerQuestAction } from '../utils/questManager';
 
 // 디버깅용 기본 placeholder 텍스트 (완결된 문장 형태)
 const DEFAULT_RISK_TEXT = '건설 현장 2층 비계 작업 중 안전난간이 심하게 흔들리고 있습니다. 작업자 3명이 해당 구역에서 철골 용접 작업을 진행 중이며, 안전대 체결 상태가 불량하여 추락 사고 위험이 매우 높은 상황입니다.';
@@ -30,15 +31,15 @@ const RiskSolutionPage = () => {
                 textPreview: textToSubmit.substring(0, 50) + '...',
                 fullText: textToSubmit // 전체 텍스트 확인용
             });
-            
+
             const result = await geminiService.analyzeRisk(textToSubmit);
-            
+
             console.log('[RiskSolutionPage] 분석 결과:', result);
             console.log('[RiskSolutionPage] 결과 위험요인:', result.riskFactor);
             console.log('[RiskSolutionPage] 결과 조치방안:', result.remediationSteps);
             console.log('[RiskSolutionPage] 결과 위험수준:', result.riskLevel);
             console.log('[RiskSolutionPage] Mock 여부:', result.fallback || result.isMock);
-            
+
             setAnalysisResult(result);
             setStep('result');
         } catch (err) {
@@ -50,10 +51,10 @@ const RiskSolutionPage = () => {
                 stack: err.stack,
                 name: err.name
             });
-            
+
             // 에러 메시지 구체화
             const errorMessage = err.message || 'AI 분석 중 오류가 발생했습니다.';
-            setError(errorMessage.includes('연결') || errorMessage.includes('네트워크') 
+            setError(errorMessage.includes('연결') || errorMessage.includes('네트워크')
                 ? '서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.'
                 : errorMessage);
             setStep('input');
@@ -72,8 +73,18 @@ const RiskSolutionPage = () => {
     };
 
     const handleSaveAndClose = () => {
-        // TODO: 조치 기록 저장 로직 추가
+        // 조치 기록 저장 및 퀘스트 완료 처리
         console.log('GEMS Analysis Saved:', analysisResult);
+
+        // 퀘스트 완료 트리거 (안전 관리자 역할)
+        const completedQuests = triggerQuestAction('check_risk', 'safetyManager');
+
+        if (completedQuests && completedQuests.length > 0) {
+            alert(`퀘스트 완료! ${completedQuests[0].reward.points}P 획득`);
+        } else {
+            alert('조치 기록이 저장되었습니다.');
+        }
+
         navigate('/');
     };
 
@@ -211,11 +222,11 @@ const RiskSolutionPage = () => {
                                     onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                                     onBlur={(e) => e.target.style.borderColor = '#334155'}
                                 />
-                                
-                                <p style={{ 
-                                    fontSize: '0.8rem', 
-                                    color: '#64748b', 
-                                    marginBottom: '1.5rem' 
+
+                                <p style={{
+                                    fontSize: '0.8rem',
+                                    color: '#64748b',
+                                    marginBottom: '1.5rem'
                                 }}>
                                     💡 빈 칸으로 제출하면 위 예시 문장으로 테스트됩니다.
                                 </p>

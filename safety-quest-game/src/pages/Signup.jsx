@@ -4,7 +4,8 @@ import { userProfile } from '../utils/storage';
 import { analytics } from '../utils/analytics';
 import authApi from '../api/authApi';
 
-function Signup({ onSignupComplete }) {
+function Signup({ onSignupComplete, onLogin }) {
+    // ... existing state ...
     const [formData, setFormData] = useState({
         nickname: '',
         email: '',
@@ -96,6 +97,7 @@ function Signup({ onSignupComplete }) {
 
                     <div className="card-body">
                         <form onSubmit={handleSubmit}>
+                            {/* ... existing fields ... */}
                             <div className="mb-md">
                                 <label className="font-bold mb-sm" style={{ display: 'block' }}>닉네임 (필수)</label>
                                 <input
@@ -195,6 +197,18 @@ function Signup({ onSignupComplete }) {
                                 {isLoading ? '가입 처리 중...' : '회원가입 완료'}
                             </button>
                         </form>
+                    </div>
+
+                    <div className="card-footer justify-center border-t border-slate-700/50 pt-4 mt-2 text-center">
+                        <p className="text-sm text-slate-400 mb-0">
+                            이미 계정이 있으신가요?{' '}
+                            <button
+                                onClick={onLogin}
+                                className="text-blue-400 hover:text-blue-300 font-medium bg-transparent border-none p-0 cursor-pointer underline hover:no-underline"
+                            >
+                                로그인하기
+                            </button>
+                        </p>
                     </div>
                 </div>
             </div>

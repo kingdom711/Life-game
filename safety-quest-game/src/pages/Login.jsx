@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const Login = () => {
+const Login = ({ onSignup }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [loginError, setLoginError] = useState('');
-    
+
     const { login } = useAuth();
     const navigate = useNavigate();
 
@@ -18,7 +18,7 @@ const Login = () => {
 
         try {
             await login({ username: email, password }); // 백엔드는 username 필드를 기대함
-            navigate('/'); // Redirect to dashboard/home after login
+            // navigate('/'); // App.jsx의 user 상태 변화에 따라 자동 전환되므로 제거
         } catch (err) {
             setLoginError(err.message || '로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.');
         } finally {
@@ -50,11 +50,11 @@ const Login = () => {
                                     아이디 (이메일)
                                 </label>
                                 <input
-                                    type="email"
+                                    type="text"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="w-full bg-slate-800/50 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-                                    placeholder="이메일을 입력하세요"
+                                    placeholder="아이디 또는 이메일을 입력하세요"
                                     required
                                 />
                             </div>
@@ -93,9 +93,12 @@ const Login = () => {
                     <div className="card-footer justify-center border-t border-slate-700/50 pt-6 mt-2">
                         <p className="text-sm text-slate-400 mb-0">
                             계정이 없으신가요?{' '}
-                            <Link to="/signup" className="text-blue-400 hover:text-blue-300 font-medium">
+                            <button
+                                onClick={onSignup}
+                                className="text-blue-400 hover:text-blue-300 font-medium bg-transparent border-none p-0 cursor-pointer underline hover:no-underline"
+                            >
                                 회원가입
-                            </Link>
+                            </button>
                         </p>
                     </div>
                 </div>
