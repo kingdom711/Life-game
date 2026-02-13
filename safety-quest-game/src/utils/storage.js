@@ -515,10 +515,40 @@ export const level = {
     }
 };
 
-// 로컬 시간대 기준 날짜 문자열 생성 헬퍼 함수
-const getLocalDateString = (date = new Date()) => {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+// KST(한국 표준시) 기준 날짜 문자열 생성 헬퍼 함수 (YYYY-MM-DD)
+export const getKSTDateString = () => {
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
 };
+
+// KST 기준 어제 날짜 문자열 (YYYY-MM-DD)
+export const getKSTYesterdayString = () => {
+    const now = new Date();
+    const kstNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+    kstNow.setDate(kstNow.getDate() - 1);
+    return `${kstNow.getFullYear()}-${String(kstNow.getMonth() + 1).padStart(2, '0')}-${String(kstNow.getDate()).padStart(2, '0')}`;
+};
+
+// KST 기준 현재 월 (YYYY-MM)
+export const getKSTMonth = () => {
+    const dateStr = getKSTDateString();
+    return dateStr.substring(0, 7);
+};
+
+// KST 기준 오늘 날짜(일)
+export const getKSTDay = () => {
+    const dateStr = getKSTDateString();
+    return parseInt(dateStr.split('-')[2], 10);
+};
+
+// KST 기준 요일 (0=일, 1=월, ..., 6=토)
+export const getKSTDayOfWeek = () => {
+    const now = new Date();
+    const kstNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+    return kstNow.getDay();
+};
+
+// 하위 호환용 alias (내부에서 사용)
+const getLocalDateString = () => getKSTDateString();
 
 // 스트릭 (연속 로그인) - 수동 체크인 방식
 export const streak = {
@@ -534,10 +564,10 @@ export const streak = {
         return storage.set(STORAGE_KEYS.STREAK, streakData);
     },
 
-    // 수동 출석 체크
+    // 수동 출석 체크 (KST 기준)
     checkIn: () => {
-        const now = new Date();
-        const today = getLocalDateString(now);
+        const today = getKSTDateString();
+        const yesterdayStr = getKSTYesterdayString();
 
         const streakData = streak.get();
         const lastLoginDate = streakData.lastLoginDate ? streakData.lastLoginDate.split('T')[0] : null;
@@ -545,10 +575,6 @@ export const streak = {
         if (lastLoginDate === today) {
             return { success: false, message: '오늘은 이미 출석했습니다.' };
         }
-
-        const yesterday = new Date(now);
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = getLocalDateString(yesterday);
 
         if (lastLoginDate === yesterdayStr) {
             // 연속 출석
@@ -560,7 +586,7 @@ export const streak = {
             if (streakData.longest === 0) streakData.longest = 1;
         }
 
-        streakData.lastLoginDate = now.toISOString();
+        streakData.lastLoginDate = today;
         streak.set(streakData);
 
         // 포인트 보상 (출석 보상 20포인트)
@@ -569,12 +595,12 @@ export const streak = {
         return { success: true, message: '출석 완료! +1 스트릭', streak: streakData.current };
     },
 
-    // 오늘 출석 여부 확인
+    // 오늘 출석 여부 확인 (KST 기준)
     isCheckedInToday: () => {
         const streakData = streak.get();
         if (!streakData.lastLoginDate) return false;
 
-        const today = getLocalDateString();
+        const today = getKSTDateString();
         const lastLogin = streakData.lastLoginDate.split('T')[0];
         return today === lastLogin;
     }
@@ -633,10 +659,10 @@ export const dailyQuestInstances = {
         return storage.get('safety_quest_daily_instances', []);
     },
 
-    // 오늘 날짜의 퀘스트 인스턴스 가져오기 (없으면 생성)
+    // 오늘 날짜의 퀘스트 인스턴스 가져오기 (없으면 생성, KST 기준)
     getTodayInstance: (userId) => {
         const instances = dailyQuestInstances.get();
-        const today = new Date().toISOString().split('T')[0];
+        const today = getKSTDateString();
 
         let instance = instances.find(inst => inst.userId === userId && inst.questDate === today);
 
@@ -811,8 +837,7 @@ export const monthlyAttendance = {
     getStorageKey: () => 'safety_quest_monthly_attendance',
 
     getCurrentMonth: () => {
-        const now = new Date();
-        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        return getKSTMonth();
     },
 
     get: () => {
@@ -841,10 +866,10 @@ export const monthlyAttendance = {
         return storage.set('safety_quest_monthly_attendance', data);
     },
 
-    // 오늘 출석 기록
+    // 오늘 출석 기록 (KST 기준)
     recordAttendance: () => {
         const data = monthlyAttendance.get();
-        const today = new Date().getDate();
+        const today = getKSTDay();
 
         if (!data.attendedDays.includes(today)) {
             data.attendedDays.push(today);
