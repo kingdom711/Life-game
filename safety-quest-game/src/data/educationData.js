@@ -623,18 +623,20 @@ export const educationContents = [
 ];
 
 /**
- * 오늘의 교육 콘텐츠 가져오기
+ * 오늘의 교육 콘텐츠 가져오기 (KST 기준)
  * 주차와 요일에 따라 순환하여 제공
  */
 export const getTodayEducation = () => {
-    const today = new Date();
-    const startOfYear = new Date(today.getFullYear(), 0, 1);
-    const dayOfYear = Math.floor((today - startOfYear) / (24 * 60 * 60 * 1000)) + 1;
+    // KST 기준 현재 날짜 구하기
+    const now = new Date();
+    const kstNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+    const startOfYear = new Date(kstNow.getFullYear(), 0, 1);
+    const dayOfYear = Math.floor((kstNow - startOfYear) / (24 * 60 * 60 * 1000)) + 1;
 
     // 주차 계산 (1~52)
     const weekNumber = Math.ceil(dayOfYear / 7) % 5 + 1; // 5주 순환
     // 요일 계산 (1=월요일 ~ 5=금요일, 주말은 1로 처리)
-    let dayOfWeek = today.getDay();
+    let dayOfWeek = kstNow.getDay();
     if (dayOfWeek === 0) dayOfWeek = 1; // 일요일 → 월요일
     if (dayOfWeek === 6) dayOfWeek = 1; // 토요일 → 월요일
 

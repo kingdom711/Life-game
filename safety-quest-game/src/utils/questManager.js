@@ -1,21 +1,11 @@
-import { questProgress, points, level, attendanceLogs, weeklyQuestProgress, streak } from './storage';
+import { questProgress, points, level, attendanceLogs, weeklyQuestProgress, streak, getKSTDateString, getKSTYesterdayString, getKSTDayOfWeek, getKSTDay, getKSTMonth } from './storage';
 import { getQuestById, dailyQuests, weeklyQuests, monthlyQuests, allQuests } from '../data/questsData';
 import { addPoints, addExperience } from './pointsCalculator';
 
-// KST 날짜 헬퍼
-const getKSTDate = () => {
-    const now = new Date();
-    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-    const kstOffset = 9 * 60 * 60 * 1000;
-    return new Date(utc + kstOffset);
-};
-
-const getKSTDateString = () => {
-    return getKSTDate().toISOString().split('T')[0];
-};
-
-const getWeekNumber = (d) => {
-    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+const getWeekNumber = () => {
+    const dateStr = getKSTDateString();
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const d = new Date(Date.UTC(year, month - 1, day));
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
     var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
     var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
@@ -98,8 +88,7 @@ export const triggerQuestAction = (action, role, amount = 1) => {
     if (action === 'attend_tbm') questType = 'TBM_ATTENDANCE';
 
     if (questType) {
-        const kstNow = getKSTDate();
-        const weekNum = getWeekNumber(kstNow);
+        const weekNum = getWeekNumber();
         weeklyQuestProgress.update(weekNum, questType, amount, 5); // 목표 5회 가정
     }
 
@@ -108,13 +97,8 @@ export const triggerQuestAction = (action, role, amount = 1) => {
 
 // 출석 체크 로직 (KST 기준, Streak 계산)
 export const checkAttendance = (userId) => {
-    const kstNow = getKSTDate();
-    const todayStr = kstNow.toISOString().split('T')[0];
-
-    // 어제 날짜 계산
-    const yesterday = new Date(kstNow);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    const todayStr = getKSTDateString();
+    const yesterdayStr = getKSTYesterdayString();
 
     const lastLog = attendanceLogs.getLastLog();
 
@@ -147,7 +131,7 @@ export const checkAttendance = (userId) => {
     streak.set({
         current: consecutiveDays,
         longest: Math.max(streak.get().longest, consecutiveDays),
-        lastLoginDate: kstNow.toISOString()
+        lastLoginDate: todayStr
     });
 
     // 보상 지급 (기본 20P + 연속 출석 보너스)
@@ -182,43 +166,42 @@ export const resetMonthlyQuests = () => {
     questProgress.resetQuests(questIds);
 };
 
-// 리셋 시간 체크 및 자동 리셋 (KST 적용)
+// 리셋 시간 체크 및 자동 리셋 (KST 자정 기준)
 export const checkAndResetQuests = () => {
     const lastReset = localStorage.getItem('safety_quest_last_reset');
-    const now = getKSTDate(); // KST 사용
+    const todayStr = getKSTDateString();       // "YYYY-MM-DD"
+    const todayMonth = getKSTMonth();          // "YYYY-MM"
+    const todayDayOfWeek = getKSTDayOfWeek();  // 0=일 ~ 6=토
+    const todayDay = getKSTDay();              // 1~31
 
     if (!lastReset) {
         localStorage.setItem('safety_quest_last_reset', JSON.stringify({
-            daily: now.toISOString(),
-            weekly: now.toISOString(),
-            monthly: now.toISOString()
+            daily: todayStr,
+            weekly: todayStr,
+            monthly: todayMonth
         }));
         return;
     }
 
     const resetDates = JSON.parse(lastReset);
-    const lastDaily = new Date(resetDates.daily);
-    const lastWeekly = new Date(resetDates.weekly);
-    const lastMonthly = new Date(resetDates.monthly);
 
-    // 일간 리셋 체크 (자정)
-    if (now.getDate() !== lastDaily.getDate() ||
-        now.getMonth() !== lastDaily.getMonth() ||
-        now.getFullYear() !== lastDaily.getFullYear()) {
+    // 일간 리셋 체크 (KST 자정 — 날짜 문자열이 다르면 리셋)
+    if (todayStr !== resetDates.daily) {
         resetDailyQuests();
-        resetDates.daily = now.toISOString();
+        resetDates.daily = todayStr;
     }
 
-    // 주간 리셋 체크 (월요일)
-    if (now.getDay() === 1 && now.getTime() - lastWeekly.getTime() > 24 * 60 * 60 * 1000) {
+    // 주간 리셋 체크 (KST 기준 월요일이고, 저장된 날짜와 다르면)
+    if (todayDayOfWeek === 1 && todayStr !== resetDates.weekly) {
         resetWeeklyQuests();
-        resetDates.weekly = now.toISOString();
+        resetDates.weekly = todayStr;
     }
 
-    // 월간 리셋 체크 (매월 1일)
-    if (now.getDate() === 1 && now.getMonth() !== lastMonthly.getMonth()) {
+    // 월간 리셋 체크 (KST 기준 매월 1일이고, 저장된 월과 다르면)
+    const lastMonthStr = resetDates.monthly ? resetDates.monthly.substring(0, 7) : '';
+    if (todayDay === 1 && todayMonth !== lastMonthStr) {
         resetMonthlyQuests();
-        resetDates.monthly = now.toISOString();
+        resetDates.monthly = todayMonth;
     }
 
     localStorage.setItem('safety_quest_last_reset', JSON.stringify(resetDates));

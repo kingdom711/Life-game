@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import authApi from '../api/authApi';
 import gameProfileApi from '../api/gameProfileApi';
+import { userProfile } from '../utils/storage';
 
 const AuthContext = createContext(null);
 
@@ -133,7 +134,13 @@ export const AuthProvider = ({ children }) => {
             try {
                 if (authApi.isAuthenticated()) {
                     const response = await authApi.getMe();
-                    setUser(response.user || response);
+                    const userData = response.user || response;
+                    setUser(userData);
+
+                    // ⭐ 사용자 이름 localStorage에 저장 (관리자 이름 표시 문제 해결)
+                    if (userData.name) {
+                        userProfile.setName(userData.name);
+                    }
 
                     // ⭐ 세션 복원 시에도 서버 게임 데이터 동기화
                     await syncGameData();
@@ -152,11 +159,20 @@ export const AuthProvider = ({ children }) => {
         setError(null);
         try {
             const response = await authApi.login(credentials);
+            let userData;
+
             if (response.user) {
-                setUser(response.user);
+                userData = response.user;
+                setUser(userData);
             } else {
                 const userResponse = await authApi.getMe();
-                setUser(userResponse.user || userResponse);
+                userData = userResponse.user || userResponse;
+                setUser(userData);
+            }
+
+            // ⭐ 사용자 이름 localStorage에 저장 (관리자 이름 표시 문제 해결)
+            if (userData && userData.name) {
+                userProfile.setName(userData.name);
             }
 
             // ⭐ 로그인 성공 후 서버 게임 데이터 동기화 (크로스 디바이스)
