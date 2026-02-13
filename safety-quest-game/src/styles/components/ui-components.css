@@ -1,0 +1,1330 @@
+/* ==================== Common Modal Styles - Dark Theme ==================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(71, 85, 105, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+  animation: modal-slide-up 0.3s ease-out;
+  color: var(--color-text);
+  border: 1px solid rgba(71, 85, 105, 0.3);
+}
+
+/* Hazard Quest Modal Styles */
+.hazard-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.hazard-modal-content {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  width: 90%;
+  max-width: 600px;
+  min-height: 500px;
+  border-radius: 16px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+  padding: 2rem;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  background: linear-gradient(to right, #38bdf8, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 2rem;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.close-btn:hover {
+  color: white;
+}
+
+/* Progress Steps */
+.progress-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.step {
+  font-weight: bold;
+  color: #64748b;
+  transition: color 0.3s;
+}
+
+.step.active {
+  color: #38bdf8;
+  text-shadow: 0 0 5px rgba(56, 189, 248, 0.5);
+}
+
+.line {
+  width: 50px;
+  height: 2px;
+  background-color: #334155;
+  margin: 0 1rem;
+}
+
+/* Category Grid */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 1rem;
+}
+
+.hazard-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hazard-card:hover {
+  background: rgba(56, 189, 248, 0.1);
+  border-color: #38bdf8;
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(56, 189, 248, 0.2);
+}
+
+.hazard-card .icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Sub Category List */
+.sub-category-list h3 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--color-text);
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .options-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.option-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.option-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.option-card.selected {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.1);
+}
+
+/* Futuristic Checkbox */
+.checkbox-futuristic {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #64748b;
+  border-radius: 50%;
+  /* Circle style as requested 0 */
+  margin-right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.option-card.selected .checkbox-futuristic {
+  border-color: #38bdf8;
+  background-color: rgba(56, 189, 248, 0.1);
+}
+
+.checkbox-futuristic .dot {
+  width: 12px;
+  height: 12px;
+  background-color: #38bdf8;
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px #38bdf8;
+}
+
+.option-card.selected .checkbox-futuristic .dot {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.btn-back {
+  background: transparent;
+  border: 1px solid #64748b;
+  color: var(--color-text-secondary);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-back:hover {
+  border-color: white;
+  color: white;
+}
+
+.btn-submit {
+  flex: 1;
+  background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+  border: none;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+}
+
+.btn-submit:disabled {
+  background: #475569;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-submit:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
+}
+
+/* Success Animation */
+.success-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.hologram-circle {
+  width: 100px;
+  height: 100px;
+  border: 4px solid #38bdf8;
+  border-radius: 50%;
+  margin-bottom: 2rem;
+  animation: pulse-glow 1.5s infinite;
+  position: relative;
+}
+
+.hologram-circle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  color: #38bdf8;
+}
+
+.points-fly {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fbbf24;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  animation: flyUp 1s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 20px rgba(56, 189, 248, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0);
+  }
+}
+
+@keyframes flyUp {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(-20px);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Start Button Hologram Effect */
+.btn-hologram {
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid #38bdf8;
+  color: #38bdf8;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+}
+
+.btn-hologram:hover {
+  background: rgba(56, 189, 248, 0.2);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+  text-shadow: 0 0 5px #38bdf8;
+}
+
+.btn-hologram::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent);
+  transform: rotate(45deg);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+
+  20% {
+    left: 100%;
+  }
+
+  100% {
+    left: 100%;
+  }
+}
+
+
+/* Quest Card Futuristic Styles */
+.quest-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.quest-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border-color: rgba(56, 189, 248, 0.5);
+}
+
+.quest-card.completed {
+  border-color: #fbbf24;
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+  animation: flash 0.5s ease-out;
+}
+
+.quest-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.quest-title {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
+.quest-reward {
+  background: rgba(56, 189, 248, 0.2);
+  color: var(--color-primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.quest-description {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.quest-progress-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.progress-text {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-weight: bold;
+}
+
+.completion-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: bold;
+  width: 100%;
+}
+
+.checkmark {
+  font-size: 1.2rem;
+  animation: glow 1.5s infinite alternate;
+}
+
+.btn-action {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-action:disabled {
+  background: #475569;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btn-action:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.hologram-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.03) 50%,
+      transparent 100%);
+  pointer-events: none;
+}
+
+@keyframes flash {
+  0% {
+    background-color: rgba(251, 191, 36, 0.5);
+  }
+
+  100% {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 5px rgba(251, 191, 36, 0.5);
+  }
+
+  to {
+    text-shadow: 0 0 15px rgba(251, 191, 36, 1);
+  }
+}
+
+/* Streak Button Styles */
+.streak-button-container {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.btn-streak {
+  width: 100%;
+  padding: 1.5rem;
+  background: transparent;
+  border: 2px solid #ef4444;
+  /* Fire color base */
+  border-radius: 16px;
+  color: white;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.btn-streak.checked-in {
+  border-color: #22c55e;
+  /* Success green */
+  cursor: default;
+}
+
+.streak-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.streak-content .icon {
+  font-size: 2rem;
+  animation: flame 1.5s infinite alternate;
+}
+
+.streak-content .text {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.streak-content .count {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.streak-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+  z-index: 1;
+  transition: all 0.3s;
+  pointer-events: none;
+}
+
+.btn-streak.checked-in .streak-bg {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+}
+
+.btn-streak:not(:disabled):hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+.streak-animation {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.plus-one,
+.plus-points {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #22c55e;
+  text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+  animation: fadeUp 1.5s ease-out forwards;
+}
+
+.plus-points {
+  color: #fbbf24;
+  animation-delay: 0.2s;
+}
+
+@keyframes flame {
+  from {
+    transform: scale(1);
+    filter: drop-shadow(0 0 5px #ef4444);
+  }
+
+  to {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 15px #f87171);
+  }
+}
+
+@keyframes fadeUp {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-40px);
+    opacity: 0;
+  }
+}
+
+
+/* Quest Completion Styles (Emerald Green Theme) */
+.quest-card.completed {
+  border-color: #10b981;
+  /* Emerald 500 */
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+  animation: flash-emerald 0.5s ease-out;
+}
+
+.completed-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(16, 185, 129, 0.15);
+  /* Green overlay */
+  pointer-events: none;
+  z-index: 0;
+}
+
+.completed-badge-icon {
+  background: rgba(16, 185, 129, 0.2);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.glowing-checkmark {
+  color: #10b981;
+  font-size: 1.5rem;
+  font-weight: bold;
+  animation: glow-emerald 1.5s infinite alternate;
+}
+
+.quest-complete-text {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #10b981;
+  text-align: center;
+  width: 100%;
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  letter-spacing: 2px;
+  animation: pulse-text 2s infinite;
+}
+
+.btn-action.completed {
+  background: #334155;
+  /* Slate 700 */
+  color: var(--color-text-secondary);
+  /* Slate 400 */
+  border: 1px solid #475569;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+@keyframes flash-emerald {
+  0% {
+    background-color: rgba(16, 185, 129, 0.5);
+  }
+
+  100% {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+}
+
+@keyframes glow-emerald {
+  from {
+    text-shadow: 0 0 5px rgba(16, 185, 129, 0.5);
+    transform: scale(1);
+  }
+
+  to {
+    text-shadow: 0 0 15px rgba(16, 185, 129, 1);
+    transform: scale(1.1);
+  }
+}
+
+@keyframes pulse-text {
+  0% {
+    opacity: 0.8;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.8;
+  }
+}
+
+/* Gear Slot & Avatar Window Animations */
+@keyframes hologram-pulse {
+  0% {
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+  }
+
+  100% {
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+  }
+}
+
+.gear-slot:hover {
+  transform: scale(1.05);
+  border-color: #64748b !important;
+  background-color: rgba(51, 65, 85, 0.8) !important;
+  box-shadow: 0 0 15px rgba(100, 116, 139, 0.4) !important;
+}
+
+.avatar-window-content {
+  animation: modal-slide-up 0.3s ease-out forwards;
+}
+
+@keyframes modal-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.avatar-center::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% + 60px);
+  height: calc(100% + 60px);
+  border: 2px dashed rgba(56, 189, 248, 0.3);
+  border-radius: 50%;
+  animation: spin-slow 20s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes spin-slow {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Quest Trigger Card (Game UI Style) */
+.quest-trigger-card {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.9) 0%, rgba(245, 158, 11, 0.8) 100%);
+  border: 2px solid #f59e0b;
+  border-radius: 16px;
+  color: #ffffff;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.1), 0 2px 4px -1px rgba(245, 158, 11, 0.06);
+}
+
+.quest-trigger-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent 0%, rgba(251, 191, 36, 0.1) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+}
+
+.quest-trigger-card:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4), 0 4px 8px rgba(245, 158, 11, 0.25);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
+}
+
+.quest-trigger-card:hover::before {
+  transform: translateX(100%);
+}
+
+.quest-trigger-card .icon {
+  font-size: 2rem;
+  filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.5));
+  animation: bounce-slow 2s infinite;
+}
+
+.quest-trigger-card .content {
+  text-align: left;
+}
+
+.quest-trigger-card .title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.quest-trigger-card .subtitle {
+  font-size: 0.875rem;
+  color: rgba(251, 191, 36, 0.8);
+  font-weight: 500;
+}
+
+.quest-trigger-card.completed {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+  border-color: #10b981;
+  color: #10b981;
+  cursor: default;
+}
+
+.quest-trigger-card.completed .icon {
+  filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.5));
+  animation: none;
+}
+
+.quest-trigger-card.completed .title {
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.quest-trigger-card.completed .subtitle {
+  color: rgba(52, 211, 153, 0.8);
+}
+
+/* Gemini Quest Card Shimmer Effect */
+.gemini-quest-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gemini-quest-card:hover::before {
+  transform: translateX(100%);
+}
+
+@keyframes bounce-slow {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* ==================== Filter Buttons (Shop Page) ==================== */
+.filter-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.filter-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+  border: none;
+  cursor: pointer;
+}
+
+.filter-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.filter-btn.active {
+  background: linear-gradient(to right, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.4);
+}
+
+.filter-btn.inactive {
+  background: rgba(51, 65, 85, 0.7);
+  color: #cbd5e1;
+}
+
+.filter-btn.inactive:hover {
+  background: rgba(71, 85, 105, 0.85);
+}
+
+/* ==================== Points Badge (Shop Page) ==================== */
+.points-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 600;
+  padding: 0.875rem 1.5rem;
+  border-radius: 9999px;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+  margin-bottom: 1.5rem;
+}
+
+/* ==================== Shop Buttons ==================== */
+.shop-btn {
+  padding: 1rem 2.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+  min-width: 140px;
+}
+
+.shop-btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.shop-btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+.shop-btn-equip {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.shop-btn-equip:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+}
+
+.shop-btn-disabled {
+  background: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ==================== Monthly Attendance Modal ==================== */
+.monthly-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.monthly-modal-content {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 249, 255, 0.95) 100%);
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  border-radius: 24px;
+  padding: 2rem;
+  overflow-y: auto;
+  position: relative;
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  animation: modal-slide-up 0.3s ease-out;
+}
+
+.monthly-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.monthly-modal-header h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.monthly-modal-header .close-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: color 0.2s;
+  line-height: 1;
+}
+
+.monthly-modal-header .close-btn:hover {
+  color: #475569;
+}
+
+/* Attendance Summary */
+.attendance-summary {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1rem 1.5rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  min-width: 120px;
+}
+
+.summary-icon {
+  font-size: 1.5rem;
+}
+
+.summary-label {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.summary-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* Progress Bar */
+.attendance-progress {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.progress-bar-container {
+  flex: 1;
+  height: 12px;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+  border-radius: 9999px;
+  transition: width 0.5s ease;
+}
+
+.progress-text {
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+}
+
+/* Rewards Grid */
+.rewards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.reward-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0.5rem;
+  background: white;
+  border-radius: 16px;
+  border: 2px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.reward-card.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.reward-card.claimable {
+  border-color: #3b82f6;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  animation: pulse-glow 2s infinite;
+}
+
+.reward-card.claimable:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+}
+
+.reward-card.claimed {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-color: #22c55e;
+}
+
+.reward-card.claiming {
+  animation: claim-animation 0.5s ease-out;
+}
+
+@keyframes claim-animation {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.reward-day {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.reward-icon {
+  font-size: 2rem;
+  margin-bottom: 0.25rem;
+}
+
+.reward-name {
+  font-size: 0.7rem;
+  color: #475569;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.claimed-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  background: #22c55e;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.claim-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.locked-badge {
+  font-size: 1rem;
+  opacity: 0.5;
+}
+
+/* Footer */
+.monthly-modal-footer {
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.monthly-modal-footer p {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+@media (max-width: 640px) {
+  .monthly-modal-content {
+    padding: 1rem;
+  }
+
+  .rewards-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+
+  .reward-card {
+    padding: 0.75rem 0.25rem;
+  }
+
+  .reward-icon {
+    font-size: 1.5rem;
+  }
+
+  .reward-name {
+    font-size: 0.6rem;
+  }
+
+  .attendance-summary {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .summary-item {
+    padding: 0.75rem 1rem;
+    min-width: 90px;
+  }
+}
+

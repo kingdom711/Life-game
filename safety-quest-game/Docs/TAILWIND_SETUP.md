@@ -14,6 +14,7 @@
 3. **CSS 통합**
    - `src/styles/index.css`에 Tailwind 지시문 추가
    - 기존 CSS 변수 및 스타일 유지 (호환성 보장)
+   - (2026-02-13) 단일 스타일 파일 분리: `index.css`를 import 허브로 전환
 
 4. **컴포넌트 예시**
    - `src/components/QuestCard.jsx`에 Tailwind 클래스 적용 예시
@@ -51,6 +52,29 @@ npm run dev
 - 기존 CSS 클래스 (`.card`, `.btn-primary` 등)는 계속 사용 가능
 - Tailwind 클래스와 기존 CSS 클래스를 함께 사용 가능
 - 점진적으로 마이그레이션 가능
+
+### 4. 스타일 파일 구조 (2026-02-13 업데이트)
+
+기존 `src/styles/index.css` 단일 파일 구조를 유지보수 가능한 모듈 구조로 분리했습니다.
+
+```text
+src/styles/
+├── index.css                      # Tailwind + 모듈 import 허브
+├── core/
+│   └── base.css                   # 변수/리셋/타이포/레이아웃/공통 유틸
+├── components/
+│   └── ui-components.css          # 모달/카드/버튼/퀘스트 등 컴포넌트 스타일
+├── features/
+│   └── item-systems.css           # 검교정/Stats HUD/인벤토리 확장 스타일
+└── pages/
+    └── dashboard.css              # 대시보드 전용 프리미엄 스타일
+```
+
+운영 원칙:
+- 공통 토큰/유틸: `core/base.css`
+- 특정 기능군 스타일: `components` 또는 `features`
+- 페이지 전용 스타일: `pages`
+- 새 파일은 `index.css`에서 import 순서를 유지하며 추가
 
 ## 📋 Tailwind 설정 내용
 
@@ -98,7 +122,8 @@ npm run dev
 
 1. **개발 서버 재시작**: `npm run dev`
 2. **컴포넌트 마이그레이션**: 점진적으로 기존 컴포넌트에 Tailwind 클래스 적용
-3. **가이드라인 적용**: 프리미엄 UX 가이드라인의 패턴을 프로젝트에 적용
+3. **일관성 점검**: `Docs/UI_PREMIUM_CONSISTENCY_CHECKLIST.md` 기반 페이지별 점검
+4. **가이드라인 적용**: 프리미엄 UX 가이드라인의 패턴을 프로젝트에 적용
 
 ## ⚠️ 주의사항
 
