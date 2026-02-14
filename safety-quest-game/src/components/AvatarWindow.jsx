@@ -89,18 +89,15 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
         const auraColors = {
             'AURA_BLUE_GLOW': {
                 gradient: 'radial-gradient(circle at center, rgba(56, 189, 248, 0.3) 0%, transparent 70%)',
-                shadow: '0 0 60px rgba(56, 189, 248, 0.5)',
-                animation: 'pulse-glow 2s infinite'
+                shadow: '0 0 60px rgba(56, 189, 248, 0.5)'
             },
             'AURA_FROST_SHIELD': {
                 gradient: 'radial-gradient(circle at center, rgba(165, 243, 252, 0.3) 0%, transparent 70%)',
-                shadow: '0 0 80px rgba(165, 243, 252, 0.6)',
-                animation: 'frost-shimmer 3s infinite'
+                shadow: '0 0 80px rgba(165, 243, 252, 0.6)'
             },
             'HOLOGRAM_SHIELD_V2': {
                 gradient: 'radial-gradient(circle at center, rgba(192, 132, 252, 0.3) 0%, rgba(34, 211, 238, 0.2) 50%, transparent 70%)',
-                shadow: '0 0 100px rgba(192, 132, 252, 0.7), 0 0 60px rgba(34, 211, 238, 0.5)',
-                animation: 'hologram-flicker 4s infinite'
+                shadow: '0 0 100px rgba(192, 132, 252, 0.7), 0 0 60px rgba(34, 211, 238, 0.5)'
             }
         };
 
@@ -272,7 +269,6 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
                                     background: auraStyles.gradient,
                                     borderRadius: '50%',
                                     opacity: 0.6,
-                                    animation: auraStyles.animation,
                                     pointerEvents: 'none'
                                 }} />
                                 <div className="aura-ring" style={{
@@ -281,7 +277,6 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
                                     border: `2px solid ${activeAura.color || '#38bdf8'}`,
                                     borderRadius: '50%',
                                     opacity: 0.4,
-                                    animation: 'spin-slow 20s linear infinite'
                                 }} />
                             </>
                         )}

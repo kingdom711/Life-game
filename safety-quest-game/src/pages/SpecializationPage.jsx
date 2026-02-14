@@ -70,12 +70,12 @@ const SpecializationPage = ({ role }) => {
 
     const getStatusLabel = (status) => {
         switch (status) {
-            case SPECIALIZATION_STATUS.LOCKED: return '잠김';
-            case SPECIALIZATION_STATUS.AVAILABLE: return '교육 가능';
-            case SPECIALIZATION_STATUS.IN_PROGRESS: return '교육 진행 중';
-            case SPECIALIZATION_STATUS.UNLOCKED: return '해금 완료';
-            case SPECIALIZATION_STATUS.ACTIVE: return '장착 중';
-            default: return '';
+            case SPECIALIZATION_STATUS.LOCKED: return '🔒 잠김';
+            case SPECIALIZATION_STATUS.AVAILABLE: return '🟢 교육 가능';
+            case SPECIALIZATION_STATUS.IN_PROGRESS: return '🟡 교육 진행 중';
+            case SPECIALIZATION_STATUS.UNLOCKED: return '🔓 해금 완료';
+            case SPECIALIZATION_STATUS.ACTIVE: return '⚡ 장착 중';
+            default: return 'ℹ️ 상태';
         }
     };
 

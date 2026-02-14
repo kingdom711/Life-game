@@ -167,9 +167,9 @@ const StatsHUD = ({ compact = false, showSetBonuses = true }) => {
  */
 export const StatsBadge = ({ type, value }) => {
     const configs = {
-        pointBoost: { icon: '💰', label: '포인트', color: '#10b981' },
-        xpAccelerator: { icon: '⚡', label: 'XP', color: '#f59e0b' },
-        streakSaver: { icon: '🛡️', label: '보호', color: '#6366f1' }
+        pointBoost: { icon: '💰', label: '포인트', color: 'var(--color-safe)' },
+        xpAccelerator: { icon: '⚡', label: 'XP', color: 'var(--color-warning)' },
+        streakSaver: { icon: '🛡️', label: '보호', color: 'var(--color-primary-light)' }
     };
 
     const config = configs[type];

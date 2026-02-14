@@ -7,6 +7,12 @@ import { getInventoryStats } from '../utils/inventoryManager';
 import { getActiveSpecialization, getUnlockedSpecializations } from '../utils/specializationManager';
 import { useAuth } from '../context/AuthContext';
 
+const COLOR = {
+    text: 'var(--color-text)',
+    textMuted: 'var(--color-text-muted)',
+    bronze: 'var(--color-bronze)'
+};
+
 function Profile({ role }) {
     const { logout } = useAuth();
     const navigate = useNavigate();
@@ -16,7 +22,7 @@ function Profile({ role }) {
         level: {
             name: 'Bronze III',
             current: 1,
-            color: '#cd7f32',
+            color: COLOR.bronze,
             min: 0,
             max: 10000,
             progress: 0,
@@ -86,10 +92,10 @@ function Profile({ role }) {
                                 src={roleInfo.image}
                                 alt={roleInfo.name}
                                 className="h-full w-auto object-contain drop-shadow-2xl relative z-10 
-                                  hover:scale-110 transition-transform duration-300"
+                                  hover:scale-105 transition-transform duration-300"
                             />
                         ) : (
-                            <span className="relative z-10 hover:scale-110 transition-transform duration-300">
+                            <span className="relative z-10 hover:scale-105 transition-transform duration-300">
                                 {roleInfo?.icon || '👤'}
                             </span>
                         )}
@@ -163,13 +169,13 @@ function Profile({ role }) {
                                                         : 'opacity-40'
                                                 }`}
                                             style={{
-                                                backgroundColor: isPastTier || isCurrentTier ? `${tierInfo.color}20` : '#f1f5f9',
+                                                backgroundColor: isPastTier || isCurrentTier ? `${tierInfo.color}20` : COLOR.text,
                                                 borderColor: tierInfo.color,
                                                 ringColor: isCurrentTier ? tierInfo.color : 'transparent'
                                             }}
                                         >
                                             <div className="text-2xl mb-1">{tierInfo.icon}</div>
-                                            <div className="text-xs font-semibold" style={{ color: isPastTier || isCurrentTier ? tierInfo.color : '#94a3b8' }}>
+                                            <div className="text-xs font-semibold" style={{ color: isPastTier || isCurrentTier ? tierInfo.color : COLOR.textMuted }}>
                                                 {tierInfo.name}
                                             </div>
                                             {isCurrentTier && (
@@ -207,7 +213,7 @@ function Profile({ role }) {
                                         background: `linear-gradient(90deg, ${stats.level.color}, ${stats.level.color}cc)`
                                     }}>
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent 
-                                      via-white/30 to-transparent animate-shimmer" />
+                                      via-white/30 to-transparent" />
                                 </div>
                             </div>
                             <div className="flex justify-between mt-1 text-xs text-slate-500">

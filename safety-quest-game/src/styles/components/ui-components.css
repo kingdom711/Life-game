@@ -499,19 +499,6 @@
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
-.hologram-effect {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(45deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.03) 50%,
-      transparent 100%);
-  pointer-events: none;
-}
-
 @keyframes flash {
   0% {
     background-color: rgba(251, 191, 36, 0.5);
@@ -666,7 +653,6 @@
   border-color: #10b981;
   /* Emerald 500 */
   box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
-  animation: flash-emerald 0.5s ease-out;
 }
 
 .completed-overlay {
@@ -692,13 +678,6 @@
   box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
 }
 
-.glowing-checkmark {
-  color: #10b981;
-  font-size: 1.5rem;
-  font-weight: bold;
-  animation: glow-emerald 1.5s infinite alternate;
-}
-
 .quest-complete-text {
   font-size: 1.5rem;
   font-weight: 800;
@@ -707,7 +686,6 @@
   width: 100%;
   text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
   letter-spacing: 2px;
-  animation: pulse-text 2s infinite;
 }
 
 .btn-action.completed {
@@ -718,42 +696,6 @@
   border: 1px solid #475569;
   cursor: not-allowed;
   box-shadow: none;
-}
-
-@keyframes flash-emerald {
-  0% {
-    background-color: rgba(16, 185, 129, 0.5);
-  }
-
-  100% {
-    background-color: rgba(255, 255, 255, 0.05);
-  }
-}
-
-@keyframes glow-emerald {
-  from {
-    text-shadow: 0 0 5px rgba(16, 185, 129, 0.5);
-    transform: scale(1);
-  }
-
-  to {
-    text-shadow: 0 0 15px rgba(16, 185, 129, 1);
-    transform: scale(1.1);
-  }
-}
-
-@keyframes pulse-text {
-  0% {
-    opacity: 0.8;
-  }
-
-  50% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0.8;
-  }
 }
 
 /* Gear Slot & Avatar Window Animations */
@@ -804,19 +746,8 @@
   height: calc(100% + 60px);
   border: 2px dashed rgba(56, 189, 248, 0.3);
   border-radius: 50%;
-  animation: spin-slow 20s linear infinite;
   pointer-events: none;
   z-index: 0;
-}
-
-@keyframes spin-slow {
-  from {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-
-  to {
-    transform: translate(-50%, -50%) rotate(360deg);
-  }
 }
 
 /* Quest Trigger Card (Game UI Style) */
@@ -1327,4 +1258,111 @@
     min-width: 90px;
   }
 }
-
+
+/* ==================== Page State (Loading / Empty / Error) ==================== */
+.page-state-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 240px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  border-radius: 16px;
+  border: 1px solid rgba(71, 85, 105, 0.45);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.82) 0%, rgba(15, 23, 42, 0.82) 100%);
+  backdrop-filter: blur(10px);
+}
+
+.page-state-spinner {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid rgba(148, 163, 184, 0.25);
+  border-top-color: #38bdf8;
+  animation: spin 1s linear infinite;
+}
+
+.page-state-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.page-state-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.page-state-description {
+  margin: 0;
+  max-width: 520px;
+  font-size: 0.92rem;
+  color: #94a3b8;
+}
+
+.page-state-action {
+  min-width: 124px;
+  margin-top: 0.35rem;
+}
+
+.page-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.page-notice-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.page-notice-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.page-notice-title {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.page-notice-description {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.page-notice-success {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(16, 185, 129, 0.1));
+  border-color: rgba(34, 197, 94, 0.35);
+}
+
+.page-notice-success .page-notice-title {
+  color: #4ade80;
+}
+
+.page-notice-success .page-notice-description {
+  color: #94a3b8;
+}
+
+.page-notice-error {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(185, 28, 28, 0.1));
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.page-notice-error .page-notice-title {
+  color: #f87171;
+}
+
+.page-notice-error .page-notice-description {
+  color: #cbd5e1;
+}

@@ -37,7 +37,7 @@ function QuestCard({ quest, onComplete }) {
                 </div>
                 {isCompleted ? (
                     <div className="completed-badge-icon bg-emerald-500/20 rounded-full w-10 h-10 flex items-center justify-center shadow-lg shadow-emerald-500/40">
-                        <span className="glowing-checkmark text-emerald-500 text-2xl font-bold">✓</span>
+                        <span className="text-emerald-500 text-2xl font-bold">✓</span>
                     </div>
                 ) : (
                     <span className="quest-reward bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-sm font-bold">
@@ -59,7 +59,7 @@ function QuestCard({ quest, onComplete }) {
                     <>
                         <ProgressBar
                             progress={percentage}
-                            color={isCompleted ? '#10b981' : '#38bdf8'}
+                            color={isCompleted ? 'var(--color-safe)' : 'var(--color-primary-light)'}
                         />
                         <span className="progress-text text-sm text-slate-500 font-bold">
                             {progress.current} / {target}
@@ -97,9 +97,6 @@ function QuestCard({ quest, onComplete }) {
                     {percentage >= 100 ? '보상 받기' : '진행 중'}
                 </button>
             )}
-
-            {/* 홀로그램 효과용 배경 */}
-            <div className="hologram-effect absolute inset-0 bg-gradient-to-45deg from-transparent via-white/3 to-transparent pointer-events-none rounded-xl"></div>
         </div>
     );
 }

@@ -3,6 +3,20 @@ import { Link } from 'react-router-dom';
 import goldApi from '../api/goldApi';
 import rewardApi from '../api/rewardApi';
 import IdentityVerificationModal from '../components/IdentityVerificationModal';
+import { LoadingState, ErrorState, EmptyState, ResultNotice } from '../components/PageState';
+
+const COLOR = {
+    text: 'var(--color-text)',
+    textSecondary: 'var(--color-text-secondary)',
+    textMuted: 'var(--color-text-muted)',
+    warning: 'var(--color-warning)',
+    warningLight: 'var(--color-warning-light)',
+    safe: 'var(--color-safe)',
+    danger: 'var(--color-danger)',
+    secondary: 'var(--color-secondary)',
+    secondaryLight: 'var(--color-secondary-light)',
+    bg: 'var(--color-bg)'
+};
 
 function RewardCenter() {
     const [goldBalance, setGoldBalance] = useState(0);
@@ -14,12 +28,14 @@ function RewardCenter() {
     const [showSuccess, setShowSuccess] = useState(false);
     const [successReward, setSuccessReward] = useState(null);
     const [error, setError] = useState(null);
+    const [loadError, setLoadError] = useState(null);
     const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
     const [pendingReward, setPendingReward] = useState(null);
 
     const loadData = useCallback(async () => {
         try {
             setLoading(true);
+            setLoadError(null);
             const [goldData, rewardsData, myRewardsData] = await Promise.allSettled([
                 goldApi.getBalance(),
                 rewardApi.getRewards(),
@@ -35,8 +51,16 @@ function RewardCenter() {
             if (myRewardsData.status === 'fulfilled') {
                 setMyRewards(Array.isArray(myRewardsData.value) ? myRewardsData.value : []);
             }
+            if (
+                goldData.status === 'rejected' &&
+                rewardsData.status === 'rejected' &&
+                myRewardsData.status === 'rejected'
+            ) {
+                setLoadError('보상센터 데이터를 불러오지 못했습니다.');
+            }
         } catch (err) {
             console.error('데이터 로딩 실패:', err);
+            setLoadError(err?.message || '보상센터 데이터를 불러오지 못했습니다.');
         } finally {
             setLoading(false);
         }
@@ -50,7 +74,6 @@ function RewardCenter() {
         if (goldBalance < reward.goldPrice) {
             setError('골드가 부족합니다. 포인트 교환소에서 골드를 먼저 교환해주세요!');
             setTimeout(() => setError(null), 3000);
-            return;
             return;
         }
 
@@ -105,22 +128,35 @@ function RewardCenter() {
 
     const getStatusLabel = (status) => {
         switch (status) {
-            case 'PENDING': return { text: '처리 대기', color: '#f59e0b', bg: 'rgba(245,158,11,0.15)' };
-            case 'DELIVERED': return { text: '발송 완료', color: '#22c55e', bg: 'rgba(34,197,94,0.15)' };
-            case 'CANCELLED': return { text: '취소됨', color: '#ef4444', bg: 'rgba(239,68,68,0.15)' };
-            default: return { text: status, color: '#94a3b8', bg: 'rgba(148,163,184,0.15)' };
+            case 'PENDING': return { text: '⏳ 처리 대기', color: COLOR.warning, bg: 'rgba(245,158,11,0.15)' };
+            case 'DELIVERED': return { text: '✅ 발송 완료', color: COLOR.safe, bg: 'rgba(34,197,94,0.15)' };
+            case 'CANCELLED': return { text: '❌ 취소됨', color: COLOR.danger, bg: 'rgba(239,68,68,0.15)' };
+            default: return { text: `ℹ️ ${status}`, color: COLOR.textMuted, bg: 'rgba(148,163,184,0.15)' };
         }
     };
 
     if (loading) {
         return (
             <div className="page">
-                <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-                    <div style={{
-                        width: 48, height: 48, border: '3px solid rgba(168,85,247,0.3)',
-                        borderTopColor: '#a855f7', borderRadius: '50%',
-                        animation: 'spin 1s linear infinite'
-                    }} />
+                <div className="container" style={{ minHeight: '60vh', display: 'grid', placeItems: 'center' }}>
+                    <LoadingState
+                        title="보상센터를 불러오는 중입니다..."
+                        description="보상 목록과 교환 내역을 동기화하고 있습니다."
+                    />
+                </div>
+            </div>
+        );
+    }
+
+    if (loadError) {
+        return (
+            <div className="page">
+                <div className="container" style={{ minHeight: '60vh', display: 'grid', placeItems: 'center' }}>
+                    <ErrorState
+                        title="보상센터 로드에 실패했습니다."
+                        description={loadError}
+                        onRetry={loadData}
+                    />
                 </div>
             </div>
         );
@@ -142,34 +178,32 @@ function RewardCenter() {
 
                 {/* 헤더 */}
                 <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                    <h1 style={{
-                        fontSize: '2rem', fontWeight: 800, marginBottom: 8,
-                        background: 'linear-gradient(135deg, #a855f7, #8b5cf6, #ec4899)',
-                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
+                    <h1 className="gradient-text-secondary" style={{
+                        fontSize: '2rem', fontWeight: 800, marginBottom: 8
                     }}>
                         🎁 보상센터
                     </h1>
-                    <p style={{ color: '#94a3b8', fontSize: '0.95rem' }}>골드로 실제 기프티콘을 교환하세요!</p>
+                    <p style={{ color: COLOR.textMuted, fontSize: '0.95rem' }}>골드로 실제 기프티콘을 교환하세요!</p>
                 </div>
 
                 {/* 골드 잔액 */}
-                <div style={{
+                <div className="ui-section-gap" style={{
                     background: 'linear-gradient(135deg, rgba(234,179,8,0.12), rgba(245,158,11,0.08))',
                     border: '1px solid rgba(234,179,8,0.25)', borderRadius: 16,
-                    padding: '1rem 1.5rem', marginBottom: '1.5rem',
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                    padding: '1rem 1.5rem',
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    flexWrap: 'wrap', gap: 10
                 }}>
                     <div>
-                        <div style={{ color: '#94a3b8', fontSize: '0.75rem' }}>보유 골드</div>
-                        <div style={{ color: '#eab308', fontSize: '1.5rem', fontWeight: 700 }}>
+                        <div style={{ color: COLOR.textMuted, fontSize: '0.75rem' }}>보유 골드</div>
+                        <div style={{ color: COLOR.warningLight, fontSize: '1.5rem', fontWeight: 700 }}>
                             🪙 {goldBalance.toLocaleString()}G
                         </div>
                     </div>
-                    <Link to="/exchange" style={{
-                        background: 'linear-gradient(135deg, #eab308, #f59e0b)',
-                        color: '#0f172a', border: 'none', borderRadius: 10,
-                        padding: '0.5rem 1rem', fontSize: '0.8rem', fontWeight: 700,
-                        textDecoration: 'none', cursor: 'pointer'
+                    <Link to="/exchange" className="ui-btn-core ui-btn-gradient-warning" style={{
+                        background: 'linear-gradient(135deg, var(--color-warning-light), var(--color-warning))',
+                        color: COLOR.bg, border: 'none', fontSize: '0.8rem', fontWeight: 700,
+                        cursor: 'pointer'
                     }}>
                         + 골드 충전
                     </Link>
@@ -177,34 +211,21 @@ function RewardCenter() {
 
                 {/* 성공 알림 */}
                 {showSuccess && successReward && (
-                    <div style={{
-                        background: 'linear-gradient(135deg, rgba(168,85,247,0.15), rgba(236,72,153,0.1))',
-                        border: '1px solid rgba(168,85,247,0.3)', borderRadius: 16,
-                        padding: '1.5rem', marginBottom: '1.5rem', textAlign: 'center',
-                        animation: 'fadeIn 0.4s ease-out'
-                    }}>
-                        <div style={{ fontSize: '3rem', marginBottom: 10 }}>🎉</div>
-                        <div style={{ color: '#a855f7', fontWeight: 700, fontSize: '1.2rem', marginBottom: 6 }}>
-                            교환 완료!
-                        </div>
-                        <div style={{ color: '#e2e8f0', fontSize: '0.95rem', marginBottom: 4 }}>
-                            {successReward.name}
-                        </div>
-                        <div style={{ color: '#94a3b8', fontSize: '0.8rem' }}>
-                            관리자 확인 후 쿠폰이 발급됩니다
-                        </div>
-                    </div>
+                    <ResultNotice
+                        type="success"
+                        icon="🎉"
+                        title="교환 완료!"
+                        description={`${successReward.name} · 관리자 확인 후 쿠폰이 발급됩니다`}
+                    />
                 )}
 
                 {/* 에러 메시지 */}
                 {error && (
-                    <div style={{
-                        background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
-                        borderRadius: 10, padding: '0.7rem 1rem', marginBottom: '1rem',
-                        color: '#ef4444', fontSize: '0.85rem'
-                    }}>
-                        ⚠️ {error}
-                    </div>
+                    <ResultNotice
+                        type="error"
+                        title="보상 교환에 실패했습니다."
+                        description={error}
+                    />
                 )}
 
                 {/* 탭 */}
@@ -214,12 +235,13 @@ function RewardCenter() {
                 }}>
                     <button
                         onClick={() => setActiveTab('rewards')}
+                        className="ui-btn-chip"
                         style={{
-                            flex: 1, padding: '0.6rem', borderRadius: 10, border: 'none',
+                            flex: 1, border: 'none',
                             background: activeTab === 'rewards'
-                                ? 'linear-gradient(135deg, #a855f7, #8b5cf6)'
+                                ? 'linear-gradient(135deg, var(--color-secondary-light), var(--color-secondary))'
                                 : 'transparent',
-                            color: activeTab === 'rewards' ? '#fff' : '#64748b',
+                            color: activeTab === 'rewards' ? COLOR.text : COLOR.textMuted,
                             fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer',
                             transition: 'all 0.2s'
                         }}
@@ -228,12 +250,13 @@ function RewardCenter() {
                     </button>
                     <button
                         onClick={() => setActiveTab('history')}
+                        className="ui-btn-chip"
                         style={{
-                            flex: 1, padding: '0.6rem', borderRadius: 10, border: 'none',
+                            flex: 1, border: 'none',
                             background: activeTab === 'history'
-                                ? 'linear-gradient(135deg, #a855f7, #8b5cf6)'
+                                ? 'linear-gradient(135deg, var(--color-secondary-light), var(--color-secondary))'
                                 : 'transparent',
-                            color: activeTab === 'history' ? '#fff' : '#64748b',
+                            color: activeTab === 'history' ? COLOR.text : COLOR.textMuted,
                             fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer',
                             transition: 'all 0.2s'
                         }}
@@ -246,21 +269,20 @@ function RewardCenter() {
                 {activeTab === 'rewards' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: '5rem' }}>
                         {rewards.length === 0 ? (
-                            <div style={{
-                                textAlign: 'center', padding: '3rem 1rem',
-                                color: '#64748b', fontSize: '0.95rem'
-                            }}>
-                                <div style={{ fontSize: '3rem', marginBottom: 10 }}>📦</div>
-                                현재 교환 가능한 보상이 없습니다
-                            </div>
+                            <EmptyState
+                                icon="📦"
+                                title="현재 교환 가능한 보상이 없습니다."
+                                description="잠시 후 다시 확인하거나 교환 내역 탭을 확인해 주세요."
+                                actionLabel="다시 불러오기"
+                                onAction={loadData}
+                            />
                         ) : (
                             rewards.map(reward => {
                                 const canAfford = goldBalance >= reward.goldPrice;
                                 const inStock = reward.remainingQuantity > 0;
 
                                 return (
-                                    <div key={reward.id} style={{
-                                        background: 'linear-gradient(145deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95))',
+                                    <div key={reward.id} className="glass-panel" style={{
                                         border: `1px solid ${canAfford && inStock ? 'rgba(168,85,247,0.3)' : 'rgba(51,65,85,0.4)'}`,
                                         borderRadius: 18, padding: '1.2rem', overflow: 'hidden',
                                         position: 'relative', transition: 'all 0.3s',
@@ -275,7 +297,7 @@ function RewardCenter() {
                                                 zIndex: 2, borderRadius: 18
                                             }}>
                                                 <span style={{
-                                                    color: '#ef4444', fontWeight: 800, fontSize: '1.3rem',
+                                                    color: COLOR.danger, fontWeight: 800, fontSize: '1.3rem',
                                                     background: 'rgba(0,0,0,0.7)', padding: '0.3rem 1rem',
                                                     borderRadius: 8
                                                 }}>
@@ -300,23 +322,23 @@ function RewardCenter() {
 
                                             {/* 텍스트 */}
                                             <div style={{ flex: 1 }}>
-                                                <div style={{ color: '#f1f5f9', fontWeight: 700, fontSize: '1rem', marginBottom: 4 }}>
+                                                <div style={{ color: COLOR.text, fontWeight: 700, fontSize: '1rem', marginBottom: 4 }}>
                                                     {reward.name}
                                                 </div>
                                                 {reward.description && (
-                                                    <div style={{ color: '#94a3b8', fontSize: '0.8rem', marginBottom: 6, lineHeight: 1.4 }}>
+                                                    <div style={{ color: COLOR.textMuted, fontSize: '0.8rem', marginBottom: 6, lineHeight: 1.4 }}>
                                                         {reward.description}
                                                     </div>
                                                 )}
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                                     <span style={{
-                                                        color: '#eab308', fontWeight: 700, fontSize: '1.05rem'
+                                                        color: COLOR.warningLight, fontWeight: 700, fontSize: '1.05rem'
                                                     }}>
                                                         🪙 {reward.goldPrice}G
                                                     </span>
                                                     {reward.cashValue && (
                                                         <span style={{
-                                                            color: '#64748b', fontSize: '0.75rem',
+                                                            color: COLOR.textMuted, fontSize: '0.75rem',
                                                             background: 'rgba(100,116,139,0.15)',
                                                             padding: '2px 6px', borderRadius: 6
                                                         }}>
@@ -324,7 +346,7 @@ function RewardCenter() {
                                                         </span>
                                                     )}
                                                     <span style={{
-                                                        color: '#64748b', fontSize: '0.7rem'
+                                                        color: COLOR.textMuted, fontSize: '0.7rem'
                                                     }}>
                                                         남은 수량: {reward.remainingQuantity}
                                                     </span>
@@ -336,14 +358,14 @@ function RewardCenter() {
                                         <button
                                             onClick={() => handleExchange(reward)}
                                             disabled={!canAfford || !inStock || exchanging === reward.id}
+                                            className="ui-btn-core"
                                             style={{
                                                 width: '100%', marginTop: '1rem',
                                                 background: (!canAfford || !inStock)
                                                     ? 'rgba(71,85,105,0.4)'
-                                                    : 'linear-gradient(135deg, #a855f7, #8b5cf6)',
-                                                color: (!canAfford || !inStock) ? '#64748b' : '#fff',
-                                                border: 'none', borderRadius: 12,
-                                                padding: '0.7rem', fontSize: '0.9rem', fontWeight: 700,
+                                                    : 'linear-gradient(135deg, var(--color-secondary-light), var(--color-secondary))',
+                                                color: (!canAfford || !inStock) ? COLOR.textMuted : COLOR.text,
+                                                border: 'none', fontSize: '0.9rem', fontWeight: 700,
                                                 cursor: (canAfford && inStock) ? 'pointer' : 'not-allowed',
                                                 transition: 'all 0.2s',
                                                 boxShadow: (canAfford && inStock) ? '0 4px 16px rgba(168,85,247,0.3)' : 'none'
@@ -365,13 +387,13 @@ function RewardCenter() {
                 {activeTab === 'history' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: '5rem' }}>
                         {myRewards.length === 0 ? (
-                            <div style={{
-                                textAlign: 'center', padding: '3rem 1rem',
-                                color: '#64748b', fontSize: '0.95rem'
-                            }}>
-                                <div style={{ fontSize: '3rem', marginBottom: 10 }}>📋</div>
-                                아직 교환한 보상이 없습니다
-                            </div>
+                            <EmptyState
+                                icon="📋"
+                                title="아직 교환한 보상이 없습니다."
+                                description="보상 목록에서 아이템을 교환하면 내역이 여기에 표시됩니다."
+                                actionLabel="보상 목록 보기"
+                                onAction={() => setActiveTab('rewards')}
+                            />
                         ) : (
                             myRewards.map(item => {
                                 const status = getStatusLabel(item.status);
@@ -382,10 +404,10 @@ function RewardCenter() {
                                     }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                                             <div>
-                                                <div style={{ color: '#e2e8f0', fontWeight: 700, fontSize: '0.95rem' }}>
+                                                <div style={{ color: COLOR.textSecondary, fontWeight: 700, fontSize: '0.95rem' }}>
                                                     {item.rewardName}
                                                 </div>
-                                                <div style={{ color: '#64748b', fontSize: '0.75rem', marginTop: 2 }}>
+                                                <div style={{ color: COLOR.textMuted, fontSize: '0.75rem', marginTop: 2 }}>
                                                     {item.createdAt ? new Date(item.createdAt).toLocaleDateString('ko-KR', {
                                                         year: 'numeric', month: 'long', day: 'numeric'
                                                     }) : ''}
@@ -400,12 +422,12 @@ function RewardCenter() {
                                             </span>
                                         </div>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <span style={{ color: '#eab308', fontSize: '0.85rem', fontWeight: 600 }}>
+                                            <span style={{ color: COLOR.warningLight, fontSize: '0.85rem', fontWeight: 600 }}>
                                                 🪙 {item.goldPaid}G 사용
                                             </span>
                                             {item.couponCode && (
                                                 <span style={{
-                                                    background: 'rgba(34,197,94,0.1)', color: '#22c55e',
+                                                    background: 'rgba(34,197,94,0.1)', color: COLOR.safe,
                                                     padding: '2px 8px', borderRadius: 6, fontSize: '0.75rem',
                                                     fontFamily: 'monospace'
                                                 }}>
@@ -422,7 +444,6 @@ function RewardCenter() {
             </div>
 
             <style>{`
-                @keyframes spin { to { transform: rotate(360deg); } }
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
             `}</style>
         </div>

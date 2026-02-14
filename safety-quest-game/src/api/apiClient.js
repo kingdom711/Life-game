@@ -128,6 +128,7 @@ const attemptTokenRefresh = async () => {
                 throw new Error('Refresh token not found');
             }
 
+            await config.resolveApiBaseUrl();
             const url = config.getApiUrl('/auth/refresh');
             const response = await fetch(url, {
                 method: 'POST',
@@ -163,6 +164,7 @@ const attemptTokenRefresh = async () => {
  * 401 에러 시 자동 토큰 갱신 시도
  */
 const request = async (endpoint, options = {}, retryCount = 0) => {
+    await config.resolveApiBaseUrl();
     const url = config.getApiUrl(endpoint);
 
     const defaultOptions = {
@@ -325,4 +327,3 @@ const apiClient = {
 };
 
 export default apiClient;
-

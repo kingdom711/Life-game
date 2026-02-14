@@ -1,22 +1,47 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getInventoryItems, equipItem, unequipItem, isItemEquipped, getInventoryStats } from '../utils/inventoryManager';
 import { CATEGORY_NAMES, getRarityColor, RARITY_NAMES } from '../data/itemsData';
 import { userInventoryInstances } from '../utils/storage';
 import { ensureItemInstance, getCalibrationInfo } from '../utils/calibrationService';
 import CalibrationModal from '../components/CalibrationModal';
 import StatsHUD from '../components/StatsHUD';
+import { LoadingState, ErrorState, EmptyState } from '../components/PageState';
+
+const COLOR = {
+    text: 'var(--color-text)',
+    textMuted: 'var(--color-text-muted)',
+    pageTitleStart: 'var(--theme-inventory-title-start)',
+    pageTitleMid: 'var(--theme-inventory-title-mid)',
+    pageTitleEnd: 'var(--theme-inventory-title-end)'
+};
 
 function Inventory() {
+    const navigate = useNavigate();
     const [inventoryItems, setInventoryItems] = useState([]);
     const [stats, setStats] = useState({});
     const [calibrationModal, setCalibrationModal] = useState({ isOpen: false, itemId: null });
     const [itemInstances, setItemInstances] = useState({});
     const [imageErrors, setImageErrors] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+    const [loadError, setLoadError] = useState('');
 
     useEffect(() => {
-        loadData();
+        initializeInventory();
     }, []);
+
+    const initializeInventory = async () => {
+        setIsLoading(true);
+        setLoadError('');
+        try {
+            loadData();
+        } catch (error) {
+            console.error('인벤토리 데이터 로드 실패:', error);
+            setLoadError('인벤토리 데이터를 불러오지 못했습니다.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const loadData = () => {
         const items = getInventoryItems();
@@ -87,6 +112,26 @@ function Inventory() {
         return itemInstances[itemId]?.currentCalibrationLevel || 0;
     };
 
+    if (isLoading) {
+        return (
+            <div className="page">
+                <div className="container">
+                    <LoadingState title="인벤토리를 불러오는 중입니다..." description="아이템과 장착 상태를 동기화하고 있습니다." />
+                </div>
+            </div>
+        );
+    }
+
+    if (loadError) {
+        return (
+            <div className="page">
+                <div className="container">
+                    <ErrorState title="인벤토리 로드에 실패했습니다." description={loadError} onRetry={initializeInventory} />
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="page">
             <div className="container">
@@ -97,14 +142,14 @@ function Inventory() {
                 </div>
                 <div style={{ marginBottom: '2rem' }}>
                     <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{
-                        background: 'linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 50%, #ec4899 100%)',
+                        background: `linear-gradient(135deg, ${COLOR.pageTitleStart} 0%, ${COLOR.pageTitleMid} 50%, ${COLOR.pageTitleEnd} 100%)`,
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         backgroundClip: 'text'
                     }}>
                         🎒 인벤토리
                     </h1>
-                    <p className="text-lg" style={{ color: '#94a3b8' }}>보유 중인 안전용품을 관리하세요</p>
+                    <p className="text-lg" style={{ color: COLOR.textMuted }}>보유 중인 안전용품을 관리하세요</p>
                 </div>
 
                 {/* 활성 스탯 HUD */}
@@ -116,35 +161,33 @@ function Inventory() {
                 <div className="grid grid-3 mb-xl">
                     <div className="card">
                         <div className="card-body text-center">
-                            <div className="mb-sm" style={{ color: '#94a3b8' }}>보유 아이템</div>
-                            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#f1f5f9' }}>{stats.totalItems}</div>
+                            <div className="mb-sm" style={{ color: COLOR.textMuted }}>보유 아이템</div>
+                            <div style={{ fontSize: '2rem', fontWeight: '700', color: COLOR.text }}>{stats.totalItems}</div>
                         </div>
                     </div>
                     <div className="card">
                         <div className="card-body text-center">
-                            <div className="mb-sm" style={{ color: '#94a3b8' }}>착용 중</div>
-                            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#f1f5f9' }}>{stats.equippedCount}</div>
+                            <div className="mb-sm" style={{ color: COLOR.textMuted }}>착용 중</div>
+                            <div style={{ fontSize: '2rem', fontWeight: '700', color: COLOR.text }}>{stats.equippedCount}</div>
                         </div>
                     </div>
                     <div className="card">
                         <div className="card-body text-center">
-                            <div className="mb-sm" style={{ color: '#94a3b8' }}>총 가치</div>
-                            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#f1f5f9' }}>{stats.totalValue?.toLocaleString()}P</div>
+                            <div className="mb-sm" style={{ color: COLOR.textMuted }}>총 가치</div>
+                            <div style={{ fontSize: '2rem', fontWeight: '700', color: COLOR.text }}>{stats.totalValue?.toLocaleString()}P</div>
                         </div>
                     </div>
                 </div>
 
                 {/* 아이템 목록 */}
                 {inventoryItems.length === 0 ? (
-                    <div className="card">
-                        <div className="card-body text-center">
-                            <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📦</div>
-                            <p style={{ color: '#94a3b8' }}>보유 중인 아이템이 없습니다.</p>
-                            <Link to="/shop">
-                                <button className="btn btn-primary mt-md">상점으로 이동</button>
-                            </Link>
-                        </div>
-                    </div>
+                    <EmptyState
+                        icon="📦"
+                        title="보유 중인 아이템이 없습니다."
+                        description="상점에서 장비를 구매한 뒤 다시 확인해 주세요."
+                        actionLabel="상점으로 이동"
+                        onAction={() => navigate('/shop')}
+                    />
                 ) : (
                     <div className="grid grid-3">
                         {inventoryItems.map(item => {
@@ -197,7 +240,7 @@ function Inventory() {
                                                 className="badge"
                                                 style={{
                                                     background: getRarityColor(item.rarity),
-                                                    color: 'white'
+                                                    color: 'var(--color-text)'
                                                 }}
                                             >
                                                 {RARITY_NAMES[item.rarity]}

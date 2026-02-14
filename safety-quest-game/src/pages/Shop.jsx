@@ -3,16 +3,48 @@ import { Link, useNavigate } from 'react-router-dom';
 import { items, ITEM_CATEGORY, ITEM_RARITY, CATEGORY_NAMES, RARITY_NAMES, getRarityColor } from '../data/itemsData';
 import { purchaseItem } from '../utils/inventoryManager';
 import { points as pointsStorage, inventory as inventoryStorage } from '../utils/storage';
+import { LoadingState, ErrorState, EmptyState } from '../components/PageState';
+
+const COLOR = {
+    text: 'var(--color-text)',
+    textSecondary: 'var(--color-text-secondary)',
+    textMuted: 'var(--color-text-muted)',
+    primaryLight: 'var(--color-primary-light)',
+    secondary: 'var(--color-secondary)',
+    secondaryLight: 'var(--color-secondary-light)',
+    warning: 'var(--color-warning)',
+    warningLight: 'var(--color-warning-light)',
+    bg: 'var(--color-bg)',
+    white: 'var(--color-text)',
+    pageTitleStart: 'var(--theme-shop-title-start)',
+    pageTitleMid: 'var(--theme-shop-title-mid)',
+    pageTitleEnd: 'var(--theme-shop-title-end)'
+};
 
 function Shop() {
     const navigate = useNavigate();
     const [currentPoints, setCurrentPoints] = useState(0);
     const [filter, setFilter] = useState('all');
     const [ownedItems, setOwnedItems] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [loadError, setLoadError] = useState('');
 
     useEffect(() => {
-        loadData();
+        initializeShop();
     }, []);
+
+    const initializeShop = async () => {
+        setIsLoading(true);
+        setLoadError('');
+        try {
+            loadData();
+        } catch (error) {
+            console.error('상점 데이터 로드 실패:', error);
+            setLoadError('상점 데이터를 불러오지 못했습니다.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const loadData = () => {
         setCurrentPoints(pointsStorage.get());
@@ -34,6 +66,26 @@ function Shop() {
         }
     };
 
+    if (isLoading) {
+        return (
+            <div className="page">
+                <div className="container">
+                    <LoadingState title="상점을 준비하는 중입니다..." description="아이템 정보와 보유 포인트를 불러오고 있습니다." />
+                </div>
+            </div>
+        );
+    }
+
+    if (loadError) {
+        return (
+            <div className="page">
+                <div className="container">
+                    <ErrorState title="상점 로드에 실패했습니다." description={loadError} onRetry={initializeShop} />
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="page">
             <div className="container">
@@ -44,29 +96,29 @@ function Shop() {
                 </div>
                 <div className="mb-12">
                     <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{
-                        background: 'linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 50%, #ec4899 100%)',
+                        background: `linear-gradient(135deg, ${COLOR.pageTitleStart} 0%, ${COLOR.pageTitleMid} 50%, ${COLOR.pageTitleEnd} 100%)`,
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         backgroundClip: 'text'
                     }}>
                         🛒 아이템 상점
                     </h1>
-                    <p className="text-lg mb-4" style={{ color: '#94a3b8' }}>포인트로 안전용품을 구매하세요</p>
+                    <p className="text-lg mb-4" style={{ color: COLOR.textMuted }}>포인트로 안전용품을 구매하세요</p>
                     <div className="mt-4" style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
                         <div className="points-badge">
                             💰 보유 포인트: <span className="font-bold">{currentPoints.toLocaleString()}P</span>
                         </div>
                         <Link to="/exchange" style={{
-                            background: 'linear-gradient(135deg, #eab308, #f59e0b)',
-                            color: '#0f172a', border: 'none', borderRadius: 10,
+                            background: `linear-gradient(135deg, ${COLOR.warningLight}, ${COLOR.warning})`,
+                            color: COLOR.bg, border: 'none', borderRadius: 10,
                             padding: '0.45rem 1rem', fontSize: '0.85rem', fontWeight: 700,
                             textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4
                         }}>
                             💱 골드 교환
                         </Link>
                         <Link to="/reward-center" style={{
-                            background: 'linear-gradient(135deg, #a855f7, #8b5cf6)',
-                            color: '#fff', border: 'none', borderRadius: 10,
+                            background: `linear-gradient(135deg, ${COLOR.secondaryLight}, ${COLOR.secondary})`,
+                            color: COLOR.white, border: 'none', borderRadius: 10,
                             padding: '0.45rem 1rem', fontSize: '0.85rem', fontWeight: 700,
                             textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4
                         }}>
@@ -95,8 +147,17 @@ function Shop() {
                 </div>
 
                 {/* 아이템 목록 */}
-                <div className="grid grid-3">
-                    {filteredItems.map(item => {
+                {filteredItems.length === 0 ? (
+                    <EmptyState
+                        icon="🛒"
+                        title="선택한 조건의 아이템이 없습니다."
+                        description="필터를 변경해서 다른 카테고리 아이템을 확인해 주세요."
+                        actionLabel="전체 보기"
+                        onAction={() => setFilter('all')}
+                    />
+                ) : (
+                    <div className="grid grid-3">
+                        {filteredItems.map(item => {
                         const owned = ownedItems.includes(item.id);
                         const canAfford = currentPoints >= item.price;
 
@@ -109,7 +170,7 @@ function Shop() {
 
                         return (
                             <div key={item.id} className="card backdrop-blur-xl rounded-2xl overflow-hidden 
-                              shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 
+                              shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 
                               group relative">
                                 {/* 희귀도별 테두리 글로우 */}
                                 <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 
@@ -133,7 +194,7 @@ function Shop() {
                                                     }}
                                                     className="w-4/5 h-4/5 object-contain 
                                                       drop-shadow-lg transition-transform duration-300 
-                                                      group-hover:scale-110"
+                                                      group-hover:scale-105"
                                                 />
                                             ) : null}
                                         </div>
@@ -147,21 +208,21 @@ function Shop() {
                                             {RARITY_NAMES[item.rarity]}
                                         </div>
                                     </div>
-                                    <h4 className="card-title text-center text-lg font-bold mb-1" style={{ color: '#f1f5f9' }}>
+                                    <h4 className="card-title text-center text-lg font-bold mb-1" style={{ color: COLOR.text }}>
                                         {item.name}
                                     </h4>
-                                    <p className="card-subtitle text-center text-sm" style={{ color: '#94a3b8' }}>
+                                    <p className="card-subtitle text-center text-sm" style={{ color: COLOR.textMuted }}>
                                         {CATEGORY_NAMES[item.category]}
                                     </p>
                                 </div>
 
                                 <div className="card-body px-4 pb-4 relative z-10">
-                                    <p className="text-sm mb-4 leading-relaxed" style={{ color: '#cbd5e1' }}>
+                                    <p className="text-sm mb-4 leading-relaxed" style={{ color: COLOR.textSecondary }}>
                                         {item.description}
                                     </p>
 
                                     <div className="mb-4">
-                                        <div className="text-xs mb-2 font-semibold" style={{ color: '#94a3b8' }}>
+                                        <div className="text-xs mb-2 font-semibold" style={{ color: COLOR.textMuted }}>
                                             효과
                                         </div>
                                         <div className="badge badge-success bg-gradient-to-r from-emerald-500 
@@ -174,7 +235,7 @@ function Shop() {
 
                                 <div className="card-footer p-4 pt-0 relative z-10">
                                     <div className="flex justify-between items-center mb-4">
-                                        <span className="font-bold text-2xl" style={{ color: '#f1f5f9' }}>
+                                        <span className="font-bold text-2xl" style={{ color: COLOR.text }}>
                                             💰 {item.price.toLocaleString()}P
                                         </span>
                                     </div>
@@ -204,7 +265,8 @@ function Shop() {
                             </div>
                         );
                     })}
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     );

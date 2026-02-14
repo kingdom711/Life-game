@@ -17,12 +17,59 @@ import { completeQuest, triggerQuestAction, checkAttendance } from '../utils/que
 import AvatarWindow from '../components/AvatarWindow';
 import AvatarGearDisplay from '../components/AvatarGearDisplay';
 import PointsHistoryModal from '../components/PointsHistoryModal';
+import { LoadingState, ErrorState, EmptyState } from '../components/PageState';
 import { getAlerts } from '../api/alertApi';
 import userApi from '../api/userApi';
 
 // [New] 교육 시스템
 import { getTodayEducationContent, hasCompletedTodayEducation, getLegalHoursProgress } from '../utils/educationManager';
 import { CATEGORY_INFO } from '../data/educationData';
+
+const COLOR = {
+    text: 'var(--color-text)',
+    textSecondary: 'var(--color-text-secondary)',
+    textMuted: 'var(--color-text-muted)',
+    textDim: 'rgba(203, 213, 225, 0.6)',
+    textFaint: 'rgba(203, 213, 225, 0.5)',
+    textStrong: 'rgba(203, 213, 225, 0.9)',
+    primaryLight: 'var(--color-primary-light)',
+    primary: 'var(--color-primary)',
+    secondaryLight: 'var(--color-secondary-light)',
+    secondary: 'var(--color-secondary)',
+    warningLight: 'var(--color-warning-light)',
+    warning: 'var(--color-warning)',
+    safe: 'var(--color-safe)',
+    safeLight: 'var(--color-safe-light)',
+    danger: 'var(--color-danger)',
+    dangerLight: 'var(--color-danger-light)',
+    bronze: 'var(--color-bronze)',
+    alertModalStart: 'var(--color-alert-modal-start)',
+    alertModalEnd: 'var(--color-alert-modal-end)'
+};
+
+const ALERT_TYPE_THEME = {
+    danger: {
+        bg: 'rgba(239, 68, 68, 0.15)',
+        border: 'rgba(239, 68, 68, 0.4)',
+        label: '위험',
+        labelColor: 'var(--color-danger-light)',
+        icon: '🚨'
+    },
+    warning: {
+        bg: 'rgba(251, 191, 36, 0.15)',
+        border: 'rgba(251, 191, 36, 0.4)',
+        label: '주의',
+        labelColor: 'var(--color-warning-light)',
+        icon: '⚠️'
+    },
+    info: {
+        bg: 'rgba(56, 189, 248, 0.15)',
+        border: 'rgba(56, 189, 248, 0.4)',
+        label: '안내',
+        labelColor: 'var(--color-primary-light)',
+        icon: 'ℹ️'
+    }
+};
 
 function Dashboard({ role }) {
     const navigate = useNavigate();
@@ -31,7 +78,7 @@ function Dashboard({ role }) {
         level: { 
             name: 'Bronze III', 
             progress: 0,
-            color: '#cd7f32',
+            color: COLOR.bronze,
             tierIcon: '🥉',
             rank: 1,
             totalRanks: 15
@@ -57,14 +104,28 @@ function Dashboard({ role }) {
     const [todayEducation, setTodayEducation] = useState(null);
     const [educationCompleted, setEducationCompleted] = useState(false);
     const [legalProgress, setLegalProgress] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [loadError, setLoadError] = useState('');
     
     // 관리자 권한 체크
     const isAdmin = role === 'supervisor' || role === 'safetyManager';
 
     useEffect(() => {
-        loadData();
-        loadAlerts();
+        initializeDashboard();
     }, [role]);
+
+    const initializeDashboard = async () => {
+        setIsLoading(true);
+        setLoadError('');
+        try {
+            await Promise.all([loadData(), loadAlerts()]);
+        } catch (error) {
+            console.error('대시보드 초기화 실패:', error);
+            setLoadError('대시보드 데이터를 불러오지 못했습니다.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const loadData = async () => {
         // localStorage에서 즉시 로드 (빠른 UI 표시)
@@ -170,6 +231,33 @@ function Dashboard({ role }) {
         loadData(); // 새로고침
     };
 
+    if (isLoading) {
+        return (
+            <div className="page dashboard-page">
+                <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+                    <LoadingState
+                        title="대시보드를 불러오는 중입니다..."
+                        description="퀘스트, 알림, 교육 데이터를 동기화하고 있습니다."
+                    />
+                </div>
+            </div>
+        );
+    }
+
+    if (loadError) {
+        return (
+            <div className="page dashboard-page">
+                <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+                    <ErrorState
+                        title="대시보드 로드에 실패했습니다."
+                        description={loadError}
+                        onRetry={initializeDashboard}
+                    />
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="page dashboard-page">
             {/* 배경 GIF - 화면 중앙 고정 */}
@@ -271,7 +359,7 @@ function Dashboard({ role }) {
                                 margin: 0,
                                 fontSize: '0.9rem',
                                 fontWeight: 700,
-                                color: '#e879f9',
+                                color: COLOR.secondaryLight,
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '0.4rem'
@@ -281,7 +369,7 @@ function Dashboard({ role }) {
                             </h3>
                             <span style={{
                                 fontSize: '0.65rem',
-                                color: 'rgba(203, 213, 225, 0.6)',
+                                color: COLOR.textMuted,
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '0.2rem'
@@ -289,9 +377,8 @@ function Dashboard({ role }) {
                                 <span style={{
                                     width: '6px',
                                     height: '6px',
-                                    background: '#ef4444',
-                                    borderRadius: '50%',
-                                    animation: 'pulse 2s infinite'
+                                    background: COLOR.danger,
+                                    borderRadius: '50%'
                                 }} />
                                 LIVE
                             </span>
@@ -308,7 +395,7 @@ function Dashboard({ role }) {
                                 flex: '0 0 auto',
                                 width: '44px',
                                 height: '44px',
-                                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                                background: `linear-gradient(135deg, ${COLOR.warningLight} 0%, ${COLOR.warning} 100%)`,
                                 borderRadius: '10px',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -323,7 +410,7 @@ function Dashboard({ role }) {
                             <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{
                                     fontSize: '0.75rem',
-                                    color: '#fbbf24',
+                                    color: COLOR.warningLight,
                                     fontWeight: 600,
                                     marginBottom: '0.15rem'
                                 }}>
@@ -331,7 +418,7 @@ function Dashboard({ role }) {
                                 </div>
                                 <div style={{
                                     fontSize: '0.9rem',
-                                    color: '#f1f5f9',
+                                    color: COLOR.text,
                                     fontWeight: 700,
                                     whiteSpace: 'nowrap',
                                     overflow: 'hidden',
@@ -341,7 +428,7 @@ function Dashboard({ role }) {
                                 </div>
                                 <div style={{
                                     fontSize: '0.65rem',
-                                    color: 'rgba(203, 213, 225, 0.6)',
+                                    color: COLOR.textMuted,
                                     marginTop: '0.15rem'
                                 }}>
                                     {latestAlerts[0]?.time} • 클릭하여 상세 보기
@@ -377,8 +464,7 @@ function Dashboard({ role }) {
                                     height: '14px',
                                     background: 'rgba(239, 68, 68, 0.6)',
                                     borderRadius: '3px',
-                                    border: '1.5px solid #ef4444',
-                                    animation: 'pulse 1.5s infinite'
+                                    border: `1.5px solid ${COLOR.danger}`
                                 }} />
                             </div>
                         </div>
@@ -425,7 +511,6 @@ function Dashboard({ role }) {
                             <div className="level-display">
                                 <div className="level-icon-wrapper">
                                     <span className="level-icon">{playerStats.level.tierIcon}</span>
-                                    <div className="level-glow" />
                                 </div>
                                 <div className="level-info">
                                     <div className="level-name" style={{ color: playerStats.level.color }}>
@@ -444,9 +529,7 @@ function Dashboard({ role }) {
                                             width: `${playerStats.level.progress}%`,
                                             background: `linear-gradient(90deg, ${playerStats.level.color}, ${playerStats.level.color}dd, ${playerStats.level.color})`
                                         }}
-                                    >
-                                        <div className="progress-shine" />
-                                    </div>
+                                    />
                                 </div>
                                 <div className="progress-text">
                                     {playerStats.level.progress}%
@@ -512,7 +595,6 @@ function Dashboard({ role }) {
                                 className="avatar-display"
                                 onClick={() => setIsAvatarWindowOpen(true)}
                             >
-                                <div className="avatar-glow-ring" />
                                 <AvatarGearDisplay
                                     equippedItems={equippedItems}
                                     size={200}
@@ -588,8 +670,8 @@ function Dashboard({ role }) {
                                         height: '70px',
                                         borderRadius: '16px',
                                         background: educationCompleted 
-                                            ? 'linear-gradient(135deg, #22c55e 0%, #10b981 100%)'
-                                            : `linear-gradient(135deg, ${CATEGORY_INFO[todayEducation.category]?.color || '#3b82f6'} 0%, ${CATEGORY_INFO[todayEducation.category]?.color || '#3b82f6'}dd 100%)`,
+                                            ? `linear-gradient(135deg, ${COLOR.safe} 0%, ${COLOR.safeLight} 100%)`
+                                            : `linear-gradient(135deg, ${CATEGORY_INFO[todayEducation.category]?.color || COLOR.primary} 0%, ${CATEGORY_INFO[todayEducation.category]?.color || COLOR.primary}dd 100%)`,
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
@@ -614,19 +696,18 @@ function Dashboard({ role }) {
                                                 margin: 0,
                                                 fontSize: '1.25rem',
                                                 fontWeight: 700,
-                                                color: educationCompleted ? '#22c55e' : '#f1f5f9'
+                                                color: educationCompleted ? COLOR.safe : COLOR.text
                                             }}>
                                                 📚 오늘의 안전 교육
                                             </h3>
                                             {!educationCompleted && (
                                                 <span style={{
                                                     background: 'rgba(239, 68, 68, 0.2)',
-                                                    color: '#f87171',
+                                                    color: COLOR.dangerLight,
                                                     fontSize: '0.7rem',
                                                     fontWeight: 700,
                                                     padding: '0.25rem 0.5rem',
-                                                    borderRadius: '4px',
-                                                    animation: 'pulse 2s infinite'
+                                                    borderRadius: '4px'
                                                 }}>
                                                     필수
                                                 </span>
@@ -636,7 +717,7 @@ function Dashboard({ role }) {
                                         <p style={{
                                             margin: 0,
                                             fontSize: '1rem',
-                                            color: '#cbd5e1',
+                                            color: COLOR.textSecondary,
                                             marginBottom: '0.5rem'
                                         }}>
                                             {educationCompleted 
@@ -653,19 +734,19 @@ function Dashboard({ role }) {
                                         }}>
                                             {!educationCompleted && (
                                                 <>
-                                                    <span style={{ color: '#94a3b8' }}>
+                                                    <span style={{ color: COLOR.textMuted }}>
                                                         ⏱️ {Math.ceil(todayEducation.duration / 60)}분
                                                     </span>
-                                                    <span style={{ color: '#94a3b8' }}>•</span>
-                                                    <span style={{ color: '#fbbf24' }}>
+                                                    <span style={{ color: COLOR.textMuted }}>•</span>
+                                                    <span style={{ color: COLOR.warningLight }}>
                                                         +{todayEducation.points}P
                                                     </span>
                                                 </>
                                             )}
                                             {legalProgress && (
                                                 <>
-                                                    {!educationCompleted && <span style={{ color: '#94a3b8' }}>•</span>}
-                                                    <span style={{ color: '#60a5fa' }}>
+                                                    {!educationCompleted && <span style={{ color: COLOR.textMuted }}>•</span>}
+                                                    <span style={{ color: COLOR.primaryLight }}>
                                                         법정교육 {legalProgress.currentYearHours}h / {legalProgress.requiredHours}h
                                                     </span>
                                                 </>
@@ -676,7 +757,7 @@ function Dashboard({ role }) {
                                     {/* 화살표 */}
                                     <div style={{
                                         fontSize: '1.5rem',
-                                        color: educationCompleted ? '#22c55e' : '#60a5fa',
+                                        color: educationCompleted ? COLOR.safe : COLOR.primaryLight,
                                         flexShrink: 0
                                     }}>
                                         →
@@ -695,7 +776,7 @@ function Dashboard({ role }) {
                                             <div style={{
                                                 height: '100%',
                                                 width: `${Math.min(100, legalProgress.completionRate)}%`,
-                                                background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+                                                background: `linear-gradient(90deg, ${COLOR.primary}, ${COLOR.secondary})`,
                                                 transition: 'width 0.5s ease'
                                             }} />
                                         </div>
@@ -736,30 +817,21 @@ function Dashboard({ role }) {
                             >
                                 <span style={{ fontSize: '2rem' }}>⚔️</span>
                                 <div style={{ flex: 1 }}>
-                                    <div style={{ fontWeight: 700, fontSize: '1rem', color: '#a78bfa' }}>
+                                    <div style={{ fontWeight: 700, fontSize: '1rem', color: COLOR.secondaryLight }}>
                                         전직 센터
                                     </div>
                                     <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
                                         특수 교육을 이수하고 유도원 · 신호수 · 밀폐담당자로 전직하세요
                                     </div>
                                 </div>
-                                <span style={{ color: '#a78bfa', fontSize: '1.25rem' }}>→</span>
+                                <span style={{ color: COLOR.secondaryLight, fontSize: '1.25rem' }}>→</span>
                             </div>
                         </Link>
                     </div>
                 )}
 
                 {/* 찾아라 위험! 일일 퀘스트 & 안전 지능 시스템 */}
-                <div className="mb-xl" style={{ 
-                    display: 'flex', 
-                    gap: '1rem', 
-                    justifyContent: 'center', 
-                    alignItems: 'stretch',
-                    flexWrap: 'wrap',
-                    width: '100%',
-                    margin: '0 auto',
-                    textAlign: 'center'
-                }}>
+                <div className="mb-xl quest-trigger-grid">
                     {/* 찾아라 위험! 버튼 */}
                     <div
                         className={`quest-trigger-card ${isHazardQuestCompleted ? 'completed' : ''}`}
@@ -770,12 +842,7 @@ function Dashboard({ role }) {
                             }
                             setIsHazardModalOpen(true);
                         }}
-                        style={{
-                            flex: '0 0 auto',
-                            width: '400px',
-                            maxWidth: '400px',
-                            margin: '0'
-                        }}
+                        style={{ margin: '0' }}
                     >
                         <div className="icon">
                             {isHazardQuestCompleted ?
@@ -794,13 +861,7 @@ function Dashboard({ role }) {
                     </div>
 
                     {/* GEMS AI 안전 지능 시스템 버튼 */}
-                    <Link to="/risk-solution" className="no-underline" style={{ 
-                        flex: '0 0 auto',
-                        width: '400px',
-                        maxWidth: '400px',
-                        display: 'flex',
-                        margin: '0'
-                    }}>
+                    <Link to="/risk-solution" className="no-underline quest-trigger-link" style={{ margin: '0' }}>
                         <div
                             className="gemini-quest-card"
                             style={{
@@ -808,9 +869,9 @@ function Dashboard({ role }) {
                                 width: '100%',
                                 padding: '1.5rem',
                                 background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.9) 0%, rgba(99, 102, 241, 0.8) 100%)',
-                                border: '2px solid #8b5cf6',
+                                border: `2px solid ${COLOR.secondary}`,
                                 borderRadius: '16px',
-                                color: '#ffffff',
+                                color: COLOR.text,
                                 cursor: 'pointer',
                                 overflow: 'hidden',
                                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -835,7 +896,6 @@ function Dashboard({ role }) {
                             <div style={{
                                 fontSize: '2rem',
                                 filter: 'drop-shadow(0 0 5px rgba(139, 92, 246, 0.5))',
-                                animation: 'bounce-slow 2s infinite',
                                 position: 'relative',
                                 zIndex: 2
                             }}>
@@ -856,7 +916,7 @@ function Dashboard({ role }) {
                                 </div>
                                 <div style={{
                                     fontSize: '0.875rem',
-                                    color: 'rgba(196, 181, 253, 0.9)',
+                                    color: COLOR.secondaryLight,
                                     fontWeight: 500
                                 }}>
                                     AI 위험 분석 • Gemini
@@ -869,70 +929,80 @@ function Dashboard({ role }) {
                 {/* 오늘의 퀘스트 */}
                 <div className="mb-xl">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                        <h2 style={{ color: '#f1f5f9' }}>📅 오늘의 퀘스트</h2>
+                        <h2 style={{ color: COLOR.text }}>📅 오늘의 퀘스트</h2>
                         <Link to="/daily">
                             <button className="btn btn-primary btn-sm">전체 보기</button>
                         </Link>
                     </div>
 
-                    <div className="grid grid-3">
-                        {dailyQuests.map(quest => (
-                            <QuestCard
-                                key={quest.id}
-                                quest={quest}
-                                onComplete={handleCompleteQuest}
-                            />
-                        ))}
-                    </div>
+                    {dailyQuests.length === 0 ? (
+                        <EmptyState
+                            icon="📅"
+                            title="오늘 표시할 퀘스트가 없습니다."
+                            description="잠시 후 다시 시도하거나 퀘스트 화면에서 새로고침해 주세요."
+                            actionLabel="다시 불러오기"
+                            onAction={loadData}
+                        />
+                    ) : (
+                        <div className="grid grid-3">
+                            {dailyQuests.map(quest => (
+                                <QuestCard
+                                    key={quest.id}
+                                    quest={quest}
+                                    onComplete={handleCompleteQuest}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* 빠른 액세스 */}
                 <div>
-                    <h3 className="mb-6 text-2xl font-bold" style={{ color: '#f1f5f9' }}>
+                    <h3 className="mb-6 text-2xl font-bold" style={{ color: COLOR.text }}>
                         빠른 액세스
                     </h3>
                     <div className="grid grid-4 gap-4">
                         <Link to="/shop" className="card backdrop-blur-xl rounded-2xl p-6 
-                          shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 
+                          shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 
                           group relative overflow-hidden no-underline text-center">
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-transparent 
                               to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                             <div className="card-body relative z-10">
-                                <div className="text-5xl mb-3 group-hover:scale-110 transition-transform duration-300">🛒</div>
-                                <div className="font-semibold" style={{ color: '#f1f5f9' }}>아이템 상점</div>
+                                <div className="text-5xl mb-3 group-hover:scale-105 transition-transform duration-300">🛒</div>
+                                <div className="font-semibold" style={{ color: COLOR.text }}>아이템 상점</div>
                             </div>
                         </Link>
 
                         <Link to="/weekly" className="card backdrop-blur-xl rounded-2xl p-6 
-                          shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 
+                          shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 
                           group relative overflow-hidden no-underline text-center">
                             <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-transparent 
                               to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                             <div className="card-body relative z-10">
-                                <div className="text-5xl mb-3 group-hover:scale-110 transition-transform duration-300">📊</div>
-                                <div className="font-semibold" style={{ color: '#f1f5f9' }}>주간 퀘스트</div>
+                                <div className="text-5xl mb-3 group-hover:scale-105 transition-transform duration-300">📊</div>
+                                <div className="font-semibold" style={{ color: COLOR.text }}>주간 퀘스트</div>
                             </div>
                         </Link>
 
                         <Link to="/monthly" className="card backdrop-blur-xl rounded-2xl p-6 
-                          shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 
+                          shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 
                           group relative overflow-hidden no-underline text-center">
                             <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 via-transparent 
                               to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                             <div className="card-body relative z-10">
-                                <div className="text-5xl mb-3 group-hover:scale-110 transition-transform duration-300">🏆</div>
-                                <div className="font-semibold" style={{ color: '#f1f5f9' }}>월간 퀘스트</div>
+                                <div className="text-5xl mb-3 group-hover:scale-105 transition-transform duration-300">🏆</div>
+                                <div className="font-semibold" style={{ color: COLOR.text }}>월간 퀘스트</div>
                             </div>
                         </Link>
 
                         <Link to="/profile" className="card backdrop-blur-xl rounded-2xl p-6 
-                          shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 
+                          shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 
                           group relative overflow-hidden no-underline text-center">
                             <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-transparent 
                               to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                             <div className="card-body relative z-10">
-                                <div className="text-5xl mb-3 group-hover:scale-110 transition-transform duration-300">👤</div>
-                                <div className="font-semibold" style={{ color: '#f1f5f9' }}>프로필</div>
+                                <div className="text-5xl mb-3 group-hover:scale-105 transition-transform duration-300">👤</div>
+                                <div className="font-semibold" style={{ color: COLOR.text }}>프로필</div>
                             </div>
                         </Link>
                     </div>
@@ -1000,7 +1070,7 @@ function Dashboard({ role }) {
                 >
                     <div 
                         style={{
-                            background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
+                            background: `linear-gradient(135deg, ${COLOR.alertModalStart} 0%, ${COLOR.alertModalEnd} 100%)`,
                             borderRadius: '20px',
                             width: '100%',
                             maxWidth: '600px',
@@ -1023,7 +1093,7 @@ function Dashboard({ role }) {
                                 margin: 0,
                                 fontSize: '1.5rem',
                                 fontWeight: 800,
-                                color: '#e879f9',
+                                color: COLOR.secondaryLight,
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '0.75rem'
@@ -1039,7 +1109,7 @@ function Dashboard({ role }) {
                                     borderRadius: '50%',
                                     width: '36px',
                                     height: '36px',
-                                    color: '#cbd5e1',
+                                    color: COLOR.textSecondary,
                                     fontSize: '1.25rem',
                                     cursor: 'pointer',
                                     display: 'flex',
@@ -1062,18 +1132,8 @@ function Dashboard({ role }) {
                                 <div 
                                     key={alert.id}
                                     style={{
-                                        background: alert.type === 'danger' 
-                                            ? 'rgba(239, 68, 68, 0.15)' 
-                                            : alert.type === 'warning' 
-                                            ? 'rgba(251, 191, 36, 0.15)' 
-                                            : 'rgba(56, 189, 248, 0.15)',
-                                        border: `2px solid ${
-                                            alert.type === 'danger' 
-                                            ? 'rgba(239, 68, 68, 0.4)' 
-                                            : alert.type === 'warning' 
-                                            ? 'rgba(251, 191, 36, 0.4)' 
-                                            : 'rgba(56, 189, 248, 0.4)'
-                                        }`,
+                                        background: (ALERT_TYPE_THEME[alert.type] || ALERT_TYPE_THEME.info).bg,
+                                        border: `2px solid ${(ALERT_TYPE_THEME[alert.type] || ALERT_TYPE_THEME.info).border}`,
                                         borderRadius: '12px',
                                         padding: '1.25rem',
                                         marginBottom: index < latestAlerts.length - 1 ? '1rem' : 0
@@ -1087,26 +1147,22 @@ function Dashboard({ role }) {
                                         marginBottom: '0.75rem'
                                     }}>
                                         <span style={{ fontSize: '1.5rem' }}>
-                                            {alert.type === 'danger' ? '🚨' : alert.type === 'warning' ? '⚠️' : 'ℹ️'}
+                                            {(ALERT_TYPE_THEME[alert.type] || ALERT_TYPE_THEME.info).icon}
                                         </span>
                                         <div>
                                             <div style={{
                                                 fontSize: '0.75rem',
-                                                color: alert.type === 'danger' 
-                                                    ? '#fca5a5' 
-                                                    : alert.type === 'warning' 
-                                                    ? '#fcd34d' 
-                                                    : '#7dd3fc',
+                                                color: (ALERT_TYPE_THEME[alert.type] || ALERT_TYPE_THEME.info).labelColor,
                                                 fontWeight: 600,
                                                 textTransform: 'uppercase',
                                                 letterSpacing: '0.05em'
                                             }}>
-                                                {alert.type === 'danger' ? '위험' : alert.type === 'warning' ? '주의' : '안내'}
+                                                {(ALERT_TYPE_THEME[alert.type] || ALERT_TYPE_THEME.info).label}
                                             </div>
                                             <div style={{
                                                 fontSize: '1.1rem',
                                                 fontWeight: 700,
-                                                color: '#f1f5f9'
+                                                color: COLOR.text
                                             }}>
                                                 {alert.zone} - {alert.message}
                                             </div>
@@ -1114,7 +1170,7 @@ function Dashboard({ role }) {
                                         <div style={{
                                             marginLeft: 'auto',
                                             fontSize: '0.75rem',
-                                            color: 'rgba(203, 213, 225, 0.6)'
+                                            color: COLOR.textMuted
                                         }}>
                                             {alert.time}
                                         </div>
@@ -1124,7 +1180,7 @@ function Dashboard({ role }) {
                                     <p style={{
                                         margin: 0,
                                         fontSize: '0.9rem',
-                                        color: 'rgba(203, 213, 225, 0.9)',
+                                        color: COLOR.textStrong,
                                         lineHeight: 1.6,
                                         paddingLeft: '2.25rem'
                                     }}>
@@ -1145,7 +1201,7 @@ function Dashboard({ role }) {
                             <p style={{
                                 margin: 0,
                                 fontSize: '0.8rem',
-                                color: 'rgba(203, 213, 225, 0.5)'
+                                color: COLOR.textFaint
                             }}>
                                 ※ 위험 알림은 실시간으로 업데이트됩니다.
                             </p>
@@ -1159,8 +1215,8 @@ function Dashboard({ role }) {
                                         padding: '0.5rem 1rem',
                                         borderRadius: '8px',
                                         border: 'none',
-                                        background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-                                        color: 'white',
+                                        background: `linear-gradient(135deg, ${COLOR.secondary} 0%, var(--color-secondary-dark) 100%)`,
+                                        color: COLOR.text,
                                         fontWeight: 600,
                                         cursor: 'pointer',
                                         fontSize: '0.875rem',

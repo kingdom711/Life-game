@@ -3,6 +3,22 @@ import { Link } from 'react-router-dom';
 import goldApi from '../api/goldApi';
 import exchangeApi from '../api/exchangeApi';
 import { points as pointsStorage } from '../utils/storage';
+import { LoadingState, ErrorState, EmptyState, ResultNotice } from '../components/PageState';
+
+const COLOR = {
+    text: 'var(--color-text)',
+    textSecondary: 'var(--color-text-secondary)',
+    textMuted: 'var(--color-text-muted)',
+    primaryLight: 'var(--color-primary-light)',
+    warning: 'var(--color-warning)',
+    warningLight: 'var(--color-warning-light)',
+    warningDark: 'var(--color-warning-dark)',
+    safe: 'var(--color-safe)',
+    danger: 'var(--color-danger)',
+    border: 'var(--color-border)',
+    bg: 'var(--color-bg)',
+    bgLight: 'var(--color-bg-light)'
+};
 
 function Exchange() {
     const [currentPoints, setCurrentPoints] = useState(0);
@@ -14,11 +30,13 @@ function Exchange() {
     const [showSuccess, setShowSuccess] = useState(false);
     const [successData, setSuccessData] = useState(null);
     const [error, setError] = useState(null);
+    const [loadError, setLoadError] = useState(null);
     const [goldHistory, setGoldHistory] = useState([]);
 
     const loadData = useCallback(async () => {
         try {
             setLoading(true);
+            setLoadError(null);
             const [goldData, rateData, historyData] = await Promise.allSettled([
                 goldApi.getBalance(),
                 exchangeApi.getExchangeRate(),
@@ -34,10 +52,18 @@ function Exchange() {
             if (historyData.status === 'fulfilled') {
                 setGoldHistory(historyData.value?.content || []);
             }
+            if (
+                goldData.status === 'rejected' &&
+                rateData.status === 'rejected' &&
+                historyData.status === 'rejected'
+            ) {
+                setLoadError('교환소 데이터를 불러오지 못했습니다.');
+            }
 
             setCurrentPoints(pointsStorage.get());
         } catch (err) {
             console.error('데이터 로딩 실패:', err);
+            setLoadError(err?.message || '교환소 데이터를 불러오지 못했습니다.');
         } finally {
             setLoading(false);
         }
@@ -86,12 +112,25 @@ function Exchange() {
     if (loading) {
         return (
             <div className="page">
-                <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-                    <div style={{
-                        width: 48, height: 48, border: '3px solid rgba(234,179,8,0.3)',
-                        borderTopColor: '#eab308', borderRadius: '50%',
-                        animation: 'spin 1s linear infinite'
-                    }} />
+                <div className="container" style={{ minHeight: '60vh', display: 'grid', placeItems: 'center' }}>
+                    <LoadingState
+                        title="교환소를 불러오는 중입니다..."
+                        description="골드 잔액과 교환 비율을 확인하고 있습니다."
+                    />
+                </div>
+            </div>
+        );
+    }
+
+    if (loadError) {
+        return (
+            <div className="page">
+                <div className="container" style={{ minHeight: '60vh', display: 'grid', placeItems: 'center' }}>
+                    <ErrorState
+                        title="교환소 로드에 실패했습니다."
+                        description={loadError}
+                        onRetry={loadData}
+                    />
                 </div>
             </div>
         );
@@ -108,20 +147,16 @@ function Exchange() {
 
                 {/* 헤더 */}
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <h1 style={{
-                        fontSize: '2rem', fontWeight: 800, marginBottom: 8,
-                        background: 'linear-gradient(135deg, #eab308, #f59e0b, #fbbf24)',
-                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
+                    <h1 className="gradient-text-warning" style={{
+                        fontSize: '2rem', fontWeight: 800, marginBottom: 8
                     }}>
                         💱 포인트 → 골드 교환소
                     </h1>
-                    <p style={{ color: '#94a3b8', fontSize: '0.95rem' }}>포인트를 골드로 교환하여 실제 기프티콘을 받으세요!</p>
+                    <p style={{ color: COLOR.textMuted, fontSize: '0.95rem' }}>포인트를 골드로 교환하여 실제 기프티콘을 받으세요!</p>
                 </div>
 
                 {/* 잔액 표시 카드 */}
-                <div style={{
-                    display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: '1.5rem'
-                }}>
+                <div className="responsive-dual-grid ui-section-gap">
                     {/* 포인트 */}
                     <div style={{
                         background: 'linear-gradient(135deg, rgba(59,130,246,0.15), rgba(99,102,241,0.1))',
@@ -129,8 +164,8 @@ function Exchange() {
                         textAlign: 'center'
                     }}>
                         <div style={{ fontSize: '1.5rem', marginBottom: 4 }}>💎</div>
-                        <div style={{ color: '#94a3b8', fontSize: '0.75rem', marginBottom: 4 }}>보유 포인트</div>
-                        <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#60a5fa' }}>
+                        <div style={{ color: COLOR.textMuted, fontSize: '0.75rem', marginBottom: 4 }}>보유 포인트</div>
+                        <div style={{ fontSize: '1.4rem', fontWeight: 700, color: COLOR.primaryLight }}>
                             {currentPoints.toLocaleString()}P
                         </div>
                     </div>
@@ -141,36 +176,34 @@ function Exchange() {
                         textAlign: 'center'
                     }}>
                         <div style={{ fontSize: '1.5rem', marginBottom: 4 }}>🪙</div>
-                        <div style={{ color: '#94a3b8', fontSize: '0.75rem', marginBottom: 4 }}>보유 골드</div>
-                        <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#eab308' }}>
+                        <div style={{ color: COLOR.textMuted, fontSize: '0.75rem', marginBottom: 4 }}>보유 골드</div>
+                        <div style={{ fontSize: '1.4rem', fontWeight: 700, color: COLOR.warningLight }}>
                             {goldBalance.toLocaleString()}G
                         </div>
                     </div>
                 </div>
 
                 {/* 교환 비율 안내 */}
-                <div style={{
+                <div className="ui-section-gap" style={{
                     background: 'rgba(234,179,8,0.08)', border: '1px solid rgba(234,179,8,0.2)',
-                    borderRadius: 12, padding: '0.8rem 1rem', marginBottom: '1.5rem',
-                    display: 'flex', alignItems: 'center', gap: 10
+                    borderRadius: 12, padding: '0.8rem 1rem',
+                    display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap'
                 }}>
                     <span style={{ fontSize: '1.2rem' }}>📊</span>
                     <div>
-                        <span style={{ color: '#fbbf24', fontWeight: 600 }}>교환 비율: </span>
-                        <span style={{ color: '#e2e8f0' }}>{pointsPerGold.toLocaleString()}P = 1G</span>
+                        <span style={{ color: COLOR.warningLight, fontWeight: 600 }}>교환 비율: </span>
+                        <span style={{ color: COLOR.textSecondary }}>{pointsPerGold.toLocaleString()}P = 1G</span>
                     </div>
                 </div>
 
                 {/* 교환 입력 카드 */}
-                <div style={{
-                    background: 'linear-gradient(145deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95))',
+                <div className="glass-panel ui-section-gap" style={{
                     border: '1px solid rgba(234,179,8,0.2)', borderRadius: 20,
-                    padding: '1.5rem', marginBottom: '1.5rem',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+                    padding: '1.5rem'
                 }}>
                     {/* 포인트 입력 */}
                     <div style={{ marginBottom: '1rem' }}>
-                        <label style={{ color: '#94a3b8', fontSize: '0.8rem', display: 'block', marginBottom: 6 }}>교환할 포인트</label>
+                        <label style={{ color: COLOR.textMuted, fontSize: '0.8rem', display: 'block', marginBottom: 6 }}>교환할 포인트</label>
                         <input
                             type="number"
                             value={exchangeAmount}
@@ -181,8 +214,8 @@ function Exchange() {
                             style={{
                                 width: '100%', background: 'rgba(15,23,42,0.8)',
                                 border: '1px solid rgba(234,179,8,0.3)', borderRadius: 12,
-                                padding: '0.8rem 1rem', color: '#f8fafc', fontSize: '1.2rem',
-                                fontWeight: 700, outline: 'none', boxSizing: 'border-box'
+                                padding: '0.8rem 1rem', color: COLOR.text, fontSize: '1.2rem',
+                                fontWeight: 700, boxSizing: 'border-box'
                             }}
                             min={pointsPerGold}
                             step={pointsPerGold}
@@ -196,14 +229,14 @@ function Exchange() {
                             <button
                                 key={amount}
                                 onClick={() => setExchangeAmount(amount)}
+                                className="ui-btn-chip"
                                 style={{
                                     background: exchangeAmount === amount
-                                        ? 'linear-gradient(135deg, #eab308, #f59e0b)'
+                                        ? 'linear-gradient(135deg, var(--color-warning-light), var(--color-warning))'
                                         : 'rgba(51,65,85,0.6)',
-                                    color: exchangeAmount === amount ? '#0f172a' : '#94a3b8',
-                                    border: 'none', borderRadius: 8, padding: '0.4rem 0.8rem',
-                                    fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer',
-                                    transition: 'all 0.2s'
+                                    color: exchangeAmount === amount ? COLOR.bg : COLOR.textMuted,
+                                    border: exchangeAmount === amount ? 'none' : '1px solid rgba(71, 85, 105, 0.5)',
+                                    cursor: 'pointer'
                                 }}
                             >
                                 {amount.toLocaleString()}P
@@ -212,14 +245,14 @@ function Exchange() {
                         {maxExchangeable > 0 && (
                             <button
                                 onClick={() => setExchangeAmount(maxExchangeable)}
+                                className="ui-btn-chip"
                                 style={{
                                     background: exchangeAmount === maxExchangeable
-                                        ? 'linear-gradient(135deg, #eab308, #f59e0b)'
+                                        ? 'linear-gradient(135deg, var(--color-warning-light), var(--color-warning))'
                                         : 'rgba(234,179,8,0.15)',
-                                    color: exchangeAmount === maxExchangeable ? '#0f172a' : '#fbbf24',
-                                    border: '1px solid rgba(234,179,8,0.3)', borderRadius: 8,
-                                    padding: '0.4rem 0.8rem', fontSize: '0.8rem', fontWeight: 600,
-                                    cursor: 'pointer', transition: 'all 0.2s'
+                                    color: exchangeAmount === maxExchangeable ? COLOR.bg : COLOR.warningLight,
+                                    border: '1px solid rgba(234,179,8,0.3)',
+                                    cursor: 'pointer'
                                 }}
                             >
                                 최대
@@ -234,43 +267,42 @@ function Exchange() {
                     }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
                             <div>
-                                <div style={{ color: '#60a5fa', fontSize: '1.3rem', fontWeight: 700 }}>
+                                <div style={{ color: COLOR.primaryLight, fontSize: '1.3rem', fontWeight: 700 }}>
                                     {exchangeAmount.toLocaleString()}P
                                 </div>
-                                <div style={{ color: '#64748b', fontSize: '0.7rem' }}>포인트 차감</div>
+                                <div style={{ color: COLOR.textMuted, fontSize: '0.7rem' }}>포인트 차감</div>
                             </div>
-                            <div style={{ fontSize: '1.5rem', color: '#eab308' }}>→</div>
+                            <div style={{ fontSize: '1.5rem', color: COLOR.warningLight }}>→</div>
                             <div>
-                                <div style={{ color: '#eab308', fontSize: '1.3rem', fontWeight: 700 }}>
+                                <div style={{ color: COLOR.warningLight, fontSize: '1.3rem', fontWeight: 700 }}>
                                     {goldPreview.toLocaleString()}G
                                 </div>
-                                <div style={{ color: '#64748b', fontSize: '0.7rem' }}>골드 획득</div>
+                                <div style={{ color: COLOR.textMuted, fontSize: '0.7rem' }}>골드 획득</div>
                             </div>
                         </div>
                     </div>
 
                     {/* 에러 메시지 */}
                     {error && (
-                        <div style={{
-                            background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
-                            borderRadius: 8, padding: '0.6rem 1rem', marginBottom: '1rem',
-                            color: '#ef4444', fontSize: '0.85rem'
-                        }}>
-                            ⚠️ {error}
-                        </div>
+                        <ResultNotice
+                            type="error"
+                            title="교환 요청에 실패했습니다."
+                            description={error}
+                        />
                     )}
 
                     {/* 교환 버튼 */}
                     <button
                         onClick={handleExchange}
                         disabled={exchanging || exchangeAmount < pointsPerGold || exchangeAmount > currentPoints || goldPreview <= 0}
+                        className="ui-btn-core"
                         style={{
                             width: '100%',
                             background: (exchanging || exchangeAmount > currentPoints || goldPreview <= 0)
                                 ? 'rgba(71,85,105,0.5)'
-                                : 'linear-gradient(135deg, #eab308, #f59e0b, #d97706)',
-                            color: (exchanging || exchangeAmount > currentPoints || goldPreview <= 0) ? '#64748b' : '#0f172a',
-                            border: 'none', borderRadius: 14, padding: '0.9rem',
+                                : 'linear-gradient(135deg, var(--color-warning-light), var(--color-warning), var(--color-warning-dark))',
+                            color: (exchanging || exchangeAmount > currentPoints || goldPreview <= 0) ? COLOR.textMuted : COLOR.bg,
+                            border: 'none',
                             fontSize: '1.05rem', fontWeight: 700, cursor: 'pointer',
                             transition: 'all 0.3s', boxShadow: '0 4px 16px rgba(234,179,8,0.25)',
                             opacity: (exchangeAmount > currentPoints || goldPreview <= 0) ? 0.5 : 1
@@ -282,26 +314,19 @@ function Exchange() {
 
                 {/* 성공 알림 */}
                 {showSuccess && successData && (
-                    <div style={{
-                        background: 'linear-gradient(135deg, rgba(34,197,94,0.15), rgba(16,185,129,0.1))',
-                        border: '1px solid rgba(34,197,94,0.3)', borderRadius: 16,
-                        padding: '1.2rem', marginBottom: '1.5rem', textAlign: 'center',
-                        animation: 'fadeIn 0.3s ease-out'
-                    }}>
-                        <div style={{ fontSize: '2rem', marginBottom: 8 }}>✅</div>
-                        <div style={{ color: '#22c55e', fontWeight: 700, fontSize: '1.1rem', marginBottom: 4 }}>
-                            교환 완료!
-                        </div>
-                        <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>
-                            {successData.pointsSpent?.toLocaleString()}P → {successData.goldEarned?.toLocaleString()}G
-                        </div>
-                    </div>
+                    <ResultNotice
+                        type="success"
+                        icon="✅"
+                        title="교환 완료!"
+                        description={`${successData.pointsSpent?.toLocaleString()}P → ${successData.goldEarned?.toLocaleString()}G`}
+                    />
                 )}
 
                 {/* 거래 내역 */}
-                {goldHistory.length > 0 && (
-                    <div style={{ marginBottom: '5rem' }}>
-                        <h3 style={{ color: '#e2e8f0', fontSize: '1rem', fontWeight: 700, marginBottom: '0.8rem' }}>
+                <div style={{ marginBottom: '5rem' }}>
+                    {goldHistory.length > 0 ? (
+                        <>
+                        <h3 style={{ color: COLOR.textSecondary, fontSize: '1rem', fontWeight: 700, marginBottom: '0.8rem' }}>
                             📜 최근 골드 내역
                         </h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -312,15 +337,15 @@ function Exchange() {
                                     display: 'flex', justifyContent: 'space-between', alignItems: 'center'
                                 }}>
                                     <div>
-                                        <div style={{ color: '#e2e8f0', fontSize: '0.85rem', fontWeight: 600 }}>
+                                        <div style={{ color: COLOR.textSecondary, fontSize: '0.85rem', fontWeight: 600 }}>
                                             {tx.description || tx.reason || '교환'}
                                         </div>
-                                        <div style={{ color: '#64748b', fontSize: '0.7rem', marginTop: 2 }}>
+                                        <div style={{ color: COLOR.textMuted, fontSize: '0.7rem', marginTop: 2 }}>
                                             {tx.createdAt ? new Date(tx.createdAt).toLocaleDateString('ko-KR') : ''}
                                         </div>
                                     </div>
                                     <div style={{
-                                        color: tx.type === 'EARN' ? '#22c55e' : '#ef4444',
+                                        color: tx.type === 'EARN' ? COLOR.safe : COLOR.danger,
                                         fontWeight: 700, fontSize: '0.95rem'
                                     }}>
                                         {tx.type === 'EARN' ? '+' : '-'}{tx.amount}G
@@ -328,12 +353,20 @@ function Exchange() {
                                 </div>
                             ))}
                         </div>
-                    </div>
-                )}
+                        </>
+                    ) : (
+                        <EmptyState
+                            icon="📜"
+                            title="최근 골드 내역이 없습니다."
+                            description="포인트를 골드로 교환하면 거래 내역이 여기에 표시됩니다."
+                            actionLabel="새로고침"
+                            onAction={loadData}
+                        />
+                    )}
+                </div>
             </div>
 
             <style>{`
-                @keyframes spin { to { transform: rotate(360deg); } }
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
             `}</style>
         </div>

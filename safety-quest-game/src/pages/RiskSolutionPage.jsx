@@ -3,9 +3,28 @@ import { useNavigate } from 'react-router-dom';
 import { geminiService } from '../utils/geminiService';
 import GEMSResultCard from '../components/GEMSResultCard';
 import { triggerQuestAction } from '../utils/questManager';
+import { LoadingState, ErrorState } from '../components/PageState';
 
 // 디버깅용 기본 placeholder 텍스트 (완결된 문장 형태)
 const DEFAULT_RISK_TEXT = '건설 현장 2층 비계 작업 중 안전난간이 심하게 흔들리고 있습니다. 작업자 3명이 해당 구역에서 철골 용접 작업을 진행 중이며, 안전대 체결 상태가 불량하여 추락 사고 위험이 매우 높은 상황입니다.';
+const COLOR = {
+    text: 'var(--color-text)',
+    textSecondary: 'var(--color-text-secondary)',
+    textMuted: 'var(--color-text-muted)',
+    primary: 'var(--color-primary)',
+    primaryLight: 'var(--color-primary-light)',
+    primaryDark: 'var(--color-primary-dark)',
+    danger: 'var(--color-danger)',
+    border: 'var(--color-border)',
+    borderLight: 'var(--color-border-light)',
+    bg: 'var(--color-bg)',
+    bgLight: 'var(--color-bg-light)',
+    warningLight: 'var(--color-warning-light)',
+    success: 'var(--color-safe)',
+    successDark: 'var(--color-safe-dark)',
+    aiTitleStart: 'var(--color-primary-light)',
+    aiTitleEnd: 'var(--color-primary)'
+};
 
 const RiskSolutionPage = () => {
     const navigate = useNavigate();
@@ -89,7 +108,7 @@ const RiskSolutionPage = () => {
     };
 
     return (
-        <div className="page" style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' }}>
+        <div className="page" style={{ minHeight: '100vh', background: `linear-gradient(135deg, ${COLOR.bg} 0%, ${COLOR.bgLight} 100%)` }}>
             <div className="container" style={{ maxWidth: '800px', padding: '2rem' }}>
                 {/* 헤더 */}
                 <div style={{
@@ -108,7 +127,7 @@ const RiskSolutionPage = () => {
                             border: '1px solid rgba(255, 255, 255, 0.2)',
                             borderRadius: '50px',
                             padding: '0.75rem 1.25rem',
-                            color: 'white',
+                            color: COLOR.text,
                             cursor: 'pointer',
                             fontSize: '0.9rem',
                             transition: 'all 0.3s ease'
@@ -125,7 +144,7 @@ const RiskSolutionPage = () => {
                         <span style={{
                             fontSize: '1.1rem',
                             fontWeight: '700',
-                            background: 'linear-gradient(to right, #60a5fa, #3b82f6)',
+                            background: `linear-gradient(to right, ${COLOR.aiTitleStart}, ${COLOR.aiTitleEnd})`,
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent'
                         }}>
@@ -137,7 +156,7 @@ const RiskSolutionPage = () => {
                 {/* 메인 카드 */}
                 <div style={{
                     background: 'rgba(15, 23, 42, 0.8)',
-                    border: '1px solid #3b82f6',
+                    border: `1px solid ${COLOR.primary}`,
                     borderRadius: '24px',
                     overflow: 'hidden',
                     boxShadow: '0 0 40px rgba(59, 130, 246, 0.15)'
@@ -152,7 +171,7 @@ const RiskSolutionPage = () => {
                             margin: 0,
                             fontSize: '1.5rem',
                             fontWeight: '700',
-                            color: 'white',
+                            color: COLOR.text,
                             display: 'flex',
                             alignItems: 'center',
                             gap: '0.75rem'
@@ -162,7 +181,7 @@ const RiskSolutionPage = () => {
                         </h1>
                         <p style={{
                             margin: '0.5rem 0 0',
-                            color: '#94a3b8',
+                            color: COLOR.textMuted,
                             fontSize: '0.95rem'
                         }}>
                             AI가 위험 요인을 분석하고 즉각적인 조치 방안을 제시합니다
@@ -182,7 +201,7 @@ const RiskSolutionPage = () => {
                                 }}>
                                     <p style={{
                                         margin: 0,
-                                        color: '#93c5fd',
+                                        color: COLOR.primaryLight,
                                         fontSize: '0.9rem',
                                         lineHeight: 1.6
                                     }}>
@@ -194,7 +213,7 @@ const RiskSolutionPage = () => {
                                 <label style={{
                                     display: 'block',
                                     marginBottom: '0.75rem',
-                                    color: '#e2e8f0',
+                                    color: COLOR.textSecondary,
                                     fontWeight: '600',
                                     fontSize: '1rem'
                                 }}>
@@ -208,39 +227,33 @@ const RiskSolutionPage = () => {
                                     rows={6}
                                     style={{
                                         width: '100%',
-                                        background: '#1e293b',
-                                        border: '1px solid #334155',
+                                        background: COLOR.bgLight,
+                                        border: `1px solid ${COLOR.borderLight}`,
                                         borderRadius: '12px',
                                         padding: '1rem',
-                                        color: '#fff',
+                                        color: COLOR.text,
                                         fontSize: '1rem',
                                         resize: 'vertical',
                                         marginBottom: '0.5rem',
-                                        transition: 'border-color 0.2s',
                                         minHeight: '150px'
                                     }}
-                                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                                    onBlur={(e) => e.target.style.borderColor = '#334155'}
                                 />
 
                                 <p style={{
                                     fontSize: '0.8rem',
-                                    color: '#64748b',
+                                    color: COLOR.textMuted,
                                     marginBottom: '1.5rem'
                                 }}>
                                     💡 빈 칸으로 제출하면 위 예시 문장으로 테스트됩니다.
                                 </p>
 
                                 {error && (
-                                    <div style={{
-                                        background: 'rgba(239, 68, 68, 0.1)',
-                                        border: '1px solid rgba(239, 68, 68, 0.3)',
-                                        borderRadius: '8px',
-                                        padding: '1rem',
-                                        marginBottom: '1rem',
-                                        color: '#fca5a5'
-                                    }}>
-                                        ⚠️ {error}
+                                    <div style={{ marginBottom: '1rem' }}>
+                                        <ErrorState
+                                            title="AI 분석 요청에 실패했습니다."
+                                            description={error}
+                                            onRetry={handleSubmit}
+                                        />
                                     </div>
                                 )}
 
@@ -256,7 +269,7 @@ const RiskSolutionPage = () => {
                                             background: 'rgba(255, 255, 255, 0.1)',
                                             border: '1px solid rgba(255, 255, 255, 0.2)',
                                             borderRadius: '12px',
-                                            color: 'white',
+                                            color: COLOR.text,
                                             fontSize: '1rem',
                                             fontWeight: '600',
                                             cursor: 'pointer',
@@ -269,10 +282,10 @@ const RiskSolutionPage = () => {
                                         onClick={handleSubmit}
                                         style={{
                                             padding: '1rem 2rem',
-                                            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                                            background: `linear-gradient(135deg, ${COLOR.primary} 0%, ${COLOR.primaryDark} 100%)`,
                                             border: 'none',
                                             borderRadius: '12px',
-                                            color: 'white',
+                                            color: COLOR.text,
                                             fontSize: '1rem',
                                             fontWeight: '700',
                                             cursor: 'pointer',
@@ -291,26 +304,10 @@ const RiskSolutionPage = () => {
 
                         {step === 'analyzing' && (
                             <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-                                <div style={{
-                                    width: '80px',
-                                    height: '80px',
-                                    margin: '0 auto 1.5rem',
-                                    border: '4px solid rgba(59, 130, 246, 0.3)',
-                                    borderTopColor: '#3b82f6',
-                                    borderRadius: '50%',
-                                    animation: 'spin 1s linear infinite'
-                                }} />
-                                <h3 style={{ color: '#60a5fa', marginBottom: '0.5rem' }}>
-                                    AI가 위험 상황을 분석하고 있습니다...
-                                </h3>
-                                <p style={{ color: '#94a3b8' }}>
-                                    잠시만 기다려주세요
-                                </p>
-                                <style>{`
-                                    @keyframes spin {
-                                        to { transform: rotate(360deg); }
-                                    }
-                                `}</style>
+                                <LoadingState
+                                    title="AI가 위험 상황을 분석하고 있습니다..."
+                                    description="잠시만 기다려주세요."
+                                />
                             </div>
                         )}
 
@@ -336,7 +333,7 @@ const RiskSolutionPage = () => {
                                             background: 'rgba(255, 255, 255, 0.1)',
                                             border: '1px solid rgba(255, 255, 255, 0.2)',
                                             borderRadius: '12px',
-                                            color: 'white',
+                                            color: COLOR.text,
                                             fontSize: '1rem',
                                             fontWeight: '600',
                                             cursor: 'pointer',
@@ -351,10 +348,10 @@ const RiskSolutionPage = () => {
                                             flex: 2,
                                             minWidth: '200px',
                                             padding: '1rem',
-                                            background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                                            background: `linear-gradient(135deg, ${COLOR.success} 0%, ${COLOR.successDark} 100%)`,
                                             border: 'none',
                                             borderRadius: '12px',
-                                            color: 'white',
+                                            color: COLOR.text,
                                             fontSize: '1rem',
                                             fontWeight: '700',
                                             cursor: 'pointer',
@@ -378,13 +375,13 @@ const RiskSolutionPage = () => {
                     borderRadius: '16px',
                     border: '1px solid rgba(255, 255, 255, 0.1)'
                 }}>
-                    <h4 style={{ color: '#fbbf24', marginBottom: '1rem', fontSize: '1rem' }}>
+                    <h4 style={{ color: COLOR.warningLight, marginBottom: '1rem', fontSize: '1rem' }}>
                         🤖 안전 지능 시스템이란?
                     </h4>
                     <ul style={{
                         margin: 0,
                         paddingLeft: '1.25rem',
-                        color: '#94a3b8',
+                        color: COLOR.textMuted,
                         lineHeight: 1.8,
                         fontSize: '0.9rem'
                     }}>

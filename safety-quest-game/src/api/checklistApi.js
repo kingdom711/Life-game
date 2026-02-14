@@ -28,6 +28,7 @@ const checklistApi = {
             headers['Authorization'] = `Bearer ${token}`;
         }
         
+        await apiClient.config.resolveApiBaseUrl();
         const url = apiClient.config.getApiUrl('/checklists');
         const response = await fetch(url, {
             method: 'POST',
@@ -85,4 +86,3 @@ const checklistApi = {
 };
 
 export default checklistApi;
-

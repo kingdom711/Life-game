@@ -68,7 +68,7 @@ function Navigation() {
                         />
                     )}
 
-                    <div className="mobile-nav-icon text-2xl mb-1 group-hover:scale-110 
+                    <div className="mobile-nav-icon text-2xl mb-1 group-hover:scale-105 
                       transition-transform duration-300">
                         {item.icon}
                     </div>

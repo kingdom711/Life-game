@@ -25,6 +25,7 @@ const aiApi = {
                 headers['Authorization'] = `Bearer ${token}`;
             }
             
+            await apiClient.config.resolveApiBaseUrl();
             const url = apiClient.config.getApiUrl('/business-plan/generate');
             const response = await fetch(url, {
                 method: 'POST',
@@ -62,4 +63,3 @@ const aiApi = {
 };
 
 export default aiApi;
-

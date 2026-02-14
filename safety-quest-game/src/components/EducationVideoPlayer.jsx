@@ -317,7 +317,7 @@ const LocalVideoPlayer = ({
                     className="absolute inset-0 flex items-center justify-center cursor-pointer bg-black/30"
                     onClick={togglePlay}
                 >
-                    <div className="w-20 h-20 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full transition-all hover:scale-110">
+                    <div className="w-20 h-20 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full transition-all hover:scale-105">
                         <span className="text-4xl text-white ml-1">▶️</span>
                     </div>
                 </div>

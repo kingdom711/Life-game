@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Navigation from './Navigation';
 import BackgroundMusic from './BackgroundMusic';
@@ -8,6 +8,7 @@ import { checkAndRunMigration } from '../utils/dataMigration';
 
 const GameLayout = ({ role, setRole }) => {
     const location = useLocation();
+    const [showDecorativeEffects, setShowDecorativeEffects] = useState(false);
 
     // Game initialization logic
     useEffect(() => {
@@ -23,6 +24,27 @@ const GameLayout = ({ role, setRole }) => {
         };
         initGame();
     }, []);
+
+    // Delay decorative effects to avoid stacking heavy visual work on first paint.
+    useEffect(() => {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReducedMotion) {
+            setShowDecorativeEffects(false);
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setShowDecorativeEffects(true);
+        }, 240);
+
+        return () => {
+            clearTimeout(timer);
+            setShowDecorativeEffects(false);
+        };
+    }, [location.pathname]);
+
+    const isHeavyVisualRoute = location.pathname === '/';
+    const shouldRenderGlobalOrbs = showDecorativeEffects && !isHeavyVisualRoute;
 
     // If no role is selected, show RoleSelector
     // We check if the current route is NOT already role-selection related to avoid loops, 
@@ -50,18 +72,22 @@ const GameLayout = ({ role, setRole }) => {
             />
 
             {/* Global Background Effects - Dark Theme */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-                {/* Dynamic Background Orbs */}
-                <div className="absolute top-1/4 left-1/4 w-[700px] h-[700px] 
-                  bg-gradient-to-br from-blue-500/20 via-indigo-500/15 to-purple-500/20 
-                  rounded-full blur-[140px] animate-float" />
-                <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] 
-                  bg-gradient-to-br from-indigo-500/20 via-purple-500/15 to-pink-500/20 
-                  rounded-full blur-[120px] animate-float-slow" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] 
-                  bg-gradient-to-br from-cyan-500/15 via-blue-500/12 to-indigo-500/15 
-                  rounded-full blur-[100px] animate-float"
-                    style={{ animationDelay: '1s', animationDuration: '8s' }} />
+            <div className="fixed inset-0 overflow-hidden pointer-events-none layer-bg-effects">
+                {shouldRenderGlobalOrbs && (
+                    <>
+                        {/* Dynamic Background Orbs */}
+                        <div className="app-global-orb absolute top-1/4 left-1/4 w-[700px] h-[700px] 
+                          bg-gradient-to-br from-blue-500/20 via-indigo-500/15 to-purple-500/20 
+                          rounded-full blur-[140px] animate-float" />
+                        <div className="app-global-orb absolute bottom-1/4 right-1/4 w-[600px] h-[600px] 
+                          bg-gradient-to-br from-indigo-500/20 via-purple-500/15 to-pink-500/20 
+                          rounded-full blur-[120px] animate-float-slow" />
+                        <div className="app-global-orb absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] 
+                          bg-gradient-to-br from-cyan-500/15 via-blue-500/12 to-indigo-500/15 
+                          rounded-full blur-[100px] animate-float"
+                            style={{ animationDelay: '1s', animationDuration: '8s' }} />
+                    </>
+                )}
 
                 {/* Subtle Grid Pattern */}
                 <div className="absolute inset-0 opacity-[0.03]"
@@ -78,7 +104,7 @@ const GameLayout = ({ role, setRole }) => {
             <Navigation />
 
             {/* Page Content */}
-            <div className="relative z-10 flex-1">
+            <div className="relative layer-page-content flex-1">
                 <Outlet />
             </div>
         </div>

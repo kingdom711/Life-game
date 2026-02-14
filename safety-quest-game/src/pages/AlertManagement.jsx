@@ -1,6 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAlerts, getAllAlerts, createAlert, updateAlert, deleteAlert } from '../api/alertApi';
+import { getAllAlerts, createAlert, updateAlert, deleteAlert } from '../api/alertApi';
+import { LoadingState, EmptyState, ResultNotice } from '../components/PageState';
+
+const COLOR = {
+    text: 'var(--color-text)',
+    textSecondary: 'var(--color-text-secondary)',
+    textMuted: 'var(--color-text-muted)',
+    primaryLight: 'var(--color-primary-light)',
+    danger: 'var(--color-danger)',
+    dangerLight: 'var(--color-danger-light)',
+    warningLight: 'var(--color-warning-light)',
+    secondary: 'var(--color-secondary)',
+    secondaryLight: 'var(--color-secondary-light)',
+    secondaryDark: 'var(--color-secondary-dark)'
+};
 
 /**
  * 알림 관리 페이지
@@ -114,10 +128,10 @@ function AlertManagement({ role }) {
 
     const getTypeLabel = (type) => {
         switch (type) {
-            case 'danger': return { label: '위험', color: '#ef4444', icon: '🚨' };
-            case 'warning': return { label: '주의', color: '#fbbf24', icon: '⚠️' };
-            case 'info': return { label: '안내', color: '#38bdf8', icon: 'ℹ️' };
-            default: return { label: '알림', color: '#94a3b8', icon: '📢' };
+            case 'danger': return { label: '위험', color: COLOR.danger, icon: '🚨' };
+            case 'warning': return { label: '주의', color: COLOR.warningLight, icon: '⚠️' };
+            case 'info': return { label: '안내', color: COLOR.primaryLight, icon: 'ℹ️' };
+            default: return { label: '알림', color: COLOR.textMuted, icon: '📢' };
         }
     };
 
@@ -139,7 +153,7 @@ function AlertManagement({ role }) {
                         <h1 style={{
                             fontSize: '2rem',
                             fontWeight: 800,
-                            color: '#e879f9',
+                            color: COLOR.secondaryLight,
                             marginBottom: '0.5rem',
                             display: 'flex',
                             alignItems: 'center',
@@ -148,18 +162,18 @@ function AlertManagement({ role }) {
                             <span>🔔</span>
                             알림 관리
                         </h1>
-                        <p style={{ color: 'rgba(203, 213, 225, 0.7)' }}>
+                        <p style={{ color: COLOR.textSecondary }}>
                             실시간 위험 알림을 작성하고 관리합니다.
                         </p>
                     </div>
                     <button
                         onClick={() => setIsFormOpen(true)}
                         style={{
-                            background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                            background: `linear-gradient(135deg, ${COLOR.secondary} 0%, ${COLOR.secondaryDark} 100%)`,
                             border: 'none',
                             borderRadius: '12px',
                             padding: '0.75rem 1.5rem',
-                            color: 'white',
+                            color: COLOR.text,
                             fontWeight: 600,
                             cursor: 'pointer',
                             display: 'flex',
@@ -175,20 +189,11 @@ function AlertManagement({ role }) {
 
                 {/* 저장 결과 메시지 */}
                 {saveStatus && (
-                    <div style={{
-                        padding: '0.75rem 1rem',
-                        borderRadius: '10px',
-                        marginBottom: '1rem',
-                        fontWeight: 600,
-                        fontSize: '0.9rem',
-                        background: saveStatus.type === 'success'
-                            ? 'rgba(34, 197, 94, 0.15)'
-                            : 'rgba(239, 68, 68, 0.15)',
-                        border: `1px solid ${saveStatus.type === 'success' ? 'rgba(34, 197, 94, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`,
-                        color: saveStatus.type === 'success' ? '#4ade80' : '#f87171'
-                    }}>
-                        {saveStatus.type === 'success' ? '✅' : '❌'} {saveStatus.message}
-                    </div>
+                    <ResultNotice
+                        type={saveStatus.type === 'success' ? 'success' : 'error'}
+                        icon={saveStatus.type === 'success' ? '✅' : '❌'}
+                        title={saveStatus.message}
+                    />
                 )}
 
                 {/* 알림 작성/수정 폼 */}
@@ -201,7 +206,7 @@ function AlertManagement({ role }) {
                         marginBottom: '2rem'
                     }}>
                         <h3 style={{
-                            color: '#f1f5f9',
+                            color: COLOR.text,
                             marginBottom: '1.5rem',
                             fontSize: '1.25rem'
                         }}>
@@ -218,7 +223,7 @@ function AlertManagement({ role }) {
                                 <div>
                                     <label style={{
                                         display: 'block',
-                                        color: 'rgba(203, 213, 225, 0.8)',
+                                        color: COLOR.textSecondary,
                                         marginBottom: '0.5rem',
                                         fontSize: '0.875rem'
                                     }}>
@@ -234,7 +239,7 @@ function AlertManagement({ role }) {
                                             borderRadius: '8px',
                                             border: '1px solid rgba(139, 92, 246, 0.3)',
                                             background: 'rgba(15, 23, 42, 0.8)',
-                                            color: '#f1f5f9',
+                                            color: COLOR.text,
                                             fontSize: '1rem'
                                         }}
                                     >
@@ -248,7 +253,7 @@ function AlertManagement({ role }) {
                                 <div>
                                     <label style={{
                                         display: 'block',
-                                        color: 'rgba(203, 213, 225, 0.8)',
+                                        color: COLOR.textSecondary,
                                         marginBottom: '0.5rem',
                                         fontSize: '0.875rem'
                                     }}>
@@ -267,7 +272,7 @@ function AlertManagement({ role }) {
                                             borderRadius: '8px',
                                             border: '1px solid rgba(139, 92, 246, 0.3)',
                                             background: 'rgba(15, 23, 42, 0.8)',
-                                            color: '#f1f5f9',
+                                            color: COLOR.text,
                                             fontSize: '1rem'
                                         }}
                                     />
@@ -277,7 +282,7 @@ function AlertManagement({ role }) {
                                 <div style={{ gridColumn: '1 / -1' }}>
                                     <label style={{
                                         display: 'block',
-                                        color: 'rgba(203, 213, 225, 0.8)',
+                                        color: COLOR.textSecondary,
                                         marginBottom: '0.5rem',
                                         fontSize: '0.875rem'
                                     }}>
@@ -296,7 +301,7 @@ function AlertManagement({ role }) {
                                             borderRadius: '8px',
                                             border: '1px solid rgba(139, 92, 246, 0.3)',
                                             background: 'rgba(15, 23, 42, 0.8)',
-                                            color: '#f1f5f9',
+                                            color: COLOR.text,
                                             fontSize: '1rem'
                                         }}
                                     />
@@ -306,7 +311,7 @@ function AlertManagement({ role }) {
                                 <div style={{ gridColumn: '1 / -1' }}>
                                     <label style={{
                                         display: 'block',
-                                        color: 'rgba(203, 213, 225, 0.8)',
+                                        color: COLOR.textSecondary,
                                         marginBottom: '0.5rem',
                                         fontSize: '0.875rem'
                                     }}>
@@ -325,7 +330,7 @@ function AlertManagement({ role }) {
                                             borderRadius: '8px',
                                             border: '1px solid rgba(139, 92, 246, 0.3)',
                                             background: 'rgba(15, 23, 42, 0.8)',
-                                            color: '#f1f5f9',
+                                            color: COLOR.text,
                                             fontSize: '1rem',
                                             resize: 'vertical'
                                         }}
@@ -342,12 +347,11 @@ function AlertManagement({ role }) {
                                 <button
                                     type="button"
                                     onClick={resetForm}
+                                    className="ui-btn-core ui-btn-ghost"
                                     style={{
-                                        padding: '0.75rem 1.5rem',
-                                        borderRadius: '8px',
                                         border: '1px solid rgba(139, 92, 246, 0.3)',
                                         background: 'transparent',
-                                        color: '#cbd5e1',
+                                        color: COLOR.textSecondary,
                                         cursor: 'pointer'
                                     }}
                                 >
@@ -355,12 +359,11 @@ function AlertManagement({ role }) {
                                 </button>
                                 <button
                                     type="submit"
+                                    className="ui-btn-core ui-btn-gradient-secondary"
                                     style={{
-                                        padding: '0.75rem 1.5rem',
-                                        borderRadius: '8px',
                                         border: 'none',
-                                        background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-                                        color: 'white',
+                                        background: `linear-gradient(135deg, ${COLOR.secondary} 0%, ${COLOR.secondaryDark} 100%)`,
+                                        color: COLOR.text,
                                         fontWeight: 600,
                                         cursor: 'pointer'
                                     }}
@@ -381,20 +384,21 @@ function AlertManagement({ role }) {
                     overflow: 'hidden'
                 }}>
                     {loading ? (
-                        <div style={{
-                            padding: '3rem',
-                            textAlign: 'center',
-                            color: 'rgba(203, 213, 225, 0.6)'
-                        }}>
-                            로딩 중...
+                        <div style={{ padding: '2rem' }}>
+                            <LoadingState
+                                title="알림 목록을 불러오는 중입니다..."
+                                description="최신 위험 알림 데이터를 동기화하고 있습니다."
+                            />
                         </div>
                     ) : alerts.length === 0 ? (
-                        <div style={{
-                            padding: '3rem',
-                            textAlign: 'center',
-                            color: 'rgba(203, 213, 225, 0.6)'
-                        }}>
-                            등록된 알림이 없습니다.
+                        <div style={{ padding: '2rem' }}>
+                            <EmptyState
+                                icon="🔔"
+                                title="등록된 알림이 없습니다."
+                                description="새 알림을 작성하거나 잠시 후 다시 동기화해 주세요."
+                                actionLabel="목록 새로고침"
+                                onAction={loadAlerts}
+                            />
                         </div>
                     ) : (
                         <div>
@@ -448,14 +452,14 @@ function AlertManagement({ role }) {
                                                     {typeInfo.label}
                                                 </span>
                                                 <span style={{
-                                                    color: '#f1f5f9',
+                                                    color: COLOR.text,
                                                     fontWeight: 600
                                                 }}>
                                                     {alert.zone} - {alert.message}
                                                 </span>
                                             </div>
                                             <p style={{
-                                                color: 'rgba(203, 213, 225, 0.7)',
+                                                color: COLOR.textSecondary,
                                                 fontSize: '0.875rem',
                                                 margin: 0,
                                                 overflow: 'hidden',
@@ -466,7 +470,7 @@ function AlertManagement({ role }) {
                                             </p>
                                             <span style={{
                                                 fontSize: '0.75rem',
-                                                color: 'rgba(203, 213, 225, 0.5)'
+                                                color: COLOR.textMuted
                                             }}>
                                                 {alert.time}
                                             </span>
@@ -484,7 +488,7 @@ function AlertManagement({ role }) {
                                                     borderRadius: '8px',
                                                     border: '1px solid rgba(139, 92, 246, 0.4)',
                                                     background: 'rgba(139, 92, 246, 0.1)',
-                                                    color: '#a78bfa',
+                                                    color: COLOR.secondaryLight,
                                                     cursor: 'pointer',
                                                     fontSize: '0.875rem'
                                                 }}
@@ -498,7 +502,7 @@ function AlertManagement({ role }) {
                                                     borderRadius: '8px',
                                                     border: '1px solid rgba(239, 68, 68, 0.4)',
                                                     background: 'rgba(239, 68, 68, 0.1)',
-                                                    color: '#f87171',
+                                                    color: COLOR.dangerLight,
                                                     cursor: 'pointer',
                                                     fontSize: '0.875rem'
                                                 }}
@@ -522,7 +526,7 @@ function AlertManagement({ role }) {
                             borderRadius: '8px',
                             border: '1px solid rgba(139, 92, 246, 0.3)',
                             background: 'transparent',
-                            color: '#cbd5e1',
+                            color: COLOR.textSecondary,
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
