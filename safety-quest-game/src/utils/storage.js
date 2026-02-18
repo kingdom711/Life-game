@@ -641,16 +641,35 @@ export const hazardLogs = {
     }
 };
 
-// 위험요인 발굴 퀘스트 이미지 목록
-const HAZARD_QUEST_IMAGES = [
-    '/hazzard/hazzard1.png',
-    '/assets/중장비.png'
-];
+// 주차/요일별 교육-이미지 매핑 (educationData.js의 스케줄과 동일)
+// weekNumber_dayOfWeek → 이미지 번호
+const HAZARD_IMAGE_SCHEDULE = {
+    '1_1': '/hazzard/1.png',   // 1주차 월요일 - 사다리 작업 안전 수칙
+    '1_2': '/hazzard/2.png',   // 1주차 화요일 - 고소작업대 안전 작업
+    '1_3': '/hazzard/3.png',   // 1주차 수요일 - 개구부 및 단차 추락 예방
+    '2_1': '/hazzard/4.png',   // 2주차 월요일 - 기계 작업 끼임 예방
+    '2_2': '/hazzard/5.png',   // 2주차 화요일 - 지게차 충돌 예방
+    '3_1': '/hazzard/6.png',   // 3주차 월요일 - 안전모 올바른 착용법
+    '3_2': '/hazzard/7.png',   // 3주차 화요일 - 안전대 착용 및 점검
+    '4_1': '/hazzard/8.png',   // 4주차 월요일 - 소화기 사용법
+    '4_2': '/hazzard/9.png',   // 4주차 화요일 - 전기 안전 기본
+    '5_1': '/hazzard/10.png',  // 5주차 월요일 - 밀폐공간 작업 안전
+};
 
-// 랜덤 이미지 선택 함수
-const getRandomHazardImage = () => {
-    const randomIndex = Math.floor(Math.random() * HAZARD_QUEST_IMAGES.length);
-    return HAZARD_QUEST_IMAGES[randomIndex];
+// 오늘의 교육에 맞는 위험 사진 선택 (getTodayEducation과 동일한 로직)
+const getTodayHazardImage = () => {
+    const now = new Date();
+    const kstNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+    const startOfYear = new Date(kstNow.getFullYear(), 0, 1);
+    const dayOfYear = Math.floor((kstNow - startOfYear) / (24 * 60 * 60 * 1000)) + 1;
+
+    const weekNumber = Math.ceil(dayOfYear / 7) % 5 + 1;
+    let dayOfWeek = kstNow.getDay();
+    if (dayOfWeek === 0) dayOfWeek = 1;
+    if (dayOfWeek === 6) dayOfWeek = 1;
+
+    const key = `${weekNumber}_${dayOfWeek}`;
+    return HAZARD_IMAGE_SCHEDULE[key] || '/hazzard/1.png';
 };
 
 // 일일 퀘스트 인스턴스 (Daily_Quest_Instance)
@@ -671,7 +690,7 @@ export const dailyQuestInstances = {
                 id: crypto.randomUUID(),
                 userId: userId,
                 questDate: today,
-                photoUrl: getRandomHazardImage(), // 랜덤 이미지 선택
+                photoUrl: getTodayHazardImage(), // 오늘의 교육에 맞는 이미지 선택
                 isCompleted: false,
                 attemptCount: 0,
                 completionTimestamp: null
