@@ -15,7 +15,7 @@ import {
     specializationProgress,
     specQuizAttempts,
     points,
-    level
+    legalHours
 } from './storage';
 
 import { calculateLevel } from './pointsCalculator';
@@ -200,6 +200,10 @@ export const completeSpecializationEducation = (specId, eduId, score) => {
         return { success: false, message: '존재하지 않는 교육입니다.' };
     }
 
+    if (specializationProgress.isEducationCompleted(specId, eduId)) {
+        return { success: false, alreadyCompleted: true, message: '이미 완료한 교육입니다.' };
+    }
+
     const requiredScore = SPECIALIZATION_EDUCATION_CONFIG.REQUIRED_SCORE;
     const passed = score >= requiredScore;
 
@@ -219,7 +223,11 @@ export const completeSpecializationEducation = (specId, eduId, score) => {
     // 보상 지급
     const pointsReward = education.points || SPECIALIZATION_EDUCATION_CONFIG.POINTS_REWARD;
     const expReward = education.exp || SPECIALIZATION_EDUCATION_CONFIG.EXP_REWARD;
+    const legalHoursReward = education.legalHours || 0;
     points.add(pointsReward, '전직 교육', `${education.title} 이수 완료`);
+    if (legalHoursReward > 0) {
+        legalHours.add(legalHoursReward);
+    }
 
     // 모든 교육 완료 확인
     const spec = getSpecializationById(specId);
@@ -234,7 +242,8 @@ export const completeSpecializationEducation = (specId, eduId, score) => {
         score,
         pointsReward,
         expReward,
-        message: `교육 이수 완료! (+${pointsReward}P, +${expReward}EXP)`,
+        legalHoursReward,
+        message: `교육 이수 완료! (+${pointsReward}P, +${expReward}EXP, +${legalHoursReward.toFixed(2)}h)`,
         allEducationsCompleted: allCompleted,
         canClassChange: allCompleted
     };

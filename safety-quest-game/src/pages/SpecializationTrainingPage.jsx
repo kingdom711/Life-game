@@ -1,24 +1,23 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getSpecializationById } from '../data/specializationData';
 import { getEducationsBySpecialization, getSpecializationEducationById, SPECIALIZATION_EDUCATION_CONFIG } from '../data/specializationEducationData';
 import {
     getSpecializationProgress,
     startSpecializationTraining,
     submitSpecializationQuiz,
-    canAttemptSpecQuiz,
     executeClassChange
 } from '../utils/specializationManager';
-import { specializationProgress as specProgressStorage, specQuizAttempts } from '../utils/storage';
-import EducationVideoPlayer from '../components/EducationVideoPlayer';
+import { specializationProgress as specProgressStorage } from '../utils/storage';
 
 /**
  * 전직 교육 페이지
  * 전직별 전용 교육 영상 시청 + 퀴즈 플로우
  */
-const SpecializationTrainingPage = () => {
-    const { specId } = useParams();
+const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, onClose = null, onProgressUpdated = null }) => {
+    const { specId: routeSpecId } = useParams();
     const navigate = useNavigate();
+    const specId = embeddedSpecId || routeSpecId;
 
     const [spec, setSpec] = useState(null);
     const [educations, setEducations] = useState([]);
@@ -33,14 +32,32 @@ const SpecializationTrainingPage = () => {
     const [classChangeResult, setClassChangeResult] = useState(null);
     const [watchedTime, setWatchedTime] = useState(0);
     const [maxWatchedTime, setMaxWatchedTime] = useState(0);
+    const [isMobileViewport, setIsMobileViewport] = useState(
+        typeof window !== 'undefined' ? window.innerWidth <= 768 : false
+    );
+
+    const isCompactLayout = embedded && isMobileViewport;
 
     useEffect(() => {
         loadData();
     }, [specId]);
 
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobileViewport(window.innerWidth <= 768);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const loadData = () => {
         const specData = getSpecializationById(specId);
         if (!specData) {
+            if (embedded && typeof onClose === 'function') {
+                onClose();
+                return;
+            }
             navigate('/specialization');
             return;
         }
@@ -51,6 +68,16 @@ const SpecializationTrainingPage = () => {
 
         const progressData = getSpecializationProgress(specId);
         setProgress(progressData);
+    };
+
+    const handleBack = () => {
+        if (embedded) {
+            if (typeof onClose === 'function') {
+                onClose();
+            }
+            return;
+        }
+        navigate('/specialization');
     };
 
     const handleSelectEducation = (edu) => {
@@ -103,6 +130,9 @@ const SpecializationTrainingPage = () => {
         if (result.passed) {
             // 교육 완료 후 데이터 갱신
             loadData();
+            if (typeof onProgressUpdated === 'function') {
+                onProgressUpdated();
+            }
 
             // 모든 교육 완료 시 전직 가능 알림
             if (result.completionResult?.canClassChange) {
@@ -119,6 +149,9 @@ const SpecializationTrainingPage = () => {
         setShowClassChangeModal(false);
         if (result.success) {
             loadData();
+            if (typeof onProgressUpdated === 'function') {
+                onProgressUpdated();
+            }
         }
     };
 
@@ -135,16 +168,22 @@ const SpecializationTrainingPage = () => {
     if (!spec) return null;
 
     return (
-        <div className="page">
-            <div className="container">
+        <div className={embedded ? undefined : 'page'}>
+            <div
+                className={embedded ? undefined : 'container'}
+                style={embedded ? { padding: 0 } : undefined}
+            >
                 {/* 헤더 */}
-                <div style={{ marginBottom: '1rem' }}>
-                    <Link to="/specialization" className="btn btn-secondary btn-sm">
-                        ← 전직 센터로 돌아가기
-                    </Link>
+                <div style={{ marginBottom: isCompactLayout ? '0.75rem' : '1rem' }}>
+                    <button
+                        className="btn btn-secondary btn-sm"
+                        onClick={handleBack}
+                    >
+                        {embedded ? '↩ 전직센터 교육 닫기' : '← 전직 센터로 돌아가기'}
+                    </button>
                 </div>
 
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                <div style={{ textAlign: 'center', marginBottom: isCompactLayout ? '1rem' : '2rem' }}>
                     <span style={{ fontSize: '2.5rem' }}>{spec.icon}</span>
                     <h1 style={{ fontSize: '1.75rem', color: spec.color, marginTop: '0.5rem' }}>
                         {spec.name} 전직 교육
@@ -188,7 +227,14 @@ const SpecializationTrainingPage = () => {
                     )}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '1.5rem', alignItems: 'start' }}>
+                <div
+                    style={{
+                        display: 'grid',
+                        gridTemplateColumns: isCompactLayout ? '1fr' : '300px 1fr',
+                        gap: isCompactLayout ? '1rem' : '1.5rem',
+                        alignItems: 'start'
+                    }}
+                >
                     {/* 좌측: 교육 목록 */}
                     <div className="card">
                         <div className="card-header">
@@ -280,7 +326,7 @@ const SpecializationTrainingPage = () => {
                                 <div className="card-body">
                                     <div style={{
                                         display: 'grid',
-                                        gridTemplateColumns: 'repeat(3, 1fr)',
+                                        gridTemplateColumns: isCompactLayout ? 'repeat(2, minmax(0, 1fr))' : 'repeat(4, 1fr)',
                                         gap: '1rem',
                                         marginBottom: '1.5rem'
                                     }}>
@@ -301,6 +347,18 @@ const SpecializationTrainingPage = () => {
                                         }}>
                                             <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>퀴즈 문항</div>
                                             <div style={{ fontWeight: 700 }}>7문제</div>
+                                        </div>
+                                        <div style={{
+                                            textAlign: 'center',
+                                            padding: '0.75rem',
+                                            borderRadius: '0.5rem',
+                                            background: 'rgba(59, 130, 246, 0.1)',
+                                            border: '1px solid rgba(59, 130, 246, 0.2)'
+                                        }}>
+                                            <div style={{ fontSize: '0.7rem', color: '#3b82f6' }}>법정 시간 반영</div>
+                                            <div style={{ fontWeight: 700, color: '#3b82f6' }}>
+                                                +{(selectedEdu.legalHours || 0).toFixed(2)}h
+                                            </div>
                                         </div>
                                         <div style={{
                                             textAlign: 'center',
@@ -715,7 +773,7 @@ const SpecializationTrainingPage = () => {
                     }}
                         onClick={() => {
                             setClassChangeResult(null);
-                            navigate('/specialization');
+                            handleBack();
                         }}
                     >
                         <div className="card" style={{
@@ -736,7 +794,7 @@ const SpecializationTrainingPage = () => {
                                 style={{ width: '100%', background: spec.bgGradient }}
                                 onClick={() => {
                                     setClassChangeResult(null);
-                                    navigate('/specialization');
+                                    handleBack();
                                 }}
                             >
                                 전직 센터로 돌아가기

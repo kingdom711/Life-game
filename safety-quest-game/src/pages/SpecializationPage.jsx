@@ -1,30 +1,27 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { points } from '../utils/storage';
 import { calculateLevel } from '../utils/pointsCalculator';
 import { SPECIALIZATIONS, SPECIALIZATION_STATUS } from '../data/specializationData';
 import {
-    getSpecializationStatus,
-    getSpecializationProgress,
     getAllSpecializationProgress,
     getActiveSpecialization,
     switchSpecialization,
-    deactivateSpecialization,
-    executeClassChange
+    deactivateSpecialization
 } from '../utils/specializationManager';
+import { getLegalHoursProgress } from '../utils/educationManager';
+import SpecializationTrainingPage from './SpecializationTrainingPage';
 
 /**
  * 전직 센터 페이지
  * 기술인이 특수 역할로 전직할 수 있는 허브 페이지
  */
 const SpecializationPage = ({ role }) => {
-    const navigate = useNavigate();
     const [specProgressList, setSpecProgressList] = useState([]);
     const [activeSpec, setActiveSpec] = useState(null);
     const [currentLevel, setCurrentLevel] = useState(null);
-    const [showClassChangeModal, setShowClassChangeModal] = useState(false);
-    const [classChangeTarget, setClassChangeTarget] = useState(null);
-    const [classChangeResult, setClassChangeResult] = useState(null);
+    const [legalProgress, setLegalProgress] = useState(null);
+    const [selectedTrainingSpecId, setSelectedTrainingSpecId] = useState(null);
 
     useEffect(() => {
         loadData();
@@ -35,25 +32,11 @@ const SpecializationPage = ({ role }) => {
         setSpecProgressList(allProgress);
         setActiveSpec(getActiveSpecialization());
         setCurrentLevel(calculateLevel(points.get()));
+        setLegalProgress(getLegalHoursProgress());
     };
 
     const handleStartTraining = (specId) => {
-        navigate(`/specialization/training/${specId}`);
-    };
-
-    const handleClassChange = (specId) => {
-        setClassChangeTarget(specId);
-        setShowClassChangeModal(true);
-    };
-
-    const confirmClassChange = () => {
-        if (!classChangeTarget) return;
-
-        const result = executeClassChange(classChangeTarget);
-        if (result.success) {
-            setClassChangeResult(result);
-            loadData();
-        }
+        setSelectedTrainingSpecId(specId);
     };
 
     const handleSwitch = (specId) => {
@@ -65,6 +48,11 @@ const SpecializationPage = ({ role }) => {
 
     const handleDeactivate = () => {
         deactivateSpecialization();
+        loadData();
+    };
+
+    const handleCloseTraining = () => {
+        setSelectedTrainingSpecId(null);
         loadData();
     };
 
@@ -178,6 +166,55 @@ const SpecializationPage = ({ role }) => {
                     </div>
                 )}
 
+                {/* 법정 교육 시간 연동 현황 */}
+                {legalProgress && (
+                    <div className="card" style={{ marginBottom: '1.5rem' }}>
+                        <div className="card-body" style={{ padding: '1rem 1.25rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                <div>
+                                    <div style={{ fontWeight: 700, marginBottom: '0.25rem' }}>📘 법정 교육 시간</div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
+                                        전직 교육 이수 시간은 연간 법정 교육시간에 누적 반영됩니다.
+                                    </div>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)' }}>
+                                        {legalProgress.currentYearHours}h / {legalProgress.requiredHours}h
+                                    </div>
+                                    <div style={{ fontWeight: 700, color: '#3b82f6' }}>
+                                        {legalProgress.completionRate}%
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{
+                                marginTop: '0.75rem',
+                                height: '8px',
+                                borderRadius: '999px',
+                                background: 'rgba(255,255,255,0.08)',
+                                overflow: 'hidden'
+                            }}>
+                                <div style={{
+                                    height: '100%',
+                                    width: `${Math.min(100, Number(legalProgress.completionRate))}%`,
+                                    background: legalProgress.hasMetRequirement
+                                        ? 'linear-gradient(90deg, #22c55e, #16a34a)'
+                                        : 'linear-gradient(90deg, #3b82f6, #6366f1)',
+                                    transition: 'width 0.4s ease'
+                                }} />
+                            </div>
+                            <div style={{
+                                marginTop: '0.4rem',
+                                fontSize: '0.75rem',
+                                color: legalProgress.hasMetRequirement ? '#22c55e' : 'var(--color-text-secondary)'
+                            }}>
+                                {legalProgress.hasMetRequirement
+                                    ? '연간 법정 교육시간을 모두 충족했습니다.'
+                                    : `${legalProgress.remainingHours}h 추가 이수 필요`}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* 전직 카드 목록 */}
                 <div className="grid grid-3" style={{ gap: '1.5rem' }}>
                     {specProgressList.map((progress) => {
@@ -274,6 +311,13 @@ const SpecializationPage = ({ role }) => {
                                                 {progress.isFullyCompleted ? '✓' : '✗'}
                                             </span>
                                             <span>교육 이수: {progress.completedCount}/{progress.totalCount}</span>
+                                        </div>
+                                        <div style={{
+                                            marginTop: '0.3rem',
+                                            fontSize: '0.72rem',
+                                            color: 'var(--color-text-tertiary)'
+                                        }}>
+                                            교육 1개 이수 시 법정 교육시간 +0.25h 반영
                                         </div>
                                     </div>
 
@@ -394,79 +438,15 @@ const SpecializationPage = ({ role }) => {
                     })}
                 </div>
 
-                {/* 전직 완료 축하 모달 */}
-                {classChangeResult && (
-                    <div style={{
-                        position: 'fixed',
-                        inset: 0,
-                        background: 'rgba(0,0,0,0.7)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000
-                    }}
-                        onClick={() => setClassChangeResult(null)}
-                    >
-                        <div
-                            className="card"
-                            style={{
-                                maxWidth: '400px',
-                                width: '90%',
-                                textAlign: 'center',
-                                padding: '2rem',
-                                animation: 'fadeIn 0.3s ease'
-                            }}
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>
-                                🎉
-                            </div>
-                            <h2 style={{ marginBottom: '0.5rem' }}>전직 완료!</h2>
-                            <div style={{
-                                fontSize: '2rem',
-                                marginBottom: '0.5rem'
-                            }}>
-                                {classChangeResult.spec?.icon} {classChangeResult.spec?.name}
-                            </div>
-                            <p style={{
-                                color: 'var(--color-text-secondary)',
-                                marginBottom: '1.5rem'
-                            }}>
-                                축하합니다! 전문 역할로 전직되었습니다.
-                            </p>
-                            <div style={{
-                                display: 'flex',
-                                gap: '1rem',
-                                justifyContent: 'center',
-                                marginBottom: '1.5rem'
-                            }}>
-                                <div style={{
-                                    padding: '0.5rem 1rem',
-                                    borderRadius: '0.5rem',
-                                    background: 'rgba(34, 197, 94, 0.1)',
-                                    border: '1px solid rgba(34, 197, 94, 0.3)'
-                                }}>
-                                    <div style={{ fontSize: '0.7rem', color: '#22c55e' }}>보상 포인트</div>
-                                    <div style={{ fontWeight: 700 }}>+{classChangeResult.reward?.points}P</div>
-                                </div>
-                                <div style={{
-                                    padding: '0.5rem 1rem',
-                                    borderRadius: '0.5rem',
-                                    background: 'rgba(59, 130, 246, 0.1)',
-                                    border: '1px solid rgba(59, 130, 246, 0.3)'
-                                }}>
-                                    <div style={{ fontSize: '0.7rem', color: '#3b82f6' }}>보상 경험치</div>
-                                    <div style={{ fontWeight: 700 }}>+{classChangeResult.reward?.exp}EXP</div>
-                                </div>
-                            </div>
-                            <button
-                                className="btn btn-primary"
-                                style={{ width: '100%' }}
-                                onClick={() => setClassChangeResult(null)}
-                            >
-                                확인
-                            </button>
-                        </div>
+                {/* 전직 교육 패널 (전직센터 내 수행) */}
+                {selectedTrainingSpecId && (
+                    <div style={{ marginTop: '2rem' }}>
+                        <SpecializationTrainingPage
+                            embedded
+                            embeddedSpecId={selectedTrainingSpecId}
+                            onClose={handleCloseTraining}
+                            onProgressUpdated={loadData}
+                        />
                     </div>
                 )}
             </div>
