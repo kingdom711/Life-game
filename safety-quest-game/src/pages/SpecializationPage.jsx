@@ -216,7 +216,7 @@ const SpecializationPage = ({ role }) => {
                 )}
 
                 {/* 전직 카드 목록 */}
-                <div className="grid grid-3" style={{ gap: '1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
                     {specProgressList.map((progress) => {
                         const spec = SPECIALIZATIONS.find(s => s.id === progress.specId);
                         if (!spec) return null;

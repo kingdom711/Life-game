@@ -6,6 +6,8 @@
  * - 유도원: 중장비/차량 안전 유도
  * - 신호수: 크레인 등 양중기 수신호
  * - 밀폐담당자: 밀폐공간 작업 안전 관리
+ * - 화재감시자: 화기작업 화재감시
+ * - 안전담당자: 현장 안전관리 총괄
  */
 
 export const SPECIALIZATION_STATUS = {
@@ -111,6 +113,70 @@ export const SPECIALIZATIONS = [
             points: 1200,
             exp: 200,
             title: '밀폐담당자 자격 취득'
+        }
+    },
+    {
+        id: 'fireWatcher',
+        name: '화재감시자',
+        icon: '🔥',
+        color: '#f97316',
+        bgGradient: 'linear-gradient(135deg, #f97316, #ea580c)',
+        parentRole: 'technician',
+        description: '화기 작업 시 화재 발생을 감시하고 초기 대응을 담당하는 전문 역할',
+        shortDescription: '화기작업 화재감시 전문가',
+        unlockRequirements: {
+            minLevel: 6,
+            minLevelName: 'Silver I',
+            requiredEducations: ['edu_sp_fire_01', 'edu_sp_fire_02'],
+            requiredScore: 90
+        },
+        features: [
+            '화기작업 안전감시 체크리스트 작성',
+            '초기 소화 대응 퀘스트',
+            '전용 장비 아이템 해금',
+            '화재감시자 전용 일일 퀘스트'
+        ],
+        bonuses: {
+            pointMultiplier: 1.3,
+            exclusiveQuests: true,
+            specialBadge: 'fire_watcher_badge'
+        },
+        classChangeReward: {
+            points: 1500,
+            exp: 250,
+            title: '화재감시자 자격 취득'
+        }
+    },
+    {
+        id: 'safetyOfficer',
+        name: '안전담당자',
+        icon: '⛑️',
+        color: '#14b8a6',
+        bgGradient: 'linear-gradient(135deg, #14b8a6, #0d9488)',
+        parentRole: 'technician',
+        description: '현장 안전 관리 전반을 담당하며 위험성 평가와 안전 조치를 총괄하는 전문 역할',
+        shortDescription: '현장 안전관리 총괄 전문가',
+        unlockRequirements: {
+            minLevel: 7,
+            minLevelName: 'Gold III',
+            requiredEducations: ['edu_sp_safety_01', 'edu_sp_safety_02', 'edu_sp_safety_03'],
+            requiredScore: 90
+        },
+        features: [
+            '위험성 평가 보고서 작성',
+            '안전 점검 종합 퀘스트',
+            '전용 장비 아이템 해금',
+            '안전담당자 전용 일일 퀘스트'
+        ],
+        bonuses: {
+            pointMultiplier: 1.35,
+            exclusiveQuests: true,
+            specialBadge: 'safety_officer_badge'
+        },
+        classChangeReward: {
+            points: 2000,
+            exp: 300,
+            title: '안전담당자 자격 취득'
         }
     }
 ];

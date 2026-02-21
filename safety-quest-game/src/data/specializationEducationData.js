@@ -494,6 +494,345 @@ export const specializationEducations = [
                 explanation: '비상 시 밀폐공간 내 잔류 인원 수와 위치를 가장 먼저 파악해야 효과적인 구조가 가능합니다.'
             }
         ]
+    },
+
+    // ===== 화재감시자 교육 =====
+    {
+        id: 'edu_sp_fire_01',
+        specializationId: 'fireWatcher',
+        title: '화기작업 안전관리 기초',
+        description: '화기작업의 종류, 화재 위험요인, 화재감시자의 역할과 책임을 학습합니다.',
+        videoUrl: '/videos/specialization/fire_basics.mp4',
+        youtubeVideoId: 'e3Gti3_K2Fk',
+        thumbnailUrl: '/images/education/fire_basics_thumbnail.png',
+        duration: 900,
+        requiredWatchTime: 810,
+        legalHours: 0.25,
+        requiredScore: 90,
+        points: 150,
+        exp: 50,
+        order: 1,
+        quiz: [
+            {
+                id: 'qsp_f1_001',
+                question: '[placeholder] 화기작업 시 화재감시자의 주요 역할은?',
+                options: ['작업 지시', '화재 감시 및 초기 대응', '장비 운반', '식사 준비', '출퇴근 관리'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 화재감시자는 화기작업 중 화재 발생을 감시하고 초기 대응을 담당합니다.'
+            },
+            {
+                id: 'qsp_f1_002',
+                question: '[placeholder] 화기작업 전 확인해야 할 안전 조치는?',
+                options: ['날씨 확인', '주변 가연물 제거 및 소화기 비치', '작업 복장 확인', '점심 메뉴 확인', '퇴근 시간 확인'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 화기작업 전 주변 가연물을 제거하고 소화기를 비치해야 합니다.'
+            },
+            {
+                id: 'qsp_f1_003',
+                question: '[placeholder] 소화기 사용 방법으로 올바른 것은?',
+                options: ['불에 직접 던진다', '안전핀을 뽑고 호스를 불의 아래쪽에 향해 분사', '거꾸로 들고 사용', '뚜껑을 열고 붓는다', '물을 먼저 뿌린 후 사용'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 소화기는 안전핀을 뽑고 호스를 불의 아래쪽에 향해 분사합니다.'
+            },
+            {
+                id: 'qsp_f1_004',
+                question: '[placeholder] 용접 작업 시 화재 예방 조치로 적절한 것은?',
+                options: ['환기만 하면 된다', '용접 불티 비산 방지 덮개 설치', '보안경만 착용', '작업 후 바로 퇴근', '소화기 없이 작업'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 용접 작업 시 불티 비산 방지 덮개를 설치해야 합니다.'
+            },
+            {
+                id: 'qsp_f1_005',
+                question: '[placeholder] 화재감시자의 감시 범위는?',
+                options: ['작업자 1m 이내', '화기작업 반경 11m 이내', '건물 전체', '작업장 출입구만', '사무실 내부만'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 화재감시자는 화기작업 반경 11m 이내를 감시해야 합니다.'
+            },
+            {
+                id: 'qsp_f1_006',
+                question: '[placeholder] 화기작업 종료 후 화재감시 시간은?',
+                options: ['즉시 종료', '작업 종료 후 최소 30분 이상', '5분', '다음 날까지', '1시간 후 확인'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 화기작업 종료 후 최소 30분 이상 화재감시를 계속해야 합니다.'
+            },
+            {
+                id: 'qsp_f1_007',
+                question: '[placeholder] 화재 발생 시 초기 대응 순서로 올바른 것은?',
+                options: ['대피 → 신고 → 소화', '신고 → 초기소화 → 대피 알림', '소화 → 대피 → 보고', '보고서 작성 → 신고', '아무것도 하지 않는다'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 화재 발생 시 신고 → 초기소화 → 대피 알림 순서로 대응합니다.'
+            }
+        ]
+    },
+    {
+        id: 'edu_sp_fire_02',
+        specializationId: 'fireWatcher',
+        title: '화재감시 실무 및 비상대응',
+        description: '화재감시 실무 절차, 소화 장비 사용법, 비상 대응 방법을 학습합니다.',
+        videoUrl: '/videos/specialization/fire_practice.mp4',
+        youtubeVideoId: 'BgJ2p9zdXJk',
+        thumbnailUrl: '/images/education/fire_practice_thumbnail.png',
+        duration: 900,
+        requiredWatchTime: 810,
+        legalHours: 0.25,
+        requiredScore: 90,
+        points: 150,
+        exp: 50,
+        order: 2,
+        quiz: [
+            {
+                id: 'qsp_f2_001',
+                question: '[placeholder] 화기작업허가서에 반드시 포함되어야 할 항목은?',
+                options: ['작업자 취미', '화재감시자 지정 및 소화장비 배치', '점심 메뉴', '날씨 예보', '작업자 혈액형'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 화기작업허가서에는 화재감시자 지정 및 소화장비 배치가 포함되어야 합니다.'
+            },
+            {
+                id: 'qsp_f2_002',
+                question: '[placeholder] 가스 용접 시 가장 주의해야 할 사항은?',
+                options: ['작업 속도', '가스 누출 점검 및 역화 방지', '용접봉 색상', '작업복 색상', '배경 음악'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 가스 용접 시 가스 누출 점검 및 역화 방지가 가장 중요합니다.'
+            },
+            {
+                id: 'qsp_f2_003',
+                question: '[placeholder] 분말소화기의 적정 방사 거리는?',
+                options: ['1m', '3~5m', '10m', '20m', '50m'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 분말소화기의 적정 방사 거리는 3~5m입니다.'
+            },
+            {
+                id: 'qsp_f2_004',
+                question: '[placeholder] 화재감시자가 휴대해야 할 필수 장비가 아닌 것은?',
+                options: ['소화기', '무전기/통신장비', '개인 노트북', '방화포', '경보장치'],
+                correctAnswer: 2,
+                explanation: '[placeholder] 개인 노트북은 화재감시자의 필수 휴대 장비가 아닙니다.'
+            },
+            {
+                id: 'qsp_f2_005',
+                question: '[placeholder] 전기 화재(C급) 시 사용해야 할 소화기 종류는?',
+                options: ['물 소화기', 'CO2 소화기 또는 분말소화기', '포소화기', '산소 소화기', '모래만 사용'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 전기 화재에는 CO2 소화기 또는 분말소화기를 사용합니다.'
+            },
+            {
+                id: 'qsp_f2_006',
+                question: '[placeholder] 비상 대피 경로의 조건으로 적절한 것은?',
+                options: ['좁을수록 좋다', '항상 개방되고 장애물이 없어야 함', '잠겨 있어야 한다', '경사가 급해야 한다', '어두워야 한다'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 비상 대피 경로는 항상 개방되고 장애물이 없어야 합니다.'
+            },
+            {
+                id: 'qsp_f2_007',
+                question: '[placeholder] 화재 발생 시 연기 속에서의 대피 방법은?',
+                options: ['서서 빠르게 뛴다', '낮은 자세로 젖은 수건으로 코와 입을 막고 이동', '엘리베이터 이용', '창문으로 뛰어내린다', '그 자리에서 기다린다'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 연기 속에서는 낮은 자세로 젖은 수건으로 코와 입을 막고 이동합니다.'
+            }
+        ]
+    },
+
+    // ===== 안전담당자 교육 =====
+    {
+        id: 'edu_sp_safety_01',
+        specializationId: 'safetyOfficer',
+        title: '위험성 평가 기초',
+        description: '산업 현장의 위험성 평가 개념, 절차, 실무 적용 방법을 학습합니다.',
+        videoUrl: '/videos/specialization/safety_risk.mp4',
+        youtubeVideoId: 'YvPWY0lwatU',
+        thumbnailUrl: '/images/education/safety_risk_thumbnail.png',
+        duration: 900,
+        requiredWatchTime: 810,
+        legalHours: 0.25,
+        requiredScore: 90,
+        points: 150,
+        exp: 50,
+        order: 1,
+        quiz: [
+            {
+                id: 'qsp_so1_001',
+                question: '[placeholder] 위험성 평가의 정의로 올바른 것은?',
+                options: ['작업 속도 평가', '유해위험요인을 파악하고 위험성을 결정하여 감소대책을 수립하는 것', '직원 능력 평가', '장비 가격 평가', '건물 외관 평가'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 위험성 평가는 유해위험요인을 파악하고 위험성을 결정하여 감소대책을 수립하는 것입니다.'
+            },
+            {
+                id: 'qsp_so1_002',
+                question: '[placeholder] 위험성 평가의 4단계 절차 순서는?',
+                options: ['대책수립→평가→파악→실행', '유해위험요인 파악→위험성 추정→위험성 결정→감소대책 수립', '실행→파악→평가→대책', '보고→파악→평가→종료', '감소대책→파악→추정→결정'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 위험성 평가는 유해위험요인 파악→위험성 추정→위험성 결정→감소대책 수립 순서입니다.'
+            },
+            {
+                id: 'qsp_so1_003',
+                question: '[placeholder] 위험성 평가 실시 시기로 적절하지 않은 것은?',
+                options: ['최초 평가', '정기 평가', '수시 평가', '퇴근 후 개인 시간', '작업 변경 시'],
+                correctAnswer: 3,
+                explanation: '[placeholder] 퇴근 후 개인 시간은 위험성 평가 실시 시기가 아닙니다.'
+            },
+            {
+                id: 'qsp_so1_004',
+                question: '[placeholder] 위험성의 크기를 결정하는 요소 2가지는?',
+                options: ['비용과 시간', '가능성(빈도)과 중대성(강도)', '날씨와 온도', '인원수와 면적', '장비 수와 종류'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 위험성의 크기는 가능성(빈도)과 중대성(강도)으로 결정합니다.'
+            },
+            {
+                id: 'qsp_so1_005',
+                question: '[placeholder] 위험성 감소대책 수립 시 우선순위가 가장 높은 것은?',
+                options: ['개인보호구 지급', '위험원 제거(본질적 대책)', '경고 표지 부착', '작업 절차서 작성', '교육 실시'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 위험원 제거(본질적 대책)가 가장 우선순위가 높습니다.'
+            },
+            {
+                id: 'qsp_so1_006',
+                question: '[placeholder] 위험성 평가에 참여해야 하는 사람은?',
+                options: ['사업주만', '안전관리자만', '해당 작업에 종사하는 근로자를 포함한 관계자', '외부 감사관만', '경비원만'],
+                correctAnswer: 2,
+                explanation: '[placeholder] 해당 작업에 종사하는 근로자를 포함한 관계자가 참여해야 합니다.'
+            },
+            {
+                id: 'qsp_so1_007',
+                question: '[placeholder] 위험성 평가 결과의 기록 보존 기간은?',
+                options: ['1개월', '6개월', '3년', '1주일', '기록 불필요'],
+                correctAnswer: 2,
+                explanation: '[placeholder] 위험성 평가 결과는 3년간 보존해야 합니다.'
+            }
+        ]
+    },
+    {
+        id: 'edu_sp_safety_02',
+        specializationId: 'safetyOfficer',
+        title: '안전 점검 및 관리 실무',
+        description: '현장 안전 점검 절차, 안전 관리 문서 작성, 법규 준수 사항을 학습합니다.',
+        videoUrl: '/videos/specialization/safety_inspection.mp4',
+        youtubeVideoId: 'ErCRkHfmRD8',
+        thumbnailUrl: '/images/education/safety_inspection_thumbnail.png',
+        duration: 900,
+        requiredWatchTime: 810,
+        legalHours: 0.25,
+        requiredScore: 90,
+        points: 150,
+        exp: 50,
+        order: 2,
+        quiz: [
+            {
+                id: 'qsp_so2_001',
+                question: '[placeholder] 안전 점검의 종류가 아닌 것은?',
+                options: ['정기 점검', '수시 점검', '특별 점검', '개인 취미 점검', '일상 점검'],
+                correctAnswer: 3,
+                explanation: '[placeholder] 개인 취미 점검은 안전 점검의 종류가 아닙니다.'
+            },
+            {
+                id: 'qsp_so2_002',
+                question: '[placeholder] 안전보건관리체제에서 안전담당자의 역할은?',
+                options: ['급여 관리', '현장 안전 점검 및 위험요인 개선', '마케팅', '인사 관리', '재무 관리'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 안전담당자는 현장 안전 점검 및 위험요인 개선을 담당합니다.'
+            },
+            {
+                id: 'qsp_so2_003',
+                question: '[placeholder] 작업 중지 권한을 행사할 수 있는 상황은?',
+                options: ['점심시간', '급박한 위험이 예상되는 경우', '날씨가 좋은 날', '작업이 지루할 때', '퇴근 시간'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 급박한 위험이 예상되는 경우 작업 중지 권한을 행사할 수 있습니다.'
+            },
+            {
+                id: 'qsp_so2_004',
+                question: '[placeholder] 안전보건교육 실시 기록에 포함되어야 할 사항이 아닌 것은?',
+                options: ['교육 일시', '교육 내용', '교육 대상자', '교육자의 취미', '교육 강사'],
+                correctAnswer: 3,
+                explanation: '[placeholder] 교육자의 취미는 안전보건교육 기록 사항이 아닙니다.'
+            },
+            {
+                id: 'qsp_so2_005',
+                question: '[placeholder] 안전 표지의 종류 중 "경고 표지"의 색상은?',
+                options: ['파란색', '노란색 바탕에 검정 기호', '초록색', '흰색', '보라색'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 경고 표지는 노란색 바탕에 검정 기호로 표시합니다.'
+            },
+            {
+                id: 'qsp_so2_006',
+                question: '[placeholder] MSDS(물질안전보건자료)를 비치해야 하는 장소는?',
+                options: ['사장실만', '해당 화학물질 취급 작업장', '주차장', '식당', '휴게실만'],
+                correctAnswer: 1,
+                explanation: '[placeholder] MSDS는 해당 화학물질 취급 작업장에 비치해야 합니다.'
+            },
+            {
+                id: 'qsp_so2_007',
+                question: '[placeholder] 근로자 건강진단의 종류가 아닌 것은?',
+                options: ['일반건강진단', '특수건강진단', '배치전건강진단', '미용건강진단', '수시건강진단'],
+                correctAnswer: 3,
+                explanation: '[placeholder] 미용건강진단은 근로자 건강진단의 종류가 아닙니다.'
+            }
+        ]
+    },
+    {
+        id: 'edu_sp_safety_03',
+        specializationId: 'safetyOfficer',
+        title: '사고 대응 및 재발 방지',
+        description: '산업 사고 발생 시 대응 절차, 사고 조사 방법, 재발 방지 대책 수립을 학습합니다.',
+        videoUrl: '/videos/specialization/safety_emergency.mp4',
+        youtubeVideoId: 't6JFsRvOvUI',
+        thumbnailUrl: '/images/education/safety_emergency_thumbnail.png',
+        duration: 900,
+        requiredWatchTime: 810,
+        legalHours: 0.25,
+        requiredScore: 90,
+        points: 150,
+        exp: 50,
+        order: 3,
+        quiz: [
+            {
+                id: 'qsp_so3_001',
+                question: '[placeholder] 산업재해 발생 시 사업주의 1차 의무는?',
+                options: ['보험 청구', '재해자 구호 및 재해 확대 방지', '언론 대응', '법률 자문', '시설 철거'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 산업재해 발생 시 재해자 구호 및 재해 확대 방지가 1차 의무입니다.'
+            },
+            {
+                id: 'qsp_so3_002',
+                question: '[placeholder] 중대재해 발생 시 보고해야 할 기관은?',
+                options: ['시청', '관할 지방고용노동관서', '경찰서', '소방서만', '세무서'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 중대재해는 관할 지방고용노동관서에 보고해야 합니다.'
+            },
+            {
+                id: 'qsp_so3_003',
+                question: '[placeholder] 사고 조사의 목적으로 가장 적절한 것은?',
+                options: ['책임자 처벌', '원인 규명 및 재발 방지 대책 수립', '보험금 산정', '작업 중단', '인력 감축'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 사고 조사의 목적은 원인 규명 및 재발 방지 대책 수립입니다.'
+            },
+            {
+                id: 'qsp_so3_004',
+                question: '[placeholder] 하인리히 법칙(1:29:300)에서 1은 무엇을 의미하는가?',
+                options: ['경미한 사고', '중대 재해', '아차 사고', '무재해', '안전 점검'],
+                correctAnswer: 1,
+                explanation: '[placeholder] 하인리히 법칙에서 1은 중대 재해를 의미합니다.'
+            },
+            {
+                id: 'qsp_so3_005',
+                question: '[placeholder] 재발 방지 대책의 수립 원칙이 아닌 것은?',
+                options: ['근본 원인 제거', '기술적 대책 우선', '관리적 대책 보완', '책임자 해고', '교육 훈련 강화'],
+                correctAnswer: 3,
+                explanation: '[placeholder] 책임자 해고는 재발 방지 대책의 원칙이 아닙니다.'
+            },
+            {
+                id: 'qsp_so3_006',
+                question: '[placeholder] 산업재해 기록 보존 기간은?',
+                options: ['1개월', '6개월', '3년', '1주일', '기록 불필요'],
+                correctAnswer: 2,
+                explanation: '[placeholder] 산업재해 기록은 3년간 보존해야 합니다.'
+            },
+            {
+                id: 'qsp_so3_007',
+                question: '[placeholder] 비상조치계획에 포함되어야 할 사항이 아닌 것은?',
+                options: ['비상 연락 체계', '대피 경로 및 방법', '응급 처치 절차', '회식 계획', '비상 장비 위치'],
+                correctAnswer: 3,
+                explanation: '[placeholder] 회식 계획은 비상조치계획에 포함되는 사항이 아닙니다.'
+            }
+        ]
     }
 ];
 
