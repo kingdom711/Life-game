@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { triggerQuestAction } from '../utils/questManager';
-import { userProfile } from '../utils/storage';
+import { userProfile, storage } from '../utils/storage';
 
 const CHECKLIST_ITEMS = [
     { id: 'ppe_helmet', label: '안전모 착용 상태 확인', category: '개인보호구(PPE)' },
@@ -20,15 +20,13 @@ const MIN_CHECKED = 8;
 const STORAGE_KEY = 'safety_quest_checklists';
 
 const getStoredChecklists = () => {
-    try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    } catch { return []; }
+    return storage.get(STORAGE_KEY, []);
 };
 
 const saveChecklist = (checklist) => {
     const existing = getStoredChecklists();
     existing.push(checklist);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+    storage.set(STORAGE_KEY, existing);
 };
 
 const ChecklistFormModal = ({ isOpen, onClose, onComplete, role }) => {

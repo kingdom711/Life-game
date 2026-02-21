@@ -19,6 +19,7 @@ import {
     points,
     level,
     questProgress,
+    userProfile,
     LEGAL_EDUCATION_REQUIREMENTS
 } from './storage';
 
@@ -30,6 +31,7 @@ import {
 } from '../data/educationData';
 
 import { addPoints, addExperience } from './pointsCalculator';
+import { applyDailyQuestCompletionToWeekly } from './questManager';
 
 /**
  * 오늘의 교육 콘텐츠 가져오기
@@ -267,6 +269,7 @@ const completeEducation = (educationId, quizScore) => {
 
     // 일일 교육 퀘스트 완료 처리
     questProgress.updateQuestProgress('daily_education_1', 1, true);
+    applyDailyQuestCompletionToWeekly();
 
     // 진행 상태 초기화
     educationProgress.reset();
@@ -409,15 +412,14 @@ export const generateCertificate = () => {
 
     const stats = getEducationStats();
     const now = new Date();
+    const profile = userProfile.get();
 
     // 증명서 데이터
     const certificate = {
         certificateId: `CERT-${now.getFullYear()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
         issueDate: now.toISOString(),
         validYear: now.getFullYear(),
-        userName: localStorage.getItem('safety_quest_user_profile')
-            ? JSON.parse(localStorage.getItem('safety_quest_user_profile')).name || '사용자'
-            : '사용자',
+        userName: profile?.name || '사용자',
         companyName: localStorage.getItem('companyName') || '',
         totalEducationHours: legalProgress.currentYearHours,
         completedCourses: stats.totalCompleted,
@@ -512,16 +514,7 @@ export const getCumulativeWatchTime = (educationId) => {
  * @param {number} totalWatchedTime - 총 누적 시청 시간 (초)
  */
 export const saveCumulativeWatchTime = (educationId, totalWatchedTime) => {
-    const CUMULATIVE_KEY = 'safety_quest_cumulative_watch_time';
-    const data = JSON.parse(localStorage.getItem(CUMULATIVE_KEY) || '{}');
-
-    // 기존 값보다 크면 업데이트
-    if (totalWatchedTime > (data[educationId] || 0)) {
-        data[educationId] = totalWatchedTime;
-        localStorage.setItem(CUMULATIVE_KEY, JSON.stringify(data));
-    }
-
-    return data[educationId];
+    return educationProgress.updateCumulativeWatchTime(educationId, totalWatchedTime);
 };
 
 export default {

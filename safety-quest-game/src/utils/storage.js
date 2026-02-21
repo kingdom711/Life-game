@@ -22,13 +22,253 @@ const STORAGE_KEYS = {
     SPECIALIZATION_QUIZ_ATTEMPTS: 'safety_quest_spec_quiz_attempts'  // 전직 퀴즈 시도 횟수
 };
 
+const ACTIVE_USER_KEY = 'safety_quest_active_user';
+const SCOPED_KEY_PREFIX = 'safety_quest_scope';
+const LEGACY_OWNER_KEY = 'safety_quest_legacy_owner';
+
+const LEGACY_USER_DATA_KEYS = Array.from(new Set([
+    ...Object.values(STORAGE_KEYS),
+    'safety_quest_hazard_logs',
+    'safety_quest_daily_instances',
+    'safety_quest_hazard_id_logs',
+    'safety_quest_action_records',
+    'safety_quest_gems_logs',
+    'safety_quest_attendance_logs',
+    'safety_quest_monthly_attendance',
+    'safety_quest_weekly_progress',
+    'safety_quest_cumulative_watch_time',
+    'safety_quest_session_watch_time',
+    'safety_quest_weekly_complete_daily_track',
+    'safety_quest_last_reset',
+    'safety_quest_migration_version',
+    'safety_quest_checklists',
+    'safety_quest_reviews',
+    'safety_quest_photos'
+]));
+
+const parseJSON = (value, defaultValue = null) => {
+    if (value === null || value === undefined) return defaultValue;
+    try {
+        return JSON.parse(value);
+    } catch {
+        return defaultValue;
+    }
+};
+
+const normalizeText = (value) => (value || '').toString().trim().toLowerCase();
+
+const toActiveUser = (user = null) => {
+    if (!user) return null;
+    return {
+        id: user.id ?? null,
+        username: user.username ?? null,
+        name: user.name ?? null,
+        email: user.email ?? null
+    };
+};
+
+const getUserScope = (user = null) => {
+    const activeUser = user || parseJSON(localStorage.getItem(ACTIVE_USER_KEY), null);
+    if (!activeUser) return null;
+
+    if (activeUser.id !== null && activeUser.id !== undefined) {
+        return `id:${activeUser.id}`;
+    }
+    if (activeUser.username) {
+        return `username:${normalizeText(activeUser.username)}`;
+    }
+    if (activeUser.email) {
+        return `email:${normalizeText(activeUser.email)}`;
+    }
+    return null;
+};
+
+const shouldUseScopedKey = (key) => typeof key === 'string' && key.startsWith('safety_quest_');
+
+const buildScopedKey = (key, scopeOverride = null) => {
+    if (!shouldUseScopedKey(key)) return key;
+
+    const scope = scopeOverride || getUserScope();
+    if (!scope) return key;
+
+    return `${SCOPED_KEY_PREFIX}:${scope}:${key}`;
+};
+
+const hasAnyLegacyData = () => LEGACY_USER_DATA_KEYS.some((key) => localStorage.getItem(key) !== null);
+
+const hasScopedData = (scope) =>
+    LEGACY_USER_DATA_KEYS.some((key) => localStorage.getItem(buildScopedKey(key, scope)) !== null);
+
+const shouldMigrateLegacyDataForUser = (user, scope) => {
+    const owner = localStorage.getItem(LEGACY_OWNER_KEY);
+    if (owner) {
+        return owner === scope;
+    }
+
+    const legacyProfile = parseJSON(localStorage.getItem(STORAGE_KEYS.USER_PROFILE), null);
+    const legacyName = normalizeText(legacyProfile?.name);
+    if (!legacyName) return false;
+
+    const candidates = [user?.name, user?.username, user?.email]
+        .map(normalizeText)
+        .filter(Boolean);
+
+    return candidates.includes(legacyName);
+};
+
+const migrateLegacyDataForUser = (user) => {
+    const scope = getUserScope(user);
+    if (!scope) {
+        return { migrated: false, reason: 'NO_SCOPE', copiedKeys: 0 };
+    }
+
+    if (!hasAnyLegacyData()) {
+        return { migrated: false, reason: 'NO_LEGACY_DATA', copiedKeys: 0 };
+    }
+
+    if (hasScopedData(scope)) {
+        return { migrated: false, reason: 'SCOPED_DATA_ALREADY_EXISTS', copiedKeys: 0 };
+    }
+
+    if (!shouldMigrateLegacyDataForUser(user, scope)) {
+        return { migrated: false, reason: 'OWNER_MISMATCH', copiedKeys: 0 };
+    }
+
+    let copiedKeys = 0;
+
+    LEGACY_USER_DATA_KEYS.forEach((legacyKey) => {
+        const legacyValue = localStorage.getItem(legacyKey);
+        if (legacyValue === null) return;
+
+        const scopedKey = buildScopedKey(legacyKey, scope);
+        if (localStorage.getItem(scopedKey) !== null) return;
+
+        localStorage.setItem(scopedKey, legacyValue);
+        copiedKeys += 1;
+    });
+
+    if (copiedKeys > 0) {
+        localStorage.setItem(LEGACY_OWNER_KEY, scope);
+    }
+
+    return {
+        migrated: copiedKeys > 0,
+        reason: copiedKeys > 0 ? 'MIGRATED' : 'NO_KEYS_COPIED',
+        copiedKeys
+    };
+};
+
+const clearScopedDataForScope = (scope) => {
+    if (!scope) return false;
+    const prefix = `${SCOPED_KEY_PREFIX}:${scope}:`;
+
+    try {
+        const keys = Object.keys(localStorage);
+        keys.forEach((key) => {
+            if (key.startsWith(prefix)) {
+                localStorage.removeItem(key);
+            }
+        });
+        return true;
+    } catch (error) {
+        console.error('Error clearing scoped localStorage:', error);
+        return false;
+    }
+};
+
 // LocalStorage 래퍼 함수들
 export const storage = {
+    setActiveUser: (user) => {
+        try {
+            const activeUser = toActiveUser(user);
+            if (!activeUser) return false;
+            localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(activeUser));
+            return true;
+        } catch (error) {
+            console.error('Error setting active user:', error);
+            return false;
+        }
+    },
+
+    getActiveUser: () => {
+        return parseJSON(localStorage.getItem(ACTIVE_USER_KEY), null);
+    },
+
+    clearActiveUser: () => {
+        try {
+            localStorage.removeItem(ACTIVE_USER_KEY);
+            return true;
+        } catch (error) {
+            console.error('Error clearing active user:', error);
+            return false;
+        }
+    },
+
+    getActiveUserScope: () => {
+        return getUserScope();
+    },
+
+    ensureScopedDataForUser: (user) => {
+        return migrateLegacyDataForUser(user);
+    },
+
+    getScopedKey: (key, user = null) => {
+        return buildScopedKey(key, user ? getUserScope(user) : null);
+    },
+
+    setRaw: (key, value) => {
+        try {
+            const serialized = typeof value === 'string' ? value : JSON.stringify(value);
+            localStorage.setItem(key, serialized);
+            return true;
+        } catch (error) {
+            console.error('Error saving raw localStorage:', error);
+            return false;
+        }
+    },
+
+    getRaw: (key, defaultValue = null) => {
+        try {
+            const item = localStorage.getItem(key);
+            if (item === null) return defaultValue;
+            const parsed = parseJSON(item, undefined);
+            return parsed === undefined ? item : parsed;
+        } catch (error) {
+            console.error('Error reading raw localStorage:', error);
+            return defaultValue;
+        }
+    },
+
+    removeRaw: (key) => {
+        try {
+            localStorage.removeItem(key);
+            return true;
+        } catch (error) {
+            console.error('Error removing raw localStorage:', error);
+            return false;
+        }
+    },
+
+    clearCurrentUserData: () => {
+        const scope = getUserScope();
+        const scopedCleared = clearScopedDataForScope(scope);
+
+        if (!scope) return scopedCleared;
+
+        // 레거시 데이터의 소유자가 현재 사용자일 때만 함께 제거합니다.
+        if (localStorage.getItem(LEGACY_OWNER_KEY) === scope) {
+            LEGACY_USER_DATA_KEYS.forEach((legacyKey) => localStorage.removeItem(legacyKey));
+            localStorage.removeItem(LEGACY_OWNER_KEY);
+        }
+
+        return scopedCleared;
+    },
+
     // 데이터 저장
     set: (key, value) => {
         try {
             const serialized = JSON.stringify(value);
-            localStorage.setItem(key, serialized);
+            localStorage.setItem(buildScopedKey(key), serialized);
             return true;
         } catch (error) {
             console.error('Error saving to localStorage:', error);
@@ -39,7 +279,7 @@ export const storage = {
     // 데이터 불러오기
     get: (key, defaultValue = null) => {
         try {
-            const item = localStorage.getItem(key);
+            const item = localStorage.getItem(buildScopedKey(key));
             return item ? JSON.parse(item) : defaultValue;
         } catch (error) {
             console.error('Error reading from localStorage:', error);
@@ -50,7 +290,7 @@ export const storage = {
     // 데이터 삭제
     remove: (key) => {
         try {
-            localStorage.removeItem(key);
+            localStorage.removeItem(buildScopedKey(key));
             return true;
         } catch (error) {
             console.error('Error removing from localStorage:', error);

@@ -72,6 +72,8 @@ function App() {
 
                 if (savedRole) {
                     setSelectedRole(savedRole);
+                } else {
+                    setSelectedRole(null);
                 }
 
                 // 기존 사용자는 BGM 자동 재생

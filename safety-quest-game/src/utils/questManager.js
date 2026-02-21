@@ -1,6 +1,8 @@
-import { questProgress, points, level, attendanceLogs, weeklyQuestProgress, streak, getKSTDateString, getKSTYesterdayString, getKSTDayOfWeek, getKSTDay, getKSTMonth } from './storage';
-import { getQuestById, dailyQuests, weeklyQuests, monthlyQuests, allQuests } from '../data/questsData';
+import { questProgress, points, level, attendanceLogs, weeklyQuestProgress, streak, userProfile, storage, getKSTDateString, getKSTYesterdayString, getKSTDayOfWeek, getKSTDay, getKSTMonth } from './storage';
+import { getQuestById, dailyQuests, weeklyQuests, monthlyQuests, allQuests, QUEST_TYPE } from '../data/questsData';
 import { addPoints, addExperience } from './pointsCalculator';
+
+const WEEKLY_COMPLETE_DAILY_TRACK_KEY = 'safety_quest_weekly_complete_daily_track';
 
 const getWeekNumber = () => {
     const dateStr = getKSTDateString();
@@ -13,6 +15,30 @@ const getWeekNumber = () => {
 };
 
 // 퀘스트 진행도 업데이트
+const getWeeklyCompleteDailyTrack = () => {
+    return storage.get(WEEKLY_COMPLETE_DAILY_TRACK_KEY, {});
+};
+
+const setWeeklyCompleteDailyTrack = (track) => {
+    storage.set(WEEKLY_COMPLETE_DAILY_TRACK_KEY, track);
+};
+
+// 일간 퀘스트를 새로 완료하면 주간 "7일의 기적" 진행도를 하루 1회 반영
+export const applyDailyQuestCompletionToWeekly = () => {
+    const todayStr = getKSTDateString();
+    const userId = userProfile.getName() || 'guest';
+    const track = getWeeklyCompleteDailyTrack();
+
+    if (track[userId] === todayStr) {
+        return false;
+    }
+
+    updateQuestProgress('weekly_complete_daily', 1);
+    track[userId] = todayStr;
+    setWeeklyCompleteDailyTrack(track);
+    return true;
+};
+
 export const updateQuestProgress = (questId, increment = 1) => {
     const quest = getQuestById(questId);
     if (!quest) return false;
@@ -26,6 +52,9 @@ export const updateQuestProgress = (questId, increment = 1) => {
 
     // 퀘스트 완료 시 보상 지급
     if (completed && !progress.completed) {
+        if (quest.type === QUEST_TYPE.DAILY) {
+            applyDailyQuestCompletionToWeekly();
+        }
         grantQuestReward(quest);
         return { completed: true, reward: quest.reward };
     }
@@ -168,22 +197,20 @@ export const resetMonthlyQuests = () => {
 
 // 리셋 시간 체크 및 자동 리셋 (KST 자정 기준)
 export const checkAndResetQuests = () => {
-    const lastReset = localStorage.getItem('safety_quest_last_reset');
+    const resetDates = storage.get('safety_quest_last_reset', null);
     const todayStr = getKSTDateString();       // "YYYY-MM-DD"
     const todayMonth = getKSTMonth();          // "YYYY-MM"
     const todayDayOfWeek = getKSTDayOfWeek();  // 0=일 ~ 6=토
     const todayDay = getKSTDay();              // 1~31
 
-    if (!lastReset) {
-        localStorage.setItem('safety_quest_last_reset', JSON.stringify({
+    if (!resetDates) {
+        storage.set('safety_quest_last_reset', {
             daily: todayStr,
             weekly: todayStr,
             monthly: todayMonth
-        }));
+        });
         return;
     }
-
-    const resetDates = JSON.parse(lastReset);
 
     // 일간 리셋 체크 (KST 자정 — 날짜 문자열이 다르면 리셋)
     if (todayStr !== resetDates.daily) {
@@ -204,7 +231,7 @@ export const checkAndResetQuests = () => {
         resetDates.monthly = todayMonth;
     }
 
-    localStorage.setItem('safety_quest_last_reset', JSON.stringify(resetDates));
+    storage.set('safety_quest_last_reset', resetDates);
 };
 
 // 퀘스트 완료 상태 확인
@@ -228,6 +255,7 @@ export default {
     updateQuestProgress,
     completeQuest,
     triggerQuestAction,
+    applyDailyQuestCompletionToWeekly,
     resetDailyQuests,
     resetWeeklyQuests,
     resetMonthlyQuests,

@@ -1,21 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { triggerQuestAction } from '../utils/questManager';
-import { userProfile } from '../utils/storage';
+import { userProfile, storage } from '../utils/storage';
 
 const REQUIRED_PHOTOS = 3;
 const MAX_PHOTOS = 5;
 const STORAGE_KEY = 'safety_quest_photos';
 
 const getStoredPhotos = () => {
-    try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    } catch { return []; }
+    return storage.get(STORAGE_KEY, []);
 };
 
 const savePhotoRecord = (record) => {
     const existing = getStoredPhotos();
     existing.push(record);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+    storage.set(STORAGE_KEY, existing);
 };
 
 // 이미지를 작은 썸네일로 리사이즈 (localStorage 용량 절약)

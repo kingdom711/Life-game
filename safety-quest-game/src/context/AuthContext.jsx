@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import authApi from '../api/authApi';
 import gameProfileApi from '../api/gameProfileApi';
-import { userProfile } from '../utils/storage';
+import { userProfile, storage } from '../utils/storage';
 
 const AuthContext = createContext(null);
 
@@ -14,43 +14,43 @@ const hydrateLocalStorage = (gameData) => {
             const { level, exp, expToNext, gameRole, activeSpecialization } = gameData.profile;
 
             // 레벨 데이터
-            localStorage.setItem('safety_quest_level', JSON.stringify({
+            storage.set('safety_quest_level', {
                 current: level,
                 exp: exp,
                 expToNext: expToNext
-            }));
+            });
 
             // 유저 프로필 (게임 역할)
-            const existingProfile = JSON.parse(localStorage.getItem('safety_quest_user_profile') || '{}');
-            localStorage.setItem('safety_quest_user_profile', JSON.stringify({
+            const existingProfile = storage.get('safety_quest_user_profile', {});
+            storage.set('safety_quest_user_profile', {
                 ...existingProfile,
                 role: gameRole || existingProfile.role
-            }));
+            });
 
             // 전직 데이터
             if (gameData.specializations) {
                 const unlockedSpecs = gameData.specializations.map(s => s.specId);
-                localStorage.setItem('safety_quest_specialization', JSON.stringify({
+                storage.set('safety_quest_specialization', {
                     activeSpecialization: activeSpecialization,
                     unlockedSpecializations: unlockedSpecs
-                }));
+                });
             }
         }
 
         if (gameData.points) {
-            localStorage.setItem('safety_quest_points', JSON.stringify({
+            storage.set('safety_quest_points', {
                 balance: gameData.points.balance,
                 totalEarned: gameData.points.totalEarned,
                 totalSpent: gameData.points.totalSpent
-            }));
+            });
         }
 
         if (gameData.streak) {
-            localStorage.setItem('safety_quest_streak', JSON.stringify({
+            storage.set('safety_quest_streak', {
                 currentStreak: gameData.streak.currentStreak,
                 longestStreak: gameData.streak.longestStreak,
                 lastCheckInDate: gameData.streak.lastCheckInDate
-            }));
+            });
         }
 
         console.log('[AuthContext] 서버 게임 데이터 → localStorage 동기화 완료');
@@ -64,11 +64,11 @@ const hydrateLocalStorage = (gameData) => {
  */
 const collectLocalData = () => {
     try {
-        const levelData = JSON.parse(localStorage.getItem('safety_quest_level') || '{}');
-        const profileData = JSON.parse(localStorage.getItem('safety_quest_user_profile') || '{}');
-        const specData = JSON.parse(localStorage.getItem('safety_quest_specialization') || '{}');
-        const pointsData = JSON.parse(localStorage.getItem('safety_quest_points') || '{}');
-        const streakData = JSON.parse(localStorage.getItem('safety_quest_streak') || '{}');
+        const levelData = storage.get('safety_quest_level', {});
+        const profileData = storage.get('safety_quest_user_profile', {});
+        const specData = storage.get('safety_quest_specialization', {});
+        const pointsData = storage.get('safety_quest_points', {});
+        const streakData = storage.get('safety_quest_streak', {});
 
         const specializations = (specData.unlockedSpecializations || []).map(specId => ({
             specId,
@@ -92,6 +92,19 @@ const collectLocalData = () => {
     } catch (err) {
         console.error('[AuthContext] localStorage 수집 실패:', err);
         return null;
+    }
+};
+
+const applyUserScope = (userData) => {
+    if (!userData) return;
+
+    storage.setActiveUser(userData);
+
+    const migrationResult = storage.ensureScopedDataForUser(userData);
+    if (migrationResult?.migrated) {
+        console.log(
+            `[AuthContext] 레거시 로컬 데이터 ${migrationResult.copiedKeys}건을 사용자 스코프로 마이그레이션했습니다.`
+        );
     }
 };
 
@@ -135,6 +148,8 @@ export const AuthProvider = ({ children }) => {
                 if (authApi.isAuthenticated()) {
                     const response = await authApi.getMe();
                     const userData = response.user || response;
+
+                    applyUserScope(userData);
                     setUser(userData);
 
                     // ⭐ 사용자 이름 localStorage에 저장 (관리자 이름 표시 문제 해결)
@@ -144,9 +159,12 @@ export const AuthProvider = ({ children }) => {
 
                     // ⭐ 세션 복원 시에도 서버 게임 데이터 동기화
                     await syncGameData();
+                } else {
+                    storage.clearActiveUser();
                 }
             } catch (err) {
                 console.error("Failed to restore session:", err);
+                storage.clearActiveUser();
             } finally {
                 setLoading(false);
             }
@@ -163,12 +181,13 @@ export const AuthProvider = ({ children }) => {
 
             if (response.user) {
                 userData = response.user;
-                setUser(userData);
             } else {
                 const userResponse = await authApi.getMe();
                 userData = userResponse.user || userResponse;
-                setUser(userData);
             }
+
+            applyUserScope(userData);
+            setUser(userData);
 
             // ⭐ 사용자 이름 localStorage에 저장 (관리자 이름 표시 문제 해결)
             if (userData && userData.name) {
@@ -192,6 +211,7 @@ export const AuthProvider = ({ children }) => {
             console.error("Logout failed:", err);
         } finally {
             setUser(null);
+            storage.clearActiveUser();
         }
     };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { triggerQuestAction } from '../utils/questManager';
+import { storage } from '../utils/storage';
 
 const STORAGE_KEY = 'safety_quest_checklists';
 const REVIEW_STORAGE_KEY = 'safety_quest_reviews';
@@ -69,28 +70,22 @@ const MOCK_CHECKLISTS = [
 ];
 
 const getSubmittedChecklists = () => {
-    try {
-        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-        const submitted = stored.filter(c => c.status === 'SUBMITTED');
-        // 제출된 체크리스트가 없으면 목업 데이터 사용
-        return submitted.length > 0 ? submitted : MOCK_CHECKLISTS;
-    } catch { return MOCK_CHECKLISTS; }
+    const stored = storage.get(STORAGE_KEY, []);
+    const submitted = stored.filter(c => c.status === 'SUBMITTED');
+    // 제출된 체크리스트가 없으면 목업 데이터 사용
+    return submitted.length > 0 ? submitted : MOCK_CHECKLISTS;
 };
 
 const updateChecklistStatus = (checklistId, status) => {
-    try {
-        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-        const updated = stored.map(c => c.id === checklistId ? { ...c, status } : c);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    } catch { /* ignore */ }
+    const stored = storage.get(STORAGE_KEY, []);
+    const updated = stored.map(c => c.id === checklistId ? { ...c, status } : c);
+    storage.set(STORAGE_KEY, updated);
 };
 
 const saveReview = (review) => {
-    try {
-        const reviews = JSON.parse(localStorage.getItem(REVIEW_STORAGE_KEY) || '[]');
-        reviews.push(review);
-        localStorage.setItem(REVIEW_STORAGE_KEY, JSON.stringify(reviews));
-    } catch { /* ignore */ }
+    const reviews = storage.get(REVIEW_STORAGE_KEY, []);
+    reviews.push(review);
+    storage.set(REVIEW_STORAGE_KEY, reviews);
 };
 
 const formatTimeAgo = (dateString) => {

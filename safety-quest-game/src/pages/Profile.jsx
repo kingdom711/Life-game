@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { points, level, streak, userProfile } from '../utils/storage';
+import { points, level, streak, userProfile, storage } from '../utils/storage';
 import { calculateLevel, getPointsToNextLevel, TIERS } from '../utils/pointsCalculator';
 import { getRoleById } from '../data/rolesData';
 import { getInventoryStats } from '../utils/inventoryManager';
@@ -411,7 +411,7 @@ function Profile({ role }) {
                             </p>
                             <button
                                 onClick={() => {
-                                    localStorage.clear();
+                                    storage.clearCurrentUserData();
                                     window.location.reload();
                                 }}
                                 className="btn btn-danger w-full"
