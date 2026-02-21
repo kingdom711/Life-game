@@ -1,0 +1,14 @@
+QUERY: 건설시공 예기치 못한 위험! 건설기계 안전수칙  --> ID: 670vqRvV9H4
+QUERY: 타워크레인 신호수 특별안전보건교육  --> ID: PA-9g7P22Lo
+QUERY: 굴착기·지게차 등 하역운반기계 작업 시 유도자 행동요령  --> ID: zD_hQbVa_P0
+QUERY: 지게차 안전작업 핵심수칙 3가지  --> ID: 77fcEYnCOtU
+QUERY: 건설현장 사망사고 1위, '떨어짐 및 부딪힘' 예방 VR  --> ID: yYDuwBA8mhg
+QUERY: 차량계 건설기계 작업계획서 작성 및 기본 준수사항  --> ID: ppOKTXcAS5k
+QUERY: 밀폐공간 질식재해 예방 필수 안전수칙  --> ID: 6886vrKJ9-g
+QUERY: O2(산소)를 찾아라! 숨막히는 밀폐공간의 진실  --> ID: AjKi0l7O3cg
+QUERY: 어느 날 갑자기 찾아온 불청객, 황화수소 중독 재해사례  --> ID: SnTkzyuz1rk
+QUERY: 밀폐공간 3대 안전수칙 (측정, 환기, 보호구) 실습 가이드  --> ID: 6886vrKJ9-g
+QUERY: 적정 공기 및 유해가스 농도 측정 방법 상세 시연  --> ID: VxLudzI5DjU
+QUERY: 올바른 환기팬 설치 및 송기마스크 착용법  --> ID: qScYzPnQCTc
+QUERY: 대형 참사를 막는 밀폐공간 긴급 구조 모의 훈련  --> ID: zbd3j3Okwfs
+QUERY: 밀폐공간 재해 발생 시 작업자 응급처치 및 심폐소생술  --> ID: xKaT4GHpfBs

@@ -1,0 +1,14 @@
+QUERY: 화재감시자 역할 및 의무  --> ID: e3Gti3_K2Fk
+QUERY: 용접·용단 작업 화재 예방 수칙  --> ID: aFxCmt-WZ2A
+QUERY: 산업현장 화재 폭발 재해예방  --> ID: gTwScLAsuuQ
+QUERY: 소화기구를 활용한 초기 화재 진압 요령  --> ID: BgJ2p9zdXJk
+QUERY: 화재 발생 시 비상 대피 및 피난 요령  --> ID: yRCCB_PTS6U
+QUERY: 동절기 건설현장 난방기구 화재예방  --> ID: thn3M_DmoWA
+QUERY: 관리감독자의 역할과 임무 안전보건교육  --> ID: kP1-AlKrU08
+QUERY: 사업주와 근로자가 함께하는 위험성평가  --> ID: YvPWY0lwatU
+QUERY: 쉽게 알아보는 산업안전보건법  --> ID: suy4t8nEExk
+QUERY: 중대재해처벌법의 이해와 안전보건관리체계  --> ID: CvCCQ3LPPSc
+QUERY: 앗차사고 발굴 우수 사례 및 활동  --> ID: t6JFsRvOvUI
+QUERY: 안전보건관리책임자 및 안전관리자 현장 점검 요령  --> ID: ErCRkHfmRD8
+QUERY: 작업 전 안전점검 TBM 실시 요령  --> ID: 0ca4GIpwfKo
+QUERY: 안전문화 정착을 위한 리더십  --> ID: Tixtg0Ar_H4

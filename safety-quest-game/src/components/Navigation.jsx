@@ -30,6 +30,7 @@ function Navigation() {
     const navItems = [
         { path: '/', label: '홈', icon: '🏠', active: location.pathname === '/' },
         { path: '/education', label: '교육', icon: '📚', active: location.pathname === '/education', badge: !educationCompleted },
+        { path: '/hazard-cycle', label: '사이클', icon: '⚠️', active: location.pathname.startsWith('/hazard-cycle') },
         ...(isTechnician ? [{ path: '/specialization', label: '전직', icon: '⚔️', active: location.pathname.startsWith('/specialization') }] : []),
         { path: '/daily', label: '일간', icon: '📅', active: location.pathname === '/daily' },
         { path: '/profile', label: '프로필', icon: '👤', active: location.pathname === '/profile' }

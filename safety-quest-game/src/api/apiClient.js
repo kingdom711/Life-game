@@ -7,6 +7,27 @@ import config from '../config/environment';
 import { logRequest, logResponse, logError } from '../Frontend_codebase/apiLogger';
 import { getSessionRequestId } from '../utils/requestIdManager';
 
+const syncTokenToOfflineDb = async (token) => {
+    try {
+        const { offlineDb } = await import('../utils/offlineDb');
+        await offlineDb.saveToken(token);
+    } catch (error) {
+        if (config.DEV_MODE) {
+            console.warn('[API] offlineDb 토큰 저장 실패:', error);
+        }
+    }
+};
+
+const clearTokenFromOfflineDb = async () => {
+    try {
+        const { offlineDb } = await import('../utils/offlineDb');
+        await offlineDb.clearToken();
+    } catch (error) {
+        if (config.DEV_MODE) {
+            console.warn('[API] offlineDb 토큰 삭제 실패:', error);
+        }
+    }
+};
 
 /**
  * API 에러 클래스
@@ -29,10 +50,14 @@ const tokenManager = {
     setTokens: (accessToken, refreshToken) => {
         if (accessToken) localStorage.setItem('accessToken', accessToken);
         if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+        if (accessToken) {
+            syncTokenToOfflineDb(accessToken);
+        }
     },
     clearTokens: () => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        clearTokenFromOfflineDb();
     }
 };
 
@@ -40,12 +65,15 @@ const tokenManager = {
  * 기본 헤더 생성
  * X-Request-ID: 세션 단위 ULID로 전구간 로그 추적에 활용
  */
-const getDefaultHeaders = () => {
+const getDefaultHeaders = ({ skipContentType = false } = {}) => {
     const headers = {
-        'Content-Type': 'application/json',
         // ULID는 시간 정보를 포함하므로 정렬에 유리함
         'X-Request-ID': getSessionRequestId(),
     };
+
+    if (!skipContentType) {
+        headers['Content-Type'] = 'application/json';
+    }
 
     const token = tokenManager.getAccessToken();
     if (token) {
@@ -166,9 +194,10 @@ const attemptTokenRefresh = async () => {
 const request = async (endpoint, options = {}, retryCount = 0) => {
     await config.resolveApiBaseUrl();
     const url = config.getApiUrl(endpoint);
+    const isFormDataBody = options.body instanceof FormData;
 
     const defaultOptions = {
-        headers: getDefaultHeaders(),
+        headers: getDefaultHeaders({ skipContentType: isFormDataBody }),
         timeout: config.API_TIMEOUT,
     };
 
@@ -183,7 +212,18 @@ const request = async (endpoint, options = {}, retryCount = 0) => {
 
     // 요청 로깅 (apiLogger 사용)
     const method = options.method || 'GET';
-    const requestBody = options.body ? JSON.parse(options.body) : undefined;
+    let requestBody;
+    if (typeof options.body === 'string') {
+        try {
+            requestBody = JSON.parse(options.body);
+        } catch (_) {
+            requestBody = options.body;
+        }
+    } else if (options.body instanceof FormData) {
+        requestBody = '[FormData]';
+    } else {
+        requestBody = options.body;
+    }
     const startTime = logRequest(method, url, requestBody, mergedOptions.headers);
 
     try {
@@ -211,7 +251,7 @@ const request = async (endpoint, options = {}, retryCount = 0) => {
                 await attemptTokenRefresh();
 
                 // 토큰 갱신 성공 시 원래 요청 재시도
-                const newHeaders = getDefaultHeaders();
+                const newHeaders = getDefaultHeaders({ skipContentType: isFormDataBody });
                 mergedOptions.headers = {
                     ...mergedOptions.headers,
                     ...newHeaders,
@@ -268,6 +308,13 @@ const request = async (endpoint, options = {}, retryCount = 0) => {
  * API 클라이언트 객체
  */
 const apiClient = {
+    buildRequestBody: (data) => {
+        if (data instanceof FormData || data instanceof Blob || typeof data === 'string') {
+            return data;
+        }
+        return JSON.stringify(data);
+    },
+
     /**
      * GET 요청
      */
@@ -282,7 +329,7 @@ const apiClient = {
         return request(endpoint, {
             ...options,
             method: 'POST',
-            body: JSON.stringify(data),
+            body: apiClient.buildRequestBody(data),
         });
     },
 
@@ -293,7 +340,7 @@ const apiClient = {
         return request(endpoint, {
             ...options,
             method: 'PUT',
-            body: JSON.stringify(data),
+            body: apiClient.buildRequestBody(data),
         });
     },
 
@@ -304,7 +351,7 @@ const apiClient = {
         return request(endpoint, {
             ...options,
             method: 'PATCH',
-            body: JSON.stringify(data),
+            body: apiClient.buildRequestBody(data),
         });
     },
 
