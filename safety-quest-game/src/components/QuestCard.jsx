@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { questProgress as questProgressStorage } from '../utils/storage';
 import ProgressBar from './ProgressBar';
 
-function QuestCard({ quest, onComplete }) {
+function QuestCard({ quest, onComplete, isLocked = false }) {
     const navigate = useNavigate();
     const progress = questProgressStorage.getQuestProgress(quest.id);
     const target = quest.requirement.target || 1;
@@ -28,6 +28,22 @@ function QuestCard({ quest, onComplete }) {
         `}>
             {isCompleted && (
                 <div className="completed-overlay absolute inset-0 bg-emerald-500/15 pointer-events-none z-0 rounded-xl"></div>
+            )}
+
+            {isLocked && !isCompleted && (
+                <div style={{
+                    position: 'absolute', inset: 0,
+                    background: 'rgba(0, 0, 0, 0.6)',
+                    display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center',
+                    zIndex: 20, borderRadius: '0.75rem',
+                    gap: '0.5rem'
+                }}>
+                    <span style={{ fontSize: '2.5rem' }}>🔒</span>
+                    <span style={{ fontSize: '0.8rem', color: '#fbbf24', fontWeight: 600 }}>
+                        교육을 먼저 완료하세요
+                    </span>
+                </div>
             )}
 
             <div className="quest-header flex justify-between items-center mb-4 relative z-10">

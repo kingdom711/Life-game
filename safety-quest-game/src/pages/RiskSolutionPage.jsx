@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { geminiService } from '../utils/geminiService';
 import GEMSResultCard from '../components/GEMSResultCard';
-import { triggerQuestAction } from '../utils/questManager';
+import { triggerQuestAction, isQuestCompleted } from '../utils/questManager';
 import { LoadingState, ErrorState } from '../components/PageState';
 
 // 디버깅용 기본 placeholder 텍스트 (완결된 문장 형태)
@@ -152,6 +152,30 @@ const RiskSolutionPage = () => {
                         </span>
                     </div>
                 </div>
+
+                {/* 퀘스트 진행 상태 */}
+                {(() => {
+                    const completed = isQuestCompleted('daily_safety_1');
+                    return (
+                        <div style={{
+                            display: 'flex', alignItems: 'center', gap: '0.75rem',
+                            padding: '0.75rem 1rem', marginBottom: '1.5rem',
+                            background: completed ? 'rgba(0, 255, 136, 0.08)' : 'rgba(251, 191, 36, 0.08)',
+                            border: `1px solid ${completed ? 'rgba(0, 255, 136, 0.3)' : 'rgba(251, 191, 36, 0.3)'}`,
+                            borderRadius: '10px'
+                        }}>
+                            <span style={{ fontSize: '1.2rem' }}>{completed ? '✅' : '📋'}</span>
+                            <div style={{ flex: 1 }}>
+                                <div style={{ color: completed ? '#00ff88' : '#fbbf24', fontWeight: 700, fontSize: '0.85rem' }}>
+                                    {completed ? '일일 퀘스트 완료!' : '일일 위험 요소 제거'}
+                                </div>
+                                <div style={{ color: 'rgba(203, 213, 225, 0.6)', fontSize: '0.75rem' }}>
+                                    {completed ? '오늘의 위험 해결 퀘스트를 완료했습니다 (+250P)' : '위험 요인을 분석하고 조치를 기록하면 퀘스트가 완료됩니다'}
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })()}
 
                 {/* 메인 카드 */}
                 <div style={{

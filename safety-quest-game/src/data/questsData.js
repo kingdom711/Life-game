@@ -145,6 +145,86 @@ export const dailyQuests = [
             points: 50,
             exp: 10
         }
+    },
+
+    // ─── 전직 전용 퀘스트 ───
+
+    // 유도원 (Signal Worker) 전용
+    {
+        id: 'daily_signal_checklist',
+        type: QUEST_TYPE.DAILY,
+        category: QUEST_CATEGORY.CHECKLIST,
+        role: 'technician',
+        specialization: 'signalWorker',
+        title: '🚦 유도 작업 체크리스트',
+        description: '중장비 유도 작업 전 안전 체크리스트를 작성하세요.',
+        icon: '🚦',
+        requirement: { type: 'count', target: 1, action: 'submit_checklist' },
+        reward: { points: 120, exp: 25 }
+    },
+    {
+        id: 'daily_signal_report',
+        type: QUEST_TYPE.DAILY,
+        category: QUEST_CATEGORY.SAFETY,
+        role: 'technician',
+        specialization: 'signalWorker',
+        title: '📡 유도 신호 이행 보고',
+        description: '오늘의 유도 신호 이행 사항을 기록하세요.',
+        icon: '📡',
+        requirement: { type: 'count', target: 1, action: 'signal_report' },
+        reward: { points: 100, exp: 20 }
+    },
+
+    // 신호수 (Crane Signer) 전용
+    {
+        id: 'daily_crane_checklist',
+        type: QUEST_TYPE.DAILY,
+        category: QUEST_CATEGORY.CHECKLIST,
+        role: 'technician',
+        specialization: 'craneSigner',
+        title: '🏗️ 크레인 신호 체크리스트',
+        description: '크레인 작업 전 신호 체계 점검 체크리스트를 작성하세요.',
+        icon: '🏗️',
+        requirement: { type: 'count', target: 1, action: 'submit_checklist' },
+        reward: { points: 130, exp: 28 }
+    },
+    {
+        id: 'daily_crane_comm_check',
+        type: QUEST_TYPE.DAILY,
+        category: QUEST_CATEGORY.SAFETY,
+        role: 'technician',
+        specialization: 'craneSigner',
+        title: '📻 무선 통신 점검',
+        description: '크레인 작업자와의 무선 통신 상태를 점검하고 기록하세요.',
+        icon: '📻',
+        requirement: { type: 'count', target: 1, action: 'comm_check' },
+        reward: { points: 110, exp: 22 }
+    },
+
+    // 밀폐담당자 (Confined Space Manager) 전용
+    {
+        id: 'daily_confined_checklist',
+        type: QUEST_TYPE.DAILY,
+        category: QUEST_CATEGORY.CHECKLIST,
+        role: 'technician',
+        specialization: 'confinedSpaceManager',
+        title: '🔒 밀폐공간 허가 관리',
+        description: '밀폐공간 작업 허가서를 점검하고 체크리스트를 작성하세요.',
+        icon: '🔒',
+        requirement: { type: 'count', target: 1, action: 'submit_checklist' },
+        reward: { points: 140, exp: 30 }
+    },
+    {
+        id: 'daily_confined_oxygen',
+        type: QUEST_TYPE.DAILY,
+        category: QUEST_CATEGORY.SAFETY,
+        role: 'technician',
+        specialization: 'confinedSpaceManager',
+        title: '🌬️ 산소 농도 측정 기록',
+        description: '밀폐공간 산소 농도를 측정하고 결과를 기록하세요.',
+        icon: '🌬️',
+        requirement: { type: 'count', target: 1, action: 'oxygen_measurement' },
+        reward: { points: 130, exp: 28 }
     }
 ];
 
@@ -354,8 +434,21 @@ export const getQuestsByRole = (role) => {
 
 export const getQuestsByTypeAndRole = (type, role) => {
     return allQuests.filter(quest =>
-        quest.type === type && (quest.role === role || quest.role === 'all')
+        quest.type === type && (quest.role === role || quest.role === 'all') && !quest.specialization
     );
+};
+
+// 전직(specialization) 포함 퀘스트 필터링
+export const getQuestsByTypeRoleAndSpec = (type, role, activeSpecialization = null) => {
+    return allQuests.filter(quest => {
+        if (quest.type !== type) return false;
+        if (quest.role !== role && quest.role !== 'all') return false;
+        // 전직 전용 퀘스트: 해당 전직이 활성화된 경우에만 포함
+        if (quest.specialization) {
+            return quest.specialization === activeSpecialization;
+        }
+        return true;
+    });
 };
 
 export const calculateQuestProgress = (quest, userProgress) => {

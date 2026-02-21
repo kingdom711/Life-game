@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { points, level, streak, dailyQuestInstances, userProfile } from '../utils/storage';
 import { calculateLevel } from '../utils/pointsCalculator';
-import { getQuestsByTypeAndRole } from '../data/questsData';
+import { getQuestsByTypeRoleAndSpec } from '../data/questsData';
 import { getAllEquippedItems } from '../utils/inventoryManager';
 import { QUEST_TYPE } from '../data/questsData';
+import { getActiveSpecialization } from '../utils/specializationManager';
 import QuestCard from '../components/QuestCard';
 import Avatar from '../components/Avatar';
 import HazardQuestModal from '../components/HazardQuestModal';
@@ -24,6 +25,17 @@ import userApi from '../api/userApi';
 // [New] 교육 시스템
 import { getTodayEducationContent, hasCompletedTodayEducation, getLegalHoursProgress } from '../utils/educationManager';
 import { CATEGORY_INFO } from '../data/educationData';
+
+// [New] 교육 게이팅
+import useWorkPermission from '../utils/useWorkPermission';
+import EducationRequiredModal from '../components/EducationRequiredModal';
+
+// [New] 체크리스트 & 사진 업로드 & 검토
+import ChecklistFormModal from '../components/ChecklistFormModal';
+import PhotoUploadModal from '../components/PhotoUploadModal';
+import ChecklistReviewModal from '../components/ChecklistReviewModal';
+
+const NON_GATED_QUESTS = ['daily_education_1', 'daily_login_1'];
 
 const COLOR = {
     text: 'var(--color-text)',
@@ -99,6 +111,8 @@ function Dashboard({ role }) {
     
     // 알림 데이터 (API에서 로드)
     const [latestAlerts, setLatestAlerts] = useState([]);
+    const [hasNewAlerts, setHasNewAlerts] = useState(false);
+    const [prevAlertCount, setPrevAlertCount] = useState(0);
 
     // [New] 교육 시스템 상태
     const [todayEducation, setTodayEducation] = useState(null);
@@ -106,6 +120,14 @@ function Dashboard({ role }) {
     const [legalProgress, setLegalProgress] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [loadError, setLoadError] = useState('');
+
+    // [New] 교육 게이팅
+    const { hasPermission, showModal: showEducationModal, checkPermission, closeModal: closeEducationModal, educationInfo } = useWorkPermission();
+
+    // [New] 체크리스트 & 사진 업로드 & 검토 모달
+    const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
+    const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     
     // 관리자 권한 체크
     const isAdmin = role === 'supervisor' || role === 'safetyManager';
@@ -113,6 +135,31 @@ function Dashboard({ role }) {
     useEffect(() => {
         initializeDashboard();
     }, [role]);
+
+    // [New] 실시간 알림 폴링 (30초 간격)
+    useEffect(() => {
+        if (isLoading) return;
+
+        const pollAlerts = async () => {
+            // 비활성 탭에서는 폴링 중단
+            if (document.visibilityState !== 'visible') return;
+            try {
+                const alerts = await getAlerts();
+                if (alerts && alerts.length > 0) {
+                    if (alerts.length > prevAlertCount && prevAlertCount > 0) {
+                        setHasNewAlerts(true);
+                    }
+                    setPrevAlertCount(alerts.length);
+                    setLatestAlerts(alerts);
+                }
+            } catch (error) {
+                // 폴링 실패는 조용히 무시
+            }
+        };
+
+        const intervalId = setInterval(pollAlerts, 30000);
+        return () => clearInterval(intervalId);
+    }, [isLoading, prevAlertCount]);
 
     const initializeDashboard = async () => {
         setIsLoading(true);
@@ -133,7 +180,8 @@ function Dashboard({ role }) {
         const currentLevel = calculateLevel(currentPoints);
         const currentStreak = streak.get();
         const equipped = getAllEquippedItems();
-        const quests = getQuestsByTypeAndRole(QUEST_TYPE.DAILY, role);
+        const activeSpec = getActiveSpecialization();
+        const quests = getQuestsByTypeRoleAndSpec(QUEST_TYPE.DAILY, role, activeSpec?.id || null);
 
         setPlayerStats({
             points: currentPoints,
@@ -219,12 +267,29 @@ function Dashboard({ role }) {
     };
 
     const handleCompleteQuest = (quest) => {
+        // 교육 게이팅: 교육/로그인 퀘스트 제외 나머지는 교육 완료 필요
+        if (!NON_GATED_QUESTS.includes(quest.id) && !checkPermission()) {
+            return;
+        }
+
         if (quest.id === 'daily_hazard_1') {
             if (isHazardQuestCompleted) {
                 alert("오늘은 이미 퀘스트를 완료했습니다. 내일 다시 도전해 주세요!");
                 return;
             }
             setIsHazardModalOpen(true);
+            return;
+        }
+        if (quest.id === 'daily_checklist_1') {
+            setIsChecklistModalOpen(true);
+            return;
+        }
+        if (quest.id === 'daily_photo_1') {
+            setIsPhotoModalOpen(true);
+            return;
+        }
+        if (quest.id === 'daily_review_1') {
+            setIsReviewModalOpen(true);
             return;
         }
         completeQuest(quest.id);
@@ -321,8 +386,8 @@ function Dashboard({ role }) {
                     </div>
 
                     {/* 오른쪽 - 실시간 위험 알림 카드 (비율 1) */}
-                    <div 
-                        onClick={() => setIsAlertModalOpen(true)}
+                    <div
+                        onClick={() => { setIsAlertModalOpen(true); setHasNewAlerts(false); }}
                         style={{
                             flex: '1 1 280px',
                             maxWidth: '350px',
@@ -346,6 +411,18 @@ function Dashboard({ role }) {
                             e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.4)';
                         }}
                     >
+                        {/* 새 알림 뱃지 */}
+                        {hasNewAlerts && (
+                            <div style={{
+                                position: 'absolute', top: '8px', right: '8px',
+                                width: '12px', height: '12px',
+                                background: '#ef4444', borderRadius: '50%',
+                                boxShadow: '0 0 8px rgba(239, 68, 68, 0.6)',
+                                animation: 'pulse 1.5s infinite',
+                                zIndex: 5
+                            }} />
+                        )}
+
                         {/* 헤더 */}
                         <div style={{
                             display: 'flex',
@@ -840,6 +917,7 @@ function Dashboard({ role }) {
                                 alert("오늘은 이미 퀘스트를 완료했습니다. 내일 다시 도전해 주세요!");
                                 return;
                             }
+                            if (!checkPermission()) return;
                             setIsHazardModalOpen(true);
                         }}
                         style={{ margin: '0' }}
@@ -950,6 +1028,7 @@ function Dashboard({ role }) {
                                     key={quest.id}
                                     quest={quest}
                                     onComplete={handleCompleteQuest}
+                                    isLocked={!hasPermission && !NON_GATED_QUESTS.includes(quest.id)}
                                 />
                             ))}
                         </div>
@@ -1044,6 +1123,36 @@ function Dashboard({ role }) {
                     navigate('/inventory');
                 }}
                 roleId={role}
+            />
+
+            {/* 교육 게이팅 모달 */}
+            <EducationRequiredModal
+                isOpen={showEducationModal}
+                onClose={closeEducationModal}
+                educationInfo={educationInfo}
+            />
+
+            {/* 체크리스트 작성 모달 */}
+            <ChecklistFormModal
+                isOpen={isChecklistModalOpen}
+                onClose={() => setIsChecklistModalOpen(false)}
+                onComplete={() => loadData()}
+                role={role}
+            />
+
+            {/* 사진 업로드 모달 */}
+            <PhotoUploadModal
+                isOpen={isPhotoModalOpen}
+                onClose={() => setIsPhotoModalOpen(false)}
+                onComplete={() => loadData()}
+                role={role}
+            />
+
+            {/* 관리감독자 검토 모달 */}
+            <ChecklistReviewModal
+                isOpen={isReviewModalOpen}
+                onClose={() => setIsReviewModalOpen(false)}
+                onComplete={() => loadData()}
             />
 
             {/* 포인트 획득 내역 모달 */}
