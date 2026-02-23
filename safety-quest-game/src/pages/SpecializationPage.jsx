@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { points } from '../utils/storage';
-import { calculateLevel } from '../utils/pointsCalculator';
 import { SPECIALIZATIONS, SPECIALIZATION_STATUS } from '../data/specializationData';
 import {
     getAllSpecializationProgress,
@@ -10,7 +8,6 @@ import {
     deactivateSpecialization
 } from '../utils/specializationManager';
 import { getLegalHoursProgress } from '../utils/educationManager';
-import SpecializationTrainingPage from './SpecializationTrainingPage';
 
 /**
  * 전직 센터 페이지
@@ -19,9 +16,7 @@ import SpecializationTrainingPage from './SpecializationTrainingPage';
 const SpecializationPage = ({ role }) => {
     const [specProgressList, setSpecProgressList] = useState([]);
     const [activeSpec, setActiveSpec] = useState(null);
-    const [currentLevel, setCurrentLevel] = useState(null);
     const [legalProgress, setLegalProgress] = useState(null);
-    const [selectedTrainingSpecId, setSelectedTrainingSpecId] = useState(null);
 
     useEffect(() => {
         loadData();
@@ -31,12 +26,7 @@ const SpecializationPage = ({ role }) => {
         const allProgress = getAllSpecializationProgress();
         setSpecProgressList(allProgress);
         setActiveSpec(getActiveSpecialization());
-        setCurrentLevel(calculateLevel(points.get()));
         setLegalProgress(getLegalHoursProgress());
-    };
-
-    const handleStartTraining = (specId) => {
-        setSelectedTrainingSpecId(specId);
     };
 
     const handleSwitch = (specId) => {
@@ -48,11 +38,6 @@ const SpecializationPage = ({ role }) => {
 
     const handleDeactivate = () => {
         deactivateSpecialization();
-        loadData();
-    };
-
-    const handleCloseTraining = () => {
-        setSelectedTrainingSpecId(null);
         loadData();
     };
 
@@ -113,22 +98,6 @@ const SpecializationPage = ({ role }) => {
                     <p className="text-muted">
                         특수 교육을 이수하고 전문 역할로 전직하세요
                     </p>
-                    {currentLevel && (
-                        <div style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            marginTop: '0.5rem',
-                            padding: '0.25rem 0.75rem',
-                            borderRadius: '999px',
-                            background: 'rgba(255,255,255,0.05)',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            fontSize: '0.875rem'
-                        }}>
-                            <span>{currentLevel.tierIcon}</span>
-                            <span style={{ color: currentLevel.color }}>{currentLevel.name}</span>
-                        </div>
-                    )}
                 </div>
 
                 {/* 현재 전직 상태 */}
@@ -288,21 +257,6 @@ const SpecializationPage = ({ role }) => {
                                             display: 'flex',
                                             alignItems: 'center',
                                             gap: '0.5rem',
-                                            fontSize: '0.8rem',
-                                            marginBottom: '0.25rem'
-                                        }}>
-                                            <span style={{
-                                                color: currentLevel && currentLevel.rank >= spec.unlockRequirements.minLevel
-                                                    ? '#22c55e' : '#ef4444'
-                                            }}>
-                                                {currentLevel && currentLevel.rank >= spec.unlockRequirements.minLevel ? '✓' : '✗'}
-                                            </span>
-                                            <span>레벨: {spec.unlockRequirements.minLevelName} 이상</span>
-                                        </div>
-                                        <div style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.5rem',
                                             fontSize: '0.8rem'
                                         }}>
                                             <span style={{
@@ -395,28 +349,35 @@ const SpecializationPage = ({ role }) => {
 
                                 {/* 카드 푸터 */}
                                 <div className="card-footer">
+                                    <Link
+                                        to={`/specialization/training/${spec.id}`}
+                                        className="btn btn-secondary btn-sm"
+                                        style={{ width: '100%', marginBottom: '0.5rem' }}
+                                    >
+                                        📘 전직 교육 페이지
+                                    </Link>
                                     {isLocked && (
                                         <button className="btn btn-secondary" style={{ width: '100%' }} disabled>
                                             🔒 조건 미충족
                                         </button>
                                     )}
                                     {isAvailable && (
-                                        <button
+                                        <Link
+                                            to={`/specialization/training/${spec.id}`}
                                             className="btn btn-primary"
                                             style={{ width: '100%', background: spec.bgGradient }}
-                                            onClick={() => handleStartTraining(spec.id)}
                                         >
                                             📚 교육 시작하기
-                                        </button>
+                                        </Link>
                                     )}
                                     {isInProgress && (
-                                        <button
+                                        <Link
+                                            to={`/specialization/training/${spec.id}`}
                                             className="btn btn-primary"
                                             style={{ width: '100%', background: spec.bgGradient }}
-                                            onClick={() => handleStartTraining(spec.id)}
                                         >
                                             📚 교육 이어하기 ({progress.completionRate}%)
-                                        </button>
+                                        </Link>
                                     )}
                                     {isUnlocked && (
                                         <button
@@ -437,18 +398,6 @@ const SpecializationPage = ({ role }) => {
                         );
                     })}
                 </div>
-
-                {/* 전직 교육 패널 (전직센터 내 수행) */}
-                {selectedTrainingSpecId && (
-                    <div style={{ marginTop: '2rem' }}>
-                        <SpecializationTrainingPage
-                            embedded
-                            embeddedSpecId={selectedTrainingSpecId}
-                            onClose={handleCloseTraining}
-                            onProgressUpdated={loadData}
-                        />
-                    </div>
-                )}
             </div>
         </div>
     );

@@ -790,18 +790,100 @@ export const getKSTDayOfWeek = () => {
 // 하위 호환용 alias (내부에서 사용)
 const getLocalDateString = () => getKSTDateString();
 
-// 스트릭 (연속 로그인) - 수동 체크인 방식
-export const streak = {
-    get: () => {
-        return storage.get(STORAGE_KEYS.STREAK, {
+const KST_DATE_FORMATTER = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+});
+
+const formatKSTDate = (dateValue) => {
+    const parts = KST_DATE_FORMATTER.formatToParts(dateValue);
+    const year = parts.find((part) => part.type === 'year')?.value;
+    const month = parts.find((part) => part.type === 'month')?.value;
+    const day = parts.find((part) => part.type === 'day')?.value;
+
+    if (!year || !month || !day) return null;
+    return `${year}-${month}-${day}`;
+};
+
+const extractDateOnly = (value) => {
+    if (!value) return null;
+
+    if (value instanceof Date && !Number.isNaN(value.getTime())) {
+        return formatKSTDate(value);
+    }
+
+    if (typeof value === 'string') {
+        const trimmed = value.trim();
+        const directMatch = trimmed.match(/\d{4}-\d{2}-\d{2}/);
+        if (directMatch) {
+            return directMatch[0];
+        }
+
+        const parsedFromString = new Date(trimmed);
+        if (!Number.isNaN(parsedFromString.getTime())) {
+            return formatKSTDate(parsedFromString);
+        }
+        return null;
+    }
+
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) {
+        return formatKSTDate(parsed);
+    }
+
+    return null;
+};
+
+const toSafeInt = (value) => {
+    const numberValue = Number(value);
+    if (!Number.isFinite(numberValue)) {
+        return 0;
+    }
+    return Math.max(0, Math.floor(numberValue));
+};
+
+const normalizeStreakPayload = (streakData = {}) => {
+    if (!streakData || typeof streakData !== 'object' || Array.isArray(streakData)) {
+        return {
             current: 0,
             longest: 0,
             lastLoginDate: null
-        });
+        };
+    }
+
+    const current = toSafeInt(streakData.current ?? streakData.currentStreak);
+    const longest = Math.max(current, toSafeInt(streakData.longest ?? streakData.longestStreak));
+    const lastLoginDate = extractDateOnly(streakData.lastLoginDate ?? streakData.lastCheckInDate);
+
+    return { current, longest, lastLoginDate };
+};
+
+// 스트릭 (연속 로그인) - 수동 체크인 방식
+export const streak = {
+    get: () => {
+        const rawData = storage.get(STORAGE_KEYS.STREAK, null);
+        const normalized = normalizeStreakPayload(rawData);
+
+        const needsMigration =
+            !!rawData &&
+            (Object.prototype.hasOwnProperty.call(rawData, 'currentStreak') ||
+                Object.prototype.hasOwnProperty.call(rawData, 'longestStreak') ||
+                Object.prototype.hasOwnProperty.call(rawData, 'lastCheckInDate') ||
+                rawData.current !== normalized.current ||
+                rawData.longest !== normalized.longest ||
+                rawData.lastLoginDate !== normalized.lastLoginDate);
+
+        if (needsMigration) {
+            storage.set(STORAGE_KEYS.STREAK, normalized);
+        }
+
+        return normalized;
     },
 
     set: (streakData) => {
-        return storage.set(STORAGE_KEYS.STREAK, streakData);
+        return storage.set(STORAGE_KEYS.STREAK, normalizeStreakPayload(streakData));
     },
 
     // 수동 출석 체크 (KST 기준)
@@ -810,7 +892,7 @@ export const streak = {
         const yesterdayStr = getKSTYesterdayString();
 
         const streakData = streak.get();
-        const lastLoginDate = streakData.lastLoginDate ? streakData.lastLoginDate.split('T')[0] : null;
+        const lastLoginDate = extractDateOnly(streakData.lastLoginDate);
 
         if (lastLoginDate === today) {
             return { success: false, message: '오늘은 이미 출석했습니다.' };
@@ -841,7 +923,7 @@ export const streak = {
         if (!streakData.lastLoginDate) return false;
 
         const today = getKSTDateString();
-        const lastLogin = streakData.lastLoginDate.split('T')[0];
+        const lastLogin = extractDateOnly(streakData.lastLoginDate);
         return today === lastLogin;
     }
 };

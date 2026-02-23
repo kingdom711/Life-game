@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EducationVideoPlayer from '../components/EducationVideoPlayer';
 import EducationQuizModal from '../components/EducationQuizModal';
@@ -17,7 +17,7 @@ import {
     saveCumulativeWatchTime
 } from '../utils/educationManager';
 import { CATEGORY_INFO } from '../data/educationData';
-import { quizAttempts } from '../utils/storage';
+import { quizAttempts, getKSTDateString } from '../utils/storage';
 
 /**
  * 교육 페이지
@@ -40,47 +40,61 @@ const EducationPage = () => {
     const [remainingAttempts, setRemainingAttempts] = useState(3);
     const [allEducations, setAllEducations] = useState([]);
     const [selectedTab, setSelectedTab] = useState('today'); // 'today' | 'all' | 'history'
+    const currentKstDateRef = useRef(getKSTDateString());
 
     // 초기 데이터 로드
     useEffect(() => {
+        currentKstDateRef.current = getKSTDateString();
         loadEducationData();
     }, []);
 
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            const currentKstDate = getKSTDateString();
+            if (currentKstDate === currentKstDateRef.current) {
+                return;
+            }
+
+            currentKstDateRef.current = currentKstDate;
+            loadEducationData();
+        }, 60000);
+
+        return () => clearInterval(intervalId);
+    }, []);
+
     const loadEducationData = () => {
-        // 오늘의 교육 콘텐츠
         const education = getTodayEducationContent();
         setTodayEducation(education);
 
-        // 이미 완료했는지 확인
+        // Reset transient UI state so day rollover does not keep old progress UI.
+        setIsEducationStarted(false);
+        setVideoCompleted(false);
+        setWatchedTime(0);
+        setMaxWatchedTime(0);
+
         const completed = hasCompletedTodayEducation();
         setAlreadyCompleted(completed);
 
-        // 법정 교육 시간 진행 상황
         const progress = getLegalHoursProgress();
         setLegalProgress(progress);
 
-        // 현재 진행 상태 확인
         const currentProgress = getCurrentProgress();
         if (currentProgress.inProgress && currentProgress.education?.id === education?.id) {
             setIsEducationStarted(true);
             setVideoCompleted(currentProgress.progress.videoCompleted);
             setMaxWatchedTime(currentProgress.progress.maxWatchedTime);
-            // 누적 시청 시간 불러오기
             const cumulative = getCumulativeWatchTime(education.id);
             setCumulativeWatchedTime(cumulative);
         } else if (education) {
-            // 진행 중이 아니어도 기존 누적 시간 불러오기
             const cumulative = getCumulativeWatchTime(education.id);
             setCumulativeWatchedTime(cumulative);
         }
 
-        // 남은 시도 횟수
         if (education) {
             const remaining = quizAttempts.getRemainingAttempts(education.id);
             setRemainingAttempts(remaining);
         }
 
-        // 모든 교육 목록
         const educations = getAllEducationsWithStatus();
         setAllEducations(educations);
     };

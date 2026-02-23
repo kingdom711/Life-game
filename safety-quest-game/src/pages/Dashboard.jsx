@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { points, level, streak, dailyQuestInstances, userProfile } from '../utils/storage';
+import { points, level, streak, dailyQuestInstances, userProfile, getKSTDateString } from '../utils/storage';
 import { calculateLevel } from '../utils/pointsCalculator';
 import { getQuestsByTypeRoleAndSpec } from '../data/questsData';
 import { getAllEquippedItems } from '../utils/inventoryManager';
@@ -13,7 +13,7 @@ import StreakButton from '../components/StreakButton';
 import DailyCheckInModal from '../components/DailyCheckInModal';
 import WeeklyQuestTracker from '../components/WeeklyQuestTracker';
 import MonthlyAttendanceModal from '../components/MonthlyAttendanceModal';
-import { completeQuest, triggerQuestAction, checkAttendance } from '../utils/questManager';
+import { completeQuest, triggerQuestAction } from '../utils/questManager';
 
 import AvatarWindow from '../components/AvatarWindow';
 import AvatarGearDisplay from '../components/AvatarGearDisplay';
@@ -136,6 +136,22 @@ function Dashboard({ role }) {
         initializeDashboard();
     }, [role]);
 
+    useEffect(() => {
+        let lastKstDate = getKSTDateString();
+
+        const intervalId = setInterval(() => {
+            const currentKstDate = getKSTDateString();
+            if (currentKstDate === lastKstDate) {
+                return;
+            }
+
+            lastKstDate = currentKstDate;
+            initializeDashboard();
+        }, 60000);
+
+        return () => clearInterval(intervalId);
+    }, [role]);
+
     // [New] 실시간 알림 폴링 (30초 간격)
     useEffect(() => {
         if (isLoading) return;
@@ -222,10 +238,22 @@ function Dashboard({ role }) {
                 }
 
                 if (streakData.status === 'fulfilled' && streakData.value) {
+                    const localStreakBeforeSync = streak.get();
+                    const localCheckedInToday = streak.isCheckedInToday();
+                    const apiLastCheckInDateRaw = streakData.value.lastCheckInDate;
+                    const apiLastCheckInDate =
+                        typeof apiLastCheckInDateRaw === 'string'
+                            ? apiLastCheckInDateRaw.split('T')[0]
+                            : apiLastCheckInDateRaw;
+                    const todayKST = getKSTDateString();
+
                     syncedStreak = {
                         current: streakData.value.currentStreak,
                         longest: streakData.value.longestStreak,
-                        lastLoginDate: streakData.value.lastCheckInDate
+                        lastLoginDate:
+                            localCheckedInToday && apiLastCheckInDate !== todayKST
+                                ? localStreakBeforeSync.lastLoginDate
+                                : streakData.value.lastCheckInDate
                     };
                     streak.set(syncedStreak);
                 }
@@ -626,16 +654,21 @@ function Dashboard({ role }) {
                             </div>
                             <div className="streak-content-wrapper">
                                 <StreakButton
-                                    onCheckIn={() => {
-                                        const result = checkAttendance(userProfile.getName() || 'guest');
-                                        if (result.success) {
-                                            triggerQuestAction('daily_login', role);
-                                            setCheckInResult({ streak: result.consecutiveDays, bonus: result.bonus });
-                                            setIsCheckInModalOpen(true);
-                                            loadData();
-                                        } else {
-                                            alert(result.message);
+                                    onCheckIn={(result) => {
+                                        if (!result?.success) {
+                                            if (result?.message) {
+                                                alert(result.message);
+                                            }
+                                            return;
                                         }
+
+                                        triggerQuestAction('daily_login', role);
+                                        setCheckInResult({
+                                            streak: result.streak ?? result.consecutiveDays ?? 0,
+                                            bonus: result.bonus ?? 0
+                                        });
+                                        setIsCheckInModalOpen(true);
+                                        loadData();
                                     }}
                                     onShowMonthlyRewards={() => setIsMonthlyModalOpen(true)}
                                 />

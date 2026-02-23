@@ -3,7 +3,7 @@
  * 기술인의 전직 시스템 핵심 비즈니스 로직
  *
  * 기능:
- * - 전직 조건 확인 (레벨, 교육 이수)
+ * - 전직 조건 확인 (교육 이수)
  * - 전직 교육 시작/완료 처리
  * - 전직 실행 (클래스 체인지)
  * - 전직 전환 (해금된 전직 간)
@@ -17,8 +17,6 @@ import {
     points,
     legalHours
 } from './storage';
-
-import { calculateLevel } from './pointsCalculator';
 
 import {
     SPECIALIZATIONS,
@@ -48,19 +46,9 @@ export const canStartSpecialization = (specId) => {
         return { canStart: false, reasons: ['이미 해금된 전직입니다.'], alreadyUnlocked: true };
     }
 
-    const reasons = [];
-    const currentLevel = calculateLevel();
-
-    // 레벨 조건 확인
-    if (currentLevel.rank < spec.unlockRequirements.minLevel) {
-        reasons.push(`${spec.unlockRequirements.minLevelName} 이상 레벨이 필요합니다. (현재: ${currentLevel.name})`);
-    }
-
     return {
-        canStart: reasons.length === 0,
-        reasons,
-        currentLevel: currentLevel.name,
-        requiredLevel: spec.unlockRequirements.minLevelName
+        canStart: true,
+        reasons: []
     };
 };
 
@@ -173,7 +161,7 @@ export const startSpecializationTraining = (specId, eduId) => {
         return { success: false, message: '이미 완료한 교육입니다.', alreadyCompleted: true };
     }
 
-    // 레벨 조건 확인
+    // 전직 조건 확인
     const { canStart, reasons } = canStartSpecialization(specId);
     if (!canStart && !specializationData.isUnlocked(specId)) {
         return { success: false, message: reasons[0] || '조건 미충족' };

@@ -47,9 +47,9 @@ const hydrateLocalStorage = (gameData) => {
 
         if (gameData.streak) {
             storage.set('safety_quest_streak', {
-                currentStreak: gameData.streak.currentStreak,
-                longestStreak: gameData.streak.longestStreak,
-                lastCheckInDate: gameData.streak.lastCheckInDate
+                current: gameData.streak.currentStreak,
+                longest: gameData.streak.longestStreak,
+                lastLoginDate: gameData.streak.lastCheckInDate
             });
         }
 
@@ -76,6 +76,10 @@ const collectLocalData = () => {
             educationProgress: null
         }));
 
+        const currentStreak = streakData.current ?? streakData.currentStreak ?? 0;
+        const longestStreak = streakData.longest ?? streakData.longestStreak ?? 0;
+        const lastCheckInDate = streakData.lastLoginDate ?? streakData.lastCheckInDate ?? null;
+
         return {
             level: levelData.current || 1,
             exp: levelData.exp || 0,
@@ -85,9 +89,9 @@ const collectLocalData = () => {
             totalQuestsCompleted: 0,
             specializations,
             pointsBalance: pointsData.balance || 0,
-            currentStreak: streakData.currentStreak || 0,
-            longestStreak: streakData.longestStreak || 0,
-            lastCheckInDate: streakData.lastCheckInDate || null
+            currentStreak,
+            longestStreak,
+            lastCheckInDate
         };
     } catch (err) {
         console.error('[AuthContext] localStorage 수집 실패:', err);

@@ -627,26 +627,34 @@ export const educationContents = [
  * 주차와 요일에 따라 순환하여 제공
  */
 export const getTodayEducation = () => {
-    // KST 기준 현재 날짜 구하기
-    const now = new Date();
-    const kstNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
-    const startOfYear = new Date(kstNow.getFullYear(), 0, 1);
-    const dayOfYear = Math.floor((kstNow - startOfYear) / (24 * 60 * 60 * 1000)) + 1;
+    if (!educationContents.length) {
+        return null;
+    }
 
-    // 주차 계산 (1~52)
-    const weekNumber = Math.ceil(dayOfYear / 7) % 5 + 1; // 5주 순환
-    // 요일 계산 (1=월요일 ~ 5=금요일, 주말은 1로 처리)
-    let dayOfWeek = kstNow.getDay();
-    if (dayOfWeek === 0) dayOfWeek = 1; // 일요일 → 월요일
-    if (dayOfWeek === 6) dayOfWeek = 1; // 토요일 → 월요일
+    const partsFormatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Seoul',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    });
 
-    // 해당 주차와 요일에 맞는 교육 찾기
-    const education = educationContents.find(
-        edu => edu.weekNumber === weekNumber && edu.dayOfWeek === dayOfWeek
-    );
+    const parts = partsFormatter.formatToParts(new Date());
+    const year = Number(parts.find((part) => part.type === 'year')?.value);
+    const month = Number(parts.find((part) => part.type === 'month')?.value);
+    const day = Number(parts.find((part) => part.type === 'day')?.value);
 
-    // 없으면 첫 번째 교육 반환
-    return education || educationContents[0];
+    if (!year || !month || !day) {
+        return educationContents[0];
+    }
+
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const currentUtc = Date.UTC(year, month - 1, day);
+    const startOfYearUtc = Date.UTC(year, 0, 1);
+    const dayOfYear = Math.floor((currentUtc - startOfYearUtc) / msPerDay) + 1;
+
+    // dayOfYear 1 => index 0, then rotate one content per day.
+    const educationIndex = (dayOfYear - 1) % educationContents.length;
+    return educationContents[educationIndex] || educationContents[0];
 };
 
 /**
