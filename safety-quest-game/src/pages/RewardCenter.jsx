@@ -18,6 +18,49 @@ const COLOR = {
     bg: 'var(--color-bg)'
 };
 
+const DEFAULT_REWARDS = [
+    {
+        id: 'default-cu-5000',
+        type: 'GIFT_CARD',
+        name: 'CU 편의점 금액권 5,000원',
+        description: 'CU 편의점에서 사용 가능한 모바일 금액권입니다.',
+        goldPrice: 50,
+        cashValue: 5000,
+        remainingQuantity: 10,
+        image: '/gift/CU편의점.png'
+    },
+    {
+        id: 'default-cu-10000',
+        type: 'GIFT_CARD',
+        name: 'CU 편의점 금액권 10,000원',
+        description: 'CU 편의점에서 사용 가능한 모바일 금액권입니다.',
+        goldPrice: 100,
+        cashValue: 10000,
+        remainingQuantity: 5,
+        image: '/gift/CU편의점.png'
+    },
+    {
+        id: 'default-starbucks-5000',
+        type: 'COFFEE_COUPON',
+        name: '스타벅스 아메리카노 Tall',
+        description: '스타벅스 매장에서 사용 가능한 음료 기프티콘입니다.',
+        goldPrice: 45,
+        cashValue: 4500,
+        remainingQuantity: 10,
+        image: '/gift/스타벅스 기프티콘.png'
+    },
+    {
+        id: 'default-starbucks-10000',
+        type: 'COFFEE_COUPON',
+        name: '스타벅스 카페라떼 Grande',
+        description: '스타벅스 매장에서 사용 가능한 음료 기프티콘입니다.',
+        goldPrice: 90,
+        cashValue: 5500,
+        remainingQuantity: 5,
+        image: '/gift/스타벅스 기프티콘.png'
+    }
+];
+
 function RewardCenter() {
     const [goldBalance, setGoldBalance] = useState(0);
     const [rewards, setRewards] = useState([]);
@@ -45,15 +88,16 @@ function RewardCenter() {
             if (goldData.status === 'fulfilled') {
                 setGoldBalance(goldData.value?.balance || 0);
             }
-            if (rewardsData.status === 'fulfilled') {
-                setRewards(Array.isArray(rewardsData.value) ? rewardsData.value : []);
+            if (rewardsData.status === 'fulfilled' && Array.isArray(rewardsData.value) && rewardsData.value.length > 0) {
+                setRewards(rewardsData.value);
+            } else {
+                setRewards(DEFAULT_REWARDS);
             }
             if (myRewardsData.status === 'fulfilled') {
                 setMyRewards(Array.isArray(myRewardsData.value) ? myRewardsData.value : []);
             }
             if (
                 goldData.status === 'rejected' &&
-                rewardsData.status === 'rejected' &&
                 myRewardsData.status === 'rejected'
             ) {
                 setLoadError('보상센터 데이터를 불러오지 못했습니다.');
@@ -309,16 +353,34 @@ function RewardCenter() {
                                         {/* 상품 정보 */}
                                         <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
                                             {/* 아이콘/이미지 */}
-                                            <div style={{
-                                                width: 64, height: 64, borderRadius: 14,
-                                                background: 'linear-gradient(135deg, rgba(168,85,247,0.2), rgba(236,72,153,0.15))',
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                fontSize: '2rem', flexShrink: 0
-                                            }}>
-                                                {reward.type === 'COFFEE_COUPON' ? '☕' :
-                                                    reward.type === 'GIFT_CARD' ? '🎫' :
-                                                        reward.type === 'VOUCHER' ? '🎟️' : '🎁'}
-                                            </div>
+                                            {reward.image ? (
+                                                <div style={{
+                                                    width: 72, height: 72, borderRadius: 14,
+                                                    overflow: 'hidden', flexShrink: 0,
+                                                    border: '1px solid rgba(148,163,184,0.15)',
+                                                    background: '#fff'
+                                                }}>
+                                                    <img
+                                                        src={reward.image}
+                                                        alt={reward.name}
+                                                        style={{
+                                                            width: '100%', height: '100%',
+                                                            objectFit: 'cover'
+                                                        }}
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div style={{
+                                                    width: 72, height: 72, borderRadius: 14,
+                                                    background: 'linear-gradient(135deg, rgba(168,85,247,0.2), rgba(236,72,153,0.15))',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    fontSize: '2rem', flexShrink: 0
+                                                }}>
+                                                    {reward.type === 'COFFEE_COUPON' ? '☕' :
+                                                        reward.type === 'GIFT_CARD' ? '🎫' :
+                                                            reward.type === 'VOUCHER' ? '🎟️' : '🎁'}
+                                                </div>
+                                            )}
 
                                             {/* 텍스트 */}
                                             <div style={{ flex: 1 }}>
