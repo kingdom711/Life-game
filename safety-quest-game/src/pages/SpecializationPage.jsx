@@ -347,17 +347,11 @@ const SpecializationPage = ({ role }) => {
                                     </ul>
                                 </div>
 
+
                                 {/* 카드 푸터 */}
                                 <div className="card-footer">
-                                    <Link
-                                        to={`/specialization/training/${spec.id}`}
-                                        className="btn btn-secondary btn-sm"
-                                        style={{ width: '100%', marginBottom: '0.5rem' }}
-                                    >
-                                        📘 전직 교육 페이지
-                                    </Link>
                                     {isLocked && (
-                                        <button className="btn btn-secondary" style={{ width: '100%' }} disabled>
+                                        <button className="btn btn-secondary" style={{ width: '100%', whiteSpace: 'nowrap' }} disabled>
                                             🔒 조건 미충족
                                         </button>
                                     )}
@@ -365,7 +359,7 @@ const SpecializationPage = ({ role }) => {
                                         <Link
                                             to={`/specialization/training/${spec.id}`}
                                             className="btn btn-primary"
-                                            style={{ width: '100%', background: spec.bgGradient }}
+                                            style={{ width: '100%', background: spec.bgGradient, whiteSpace: 'nowrap' }}
                                         >
                                             📚 교육 시작하기
                                         </Link>
@@ -374,7 +368,7 @@ const SpecializationPage = ({ role }) => {
                                         <Link
                                             to={`/specialization/training/${spec.id}`}
                                             className="btn btn-primary"
-                                            style={{ width: '100%', background: spec.bgGradient }}
+                                            style={{ width: '100%', background: spec.bgGradient, whiteSpace: 'nowrap' }}
                                         >
                                             📚 교육 이어하기 ({progress.completionRate}%)
                                         </Link>
@@ -382,14 +376,14 @@ const SpecializationPage = ({ role }) => {
                                     {isUnlocked && (
                                         <button
                                             className="btn btn-primary"
-                                            style={{ width: '100%', background: spec.bgGradient }}
+                                            style={{ width: '100%', background: spec.bgGradient, whiteSpace: 'nowrap' }}
                                             onClick={() => handleSwitch(spec.id)}
                                         >
                                             ⚔️ 전직 장착하기
                                         </button>
                                     )}
                                     {isActive && (
-                                        <button className="btn btn-secondary" style={{ width: '100%' }} disabled>
+                                        <button className="btn btn-secondary" style={{ width: '100%', whiteSpace: 'nowrap' }} disabled>
                                             ✅ 현재 장착 중
                                         </button>
                                     )}

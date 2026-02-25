@@ -99,9 +99,29 @@ const userApi = {
      * 랭킹 조회
      * @param {string} type - points, level, streak
      * @param {number} limit
+     * @param {object} options
      */
-    getRankings: async (type = 'points', limit = 10) => {
-        return apiClient.get(`/users/rankings?type=${type}&limit=${limit}`);
+    getRankings: async (type = 'points', limit = 10, { period = 'all', role = '' } = {}) => {
+        let url = `/users/rankings?type=${type}&limit=${limit}&period=${period}`;
+        if (role) url += `&role=${role}`;
+        return apiClient.get(url);
+    },
+
+    /**
+     * 내 랭킹 조회
+     * @param {string} type - points, level, streak
+     */
+    getMyRank: async (type = 'points') => {
+        return apiClient.get(`/users/me/rank?type=${type}`);
+    },
+
+    /**
+     * 팀 랭킹 조회
+     * @param {string} type - points, level, streak
+     * @param {number} limit
+     */
+    getTeamRankings: async (type = 'points', limit = 10) => {
+        return apiClient.get(`/teams/rankings?type=${type}&limit=${limit}`);
     }
 };
 

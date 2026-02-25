@@ -5,6 +5,8 @@ import { calculateLevel, getPointsToNextLevel, TIERS } from '../utils/pointsCalc
 import { getRoleById } from '../data/rolesData';
 import { getInventoryStats } from '../utils/inventoryManager';
 import { getActiveSpecialization, getUnlockedSpecializations } from '../utils/specializationManager';
+import { getAllSpecializationProgress } from '../utils/specializationManager';
+import { SPECIALIZATIONS, SPECIALIZATION_STATUS } from '../data/specializationData';
 import { useAuth } from '../context/AuthContext';
 
 const COLOR = {
@@ -163,10 +165,10 @@ function Profile({ role }) {
                                         <div
                                             key={tierKey}
                                             className={`flex-1 p-3 rounded-lg text-center transition-all duration-300 ${isCurrentTier
-                                                    ? 'ring-2 ring-offset-2 shadow-lg'
-                                                    : isPastTier
-                                                        ? 'opacity-100'
-                                                        : 'opacity-40'
+                                                ? 'ring-2 ring-offset-2 shadow-lg'
+                                                : isPastTier
+                                                    ? 'opacity-100'
+                                                    : 'opacity-40'
                                                 }`}
                                             style={{
                                                 backgroundColor: isPastTier || isCurrentTier ? `${tierInfo.color}20` : COLOR.text,
@@ -225,162 +227,117 @@ function Profile({ role }) {
                     </div>
                 </div>
 
-                <div className="grid grid-2 mb-xl gap-6">
-                    {/* 출석 정보 */}
-                    <div className="card backdrop-blur-xl bg-gradient-to-br from-white/80 via-orange-50/50 
-                      to-white/60 border border-orange-200/50 rounded-2xl p-6 shadow-xl 
-                      shadow-orange-500/10 hover:shadow-2xl transition-all duration-500 
-                      relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full 
-                          blur-3xl -translate-y-1/2 translate-x-1/2 opacity-0 group-hover:opacity-100 
-                          transition-opacity duration-500" />
-                        <div className="card-header relative z-10 mb-4">
-                            <h3 className="card-title text-lg font-bold bg-gradient-to-r from-orange-600 
-                              to-red-600 bg-clip-text text-transparent">
-                                🔥 출석 정보
-                            </h3>
-                        </div>
-                        <div className="card-body relative z-10">
-                            <div className="mb-6">
-                                <div className="text-slate-300 mb-2 text-sm font-semibold">현재 연속 출석</div>
-                                <div className="text-4xl font-extrabold bg-gradient-to-r from-orange-500 
-                                  to-red-500 bg-clip-text text-transparent">
-                                    {stats.streak.current}일
-                                </div>
-                            </div>
-                            <div>
-                                <div className="text-slate-300 mb-2 text-sm font-semibold">최장 연속 출석</div>
-                                <div className="text-2xl font-bold text-orange-400">
-                                    {stats.streak.longest}일
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                {/* 출석 정보 & 인벤토리 정보 - 비활성화 */}
 
-                    {/* 인벤토리 정보 */}
-                    <div className="card backdrop-blur-xl bg-gradient-to-br from-white/80 via-emerald-50/50 
-                      to-white/60 border border-emerald-200/50 rounded-2xl p-6 shadow-xl 
-                      shadow-emerald-500/10 hover:shadow-2xl transition-all duration-500 
-                      relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full 
-                          blur-3xl -translate-y-1/2 translate-x-1/2 opacity-0 group-hover:opacity-100 
-                          transition-opacity duration-500" />
-                        <div className="card-header relative z-10 mb-4">
-                            <h3 className="card-title text-lg font-bold bg-gradient-to-r from-emerald-600 
-                              to-teal-600 bg-clip-text text-transparent">
-                                🎒 인벤토리 정보
-                            </h3>
-                        </div>
-                        <div className="card-body relative z-10">
-                            <div className="mb-6">
-                                <div className="text-slate-300 mb-2 text-sm font-semibold">보유 아이템</div>
-                                <div className="text-4xl font-extrabold bg-gradient-to-r from-emerald-500 
-                                  to-teal-500 bg-clip-text text-transparent">
-                                    {stats.inventory.totalItems || 0}개
-                                </div>
-                            </div>
-                            <div>
-                                <div className="text-slate-300 mb-2 text-sm font-semibold">총 가치</div>
-                                <div className="text-2xl font-bold text-emerald-400">
-                                    {(stats.inventory.totalValue || 0).toLocaleString()}P
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 역할 정보 */}
-                {roleInfo && (
-                    <div className="card">
-                        <div className="card-header">
-                            <h3 className="card-title">💼 {roleInfo.name}</h3>
-                        </div>
-                        <div className="card-body">
-                            <p className="mb-md">{roleInfo.description}</p>
-                            <div>
-                                <h4 style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>주요 기능</h4>
-                                <ul style={{ listStyle: 'none', padding: 0 }}>
-                                    {roleInfo.features.map((feature, index) => (
-                                        <li key={index} style={{ marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            <span style={{ color: roleInfo.color }}>✓</span>
-                                            <span>{feature}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* [New] 전직 정보 - 기술인만 */}
-                {role === 'technician' && (() => {
-                    const activeSpec = getActiveSpecialization();
-                    const unlockedSpecs = getUnlockedSpecializations();
-                    return (
-                        <div className="card" style={{ marginTop: '1.5rem' }}>
+                {/* 역할 정보 + 전직 정보 (1:1 가로 배치) */}
+                <div style={{ display: 'grid', gridTemplateColumns: role === 'technician' ? '1fr 1fr' : '1fr', gap: '1.5rem', alignItems: 'stretch' }}>
+                    {/* 역할 정보 */}
+                    {roleInfo && (
+                        <div className="card" style={{ margin: 0, display: 'flex', flexDirection: 'column' }}>
                             <div className="card-header">
-                                <h3 className="card-title">⚔️ 전직 정보</h3>
+                                <h3 className="card-title">💼 {roleInfo.name}</h3>
                             </div>
-                            <div className="card-body">
-                                {activeSpec ? (
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.75rem',
-                                        padding: '0.75rem',
-                                        borderRadius: '0.5rem',
-                                        background: `${activeSpec.color}10`,
-                                        border: `1px solid ${activeSpec.color}30`,
-                                        marginBottom: '1rem'
-                                    }}>
-                                        <span style={{ fontSize: '2rem' }}>{activeSpec.icon}</span>
-                                        <div>
-                                            <div style={{ fontWeight: 700, color: activeSpec.color }}>{activeSpec.name}</div>
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
-                                                포인트 x{activeSpec.bonuses.pointMultiplier} 보너스 적용 중
+                            <div className="card-body" style={{ flex: 1 }}>
+                                <p className="mb-md">{roleInfo.description}</p>
+                                <div>
+                                    <h4 style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>주요 기능</h4>
+                                    <ul style={{ listStyle: 'none', padding: 0 }}>
+                                        {roleInfo.features.map((feature, index) => (
+                                            <li key={index} style={{ marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                <span style={{ color: roleInfo.color }}>✓</span>
+                                                <span>{feature}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 전직 정보 - 기술인만 */}
+                    {role === 'technician' && (() => {
+                        const activeSpec = getActiveSpecialization();
+                        const unlockedSpecs = getUnlockedSpecializations();
+                        return (
+                            <div className="card" style={{ margin: 0, display: 'flex', flexDirection: 'column' }}>
+                                <div className="card-header">
+                                    <h3 className="card-title">⚔️ 전직 정보</h3>
+                                </div>
+                                <div className="card-body" style={{ flex: 1 }}>
+                                    {/* 현재 전직 상태 */}
+                                    {activeSpec ? (
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.75rem',
+                                            padding: '0.75rem',
+                                            borderRadius: '0.5rem',
+                                            background: `${activeSpec.color}10`,
+                                            border: `1px solid ${activeSpec.color}30`,
+                                            marginBottom: '1rem'
+                                        }}>
+                                            <span style={{ fontSize: '2rem' }}>{activeSpec.icon}</span>
+                                            <div>
+                                                <div style={{ fontWeight: 700, color: activeSpec.color }}>{activeSpec.name}</div>
+                                                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
+                                                    포인트 x{activeSpec.bonuses.pointMultiplier} 보너스 적용 중
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ) : (
-                                    <p style={{ color: 'var(--color-text-tertiary)', marginBottom: '1rem', fontSize: '0.875rem' }}>
-                                        아직 전직하지 않았습니다
-                                    </p>
-                                )}
-                                {unlockedSpecs.length > 0 && (
-                                    <div>
-                                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', marginBottom: '0.5rem' }}>
-                                            해금된 전직 ({unlockedSpecs.length}개)
+                                    ) : (
+                                        <p style={{ color: 'var(--color-text-tertiary)', marginBottom: '1rem', fontSize: '0.875rem' }}>
+                                            아직 전직하지 않았습니다
+                                        </p>
+                                    )}
+
+                                    {/* 전체 역할 목록 */}
+                                    <div style={{ marginBottom: '1rem' }}>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)', marginBottom: '0.5rem', fontWeight: 600 }}>
+                                            전직 가능 역할
                                         </div>
-                                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                            {unlockedSpecs.map(spec => (
-                                                <span key={spec.id} style={{
-                                                    display: 'inline-flex',
-                                                    alignItems: 'center',
-                                                    gap: '0.25rem',
-                                                    padding: '0.2rem 0.5rem',
-                                                    borderRadius: '999px',
-                                                    fontSize: '0.75rem',
-                                                    background: `${spec.color}15`,
-                                                    border: `1px solid ${spec.color}30`,
-                                                    color: spec.color
-                                                }}>
-                                                    {spec.icon} {spec.name}
-                                                </span>
-                                            ))}
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                            {SPECIALIZATIONS.map(spec => {
+                                                const progress = getAllSpecializationProgress().find(p => p.specId === spec.id);
+                                                const isActive = activeSpec?.id === spec.id;
+                                                const isUnlocked = progress?.status === SPECIALIZATION_STATUS.UNLOCKED || progress?.status === SPECIALIZATION_STATUS.ACTIVE;
+                                                const isInProgress = progress?.status === SPECIALIZATION_STATUS.IN_PROGRESS;
+                                                const isAvailable = progress?.status === SPECIALIZATION_STATUS.AVAILABLE;
+                                                return (
+                                                    <div key={spec.id} style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '0.6rem',
+                                                        padding: '0.4rem 0.6rem',
+                                                        borderRadius: '0.4rem',
+                                                        background: isActive ? `${spec.color}15` : 'rgba(255,255,255,0.03)',
+                                                        border: isActive ? `1px solid ${spec.color}30` : '1px solid transparent',
+                                                        opacity: isActive || isUnlocked || isInProgress || isAvailable ? 1 : 0.5
+                                                    }}>
+                                                        <span style={{ fontSize: '1.2rem', width: '1.5rem', textAlign: 'center' }}>{spec.icon}</span>
+                                                        <span style={{ flex: 1, fontSize: '0.85rem', fontWeight: isActive ? 700 : 400, color: isActive ? spec.color : 'var(--color-text-secondary)' }}>
+                                                            {spec.name}
+                                                        </span>
+                                                        <span style={{ fontSize: '0.7rem', color: isActive ? spec.color : isUnlocked ? '#22c55e' : isInProgress ? '#f59e0b' : 'var(--color-text-tertiary)' }}>
+                                                            {isActive ? '⚡ 장착중' : isUnlocked ? '✓ 해금' : isInProgress ? '진행중' : isAvailable ? '가능' : '🔒'}
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
-                                )}
-                                <Link
-                                    to="/specialization"
-                                    className="btn btn-secondary btn-sm"
-                                    style={{ marginTop: '1rem', display: 'inline-block' }}
-                                >
-                                    전직 센터 바로가기 →
-                                </Link>
+
+                                    <Link
+                                        to="/specialization"
+                                        className="btn btn-secondary btn-sm"
+                                        style={{ marginTop: 'auto', display: 'inline-block' }}
+                                    >
+                                        전직 센터 바로가기 →
+                                    </Link>
+                                </div>
                             </div>
-                        </div>
-                    );
-                })()}
+                        );
+                    })()}
+                </div>
 
                 {/* 로그아웃 & 초기화 버튼 */}
                 <div className="grid grid-2 gap-6 mt-xl">

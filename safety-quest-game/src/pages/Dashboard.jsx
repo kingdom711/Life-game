@@ -1,36 +1,37 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { points, level, streak, dailyQuestInstances, userProfile, getKSTDateString } from '../utils/storage';
+import { useNavigate } from 'react-router-dom';
+import { points, streak, dailyQuestInstances, userProfile, getKSTDateString, questProgress } from '../utils/storage';
 import { calculateLevel } from '../utils/pointsCalculator';
 import { getQuestsByTypeRoleAndSpec } from '../data/questsData';
 import { getAllEquippedItems } from '../utils/inventoryManager';
 import { QUEST_TYPE } from '../data/questsData';
 import { getActiveSpecialization } from '../utils/specializationManager';
-import QuestCard from '../components/QuestCard';
-import Avatar from '../components/Avatar';
 import HazardQuestModal from '../components/HazardQuestModal';
-import StreakButton from '../components/StreakButton';
 import DailyCheckInModal from '../components/DailyCheckInModal';
-import WeeklyQuestTracker from '../components/WeeklyQuestTracker';
 import MonthlyAttendanceModal from '../components/MonthlyAttendanceModal';
 import { completeQuest, triggerQuestAction } from '../utils/questManager';
 
 import AvatarWindow from '../components/AvatarWindow';
-import AvatarGearDisplay from '../components/AvatarGearDisplay';
 import PointsHistoryModal from '../components/PointsHistoryModal';
-import { LoadingState, ErrorState, EmptyState } from '../components/PageState';
+import LeaderboardModal from '../components/LeaderboardModal';
+import { LoadingState, ErrorState } from '../components/PageState';
 import { getAlerts } from '../api/alertApi';
 import userApi from '../api/userApi';
+import TopProgressHeader from '../components/dashboard/TopProgressHeader';
+import QuestTimeline from '../components/dashboard/QuestTimeline';
+import EquipmentSidebar from '../components/dashboard/EquipmentSidebar';
+import WeeklyQuestProgress from '../components/dashboard/WeeklyQuestProgress';
+import TeamRankingSidebar from '../components/dashboard/TeamRankingSidebar';
+import SafetyTipBar from '../components/dashboard/SafetyTipBar';
 
-// [New] 교육 시스템
-import { getTodayEducationContent, hasCompletedTodayEducation, getLegalHoursProgress } from '../utils/educationManager';
-import { CATEGORY_INFO } from '../data/educationData';
+// [New] 援먯쑁 ?쒖뒪??
+import { getTodayEducationContent, hasCompletedTodayEducation } from '../utils/educationManager';
 
-// [New] 교육 게이팅
+// [New] 援먯쑁 寃뚯씠??
 import useWorkPermission from '../utils/useWorkPermission';
 import EducationRequiredModal from '../components/EducationRequiredModal';
 
-// [New] 체크리스트 & 사진 업로드 & 검토
+// [New] 泥댄겕由ъ뒪??& ?ъ쭊 ?낅줈??& 寃??
 import ChecklistFormModal from '../components/ChecklistFormModal';
 import PhotoUploadModal from '../components/PhotoUploadModal';
 import ChecklistReviewModal from '../components/ChecklistReviewModal';
@@ -107,29 +108,29 @@ function Dashboard({ role }) {
     const [checkInResult, setCheckInResult] = useState({ streak: 0, bonus: 0 });
     const [isMonthlyModalOpen, setIsMonthlyModalOpen] = useState(false);
     const [isPointsHistoryModalOpen, setIsPointsHistoryModalOpen] = useState(false);
+    const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
     const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
     
-    // 알림 데이터 (API에서 로드)
+    // ?뚮┝ ?곗씠??(API?먯꽌 濡쒕뱶)
     const [latestAlerts, setLatestAlerts] = useState([]);
     const [hasNewAlerts, setHasNewAlerts] = useState(false);
     const [prevAlertCount, setPrevAlertCount] = useState(0);
 
-    // [New] 교육 시스템 상태
+    // [New] 援먯쑁 ?쒖뒪???곹깭
     const [todayEducation, setTodayEducation] = useState(null);
     const [educationCompleted, setEducationCompleted] = useState(false);
-    const [legalProgress, setLegalProgress] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [loadError, setLoadError] = useState('');
 
-    // [New] 교육 게이팅
-    const { hasPermission, showModal: showEducationModal, checkPermission, closeModal: closeEducationModal, educationInfo } = useWorkPermission();
+    // [New] 援먯쑁 寃뚯씠??
+    const { showModal: showEducationModal, checkPermission, closeModal: closeEducationModal, educationInfo } = useWorkPermission();
 
-    // [New] 체크리스트 & 사진 업로드 & 검토 모달
+    // [New] 泥댄겕由ъ뒪??& ?ъ쭊 ?낅줈??& 寃??紐⑤떖
     const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
     const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     
-    // 관리자 권한 체크
+    // 愿由ъ옄 沅뚰븳 泥댄겕
     const isAdmin = role === 'supervisor' || role === 'safetyManager';
 
     useEffect(() => {
@@ -152,12 +153,12 @@ function Dashboard({ role }) {
         return () => clearInterval(intervalId);
     }, [role]);
 
-    // [New] 실시간 알림 폴링 (30초 간격)
+    // [New] ?ㅼ떆媛??뚮┝ ?대쭅 (30珥?媛꾧꺽)
     useEffect(() => {
         if (isLoading) return;
 
         const pollAlerts = async () => {
-            // 비활성 탭에서는 폴링 중단
+            // 鍮꾪솢????뿉?쒕뒗 ?대쭅 以묐떒
             if (document.visibilityState !== 'visible') return;
             try {
                 const alerts = await getAlerts();
@@ -169,7 +170,7 @@ function Dashboard({ role }) {
                     setLatestAlerts(alerts);
                 }
             } catch (error) {
-                // 폴링 실패는 조용히 무시
+                // ?대쭅 ?ㅽ뙣??議곗슜??臾댁떆
             }
         };
 
@@ -191,7 +192,7 @@ function Dashboard({ role }) {
     };
 
     const loadData = async () => {
-        // localStorage에서 즉시 로드 (빠른 UI 표시)
+        // localStorage?먯꽌 利됱떆 濡쒕뱶 (鍮좊Ⅸ UI ?쒖떆)
         const currentPoints = points.get();
         const currentLevel = calculateLevel(currentPoints);
         const currentStreak = streak.get();
@@ -205,22 +206,21 @@ function Dashboard({ role }) {
             streak: currentStreak
         });
         setEquippedItems(equipped);
-        setDailyQuests(quests.slice(0, 4)); // 처음 4개 표시
+        setDailyQuests(quests.slice(0, 4)); // 泥섏쓬 4媛??쒖떆
 
         const todayInstance = dailyQuestInstances.getTodayInstance(userProfile.getName() || 'guest');
         setIsHazardQuestCompleted(todayInstance.isCompleted);
 
-        // [New] 교육 데이터 로드
+        // [New] 援먯쑁 ?곗씠??濡쒕뱶
         try {
             const education = getTodayEducationContent();
             setTodayEducation(education);
             setEducationCompleted(hasCompletedTodayEducation());
-            setLegalProgress(getLegalHoursProgress());
         } catch (error) {
             console.error('교육 데이터 로드 실패:', error);
         }
 
-        // 백엔드에서 최신 데이터 동기화 (로그인 상태일 때)
+        // 諛깆뿏?쒖뿉??理쒖떊 ?곗씠???숆린??(濡쒓렇???곹깭????
         const token = localStorage.getItem('accessToken');
         if (token) {
             try {
@@ -271,38 +271,99 @@ function Dashboard({ role }) {
     };
 
     const loadAlerts = async () => {
+        const fallbackAlerts = [
+            {
+                id: 1,
+                type: 'danger',
+                zone: '2구역',
+                message: '낙하물 주의',
+                time: '10분 전',
+                detail: '2구역 상부 작업 중 낙하물 위험이 감지되었습니다. 해당 구역 진입 전 안전모 착용과 작업 반경 확인이 필요합니다.'
+            },
+            {
+                id: 2,
+                type: 'warning',
+                zone: '5구역',
+                message: '고소작업 진행 중',
+                time: '25분 전',
+                detail: '5구역 고소작업이 진행 중입니다. 추락 방지 안전대와 출입 통제 상태를 확인해 주세요.'
+            },
+            {
+                id: 3,
+                type: 'info',
+                zone: '전체',
+                message: '정기 안전점검 예정',
+                time: '1시간 전',
+                detail: '오후 2시부터 전 구역 정기 안전점검이 예정되어 있습니다. 작업 중단 및 관리자 지시에 협조해 주세요.'
+            }
+        ];
+
         try {
             const alerts = await getAlerts();
             if (alerts && alerts.length > 0) {
                 setLatestAlerts(alerts);
-            } else {
-                // API 연결 안 됐을 때 기본 데이터
-                setLatestAlerts([
-                    { id: 1, type: 'danger', zone: '2구역', message: '낙하물 주의', time: '10분 전', detail: '2구역 상부 작업 중 자재 낙하 위험이 감지되었습니다. 해당 구역 진입 시 안전모 착용을 필수로 하시고, 상부 작업자의 신호를 확인 후 이동하세요.' },
-                    { id: 2, type: 'warning', zone: '5구역', message: '고소작업 진행중', time: '25분 전', detail: '5구역에서 고소작업이 진행 중입니다. 추락 방지 안전대 착용을 확인하시고, 작업 반경 내 출입을 자제해 주세요.' },
-                    { id: 3, type: 'info', zone: '전체', message: '안전점검 예정', time: '1시간 전', detail: '오후 2시부터 전 구역 정기 안전점검이 예정되어 있습니다. 작업 중단 후 안전관리자의 지시에 따라주세요.' }
-                ]);
+                return;
             }
+            setLatestAlerts(fallbackAlerts);
         } catch (error) {
             console.error('알림 로드 실패:', error);
-            // 에러 시 기본 데이터
-            setLatestAlerts([
-                { id: 1, type: 'danger', zone: '2구역', message: '낙하물 주의', time: '10분 전', detail: '2구역 상부 작업 중 자재 낙하 위험이 감지되었습니다.' },
-                { id: 2, type: 'warning', zone: '5구역', message: '고소작업 진행중', time: '25분 전', detail: '5구역에서 고소작업이 진행 중입니다.' },
-                { id: 3, type: 'info', zone: '전체', message: '안전점검 예정', time: '1시간 전', detail: '오후 2시부터 전 구역 정기 안전점검이 예정되어 있습니다.' }
-            ]);
+            setLatestAlerts(fallbackAlerts);
         }
+    };
+    const enrichedQuests = dailyQuests.map((quest, index) => {
+        const progress = questProgress?.getQuestProgress?.(quest.id);
+        const isCompleted = progress?.completed || false;
+
+        // 순차 잠금 해제 (첫 번째 퀘스트는 항상 해제)
+        let prevAllCompleted = true;
+        for (let i = 0; i < index; i++) {
+            const prevProgress = questProgress?.getQuestProgress?.(dailyQuests[i].id);
+            if (!prevProgress?.completed) {
+                prevAllCompleted = false;
+                break;
+            }
+        }
+
+        // 교육 게이팅
+        const isGated = !NON_GATED_QUESTS.includes(quest.id) && !educationCompleted;
+        const isLocked = !isCompleted && (!prevAllCompleted || isGated);
+
+        return {
+            ...quest,
+            isCompleted,
+            isLocked,
+            isActive: !isCompleted && !isLocked,
+            state: isCompleted ? 'completed' : (!isLocked ? 'active' : 'locked'),
+            lockReason: isGated ? '교육 완료 후 잠금 해제' : '이전 퀘스트 완료 필요'
+        };
+    });
+
+    const handleStreakCheckIn = (result) => {
+        if (!result?.success) {
+            if (result?.message) {
+                alert(result.message);
+            }
+            return;
+        }
+
+        triggerQuestAction('daily_login', role);
+        setCheckInResult({
+            streak: result.streak ?? result.consecutiveDays ?? 0,
+            bonus: result.bonus ?? 0
+        });
+        setIsCheckInModalOpen(true);
+        loadData();
     };
 
     const handleCompleteQuest = (quest) => {
-        // 교육 게이팅: 교육/로그인 퀘스트 제외 나머지는 교육 완료 필요
+        // 援먯쑁 寃뚯씠?? 援먯쑁/濡쒓렇???섏뒪???쒖쇅 ?섎㉧吏??援먯쑁 ?꾨즺 ?꾩슂
         if (!NON_GATED_QUESTS.includes(quest.id) && !checkPermission()) {
             return;
         }
 
         if (quest.id === 'daily_hazard_1') {
             if (isHazardQuestCompleted) {
-                alert("오늘은 이미 퀘스트를 완료했습니다. 내일 다시 도전해 주세요!");
+                alert('오늘은 이미 퀘스트를 완료했습니다. 내일 다시 도전해 주세요!');
                 return;
             }
             setIsHazardModalOpen(true);
@@ -321,7 +382,7 @@ function Dashboard({ role }) {
             return;
         }
         completeQuest(quest.id);
-        loadData(); // 새로고침
+        loadData(); // ?덈줈怨좎묠
     };
 
     if (isLoading) {
@@ -354,7 +415,7 @@ function Dashboard({ role }) {
     return (
         <div className="page dashboard-page">
             {/* 배경 GIF - 화면 중앙 고정 */}
-            <div 
+            <div
                 style={{
                     position: 'fixed',
                     top: '50%',
@@ -370,8 +431,8 @@ function Dashboard({ role }) {
                     overflow: 'hidden'
                 }}
             >
-                <img 
-                    src="/assets/안전_관리_대시보드_배경_영상.gif" 
+                <img
+                    src="/assets/안전_관리_대시보드_배경_영상.gif"
                     alt="배경"
                     style={{
                         width: 'auto',
@@ -383,752 +444,55 @@ function Dashboard({ role }) {
                     }}
                 />
             </div>
+
             <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-                {/* 헤더 - 프리미엄 디자인 with 실시간 알림 */}
-                <div 
-                    className="dashboard-header mb-12"
-                    style={{
-                        display: 'flex',
-                        alignItems: 'stretch',
-                        justifyContent: 'space-between',
-                        gap: '2rem',
-                        flexWrap: 'wrap'
+                <TopProgressHeader
+                    playerStats={playerStats}
+                    role={role}
+                    onPointsClick={() => setIsPointsHistoryModalOpen(true)}
+                    equippedItems={equippedItems}
+                    onNavigateShop={() => navigate('/shop')}
+                    onNavigateAvatar={() => setIsAvatarWindowOpen(true)}
+                    latestAlerts={latestAlerts}
+                    hasNewAlerts={hasNewAlerts}
+                    onAlertClick={() => {
+                        setIsAlertModalOpen(true);
+                        setHasNewAlerts(false);
                     }}
-                >
-                    {/* 왼쪽 - 제목 영역 (비율 2) */}
-                    <div style={{ 
-                        flex: '2 1 300px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        textAlign: 'center'
-                    }}>
-                        <div className="header-glow" />
-                        <h1 className="dashboard-title">
-                            안전관리 대시보드
-                        </h1>
-                        <p className="dashboard-subtitle">
-                            오늘도 안전한 하루를 만들어가세요!
-                        </p>
-                    </div>
+                />
 
-                    {/* 오른쪽 - 실시간 위험 알림 카드 (비율 1) */}
-                    <div
-                        onClick={() => { setIsAlertModalOpen(true); setHasNewAlerts(false); }}
-                        style={{
-                            flex: '1 1 280px',
-                            maxWidth: '350px',
-                            background: 'linear-gradient(135deg, rgba(30, 27, 75, 0.9) 0%, rgba(55, 48, 107, 0.85) 100%)',
-                            border: '2px solid rgba(139, 92, 246, 0.4)',
-                            borderRadius: '12px',
-                            padding: '1rem',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s ease',
-                            position: 'relative',
-                            overflow: 'hidden'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 8px 32px rgba(139, 92, 246, 0.3)';
-                            e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.6)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = 'none';
-                            e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.4)';
-                        }}
-                    >
-                        {/* 새 알림 뱃지 */}
-                        {hasNewAlerts && (
-                            <div style={{
-                                position: 'absolute', top: '8px', right: '8px',
-                                width: '12px', height: '12px',
-                                background: '#ef4444', borderRadius: '50%',
-                                boxShadow: '0 0 8px rgba(239, 68, 68, 0.6)',
-                                animation: 'pulse 1.5s infinite',
-                                zIndex: 5
-                            }} />
-                        )}
-
-                        {/* 헤더 */}
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            marginBottom: '0.75rem',
-                            paddingBottom: '0.5rem',
-                            borderBottom: '1px solid rgba(139, 92, 246, 0.3)'
-                        }}>
-                            <h3 style={{
-                                margin: 0,
-                                fontSize: '0.9rem',
-                                fontWeight: 700,
-                                color: COLOR.secondaryLight,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.4rem'
-                            }}>
-                                <span style={{ fontSize: '1rem' }}>🔔</span>
-                                실시간 위험 알림
-                            </h3>
-                            <span style={{
-                                fontSize: '0.65rem',
-                                color: COLOR.textMuted,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.2rem'
-                            }}>
-                                <span style={{
-                                    width: '6px',
-                                    height: '6px',
-                                    background: COLOR.danger,
-                                    borderRadius: '50%'
-                                }} />
-                                LIVE
-                            </span>
-                        </div>
-
-                        {/* 알림 내용 */}
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem'
-                        }}>
-                            {/* 경고 아이콘 */}
-                            <div style={{
-                                flex: '0 0 auto',
-                                width: '44px',
-                                height: '44px',
-                                background: `linear-gradient(135deg, ${COLOR.warningLight} 0%, ${COLOR.warning} 100%)`,
-                                borderRadius: '10px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '1.4rem',
-                                boxShadow: '0 4px 12px rgba(251, 191, 36, 0.3)'
-                            }}>
-                                ⚠️
-                            </div>
-
-                            {/* 텍스트 */}
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{
-                                    fontSize: '0.75rem',
-                                    color: COLOR.warningLight,
-                                    fontWeight: 600,
-                                    marginBottom: '0.15rem'
-                                }}>
-                                    경고:
-                                </div>
-                                <div style={{
-                                    fontSize: '0.9rem',
-                                    color: COLOR.text,
-                                    fontWeight: 700,
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis'
-                                }}>
-                                    {latestAlerts[0]?.zone} {latestAlerts[0]?.message}
-                                </div>
-                                <div style={{
-                                    fontSize: '0.65rem',
-                                    color: COLOR.textMuted,
-                                    marginTop: '0.15rem'
-                                }}>
-                                    {latestAlerts[0]?.time} • 클릭하여 상세 보기
-                                </div>
-                            </div>
-
-                            {/* 구역 미니맵 */}
-                            <div style={{
-                                flex: '0 0 auto',
-                                width: '50px',
-                                height: '40px',
-                                background: 'rgba(139, 92, 246, 0.2)',
-                                borderRadius: '6px',
-                                border: '1px solid rgba(139, 92, 246, 0.3)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                position: 'relative',
-                                overflow: 'hidden'
-                            }}>
-                                {/* 간단한 구역 표시 */}
-                                <div style={{
-                                    position: 'absolute',
-                                    inset: '3px',
-                                    background: `
-                                        linear-gradient(90deg, rgba(139, 92, 246, 0.15) 1px, transparent 1px),
-                                        linear-gradient(rgba(139, 92, 246, 0.15) 1px, transparent 1px)
-                                    `,
-                                    backgroundSize: '8px 8px'
-                                }} />
-                                <div style={{
-                                    width: '14px',
-                                    height: '14px',
-                                    background: 'rgba(239, 68, 68, 0.6)',
-                                    borderRadius: '3px',
-                                    border: `1.5px solid ${COLOR.danger}`
-                                }} />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 통계 카드 - 프리미엄 디자인 */}
-                <div className="stats-grid mb-xl">
-                    {/* 포인트 카드 */}
-                    <div 
-                        className="stat-card stat-card-points"
-                        onClick={() => setIsPointsHistoryModalOpen(true)}
-                    >
-                        <div className="stat-card-glow" />
-                        <div className="stat-card-pattern" />
-                        <div className="stat-card-content">
-                            <div className="stat-header">
-                                <div className="stat-icon">💰</div>
-                                <h4 className="stat-title">포인트</h4>
-                            </div>
-                            <div className="stat-value-wrapper">
-                                <div className="stat-value" data-value={playerStats.points}>
-                                    {playerStats.points.toLocaleString()}
-                                </div>
-                                <div className="stat-badge">
-                                    {playerStats.level.name}
-                                </div>
-                            </div>
-                            <div className="stat-footer">
-                                <span className="stat-hint">클릭하여 획득 내역 보기</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 레벨 진행도 카드 */}
-                    <div className="stat-card stat-card-level">
-                        <div className="stat-card-glow" />
-                        <div className="stat-card-pattern" />
-                        <div className="stat-card-content">
-                            <div className="stat-header">
-                                <div className="stat-icon">📈</div>
-                                <h4 className="stat-title">레벨 진행도</h4>
-                            </div>
-                            <div className="level-display">
-                                <div className="level-icon-wrapper">
-                                    <span className="level-icon">{playerStats.level.tierIcon}</span>
-                                </div>
-                                <div className="level-info">
-                                    <div className="level-name" style={{ color: playerStats.level.color }}>
-                                        {playerStats.level.name}
-                                    </div>
-                                    <div className="level-rank">
-                                        Rank {playerStats.level.rank} / {playerStats.level.totalRanks}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="progress-wrapper">
-                                <div className="progress-bar-advanced">
-                                    <div 
-                                        className="progress-fill"
-                                        style={{ 
-                                            width: `${playerStats.level.progress}%`,
-                                            background: `linear-gradient(90deg, ${playerStats.level.color}, ${playerStats.level.color}dd, ${playerStats.level.color})`
-                                        }}
-                                    />
-                                </div>
-                                <div className="progress-text">
-                                    {playerStats.level.progress}%
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 연속 로그인 카드 */}
-                    <div className="stat-card stat-card-streak">
-                        <div className="stat-card-glow" />
-                        <div className="stat-card-pattern" />
-                        <div className="stat-card-content">
-                            <div className="stat-header">
-                                <div className="stat-icon">🔥</div>
-                                <h4 className="stat-title">연속 로그인</h4>
-                            </div>
-                            <div className="streak-content-wrapper">
-                                <StreakButton
-                                    onCheckIn={(result) => {
-                                        if (!result?.success) {
-                                            if (result?.message) {
-                                                alert(result.message);
-                                            }
-                                            return;
-                                        }
-
-                                        triggerQuestAction('daily_login', role);
-                                        setCheckInResult({
-                                            streak: result.streak ?? result.consecutiveDays ?? 0,
-                                            bonus: result.bonus ?? 0
-                                        });
-                                        setIsCheckInModalOpen(true);
-                                        loadData();
-                                    }}
-                                    onShowMonthlyRewards={() => setIsMonthlyModalOpen(true)}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 아바타 섹션 - 프리미엄 디자인 */}
-                <div className="avatar-section-card mb-xl">
-                    <div className="avatar-section-glow" />
-                    <div className="avatar-section-content">
-                        <div className="avatar-section-header">
-                            <h3 className="avatar-section-title">
-                                <span className="avatar-section-icon">👤</span>
-                                내 아바타
-                            </h3>
-                            <div className="avatar-section-actions">
-                                <button
-                                    className="btn btn-primary btn-sm btn-gradient"
-                                    onClick={() => setIsAvatarWindowOpen(true)}
-                                >
-                                    장비 관리
-                                </button>
-                                <Link to="/inventory">
-                                    <button className="btn btn-secondary btn-sm btn-glass">
-                                        인벤토리
-                                    </button>
-                                </Link>
-                            </div>
-                        </div>
-                        <div className="avatar-display-wrapper">
-                            <div 
-                                className="avatar-display"
-                                onClick={() => setIsAvatarWindowOpen(true)}
-                            >
-                                <AvatarGearDisplay
-                                    equippedItems={equippedItems}
-                                    size={200}
-                                    slotSize={45}
-                                    onSlotClick={() => setIsAvatarWindowOpen(true)}
-                                    onImageClick={(category, item) => {
-                                        navigate('/inventory');
-                                    }}
-                                    roleId={role}
-                                />
-                            </div>
-                            <div className="avatar-hint">
-                                * 아바타를 클릭하여 장비를 관리하세요
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 주간 퀘스트 트래커 */}
-                <div className="mb-xl">
-                    <WeeklyQuestTracker role={role} />
-                </div>
-
-                {/* [New] 오늘의 안전 교육 위젯 */}
-                {todayEducation && (
-                    <div className="mb-xl">
-                        <Link 
-                            to="/education" 
-                            className="no-underline"
-                            style={{ display: 'block' }}
-                        >
-                            <div 
-                                style={{
-                                    background: educationCompleted 
-                                        ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(16, 185, 129, 0.15) 100%)'
-                                        : 'linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%)',
-                                    border: educationCompleted 
-                                        ? '2px solid rgba(34, 197, 94, 0.4)'
-                                        : '2px solid rgba(59, 130, 246, 0.4)',
-                                    borderRadius: '16px',
-                                    padding: '1.5rem',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease',
-                                    position: 'relative',
-                                    overflow: 'hidden'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-2px)';
-                                    e.currentTarget.style.boxShadow = educationCompleted 
-                                        ? '0 8px 32px rgba(34, 197, 94, 0.2)'
-                                        : '0 8px 32px rgba(59, 130, 246, 0.2)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = 'none';
-                                }}
-                            >
-                                {/* 배경 패턴 */}
-                                <div style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    right: 0,
-                                    width: '200px',
-                                    height: '100%',
-                                    background: 'linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.03) 100%)',
-                                    pointerEvents: 'none'
-                                }} />
-
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                                    {/* 아이콘 */}
-                                    <div style={{
-                                        width: '70px',
-                                        height: '70px',
-                                        borderRadius: '16px',
-                                        background: educationCompleted 
-                                            ? `linear-gradient(135deg, ${COLOR.safe} 0%, ${COLOR.safeLight} 100%)`
-                                            : `linear-gradient(135deg, ${CATEGORY_INFO[todayEducation.category]?.color || COLOR.primary} 0%, ${CATEGORY_INFO[todayEducation.category]?.color || COLOR.primary}dd 100%)`,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        fontSize: '2.5rem',
-                                        boxShadow: educationCompleted 
-                                            ? '0 4px 15px rgba(34, 197, 94, 0.3)'
-                                            : '0 4px 15px rgba(59, 130, 246, 0.3)',
-                                        flexShrink: 0
-                                    }}>
-                                        {educationCompleted ? '✅' : (CATEGORY_INFO[todayEducation.category]?.icon || '📚')}
-                                    </div>
-
-                                    {/* 콘텐츠 */}
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.75rem',
-                                            marginBottom: '0.5rem'
-                                        }}>
-                                            <h3 style={{
-                                                margin: 0,
-                                                fontSize: '1.25rem',
-                                                fontWeight: 700,
-                                                color: educationCompleted ? COLOR.safe : COLOR.text
-                                            }}>
-                                                📚 오늘의 안전 교육
-                                            </h3>
-                                            {!educationCompleted && (
-                                                <span style={{
-                                                    background: 'rgba(239, 68, 68, 0.2)',
-                                                    color: COLOR.dangerLight,
-                                                    fontSize: '0.7rem',
-                                                    fontWeight: 700,
-                                                    padding: '0.25rem 0.5rem',
-                                                    borderRadius: '4px'
-                                                }}>
-                                                    필수
-                                                </span>
-                                            )}
-                                        </div>
-                                        
-                                        <p style={{
-                                            margin: 0,
-                                            fontSize: '1rem',
-                                            color: COLOR.textSecondary,
-                                            marginBottom: '0.5rem'
-                                        }}>
-                                            {educationCompleted 
-                                                ? '오늘의 교육을 완료했습니다! 수고하셨습니다.' 
-                                                : todayEducation.title
-                                            }
-                                        </p>
-
-                                        <div style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '1rem',
-                                            fontSize: '0.875rem'
-                                        }}>
-                                            {!educationCompleted && (
-                                                <>
-                                                    <span style={{ color: COLOR.textMuted }}>
-                                                        ⏱️ {Math.ceil(todayEducation.duration / 60)}분
-                                                    </span>
-                                                    <span style={{ color: COLOR.textMuted }}>•</span>
-                                                    <span style={{ color: COLOR.warningLight }}>
-                                                        +{todayEducation.points}P
-                                                    </span>
-                                                </>
-                                            )}
-                                            {legalProgress && (
-                                                <>
-                                                    {!educationCompleted && <span style={{ color: COLOR.textMuted }}>•</span>}
-                                                    <span style={{ color: COLOR.primaryLight }}>
-                                                        법정교육 {legalProgress.currentYearHours}h / {legalProgress.requiredHours}h
-                                                    </span>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* 화살표 */}
-                                    <div style={{
-                                        fontSize: '1.5rem',
-                                        color: educationCompleted ? COLOR.safe : COLOR.primaryLight,
-                                        flexShrink: 0
-                                    }}>
-                                        →
-                                    </div>
-                                </div>
-
-                                {/* 진행률 바 (미완료 시) */}
-                                {!educationCompleted && legalProgress && (
-                                    <div style={{ marginTop: '1rem' }}>
-                                        <div style={{
-                                            height: '4px',
-                                            background: 'rgba(255, 255, 255, 0.1)',
-                                            borderRadius: '2px',
-                                            overflow: 'hidden'
-                                        }}>
-                                            <div style={{
-                                                height: '100%',
-                                                width: `${Math.min(100, legalProgress.completionRate)}%`,
-                                                background: `linear-gradient(90deg, ${COLOR.primary}, ${COLOR.secondary})`,
-                                                transition: 'width 0.5s ease'
-                                            }} />
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </Link>
-                    </div>
-                )}
-
-                {/* [New] 전직 카드 - 기술인 역할일 때만 표시 */}
-                {role === 'technician' && (
-                    <div className="mb-xl">
-                        <Link
-                            to="/specialization"
-                            style={{ textDecoration: 'none', display: 'block' }}
-                        >
-                            <div
-                                style={{
-                                    padding: '1rem 1.5rem',
-                                    borderRadius: '1rem',
-                                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.05))',
-                                    border: '1px solid rgba(139, 92, 246, 0.2)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '1rem',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease'
-                                }}
-                                onMouseEnter={e => {
-                                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(99, 102, 241, 0.1))';
-                                    e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.4)';
-                                }}
-                                onMouseLeave={e => {
-                                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.05))';
-                                    e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.2)';
-                                }}
-                            >
-                                <span style={{ fontSize: '2rem' }}>⚔️</span>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ fontWeight: 700, fontSize: '1rem', color: COLOR.secondaryLight }}>
-                                        전직 센터
-                                    </div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
-                                        특수 교육을 이수하고 유도원 · 신호수 · 밀폐담당자로 전직하세요
-                                    </div>
-                                </div>
-                                <span style={{ color: COLOR.secondaryLight, fontSize: '1.25rem' }}>→</span>
-                            </div>
-                        </Link>
-                    </div>
-                )}
-
-                {/* 찾아라 위험! 일일 퀘스트 & 안전 지능 시스템 */}
-                <div className="mb-xl quest-trigger-grid">
-                    {/* 찾아라 위험! 버튼 */}
-                    <div
-                        className={`quest-trigger-card ${isHazardQuestCompleted ? 'completed' : ''}`}
-                        onClick={() => {
-                            if (isHazardQuestCompleted) {
-                                alert("오늘은 이미 퀘스트를 완료했습니다. 내일 다시 도전해 주세요!");
-                                return;
-                            }
-                            if (!checkPermission()) return;
-                            setIsHazardModalOpen(true);
-                        }}
-                        style={{ margin: '0' }}
-                    >
-                        <div className="icon">
-                            {isHazardQuestCompleted ?
-                                '✅' :
-                                <img src="/icon/hazard hunt.ico" alt="Hazard Hunt" style={{ width: '40px', height: '40px' }} />
-                            }
-                        </div>
-                        <div className="content">
-                            <div className="title">
-                                {isHazardQuestCompleted ? '위험요인 발굴 완료!' : '찾아라 위험!'}
-                            </div>
-                            <div className="subtitle">
-                                {isHazardQuestCompleted ? '오늘의 안전을 지켰습니다' : '일일 퀘스트 • +100P'}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* GEMS AI 안전 지능 시스템 버튼 */}
-                    <Link to="/risk-solution" className="no-underline quest-trigger-link" style={{ margin: '0' }}>
-                        <div
-                            className="gemini-quest-card"
-                            style={{
-                                position: 'relative',
-                                width: '100%',
-                                padding: '1.5rem',
-                                background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.9) 0%, rgba(99, 102, 241, 0.8) 100%)',
-                                border: `2px solid ${COLOR.secondary}`,
-                                borderRadius: '16px',
-                                color: COLOR.text,
-                                cursor: 'pointer',
-                                overflow: 'hidden',
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '1rem',
-                                boxShadow: '0 4px 6px -1px rgba(139, 92, 246, 0.1), 0 2px 4px -1px rgba(139, 92, 246, 0.06)',
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-                                e.currentTarget.style.boxShadow = '0 6px 16px rgba(139, 92, 246, 0.4), 0 4px 8px rgba(139, 92, 246, 0.25)';
-                                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(99, 102, 241, 0.1) 100%)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(139, 92, 246, 0.1), 0 2px 4px -1px rgba(139, 92, 246, 0.06)';
-                                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(139, 92, 246, 0.9) 0%, rgba(99, 102, 241, 0.8) 100%)';
-                            }}
-                        >
-                            {/* 아이콘 */}
-                            <div style={{
-                                fontSize: '2rem',
-                                filter: 'drop-shadow(0 0 5px rgba(139, 92, 246, 0.5))',
-                                position: 'relative',
-                                zIndex: 2
-                            }}>
-                                🤖
-                            </div>
-                            
-                            {/* 콘텐츠 */}
-                            <div style={{ textAlign: 'left', position: 'relative', zIndex: 2 }}>
-                                <div style={{
-                                    fontSize: '1.25rem',
-                                    fontWeight: 800,
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.05em',
-                                    marginBottom: '0.25rem',
-                                    textShadow: '0 0 10px rgba(139, 92, 246, 0.3)'
-                                }}>
-                                    안전 지능 시스템
-                                </div>
-                                <div style={{
-                                    fontSize: '0.875rem',
-                                    color: COLOR.secondaryLight,
-                                    fontWeight: 500
-                                }}>
-                                    AI 위험 분석 • Gemini
-                                </div>
-                            </div>
-                        </div>
-                    </Link>
-                </div>
-
-                {/* 오늘의 퀘스트 */}
-                <div className="mb-xl">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                        <h2 style={{ color: COLOR.text }}>📅 오늘의 퀘스트</h2>
-                        <Link to="/daily">
-                            <button className="btn btn-primary btn-sm">전체 보기</button>
-                        </Link>
-                    </div>
-
-                    {dailyQuests.length === 0 ? (
-                        <EmptyState
-                            icon="📅"
-                            title="오늘 표시할 퀘스트가 없습니다."
-                            description="잠시 후 다시 시도하거나 퀘스트 화면에서 새로고침해 주세요."
-                            actionLabel="다시 불러오기"
-                            onAction={loadData}
+                <div className="dashboard-content-layout">
+                    <section className="dashboard-main-column">
+                        <h2 className="dashboard-quest-heading">
+                            오늘의 안전 퀘스트
+                            <span>(Today's Safety Quests)</span>
+                        </h2>
+                        <QuestTimeline
+                            quests={enrichedQuests}
+                            onQuestAction={handleCompleteQuest}
+                            todayEducation={todayEducation}
+                            educationCompleted={educationCompleted}
+                            onCheckIn={handleStreakCheckIn}
+                            onOpenMonthlyRewards={() => setIsMonthlyModalOpen(true)}
                         />
-                    ) : (
-                        <div className="grid grid-3">
-                            {dailyQuests.map(quest => (
-                                <QuestCard
-                                    key={quest.id}
-                                    quest={quest}
-                                    onComplete={handleCompleteQuest}
-                                    isLocked={!hasPermission && !NON_GATED_QUESTS.includes(quest.id)}
-                                />
-                            ))}
-                        </div>
-                    )}
+                    </section>
+
+                    <aside className="dashboard-side-column">
+                        <WeeklyQuestProgress quests={enrichedQuests} />
+                        <TeamRankingSidebar onShowLeaderboard={() => setIsLeaderboardOpen(true)} />
+                    </aside>
                 </div>
 
-                {/* 빠른 액세스 */}
-                <div>
-                    <h3 className="mb-6 text-2xl font-bold" style={{ color: COLOR.text }}>
-                        빠른 액세스
-                    </h3>
-                    <div className="grid grid-4 gap-4">
-                        <Link to="/shop" className="card backdrop-blur-xl rounded-2xl p-6 
-                          shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 
-                          group relative overflow-hidden no-underline text-center">
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-transparent 
-                              to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            <div className="card-body relative z-10">
-                                <div className="text-5xl mb-3 group-hover:scale-105 transition-transform duration-300">🛒</div>
-                                <div className="font-semibold" style={{ color: COLOR.text }}>아이템 상점</div>
-                            </div>
-                        </Link>
-
-                        <Link to="/weekly" className="card backdrop-blur-xl rounded-2xl p-6 
-                          shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 
-                          group relative overflow-hidden no-underline text-center">
-                            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-transparent 
-                              to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            <div className="card-body relative z-10">
-                                <div className="text-5xl mb-3 group-hover:scale-105 transition-transform duration-300">📊</div>
-                                <div className="font-semibold" style={{ color: COLOR.text }}>주간 퀘스트</div>
-                            </div>
-                        </Link>
-
-                        <Link to="/monthly" className="card backdrop-blur-xl rounded-2xl p-6 
-                          shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 
-                          group relative overflow-hidden no-underline text-center">
-                            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 via-transparent 
-                              to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            <div className="card-body relative z-10">
-                                <div className="text-5xl mb-3 group-hover:scale-105 transition-transform duration-300">🏆</div>
-                                <div className="font-semibold" style={{ color: COLOR.text }}>월간 퀘스트</div>
-                            </div>
-                        </Link>
-
-                        <Link to="/profile" className="card backdrop-blur-xl rounded-2xl p-6 
-                          shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 
-                          group relative overflow-hidden no-underline text-center">
-                            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-transparent 
-                              to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            <div className="card-body relative z-10">
-                                <div className="text-5xl mb-3 group-hover:scale-105 transition-transform duration-300">👤</div>
-                                <div className="font-semibold" style={{ color: COLOR.text }}>프로필</div>
-                            </div>
-                        </Link>
-                    </div>
-                </div>
+                <SafetyTipBar />
             </div>
-
             <HazardQuestModal
                 isOpen={isHazardModalOpen}
                 onClose={() => setIsHazardModalOpen(false)}
                 onComplete={(points) => {
-                    // 위험 항목 확인 퀘스트 트리거
+                    // ?꾪뿕 ??ぉ ?뺤씤 ?섏뒪???몃━嫄?
                     triggerQuestAction('check_risk', role);
 
-                    loadData(); // 포인트 및 퀘스트 상태 업데이트 반영
+                    loadData(); // ?ъ씤??諛??섏뒪???곹깭 ?낅뜲?댄듃 諛섏쁺
                 }}
             />
 
@@ -1148,24 +512,24 @@ function Dashboard({ role }) {
                 isOpen={isAvatarWindowOpen}
                 onClose={() => {
                     setIsAvatarWindowOpen(false);
-                    loadData(); // 장비 변경 사항 반영
+                    loadData(); // ?λ퉬 蹂寃??ы빆 諛섏쁺
                 }}
                 onEquipRequest={(category) => {
-                    // 빈 슬롯 클릭 시 인벤토리로 이동
+                    // 鍮??щ’ ?대┃ ???몃깽?좊━濡??대룞
                     setIsAvatarWindowOpen(false);
                     navigate('/inventory');
                 }}
                 roleId={role}
             />
 
-            {/* 교육 게이팅 모달 */}
+            {/* 援먯쑁 寃뚯씠??紐⑤떖 */}
             <EducationRequiredModal
                 isOpen={showEducationModal}
                 onClose={closeEducationModal}
                 educationInfo={educationInfo}
             />
 
-            {/* 체크리스트 작성 모달 */}
+            {/* 泥댄겕由ъ뒪???묒꽦 紐⑤떖 */}
             <ChecklistFormModal
                 isOpen={isChecklistModalOpen}
                 onClose={() => setIsChecklistModalOpen(false)}
@@ -1173,7 +537,7 @@ function Dashboard({ role }) {
                 role={role}
             />
 
-            {/* 사진 업로드 모달 */}
+            {/* ?ъ쭊 ?낅줈??紐⑤떖 */}
             <PhotoUploadModal
                 isOpen={isPhotoModalOpen}
                 onClose={() => setIsPhotoModalOpen(false)}
@@ -1181,20 +545,25 @@ function Dashboard({ role }) {
                 role={role}
             />
 
-            {/* 관리감독자 검토 모달 */}
+            {/* 愿由ш컧?낆옄 寃??紐⑤떖 */}
             <ChecklistReviewModal
                 isOpen={isReviewModalOpen}
                 onClose={() => setIsReviewModalOpen(false)}
                 onComplete={() => loadData()}
             />
 
-            {/* 포인트 획득 내역 모달 */}
+            {/* ?ъ씤???띾뱷 ?댁뿭 紐⑤떖 */}
             <PointsHistoryModal
                 isOpen={isPointsHistoryModalOpen}
                 onClose={() => setIsPointsHistoryModalOpen(false)}
             />
 
-            {/* 실시간 위험 알림 모달 */}
+            <LeaderboardModal
+                isOpen={isLeaderboardOpen}
+                onClose={() => setIsLeaderboardOpen(false)}
+            />
+
+            {/* ?ㅼ떆媛??꾪뿕 ?뚮┝ 紐⑤떖 */}
             {isAlertModalOpen && (
                 <div 
                     style={{
@@ -1223,7 +592,7 @@ function Dashboard({ role }) {
                         }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {/* 모달 헤더 */}
+                        {/* 紐⑤떖 ?ㅻ뜑 */}
                         <div style={{
                             padding: '1.5rem',
                             borderBottom: '1px solid rgba(139, 92, 246, 0.3)',
@@ -1264,7 +633,7 @@ function Dashboard({ role }) {
                             </button>
                         </div>
 
-                        {/* 모달 내용 */}
+                        {/* 紐⑤떖 ?댁슜 */}
                         <div style={{
                             padding: '1.5rem',
                             maxHeight: 'calc(80vh - 80px)',
@@ -1281,7 +650,7 @@ function Dashboard({ role }) {
                                         marginBottom: index < latestAlerts.length - 1 ? '1rem' : 0
                                     }}
                                 >
-                                    {/* 알림 헤더 */}
+                                    {/* ?뚮┝ ?ㅻ뜑 */}
                                     <div style={{
                                         display: 'flex',
                                         alignItems: 'center',
@@ -1318,7 +687,7 @@ function Dashboard({ role }) {
                                         </div>
                                     </div>
 
-                                    {/* 상세 내용 */}
+                                    {/* ?곸꽭 ?댁슜 */}
                                     <p style={{
                                         margin: 0,
                                         fontSize: '0.9rem',
@@ -1332,7 +701,7 @@ function Dashboard({ role }) {
                             ))}
                         </div>
 
-                        {/* 모달 푸터 */}
+                        {/* 紐⑤떖 ?명꽣 */}
                         <div style={{
                             padding: '1rem 1.5rem',
                             borderTop: '1px solid rgba(139, 92, 246, 0.3)',

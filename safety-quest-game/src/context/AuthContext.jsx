@@ -4,6 +4,13 @@ import gameProfileApi from '../api/gameProfileApi';
 import { userProfile, storage } from '../utils/storage';
 
 const AuthContext = createContext(null);
+const AUTH_BYPASS_ENABLED = import.meta.env.DEV && import.meta.env.VITE_DISABLE_AUTH === 'true';
+const DEV_BYPASS_USER = {
+    id: 'local-dev-user',
+    username: 'local-dev',
+    name: '로컬 테스트 사용자',
+    email: 'local-dev@example.com'
+};
 
 /**
  * 서버 게임 데이터를 localStorage에 저장 (크로스 디바이스 동기화)
@@ -148,6 +155,16 @@ export const AuthProvider = ({ children }) => {
     // Check for existing session on mount
     useEffect(() => {
         const initAuth = async () => {
+            if (AUTH_BYPASS_ENABLED) {
+                applyUserScope(DEV_BYPASS_USER);
+                if (!userProfile.getName()) {
+                    userProfile.setName(DEV_BYPASS_USER.name);
+                }
+                setUser(DEV_BYPASS_USER);
+                setLoading(false);
+                return;
+            }
+
             try {
                 if (authApi.isAuthenticated()) {
                     const response = await authApi.getMe();
@@ -178,6 +195,19 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (credentials) => {
+        if (AUTH_BYPASS_ENABLED) {
+            const bypassUser = {
+                ...DEV_BYPASS_USER,
+                username: credentials?.username || DEV_BYPASS_USER.username
+            };
+            applyUserScope(bypassUser);
+            if (!userProfile.getName()) {
+                userProfile.setName(bypassUser.name);
+            }
+            setUser(bypassUser);
+            return { user: bypassUser, bypass: true };
+        }
+
         setError(null);
         try {
             const response = await authApi.login(credentials);
@@ -209,6 +239,11 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = async () => {
+        if (AUTH_BYPASS_ENABLED) {
+            setUser(DEV_BYPASS_USER);
+            return;
+        }
+
         try {
             await authApi.logout();
         } catch (err) {
