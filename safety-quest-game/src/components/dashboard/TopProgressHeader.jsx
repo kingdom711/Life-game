@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import Avatar from '../Avatar';
 import EquipmentSidebar from './EquipmentSidebar';
+import StreakButton from '../StreakButton';
 import { userProfile } from '../../utils/storage';
 import { LEVELS } from '../../utils/pointsCalculator';
 
@@ -17,7 +18,7 @@ const getNextLevelInfo = (currentPoints) => {
 
 const formatPoints = (value) => Number(value || 0).toLocaleString();
 
-function TopProgressHeader({ playerStats, role, onPointsClick, equippedItems, onNavigateShop, onNavigateAvatar, latestAlerts = [], hasNewAlerts = false, onAlertClick }) {
+function TopProgressHeader({ playerStats, role, onPointsClick, equippedItems, onNavigateShop, onNavigateAvatar, latestAlerts = [], hasNewAlerts = false, onAlertClick, onCheckIn, onShowMonthlyRewards }) {
     const pointsValue = Number(playerStats?.points || 0);
     const levelInfo = playerStats?.level || {};
     const levelName = levelInfo.name || 'Bronze III';
@@ -59,23 +60,32 @@ function TopProgressHeader({ playerStats, role, onPointsClick, equippedItems, on
                                 />
                             </div>
                             <div className="top-progress-next-level">{nextLevelText}</div>
+
+                            {/* 포인트 & 스트릭 — 레벨 바 아래로 이동 */}
+                            <div className="top-progress-metrics">
+                                <button
+                                    type="button"
+                                    className="top-progress-metric-btn"
+                                    onClick={onPointsClick}
+                                    aria-label="포인트 내역 보기"
+                                >
+                                    <span className="metric-icon" aria-hidden="true">💰</span>
+                                    <span className="metric-value">{formatPoints(pointsValue)}P</span>
+                                </button>
+                                <div className="top-progress-metric">
+                                    <span className="metric-icon" aria-hidden="true">🔥</span>
+                                    <span className="metric-value">{streakDays}Days</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="top-progress-metrics">
-                        <button
-                            type="button"
-                            className="top-progress-metric-btn"
-                            onClick={onPointsClick}
-                            aria-label="포인트 내역 보기"
-                        >
-                            <span className="metric-icon" aria-hidden="true">💰</span>
-                            <span className="metric-value">{formatPoints(pointsValue)}P</span>
-                        </button>
-                        <div className="top-progress-metric">
-                            <span className="metric-icon" aria-hidden="true">🔥</span>
-                            <span className="metric-value">{streakDays}Days</span>
-                        </div>
+                    {/* 출석체크 버튼 — 빨간 박스 위치 */}
+                    <div className="top-progress-checkin-area">
+                        <StreakButton
+                            onCheckIn={onCheckIn}
+                            onShowMonthlyRewards={onShowMonthlyRewards}
+                        />
                     </div>
                 </div>
 

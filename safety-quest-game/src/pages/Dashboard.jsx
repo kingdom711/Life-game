@@ -88,8 +88,8 @@ function Dashboard({ role }) {
     const navigate = useNavigate();
     const [playerStats, setPlayerStats] = useState({
         points: 0,
-        level: { 
-            name: 'Bronze III', 
+        level: {
+            name: 'Bronze III',
             progress: 0,
             color: COLOR.bronze,
             tierIcon: '🥉',
@@ -110,7 +110,7 @@ function Dashboard({ role }) {
     const [isPointsHistoryModalOpen, setIsPointsHistoryModalOpen] = useState(false);
     const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
     const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
-    
+
     // ?뚮┝ ?곗씠??(API?먯꽌 濡쒕뱶)
     const [latestAlerts, setLatestAlerts] = useState([]);
     const [hasNewAlerts, setHasNewAlerts] = useState(false);
@@ -129,7 +129,7 @@ function Dashboard({ role }) {
     const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
     const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-    
+
     // 愿由ъ옄 沅뚰븳 泥댄겕
     const isAdmin = role === 'supervisor' || role === 'safetyManager';
 
@@ -314,19 +314,12 @@ function Dashboard({ role }) {
         const progress = questProgress?.getQuestProgress?.(quest.id);
         const isCompleted = progress?.completed || false;
 
-        // 순차 잠금 해제 (첫 번째 퀘스트는 항상 해제)
-        let prevAllCompleted = true;
-        for (let i = 0; i < index; i++) {
-            const prevProgress = questProgress?.getQuestProgress?.(dailyQuests[i].id);
-            if (!prevProgress?.completed) {
-                prevAllCompleted = false;
-                break;
-            }
-        }
+        // 로그인(출석) 퀘스트는 잠금에서 완전히 제외
+        const isLoginQuest = quest.id === 'daily_login_1';
 
-        // 교육 게이팅
+        // 교육 게이팅: 교육 완료 시 나머지 퀘스트 모두 자동 해금 (순차 잠금 없음)
         const isGated = !NON_GATED_QUESTS.includes(quest.id) && !educationCompleted;
-        const isLocked = !isCompleted && (!prevAllCompleted || isGated);
+        const isLocked = !isCompleted && !isLoginQuest && isGated;
 
         return {
             ...quest,
@@ -334,7 +327,7 @@ function Dashboard({ role }) {
             isLocked,
             isActive: !isCompleted && !isLocked,
             state: isCompleted ? 'completed' : (!isLocked ? 'active' : 'locked'),
-            lockReason: isGated ? '교육 완료 후 잠금 해제' : '이전 퀘스트 완료 필요'
+            lockReason: isGated ? '교육 완료 후 잠금 해제' : ''
         };
     });
 
@@ -361,6 +354,10 @@ function Dashboard({ role }) {
             return;
         }
 
+        if (quest.id === 'daily_education_1') {
+            navigate('/education');
+            return;
+        }
         if (quest.id === 'daily_hazard_1') {
             if (isHazardQuestCompleted) {
                 alert('오늘은 이미 퀘스트를 완료했습니다. 내일 다시 도전해 주세요!');
@@ -459,6 +456,8 @@ function Dashboard({ role }) {
                         setIsAlertModalOpen(true);
                         setHasNewAlerts(false);
                     }}
+                    onCheckIn={handleStreakCheckIn}
+                    onShowMonthlyRewards={() => setIsMonthlyModalOpen(true)}
                 />
 
                 <div className="dashboard-content-layout">
@@ -565,7 +564,7 @@ function Dashboard({ role }) {
 
             {/* ?ㅼ떆媛??꾪뿕 ?뚮┝ 紐⑤떖 */}
             {isAlertModalOpen && (
-                <div 
+                <div
                     style={{
                         position: 'fixed',
                         inset: 0,
@@ -579,7 +578,7 @@ function Dashboard({ role }) {
                     }}
                     onClick={() => setIsAlertModalOpen(false)}
                 >
-                    <div 
+                    <div
                         style={{
                             background: `linear-gradient(135deg, ${COLOR.alertModalStart} 0%, ${COLOR.alertModalEnd} 100%)`,
                             borderRadius: '20px',
@@ -640,7 +639,7 @@ function Dashboard({ role }) {
                             overflowY: 'auto'
                         }}>
                             {latestAlerts.map((alert, index) => (
-                                <div 
+                                <div
                                     key={alert.id}
                                     style={{
                                         background: (ALERT_TYPE_THEME[alert.type] || ALERT_TYPE_THEME.info).bg,

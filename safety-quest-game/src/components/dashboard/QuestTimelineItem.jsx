@@ -17,7 +17,7 @@ const isLoginQuest = (quest) =>
 
 const getActiveButtonLabel = (quest) => {
     const reward = Number(quest?.reward?.points || 0);
-    if (isEducationQuest(quest)) return `퀴즈 풀기 (+${reward}P)`;
+    if (isEducationQuest(quest)) return `영상 시청하기 (+${reward}P)`;
     if (quest?.id?.includes('hazard') || quest?.category === 'photo') return `시작하기 (+${reward}P)`;
     if (quest?.id?.includes('checklist') || quest?.category === 'checklist') return `점검 시작 (+${reward}P)`;
     if (quest?.id?.includes('review') || quest?.category === 'review') return `검토 시작 (+${reward}P)`;
