@@ -89,6 +89,16 @@ function TopProgressHeader({ playerStats, role, onPointsClick, equippedItems, on
                     </div>
                 </div>
 
+                {/* 모바일 전용: 장비 바로가기 버튼 (데스크탑에서는 CSS로 숨김) */}
+                <div className="mobile-equip-shortcuts">
+                    <button type="button" className="mobile-equip-shortcut-btn" onClick={onNavigateAvatar}>
+                        🛠️ 장비 관리
+                    </button>
+                    <button type="button" className="mobile-equip-shortcut-btn" onClick={onNavigateShop}>
+                        🛒 상점 가기
+                    </button>
+                </div>
+
                 <div className="dashboard-alert-inline">
                     <button
                         type="button"

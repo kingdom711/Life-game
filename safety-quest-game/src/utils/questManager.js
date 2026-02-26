@@ -1,4 +1,4 @@
-import { questProgress, points, level, attendanceLogs, weeklyQuestProgress, streak, userProfile, storage, getKSTDateString, getKSTYesterdayString, getKSTDayOfWeek, getKSTDay, getKSTMonth } from './storage';
+import { questProgress, points, level, attendanceLogs, weeklyQuestProgress, dailyQuestSnapshots, streak, userProfile, storage, getKSTDateString, getKSTYesterdayString, getKSTDayOfWeek, getKSTDay, getKSTMonth } from './storage';
 import { getQuestById, dailyQuests, weeklyQuests, monthlyQuests, allQuests, QUEST_TYPE } from '../data/questsData';
 import { addPoints, addExperience } from './pointsCalculator';
 
@@ -214,6 +214,19 @@ export const checkAndResetQuests = () => {
 
     // 일간 리셋 체크 (KST 자정 — 날짜 문자열이 다르면 리셋)
     if (todayStr !== resetDates.daily) {
+        // 리셋 전 이전 날짜 스냅샷 저장 (안전장치)
+        const prevDateStr = resetDates.daily;
+        if (!dailyQuestSnapshots.getByDate(prevDateStr)) {
+            const currentProgress = questProgress.get();
+            const snapshotQuests = dailyQuests.map(q => ({
+                id: q.id,
+                title: q.title || '',
+                isCompleted: currentProgress[q.id]?.completed || false
+            }));
+            dailyQuestSnapshots.save(prevDateStr, snapshotQuests);
+        }
+        dailyQuestSnapshots.cleanOldEntries(14);
+
         resetDailyQuests();
         resetDates.daily = todayStr;
     }

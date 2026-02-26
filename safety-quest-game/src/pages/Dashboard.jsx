@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { points, streak, dailyQuestInstances, userProfile, getKSTDateString, questProgress } from '../utils/storage';
+import { points, streak, dailyQuestInstances, userProfile, getKSTDateString, questProgress, dailyQuestSnapshots } from '../utils/storage';
 import { calculateLevel } from '../utils/pointsCalculator';
 import { getQuestsByTypeRoleAndSpec } from '../data/questsData';
 import { getAllEquippedItems } from '../utils/inventoryManager';
@@ -330,6 +330,13 @@ function Dashboard({ role }) {
             lockReason: isGated ? '교육 완료 후 잠금 해제' : ''
         };
     });
+
+    // 오늘의 퀘스트 수행률 스냅샷 자동 저장
+    useEffect(() => {
+        if (dailyQuests.length === 0) return;
+        const todayStr = getKSTDateString();
+        dailyQuestSnapshots.save(todayStr, enrichedQuests);
+    }, [dailyQuests, educationCompleted]);
 
     const handleStreakCheckIn = (result) => {
         if (!result?.success) {

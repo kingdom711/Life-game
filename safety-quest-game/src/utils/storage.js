@@ -39,6 +39,7 @@ const LEGACY_USER_DATA_KEYS = Array.from(new Set([
     'safety_quest_cumulative_watch_time',
     'safety_quest_session_watch_time',
     'safety_quest_weekly_complete_daily_track',
+    'safety_quest_daily_snapshots',
     'safety_quest_last_reset',
     'safety_quest_migration_version',
     'safety_quest_checklists',
@@ -1310,6 +1311,49 @@ export const weeklyQuestProgress = {
     }
 };
 
+// 일간 퀘스트 스냅샷 (요일별 수행률 조회용)
+export const dailyQuestSnapshots = {
+    getAll: () => {
+        return storage.get('safety_quest_daily_snapshots', {});
+    },
+
+    getByDate: (dateStr) => {
+        const all = dailyQuestSnapshots.getAll();
+        return all[dateStr] || null;
+    },
+
+    save: (dateStr, enrichedQuests) => {
+        const all = dailyQuestSnapshots.getAll();
+        const total = enrichedQuests.length;
+        const completed = enrichedQuests.filter(q => q.isCompleted).length;
+
+        all[dateStr] = {
+            date: dateStr,
+            total,
+            completed,
+            quests: enrichedQuests.map(q => ({
+                id: q.id,
+                title: q.title || '',
+                isCompleted: q.isCompleted
+            }))
+        };
+
+        return storage.set('safety_quest_daily_snapshots', all);
+    },
+
+    cleanOldEntries: (keepDays = 14) => {
+        const all = dailyQuestSnapshots.getAll();
+        const keys = Object.keys(all);
+        if (keys.length <= keepDays) return;
+
+        const sorted = keys.sort();
+        const toRemove = sorted.slice(0, sorted.length - keepDays);
+        toRemove.forEach(key => delete all[key]);
+
+        storage.set('safety_quest_daily_snapshots', all);
+    }
+};
+
 // ===== [New] 마이크로 러닝 교육 시스템 =====
 
 // 법정 교육 시간 (연간 기준)
@@ -1833,6 +1877,7 @@ export default {
     gemsAnalysisLogs,
     attendanceLogs,
     weeklyQuestProgress,
+    dailyQuestSnapshots,
     monthlyAttendance,
     MONTHLY_REWARDS,
     // [New] 교육 시스템
