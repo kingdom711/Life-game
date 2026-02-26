@@ -385,8 +385,12 @@ function Dashboard({ role }) {
             setIsReviewModalOpen(true);
             return;
         }
+        if (quest.id === 'daily_safety_1') {
+            navigate('/risk-solution');
+            return;
+        }
         completeQuest(quest.id);
-        loadData(); // ?덈줈怨좎묠
+        loadData();
     };
 
     if (isLoading) {
