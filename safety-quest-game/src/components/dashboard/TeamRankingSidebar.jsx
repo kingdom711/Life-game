@@ -15,7 +15,7 @@ const RANKING_TYPES = [
 const SOURCE_LABELS = {
     api: '실시간',
     cache: '캐시',
-    fallback: '오프라인'
+    empty: '데이터 없음'
 };
 
 const PODIUM_ORDER = [2, 1, 3];
