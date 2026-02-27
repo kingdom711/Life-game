@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import goldApi from '../api/goldApi';
 import rewardApi from '../api/rewardApi';
+import { useAuth } from '../context/AuthContext';
 import IdentityVerificationModal from '../components/IdentityVerificationModal';
 import { LoadingState, ErrorState, EmptyState, ResultNotice } from '../components/PageState';
 
@@ -62,6 +63,7 @@ const DEFAULT_REWARDS = [
 ];
 
 function RewardCenter() {
+    const { user } = useAuth();
     const [goldBalance, setGoldBalance] = useState(0);
     const [rewards, setRewards] = useState([]);
     const [myRewards, setMyRewards] = useState([]);
@@ -86,7 +88,9 @@ function RewardCenter() {
             ]);
 
             if (goldData.status === 'fulfilled') {
-                setGoldBalance(goldData.value?.balance || 0);
+                const serverBalance = goldData.value?.balance || 0;
+                const mockSpent = rewardApi.getMockGoldSpent();
+                setGoldBalance(Math.max(0, serverBalance - mockSpent));
             }
             if (rewardsData.status === 'fulfilled' && Array.isArray(rewardsData.value) && rewardsData.value.length > 0) {
                 setRewards(rewardsData.value);
@@ -121,22 +125,20 @@ function RewardCenter() {
             return;
         }
 
-        // 본인 인증 체크
+        // 본인 인증 체크 (백엔드 미연동 시 mock 폴백 자동 적용)
         try {
             const { isVerified } = await rewardApi.checkVerificationStatus();
             if (!isVerified) {
-                // 인증 안됨 -> 모달 띄움
                 setPendingReward(reward);
                 setIsVerificationModalOpen(true);
                 return;
             }
-
-            // 인증 됨 -> 교환 진행
             await processExchange(reward);
         } catch (err) {
             console.error('인증 상태 확인 실패:', err);
-            // 에러 시에도 일단 진행 시도하거나 에러 표시 (여기서는 에러 표시)
-            setError('본인 인증 상태를 확인할 수 없습니다.');
+            // 폴백도 실패한 경우 인증 모달을 직접 띄움
+            setPendingReward(reward);
+            setIsVerificationModalOpen(true);
         }
     };
 
@@ -144,12 +146,20 @@ function RewardCenter() {
         try {
             setExchanging(reward.id);
             setError(null);
-            const result = await rewardApi.exchangeReward(reward.id);
+
+            const isDefaultReward = String(reward.id).startsWith('default-');
+            if (isDefaultReward) {
+                // default reward: localStorage에 교환 내역 영속화
+                rewardApi.addMockExchange(reward, { username: user?.username, name: user?.name });
+            } else {
+                await rewardApi.exchangeReward(reward.id);
+            }
+
             setSuccessReward(reward);
             setShowSuccess(true);
             setGoldBalance(prev => prev - reward.goldPrice);
 
-            // 내역 갱신
+            // 내역 갱신 (백엔드 + mock 병합)
             await rewardApi.getMyRewards().then(data => {
                 setMyRewards(Array.isArray(data) ? data : []);
             }).catch(() => { });

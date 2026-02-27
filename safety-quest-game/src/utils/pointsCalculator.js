@@ -348,6 +348,9 @@ export const addExperience = (expAmount) => {
     const newLevelData = level.get();
     const leveledUp = newLevelData.current > oldLevel;
 
+    // 레벨업 시 레벨 이름 정보 추가 (공유 기능용)
+    const newLevelInfo = leveledUp ? calculateLevel() : null;
+
     return {
         exp: expAmount,
         boostedExp,
@@ -355,6 +358,9 @@ export const addExperience = (expAmount) => {
         leveledUp,
         oldLevel,
         newLevel: newLevelData.current,
+        newLevelName: newLevelInfo?.name || null,
+        newLevelTierIcon: newLevelInfo?.tierIcon || null,
+        newLevelColor: newLevelInfo?.color || null,
         currentExp: newLevelData.exp,
         expToNext: newLevelData.expToNext
     };

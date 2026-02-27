@@ -19,7 +19,7 @@ const IdentityVerificationModal = ({ isOpen, onClose, onVerified }) => {
         try {
             await rewardApi.requestVerification(phoneNumber);
             setStep('code');
-            alert(`인증번호가 발송되었습니다. (모의: 개발자 도구 콘솔 확인)`);
+            alert('인증번호가 발송되었습니다. (개발 환경: 브라우저 콘솔에서 인증번호 확인)');
         } catch (err) {
             setError(err.message || '인증번호 발송 실패');
         } finally {
@@ -72,7 +72,7 @@ const IdentityVerificationModal = ({ isOpen, onClose, onVerified }) => {
                     <>
                         <p style={{ color: '#94a3b8', marginBottom: '1rem', fontSize: '0.9rem' }}>
                             상품 교환을 위해 본인 인증이 필요합니다.<br />
-                            (모의 인증: 아무 번호나 입력하세요)
+                            휴대폰 번호를 입력하면 인증번호가 발송됩니다.
                         </p>
                         <input
                             type="tel"

@@ -19,7 +19,11 @@ const STORAGE_KEYS = {
     // [New] 전직(특수역할) 시스템
     SPECIALIZATION_DATA: 'safety_quest_specialization',         // 전직 상태 (활성 전직, 해금 목록)
     SPECIALIZATION_PROGRESS: 'safety_quest_spec_progress',      // 전직 교육 진행 상황
-    SPECIALIZATION_QUIZ_ATTEMPTS: 'safety_quest_spec_quiz_attempts'  // 전직 퀴즈 시도 횟수
+    SPECIALIZATION_QUIZ_ATTEMPTS: 'safety_quest_spec_quiz_attempts',  // 전직 퀴즈 시도 횟수
+    // [New] 날씨 연동 안전 팁
+    WEATHER_CACHE: 'safety_quest_weather_cache',                // 날씨 API 캐시
+    // [New] 사업장 안전 점수
+    SAFETY_SCORE_HISTORY: 'safety_quest_safety_score_history'   // 안전 점수 히스토리
 };
 
 const ACTIVE_USER_KEY = 'safety_quest_active_user';

@@ -23,6 +23,8 @@ import EquipmentSidebar from '../components/dashboard/EquipmentSidebar';
 import WeeklyQuestProgress from '../components/dashboard/WeeklyQuestProgress';
 import TeamRankingSidebar from '../components/dashboard/TeamRankingSidebar';
 import SafetyTipBar from '../components/dashboard/SafetyTipBar';
+import SafetyScoreWidget from '../components/dashboard/SafetyScoreWidget';
+import ShareRewardModal from '../components/ShareRewardModal';
 
 // [New] 援먯쑁 ?쒖뒪??
 import { getTodayEducationContent, hasCompletedTodayEducation } from '../utils/educationManager';
@@ -129,6 +131,7 @@ function Dashboard({ role }) {
     const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
     const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [shareModal, setShareModal] = useState({ isOpen: false, type: null, data: null });
 
     // 愿由ъ옄 沅뚰븳 泥댄겕
     const isAdmin = role === 'supervisor' || role === 'safetyManager';
@@ -488,6 +491,7 @@ function Dashboard({ role }) {
                     </section>
 
                     <aside className="dashboard-side-column">
+                        {isAdmin && <SafetyScoreWidget />}
                         <WeeklyQuestProgress quests={enrichedQuests} />
                         <TeamRankingSidebar onShowLeaderboard={() => setIsLeaderboardOpen(true)} />
                     </aside>
@@ -753,6 +757,13 @@ function Dashboard({ role }) {
                     </div>
                 </div>
             )}
+
+            <ShareRewardModal
+                isOpen={shareModal.isOpen}
+                onClose={() => setShareModal({ isOpen: false, type: null, data: null })}
+                shareType={shareModal.type}
+                shareData={shareModal.data}
+            />
         </div>
     );
 }

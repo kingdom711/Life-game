@@ -4,6 +4,8 @@ import { items, ITEM_CATEGORY, ITEM_RARITY, CATEGORY_NAMES, RARITY_NAMES, getRar
 import { purchaseItem } from '../utils/inventoryManager';
 import { points as pointsStorage, inventory as inventoryStorage } from '../utils/storage';
 import { LoadingState, ErrorState, EmptyState } from '../components/PageState';
+import ShareRewardModal from '../components/ShareRewardModal';
+import { buildItemShareData } from '../utils/shareManager';
 
 const COLOR = {
     text: 'var(--color-text)',
@@ -28,6 +30,7 @@ function Shop() {
     const [ownedItems, setOwnedItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [loadError, setLoadError] = useState('');
+    const [shareModal, setShareModal] = useState({ isOpen: false, type: null, data: null });
 
     useEffect(() => {
         initializeShop();
@@ -58,10 +61,16 @@ function Shop() {
     const handlePurchase = (item) => {
         const result = purchaseItem(item.id);
         if (result.success) {
-            // alert(result.message); // 제거됨
-            loadData(); // 새로고침
+            loadData();
+            // epic 이상 아이템 구매 시 공유 모달 표시
+            if (item.rarity === 'epic' || item.rarity === 'legendary') {
+                setShareModal({
+                    isOpen: true,
+                    type: 'rareItem',
+                    data: buildItemShareData(item)
+                });
+            }
         } else {
-            // alert(result.message); // 제거됨
             console.log(result.message);
         }
     };
@@ -268,6 +277,13 @@ function Shop() {
                     </div>
                 )}
             </div>
+
+            <ShareRewardModal
+                isOpen={shareModal.isOpen}
+                onClose={() => setShareModal({ isOpen: false, type: null, data: null })}
+                shareType={shareModal.type}
+                shareData={shareModal.data}
+            />
         </div>
     );
 }

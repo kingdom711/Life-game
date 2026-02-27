@@ -9,6 +9,8 @@ import {
     executeClassChange
 } from '../utils/specializationManager';
 import { specializationProgress as specProgressStorage } from '../utils/storage';
+import ShareRewardModal from '../components/ShareRewardModal';
+import { buildSpecializationShareData } from '../utils/shareManager';
 
 /**
  * 전직 교육 페이지
@@ -30,6 +32,7 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
     const [quizResult, setQuizResult] = useState(null);
     const [showClassChangeModal, setShowClassChangeModal] = useState(false);
     const [classChangeResult, setClassChangeResult] = useState(null);
+    const [shareModal, setShareModal] = useState({ isOpen: false, data: null });
     const [watchedTime, setWatchedTime] = useState(0);
     const [maxWatchedTime, setMaxWatchedTime] = useState(0);
     const [isMobileViewport, setIsMobileViewport] = useState(
@@ -789,19 +792,44 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                             <p style={{ color: 'var(--color-text-secondary)', margin: '0.75rem 0 1.5rem' }}>
                                 {classChangeResult.message}
                             </p>
-                            <button
-                                className="btn btn-primary"
-                                style={{ width: '100%', background: spec.bgGradient }}
-                                onClick={() => {
-                                    setClassChangeResult(null);
-                                    handleBack();
-                                }}
-                            >
-                                전직 센터로 돌아가기
-                            </button>
+                            <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
+                                <button
+                                    className="btn btn-primary"
+                                    style={{ width: '100%', background: spec.bgGradient }}
+                                    onClick={() => {
+                                        setClassChangeResult(null);
+                                        setShareModal({
+                                            isOpen: true,
+                                            data: buildSpecializationShareData(spec.name)
+                                        });
+                                    }}
+                                >
+                                    공유하기 🔗
+                                </button>
+                                <button
+                                    className="btn btn-secondary"
+                                    style={{ width: '100%' }}
+                                    onClick={() => {
+                                        setClassChangeResult(null);
+                                        handleBack();
+                                    }}
+                                >
+                                    전직 센터로 돌아가기
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}
+
+                <ShareRewardModal
+                    isOpen={shareModal.isOpen}
+                    onClose={() => {
+                        setShareModal({ isOpen: false, data: null });
+                        handleBack();
+                    }}
+                    shareType="specialization"
+                    shareData={shareModal.data}
+                />
             </div>
         </div>
     );

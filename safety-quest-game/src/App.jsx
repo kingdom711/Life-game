@@ -27,6 +27,8 @@ import Exchange from './pages/Exchange'; // [New] 포인트→골드 교환소
 import RewardCenter from './pages/RewardCenter'; // [New] 보상센터
 import HazardCyclePage from './pages/HazardCyclePage';
 import CycleHistoryPage from './pages/CycleHistoryPage';
+import SafetyScoreDashboard from './pages/SafetyScoreDashboard';
+import AdminRewardApproval from './pages/AdminRewardApproval';
 
 // Components
 import RoleSelector from './components/RoleSelector';
@@ -253,6 +255,8 @@ function App() {
                                     <Route path="/education" element={<EducationPage />} />
                                     <Route path="/specialization" element={<SpecializationPage role={selectedRole} />} />
                                     <Route path="/specialization/training/:specId" element={<SpecializationTrainingPage />} />
+                                    <Route path="/safety-score" element={<SafetyScoreDashboard role={selectedRole} />} />
+                                    <Route path="/admin/reward-approval" element={<AdminRewardApproval />} />
                                     <Route path="*" element={<Navigate to="/" replace />} />
                                 </Routes>
                             </div>

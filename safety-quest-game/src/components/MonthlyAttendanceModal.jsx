@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { monthlyAttendance, MONTHLY_REWARDS, points } from '../utils/storage';
+import ShareRewardModal from './ShareRewardModal';
+import { buildMonthlyAttendanceShareData } from '../utils/shareManager';
 
 const MonthlyAttendanceModal = ({ isOpen, onClose }) => {
     const [attendanceData, setAttendanceData] = useState(null);
     const [claimAnimation, setClaimAnimation] = useState(null);
+    const [shareModal, setShareModal] = useState({ isOpen: false, data: null });
 
     useEffect(() => {
         if (isOpen) {
@@ -23,6 +26,13 @@ const MonthlyAttendanceModal = ({ isOpen, onClose }) => {
             setTimeout(() => {
                 setClaimAnimation(null);
                 loadAttendanceData();
+                // 14일 이상 출석 보상 수령 시 공유 모달 표시
+                if (rewardDay >= 14) {
+                    setShareModal({
+                        isOpen: true,
+                        data: buildMonthlyAttendanceShareData(rewardDay)
+                    });
+                }
             }, 1000);
         }
     };
@@ -130,6 +140,13 @@ const MonthlyAttendanceModal = ({ isOpen, onClose }) => {
                     <p>🔄 매월 1일에 자동으로 초기화됩니다.</p>
                 </div>
             </div>
+
+            <ShareRewardModal
+                isOpen={shareModal.isOpen}
+                onClose={() => setShareModal({ isOpen: false, data: null })}
+                shareType="monthlyAttendance"
+                shareData={shareModal.data}
+            />
         </div>
     );
 };
