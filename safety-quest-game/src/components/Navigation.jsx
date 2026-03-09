@@ -31,14 +31,10 @@ function Navigation() {
     const isAdmin = currentRole === 'supervisor' || currentRole === 'safetyManager';
 
     const navItems = [
-        { path: '/', label: '홈', icon: '🏠', active: location.pathname === '/' },
-        { path: '/education', label: '교육', icon: '📚', active: location.pathname === '/education', badge: !educationCompleted },
-        { path: '/hazard-cycle', label: '사이클', icon: '⚠️', active: location.pathname.startsWith('/hazard-cycle') },
-        ...(isTechnician ? [{ path: '/specialization', label: '전직', icon: '⚔️', active: location.pathname.startsWith('/specialization') }] : []),
-        ...(isAdmin ? [{ path: '/safety-score', label: '안전점수', icon: '📊', active: location.pathname === '/safety-score' }] : []),
-        ...(user?.username === 'admin' ? [{ path: '/admin/reward-approval', label: '보상승인', icon: '✅', active: location.pathname === '/admin/reward-approval' }] : []),
-        { path: '/daily', label: '일간', icon: '📅', active: location.pathname === '/daily' },
-        { path: '/profile', label: '프로필', icon: '👤', active: location.pathname === '/profile' }
+        { path: '/shop', label: '상점', icon: '🛒', active: location.pathname === '/shop' },
+        { path: '/inventory', label: '인벤토리', icon: '🎒', active: location.pathname === '/inventory' },
+        { path: '/profile', label: '보상센터', icon: '🏆', active: location.pathname === '/profile' },
+        { path: '/daily', label: '더보기', icon: '⊞', active: ['/daily', '/education', '/hazard-cycle', '/specialization', '/safety-score'].some(p => location.pathname.startsWith(p)) }
     ];
 
     return (

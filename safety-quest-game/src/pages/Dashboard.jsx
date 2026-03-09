@@ -17,14 +17,17 @@ import LeaderboardModal from '../components/LeaderboardModal';
 import { LoadingState, ErrorState } from '../components/PageState';
 import { getAlerts } from '../api/alertApi';
 import userApi from '../api/userApi';
-import TopProgressHeader from '../components/dashboard/TopProgressHeader';
-import QuestTimeline from '../components/dashboard/QuestTimeline';
-import EquipmentSidebar from '../components/dashboard/EquipmentSidebar';
-import WeeklyQuestProgress from '../components/dashboard/WeeklyQuestProgress';
-import TeamRankingSidebar from '../components/dashboard/TeamRankingSidebar';
-import SafetyTipBar from '../components/dashboard/SafetyTipBar';
-import SafetyScoreWidget from '../components/dashboard/SafetyScoreWidget';
 import ShareRewardModal from '../components/ShareRewardModal';
+
+// New dashboard components
+import UserProfileCard from '../components/dashboard/UserProfileCard';
+import TodayMissions from '../components/dashboard/TodayMissions';
+import SiteInfoSection from '../components/dashboard/SiteInfoSection';
+import MyGrowthStats from '../components/dashboard/MyGrowthStats';
+import EquippedGearDisplay from '../components/dashboard/EquippedGearDisplay';
+import RecentRewards from '../components/dashboard/RecentRewards';
+import OurTeamSection from '../components/dashboard/OurTeamSection';
+import QuickNavigation from '../components/dashboard/QuickNavigation';
 
 // [New] 援먯쑁 ?쒖뒪??
 import { getTodayEducationContent, hasCompletedTodayEducation } from '../utils/educationManager';
@@ -425,79 +428,36 @@ function Dashboard({ role }) {
 
     return (
         <div className="page dashboard-page">
-            {/* 배경 GIF - 화면 중앙 고정 */}
-            <div
-                style={{
-                    position: 'fixed',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '100vw',
-                    height: '100vh',
-                    zIndex: 0,
-                    pointerEvents: 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden'
-                }}
-            >
-                <img
-                    src="/assets/안전_관리_대시보드_배경_영상.gif"
-                    alt="배경"
-                    style={{
-                        width: 'auto',
-                        height: 'auto',
-                        maxWidth: '100%',
-                        maxHeight: '100%',
-                        objectFit: 'contain',
-                        opacity: 0.3
-                    }}
-                />
-            </div>
-
             <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-                <TopProgressHeader
-                    playerStats={playerStats}
-                    role={role}
-                    onPointsClick={() => setIsPointsHistoryModalOpen(true)}
-                    equippedItems={equippedItems}
-                    onNavigateShop={() => navigate('/shop')}
-                    onNavigateAvatar={() => setIsAvatarWindowOpen(true)}
-                    latestAlerts={latestAlerts}
-                    hasNewAlerts={hasNewAlerts}
-                    onAlertClick={() => {
-                        setIsAlertModalOpen(true);
-                        setHasNewAlerts(false);
-                    }}
-                    onCheckIn={handleStreakCheckIn}
-                    onShowMonthlyRewards={() => setIsMonthlyModalOpen(true)}
-                />
-
-                <div className="dashboard-content-layout">
-                    <section className="dashboard-main-column">
-                        <h2 className="dashboard-quest-heading">
-                            오늘의 안전 퀘스트
-                            <span>(Today's Safety Quests)</span>
-                        </h2>
-                        <QuestTimeline
+                <div className="new-dashboard-layout">
+                    {/* Left main column */}
+                    <main className="new-dashboard-left">
+                        <UserProfileCard
+                            playerStats={playerStats}
+                            role={role}
+                            equippedItems={equippedItems}
+                            educationCompleted={educationCompleted}
+                        />
+                        <TodayMissions
                             quests={enrichedQuests}
                             onQuestAction={handleCompleteQuest}
-                            todayEducation={todayEducation}
-                            educationCompleted={educationCompleted}
-                            onCheckIn={handleStreakCheckIn}
-                            onOpenMonthlyRewards={() => setIsMonthlyModalOpen(true)}
                         />
-                    </section>
+                        <SiteInfoSection alerts={latestAlerts} />
+                    </main>
 
-                    <aside className="dashboard-side-column">
-                        {isAdmin && <SafetyScoreWidget />}
-                        <WeeklyQuestProgress quests={enrichedQuests} />
-                        <TeamRankingSidebar onShowLeaderboard={() => setIsLeaderboardOpen(true)} />
+                    {/* Right sidebar */}
+                    <aside className="new-dashboard-right">
+                        <MyGrowthStats
+                            points={Number(playerStats?.points || 0)}
+                            safetyScore={92}
+                            ranking={3}
+                        />
+                        <EquippedGearDisplay equippedItems={equippedItems} />
+                        <RecentRewards />
+                        <OurTeamSection weeklyProgress={78} />
+                        <QuickNavigation alertCount={latestAlerts.length} />
                     </aside>
                 </div>
-
-                <SafetyTipBar />
             </div>
             <HazardQuestModal
                 isOpen={isHazardModalOpen}
