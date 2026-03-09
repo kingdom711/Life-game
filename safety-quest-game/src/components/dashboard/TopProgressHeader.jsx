@@ -33,72 +33,83 @@ function TopProgressHeader({ playerStats, role, onPointsClick, equippedItems, on
         : '(Max level reached)';
 
     return (
-        <header className="top-progress-header">
-            <div className="top-progress-box-logo">
-                <img src="/assets/safety_road_logo-removebg-preview.png" alt="안전의 길" className="top-progress-logo-icon" />
-                <span className="top-progress-logo-text">안전의 길</span>
-            </div>
+        <div className="top-progress-wrapper">
+            <header className="top-progress-header">
+                <div className="top-progress-box-logo">
+                    <img src="/assets/safety_road_logo-removebg-preview.png" alt="안전의 길" className="top-progress-logo-icon" />
+                    <span className="top-progress-logo-text">안전의 길</span>
+                </div>
 
-            <div className="top-progress-center-column">
-                <div className="top-progress-box-info">
-                    <div className="top-progress-profile">
-                        <Link to="/profile" className="top-progress-profile-link">
-                            <div className="top-progress-avatar-wrap">
-                                <Avatar size={40} roleId={role} equippedItems={{}} />
-                            </div>
-                            <div className="top-progress-user-line">{displayName}</div>
-                        </Link>
-                        <div className="top-progress-profile-content">
-                            <div className="top-progress-level-line">Level: {levelName}</div>
-                            <div className="top-progress-level-track" aria-label="Level progress">
-                                <span
-                                    className="top-progress-level-fill"
-                                    style={{
-                                        width: `${Math.max(0, Math.min(100, levelProgress))}%`,
-                                        background: `linear-gradient(90deg, ${levelColor}, ${levelColor}aa)`
-                                    }}
-                                />
-                            </div>
-                            <div className="top-progress-next-level">{nextLevelText}</div>
+                <div className="top-progress-center-column">
+                    <div className="top-progress-box-info">
+                        <div className="top-progress-profile">
+                            <Link to="/profile" className="top-progress-profile-link">
+                                <div className="top-progress-avatar-wrap">
+                                    <Avatar size={40} roleId={role} equippedItems={{}} />
+                                </div>
+                                <div className="top-progress-user-line">{displayName}</div>
+                            </Link>
+                            <div className="top-progress-profile-content">
+                                <div className="top-progress-level-line">Level: {levelName}</div>
+                                <div className="top-progress-level-track" aria-label="Level progress">
+                                    <span
+                                        className="top-progress-level-fill"
+                                        style={{
+                                            width: `${Math.max(0, Math.min(100, levelProgress))}%`,
+                                            background: `linear-gradient(90deg, ${levelColor}, ${levelColor}aa)`
+                                        }}
+                                    />
+                                </div>
+                                <div className="top-progress-next-level">{nextLevelText}</div>
 
-                            {/* 포인트 & 스트릭 — 레벨 바 아래로 이동 */}
-                            <div className="top-progress-metrics">
-                                <button
-                                    type="button"
-                                    className="top-progress-metric-btn"
-                                    onClick={onPointsClick}
-                                    aria-label="포인트 내역 보기"
-                                >
-                                    <span className="metric-icon" aria-hidden="true">💰</span>
-                                    <span className="metric-value">{formatPoints(pointsValue)}P</span>
-                                </button>
-                                <div className="top-progress-metric">
-                                    <span className="metric-icon" aria-hidden="true">🔥</span>
-                                    <span className="metric-value">{streakDays}Days</span>
+                                {/* 포인트 & 스트릭 — 레벨 바 아래로 이동 */}
+                                <div className="top-progress-metrics">
+                                    <button
+                                        type="button"
+                                        className="top-progress-metric-btn"
+                                        onClick={onPointsClick}
+                                        aria-label="포인트 내역 보기"
+                                    >
+                                        <span className="metric-icon" aria-hidden="true">💰</span>
+                                        <span className="metric-value">{formatPoints(pointsValue)}P</span>
+                                    </button>
+                                    <div className="top-progress-metric">
+                                        <span className="metric-icon" aria-hidden="true">🔥</span>
+                                        <span className="metric-value">{streakDays}Days</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* 출석체크 버튼 — 빨간 박스 위치 */}
-                    <div className="top-progress-checkin-area">
-                        <StreakButton
-                            onCheckIn={onCheckIn}
-                            onShowMonthlyRewards={onShowMonthlyRewards}
-                        />
+                    {/* 모바일 전용: 장비 바로가기 버튼 (데스크탑에서는 CSS로 숨김) */}
+                    <div className="mobile-equip-shortcuts">
+                        <button type="button" className="mobile-equip-shortcut-btn" onClick={onNavigateAvatar}>
+                            🛠️ 장비 관리
+                        </button>
+                        <button type="button" className="mobile-equip-shortcut-btn" onClick={onNavigateShop}>
+                            🛒 상점 가기
+                        </button>
                     </div>
                 </div>
 
-                {/* 모바일 전용: 장비 바로가기 버튼 (데스크탑에서는 CSS로 숨김) */}
-                <div className="mobile-equip-shortcuts">
-                    <button type="button" className="mobile-equip-shortcut-btn" onClick={onNavigateAvatar}>
-                        🛠️ 장비 관리
-                    </button>
-                    <button type="button" className="mobile-equip-shortcut-btn" onClick={onNavigateShop}>
-                        🛒 상점 가기
-                    </button>
+                <div className="top-progress-box-equip">
+                    <EquipmentSidebar
+                        equippedItems={equippedItems}
+                        onNavigateShop={onNavigateShop}
+                        onNavigateAvatar={onNavigateAvatar}
+                    />
                 </div>
+            </header>
 
+            {/* 스트릭 + 실시간 알림: 헤더 하단 별도 행 */}
+            <div className="top-progress-sub-row">
+                <div className="top-progress-checkin-area">
+                    <StreakButton
+                        onCheckIn={onCheckIn}
+                        onShowMonthlyRewards={onShowMonthlyRewards}
+                    />
+                </div>
                 <div className="dashboard-alert-inline">
                     <button
                         type="button"
@@ -115,15 +126,7 @@ function TopProgressHeader({ playerStats, role, onPointsClick, equippedItems, on
                     </button>
                 </div>
             </div>
-
-            <div className="top-progress-box-equip">
-                <EquipmentSidebar
-                    equippedItems={equippedItems}
-                    onNavigateShop={onNavigateShop}
-                    onNavigateAvatar={onNavigateAvatar}
-                />
-            </div>
-        </header>
+        </div>
     );
 }
 

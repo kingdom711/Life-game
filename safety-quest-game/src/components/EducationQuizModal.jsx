@@ -1,19 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import educationApi from '../api/educationApi';
 
 /**
  * 교육 퀴즈 모달 컴포넌트
- * 
+ *
  * 특징:
  * - 문제별 즉시 피드백
  * - 해설 표시
  * - 최종 점수 계산
  * - 합격/불합격 결과
  * - 남은 시도 횟수 표시
+ * - [교육 수료 증거] 문항별 답안 + 소요 시간 서버 저장
  */
 const EducationQuizModal = ({
     isOpen,
     onClose,
     quiz,
+    educationId,
     educationTitle,
     requiredScore = 80,
     remainingAttempts = 3,
@@ -27,6 +30,12 @@ const EducationQuizModal = ({
     const [quizResult, setQuizResult] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // ─── [교육 수료 증거] 문항별 소요 시간 추적 ──────────────────────
+    // { questionId → { selectedOption, timeSpentSec } }
+    const detailedAnswers = useRef({});
+    const questionStartTime = useRef(null);   // 현재 문항 시작 시각
+    const attemptNumberRef  = useRef(1);      // 현재 시도 번호
+
     // 모달이 닫힐 때 상태 초기화
     useEffect(() => {
         if (!isOpen) {
@@ -36,8 +45,17 @@ const EducationQuizModal = ({
             setSelectedAnswer(null);
             setIsAnswered(false);
             setQuizResult(null);
+            detailedAnswers.current = {};
+            questionStartTime.current = null;
         }
     }, [isOpen]);
+
+    // 문항이 바뀔 때 시작 시각 기록
+    useEffect(() => {
+        if (isOpen) {
+            questionStartTime.current = Date.now();
+        }
+    }, [currentQuestionIndex, isOpen]);
 
     if (!isOpen || !quiz || quiz.length === 0) return null;
 
@@ -49,12 +67,23 @@ const EducationQuizModal = ({
     const handleSelectAnswer = (optionIndex) => {
         if (isAnswered) return;
 
+        // [교육 수료 증거] 소요 시간 계산
+        const timeSpentSec = questionStartTime.current
+            ? Math.floor((Date.now() - questionStartTime.current) / 1000)
+            : null;
+
         setSelectedAnswer(optionIndex);
         setIsAnswered(true);
         setAnswers(prev => ({
             ...prev,
             [currentQuestion.id]: optionIndex
         }));
+
+        // [교육 수료 증거] 상세 답안 누적
+        detailedAnswers.current[currentQuestion.id] = {
+            selectedOption: optionIndex,
+            timeSpentSec,
+        };
     };
 
     // 다음 문제로 이동
@@ -66,14 +95,35 @@ const EducationQuizModal = ({
             setCurrentQuestionIndex(prev => prev + 1);
             setSelectedAnswer(null);
             setIsAnswered(false);
+            // 다음 문항 시작 시각은 useEffect에서 자동 갱신
         }
     };
 
     // 퀴즈 제출
     const handleSubmitQuiz = async () => {
         setIsSubmitting(true);
-        
+
         try {
+            // [교육 수료 증거] 퀴즈 답안 서버 저장 (fire-and-forget)
+            if (educationId) {
+                const answersPayload = Object.entries(detailedAnswers.current).map(
+                    ([questionId, { selectedOption, timeSpentSec }]) => ({
+                        questionId,
+                        selectedOption,
+                        timeSpentSec,
+                    })
+                );
+
+                educationApi.submitQuizAnswers({
+                    educationId,
+                    attemptNumber: attemptNumberRef.current,
+                    answers: answersPayload,
+                }).catch(() => {
+                    // 네트워크 오류 시 조용히 무시 (퀴즈 UX 방해 안 함)
+                });
+            }
+
+            // 부모 컴포넌트의 결과 처리
             const result = await onSubmit(answers);
             setQuizResult(result);
             setShowResult(true);
@@ -82,6 +132,19 @@ const EducationQuizModal = ({
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    // 재도전 시 시도 번호 증가 및 상태 초기화
+    const handleRetry = () => {
+        attemptNumberRef.current += 1;
+        detailedAnswers.current = {};
+        setShowResult(false);
+        setCurrentQuestionIndex(0);
+        setAnswers({});
+        setSelectedAnswer(null);
+        setIsAnswered(false);
+        setQuizResult(null);
+        questionStartTime.current = Date.now();
     };
 
     // 현재 답변이 정답인지 확인
@@ -106,8 +169,8 @@ const EducationQuizModal = ({
                             {quizResult.passed ? '축하합니다!' : '아쉽습니다'}
                         </h2>
                         <p className="text-gray-400">
-                            {quizResult.passed 
-                                ? '안전 교육 퀴즈를 통과했습니다!' 
+                            {quizResult.passed
+                                ? '안전 교육 퀴즈를 통과했습니다!'
                                 : `${requiredScore}점 이상이 필요합니다.`
                             }
                         </p>
@@ -184,8 +247,8 @@ const EducationQuizModal = ({
                                 <div
                                     key={result.questionId}
                                     className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm ${
-                                        result.isCorrect 
-                                            ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                                        result.isCorrect
+                                            ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                                             : 'bg-red-500/20 text-red-400 border border-red-500/30'
                                     }`}
                                     title={result.isCorrect ? '정답' : '오답'}
@@ -200,14 +263,7 @@ const EducationQuizModal = ({
                     <div className="flex gap-3">
                         {!quizResult.passed && quizResult.remainingAttempts > 0 && (
                             <button
-                                onClick={() => {
-                                    setShowResult(false);
-                                    setCurrentQuestionIndex(0);
-                                    setAnswers({});
-                                    setSelectedAnswer(null);
-                                    setIsAnswered(false);
-                                    setQuizResult(null);
-                                }}
+                                onClick={handleRetry}
                                 className="flex-1 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-colors"
                             >
                                 다시 도전
@@ -216,8 +272,8 @@ const EducationQuizModal = ({
                         <button
                             onClick={onClose}
                             className={`flex-1 py-3 font-bold rounded-xl transition-colors ${
-                                quizResult.passed 
-                                    ? 'bg-green-500 hover:bg-green-600 text-white' 
+                                quizResult.passed
+                                    ? 'bg-green-500 hover:bg-green-600 text-white'
                                     : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
                             }`}
                         >
@@ -249,7 +305,7 @@ const EducationQuizModal = ({
 
                 {/* 진행률 바 */}
                 <div className="h-1 bg-gray-700">
-                    <div 
+                    <div
                         className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
                         style={{ width: `${progressPercent}%` }}
                     />
@@ -278,7 +334,7 @@ const EducationQuizModal = ({
                     <div className="space-y-3 mb-6">
                         {currentQuestion.options.map((option, index) => {
                             let buttonStyle = 'bg-gray-800 hover:bg-gray-700 border-gray-600 text-gray-300';
-                            
+
                             if (isAnswered) {
                                 if (index === currentQuestion.correctAnswer) {
                                     buttonStyle = 'bg-green-500/20 border-green-500 text-green-400';
@@ -321,8 +377,8 @@ const EducationQuizModal = ({
                     {/* 해설 (답변 후 표시) */}
                     {isAnswered && (
                         <div className={`rounded-xl p-4 mb-6 ${
-                            isCorrect 
-                                ? 'bg-green-500/10 border border-green-500/30' 
+                            isCorrect
+                                ? 'bg-green-500/10 border border-green-500/30'
                                 : 'bg-orange-500/10 border border-orange-500/30'
                         }`}>
                             <div className={`font-bold mb-2 flex items-center gap-2 ${
@@ -343,10 +399,10 @@ const EducationQuizModal = ({
                             disabled={isSubmitting}
                             className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold rounded-xl transition-all disabled:opacity-50"
                         >
-                            {isSubmitting 
-                                ? '제출 중...' 
-                                : isLastQuestion 
-                                    ? '결과 확인' 
+                            {isSubmitting
+                                ? '제출 중...'
+                                : isLastQuestion
+                                    ? '결과 확인'
                                     : '다음 문제'
                             }
                         </button>

@@ -1,11 +1,19 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import YouTubeEducationPlayer from './YouTubeEducationPlayer';
+import educationApi from '../api/educationApi';
+
+// 체크포인트 전송 간격 (30초)
+const CHECKPOINT_INTERVAL_MS = 30_000;
 
 /**
  * 교육 비디오 플레이어 컴포넌트 (래퍼)
- * 
+ *
  * YouTube 비디오 ID가 있으면 YouTubeEducationPlayer를 사용하고,
  * 없으면 기존 로컬 비디오 플레이어를 사용합니다.
+ *
+ * 추가 기능 (교육 수료 증거 기록):
+ * - 30초 간격으로 시청 체크포인트를 서버에 전송
+ * - 탭 비활성화(포커스 아웃) 이벤트 감지 및 기록
  */
 const EducationVideoPlayer = (props) => {
     const { youtubeVideoId, ...restProps } = props;
@@ -21,14 +29,17 @@ const EducationVideoPlayer = (props) => {
 
 /**
  * 로컬 비디오 플레이어 컴포넌트
- * 
+ *
  * 특징:
  * - 시청 시간 실시간 추적
  * - 빨리감기 방지 (이전 최대 시청 위치 기준)
  * - 진행률 표시
  * - 90% 이상 시청 시 완료 처리
+ * - [교육 수료 증거] 30초 간격 서버 체크포인트 전송
+ * - [교육 수료 증거] 탭 비활성화 감지 및 서버 기록
  */
 const LocalVideoPlayer = ({
+    educationId,
     videoUrl,
     duration,
     requiredWatchTime,
@@ -48,6 +59,66 @@ const LocalVideoPlayer = ({
     const [isMuted, setIsMuted] = useState(false);
     const [showControls, setShowControls] = useState(true);
     const controlsTimeoutRef = useRef(null);
+
+    // ─── [교육 수료 증거] 체크포인트 관련 ref ─────────────────────────
+    const isPlayingRef   = useRef(false);   // interval 내에서 최신 상태 참조
+    const currentTimeRef = useRef(0);       // interval 내에서 최신 재생 위치 참조
+    const tabVisibleRef  = useRef(true);    // 탭 활성화 여부
+    const checkpointIntervalRef = useRef(null);
+
+    // ─── [교육 수료 증거] 탭 가시성 변경 감지 ────────────────────────
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            const visible = document.visibilityState === 'visible';
+            tabVisibleRef.current = visible;
+
+            // 탭이 숨겨지면 영상 일시정지 + 체크포인트 즉시 전송
+            if (!visible) {
+                videoRef.current?.pause();
+                sendCheckpoint(false);
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [educationId]);
+
+    // ─── [교육 수료 증거] 30초 체크포인트 인터벌 ─────────────────────
+    useEffect(() => {
+        checkpointIntervalRef.current = setInterval(() => {
+            // 재생 중일 때만 전송 (불필요한 요청 방지)
+            if (isPlayingRef.current && educationId) {
+                sendCheckpoint(true);
+            }
+        }, CHECKPOINT_INTERVAL_MS);
+
+        return () => {
+            if (checkpointIntervalRef.current) {
+                clearInterval(checkpointIntervalRef.current);
+            }
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [educationId]);
+
+    /**
+     * 체크포인트 서버 전송 (fire-and-forget, 실패해도 플레이어 동작에 영향 없음)
+     */
+    const sendCheckpoint = useCallback((playing) => {
+        if (!educationId) return;
+
+        educationApi.saveCheckpoint({
+            educationId,
+            checkpointSec: Math.floor(currentTimeRef.current),
+            totalSec:      Math.floor(duration),
+            isPlaying:     playing,
+            tabVisible:    tabVisibleRef.current,
+        }).catch(() => {
+            // 네트워크 오류 시 조용히 무시 (플레이어 UX 방해 안 함)
+        });
+    }, [educationId, duration]);
+
+    // ─── 기존 로직 (진행률, 완료 체크) ──────────────────────────────
 
     // 진행률 계산
     useEffect(() => {
@@ -70,6 +141,7 @@ const LocalVideoPlayer = ({
 
         const currentVideoTime = video.currentTime;
         setCurrentTime(currentVideoTime);
+        currentTimeRef.current = currentVideoTime; // ref 동기화
 
         // 빨리감기 감지 (최대 시청 위치 + 3초 이상 점프 시)
         const maxAllowedJump = 3;
@@ -99,9 +171,13 @@ const LocalVideoPlayer = ({
         if (video.paused) {
             video.play();
             setIsPlaying(true);
+            isPlayingRef.current = true;
         } else {
             video.pause();
             setIsPlaying(false);
+            isPlayingRef.current = false;
+            // 일시정지 시 즉시 체크포인트 전송
+            sendCheckpoint(false);
         }
     };
 
@@ -182,10 +258,19 @@ const LocalVideoPlayer = ({
                 className="w-full aspect-video"
                 src={videoUrl}
                 onTimeUpdate={handleTimeUpdate}
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
+                onPlay={() => {
+                    setIsPlaying(true);
+                    isPlayingRef.current = true;
+                }}
+                onPause={() => {
+                    setIsPlaying(false);
+                    isPlayingRef.current = false;
+                }}
                 onEnded={() => {
                     setIsPlaying(false);
+                    isPlayingRef.current = false;
+                    // 영상 종료 시 최종 체크포인트 전송
+                    sendCheckpoint(false);
                     if (maxWatchedTime >= requiredWatchTime) {
                         onVideoComplete?.();
                     }

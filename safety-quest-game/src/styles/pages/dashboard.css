@@ -552,13 +552,35 @@
   }
 }
 
+.top-progress-wrapper {
+  margin-top: 1rem;
+  animation: dashboardSlideDown 0.45s ease-out both;
+}
+
 .top-progress-header {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: stretch;
   gap: 0.8rem;
-  margin-top: 1rem;
-  animation: dashboardSlideDown 0.45s ease-out both;
+}
+
+.top-progress-sub-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.top-progress-sub-row .top-progress-checkin-area {
+  flex: 0 0 auto;
+  min-width: 180px;
+  max-width: 260px;
+}
+
+.top-progress-sub-row .dashboard-alert-inline {
+  flex: 1;
+  min-width: 0;
+  margin-top: 0;
 }
 
 .top-progress-box-logo {
@@ -702,23 +724,41 @@
 }
 
 .top-progress-checkin-area {
-  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  max-width: 100%;
 }
 
 .top-progress-checkin-area .streak-button-container {
   width: 100%;
+  max-width: none;
+  margin: 0;
 }
 
 .top-progress-checkin-area .btn-streak {
   width: 100%;
-  min-height: 44px;
-  border-radius: 14px;
-  padding: 0.6rem 1rem;
+  min-height: unset;
+  border-radius: 12px;
+  padding: 0.5rem 0.8rem;
+}
+
+/* sub-row 내 스트릭 버튼: 가로형 컴팩트 */
+.top-progress-sub-row .streak-content {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.top-progress-sub-row .streak-content .icon {
+  font-size: 1.2rem;
+}
+
+.top-progress-sub-row .streak-content .text {
+  font-size: 0.82rem;
+}
+
+.top-progress-sub-row .streak-content .count {
+  font-size: 0.72rem;
 }
 
 .top-progress-metric-btn,
@@ -1570,22 +1610,22 @@
 
 @media (min-width: 640px) {
   .top-progress-header {
-    grid-template-columns: 140px minmax(200px, 1fr) auto;
+    grid-template-columns: 110px minmax(200px, 1fr) auto;
     align-items: stretch;
-    gap: 0.8rem;
+    gap: 0.6rem;
   }
 
   .top-progress-box-logo {
-    padding: 0.8rem 1rem;
+    padding: 0.6rem 0.8rem;
   }
 
   .top-progress-logo-icon {
-    width: 4rem;
-    height: 4rem;
+    width: 3.5rem;
+    height: 3.5rem;
   }
 
   .top-progress-logo-text {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 
   .dashboard-content-layout {
@@ -1600,28 +1640,27 @@
   }
 
   .top-progress-header {
-    grid-template-columns: 170px minmax(0, 1fr) auto;
+    grid-template-columns: 140px minmax(0, 1fr) auto;
     gap: 1rem;
   }
 
   .top-progress-box-logo {
-    padding: 1.2rem 1.5rem;
+    padding: 1rem 1.2rem;
   }
 
   .top-progress-logo-icon {
-    width: clamp(4.5rem, 7vw, 6.5rem);
-    height: clamp(4.5rem, 7vw, 6.5rem);
+    width: clamp(4rem, 6vw, 5.5rem);
+    height: clamp(4rem, 6vw, 5.5rem);
   }
 
   .top-progress-logo-text {
-    font-size: clamp(1.3rem, 1.8vw, 1.65rem);
+    font-size: clamp(1.1rem, 1.5vw, 1.4rem);
   }
 
-  /* 데스크탑: 프로필 + 체크인 가로 배치 복원 */
+  /* 데스크탑: 프로필 가로 배치 */
   .top-progress-box-info {
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
   }
 
   .top-progress-profile {
@@ -1630,15 +1669,14 @@
     gap: 0.75rem;
   }
 
-  .top-progress-checkin-area {
-    min-width: 180px;
-    max-width: 260px;
-    width: auto;
+  .top-progress-sub-row .top-progress-checkin-area {
+    min-width: 200px;
+    max-width: 280px;
   }
 
-  .top-progress-checkin-area .btn-streak {
-    min-height: 56px;
-    padding: 1.5rem;
+  .top-progress-sub-row .top-progress-checkin-area .btn-streak {
+    min-height: 48px;
+    padding: 0.8rem 1.2rem;
   }
 }
 
@@ -1660,11 +1698,11 @@
     display: none;
   }
 
-  /* 프로필 + 체크인: 세로 배치 */
+  /* 프로필 정보만 */
   .top-progress-box-info {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.6rem;
+    gap: 0.5rem;
     padding: 0.8rem;
   }
 
@@ -1674,16 +1712,21 @@
     gap: 0.6rem;
   }
 
-  /* 체크인 영역: 전폭 */
-  .top-progress-checkin-area {
+  /* sub-row: 세로 스택 */
+  .top-progress-sub-row {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .top-progress-sub-row .top-progress-checkin-area {
     min-width: unset;
     max-width: 100%;
     width: 100%;
   }
 
-  .top-progress-checkin-area .btn-streak {
-    min-height: 48px;
-    padding: 0.8rem 1rem;
+  .top-progress-sub-row .top-progress-checkin-area .btn-streak {
+    min-height: 44px;
+    padding: 0.6rem 1rem;
   }
 
   /* 레벨 트랙: 전폭 */
