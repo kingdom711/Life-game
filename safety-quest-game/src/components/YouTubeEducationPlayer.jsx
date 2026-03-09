@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { storage } from '../utils/storage';
+import { educationProgress } from '../utils/storage';
 
 /**
  * YouTube 교육 비디오 플레이어 컴포넌트
@@ -18,9 +18,6 @@ const YouTubeEducationPlayer = ({
     const playerRef = useRef(null);
     const timeCheckIntervalRef = useRef(null);
 
-    // localStorage 키
-    const STORAGE_KEY = 'safety_quest_cumulative_watch_time';
-
     const [isReady, setIsReady] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
@@ -29,16 +26,13 @@ const YouTubeEducationPlayer = ({
 
     // localStorage에서 누적 시간 불러오기
     const loadCumulativeTime = useCallback(() => {
-        const data = storage.get(STORAGE_KEY, {});
-        return data[educationId] || 0;
+        return educationProgress.getCumulativeWatchTime(educationId);
     }, [educationId]);
 
     // localStorage에 누적 시간 저장
     const saveCumulativeTime = useCallback((time) => {
         try {
-            const data = storage.get(STORAGE_KEY, {});
-            data[educationId] = time;
-            storage.set(STORAGE_KEY, data);
+            educationProgress.updateCumulativeWatchTime(educationId, time);
         } catch (e) {
             console.warn('누적 시간 저장 실패:', e);
         }

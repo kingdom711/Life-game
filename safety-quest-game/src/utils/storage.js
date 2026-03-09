@@ -1367,19 +1367,42 @@ export const LEGAL_EDUCATION_REQUIREMENTS = {
     MONTHLY_MINIMUM: 0.33      // 월별 최소 권장 시간 (20분)
 };
 
+const createEmptyEducationProgress = () => ({
+    currentEducationId: null,
+    progressDate: null,
+    watchedTime: 0,
+    maxWatchedTime: 0,
+    cumulativeWatchedTime: 0,
+    baseCumulativeWatchedTime: 0,
+    videoCompleted: false,
+    quizCompleted: false,
+    quizScore: 0,
+    startedAt: null,
+    lastUpdatedAt: null
+});
+
 // 교육 진행 상태 관리
 export const educationProgress = {
     get: () => {
-        return storage.get(STORAGE_KEYS.EDUCATION_PROGRESS, {
-            currentEducationId: null,
-            watchedTime: 0,
-            maxWatchedTime: 0,
-            videoCompleted: false,
-            quizCompleted: false,
-            quizScore: 0,
-            startedAt: null,
-            lastUpdatedAt: null
-        });
+        const today = getKSTDateString();
+        const progress = storage.get(STORAGE_KEYS.EDUCATION_PROGRESS, createEmptyEducationProgress());
+
+        if (progress.currentEducationId && progress.progressDate !== today) {
+            const resetProgress = createEmptyEducationProgress();
+            storage.set(STORAGE_KEYS.EDUCATION_PROGRESS, resetProgress);
+            return resetProgress;
+        }
+
+        return {
+            ...createEmptyEducationProgress(),
+            ...progress,
+            progressDate: progress.progressDate || null,
+            watchedTime: toSafeInt(progress.watchedTime),
+            maxWatchedTime: toSafeInt(progress.maxWatchedTime),
+            cumulativeWatchedTime: toSafeInt(progress.cumulativeWatchedTime),
+            baseCumulativeWatchedTime: toSafeInt(progress.baseCumulativeWatchedTime),
+            quizScore: toSafeInt(progress.quizScore)
+        };
     },
 
     set: (progress) => {
@@ -1389,58 +1412,66 @@ export const educationProgress = {
     // 교육별 누적 시청 시간 저장소 키
     getCumulativeStorageKey: () => 'safety_quest_cumulative_watch_time',
 
+    getDailyEntryKey: (educationId, dateKey = getKSTDateString()) => `${dateKey}::${educationId}`,
+
     // 교육별 누적 시청 시간 가져오기
-    getCumulativeWatchTime: (educationId) => {
+    getCumulativeWatchTime: (educationId, dateKey = getKSTDateString()) => {
         const data = storage.get(educationProgress.getCumulativeStorageKey(), {});
-        return data[educationId] || 0;
+        return toSafeInt(data[educationProgress.getDailyEntryKey(educationId, dateKey)]);
     },
 
     // 교육별 누적 시청 시간 업데이트
-    updateCumulativeWatchTime: (educationId, watchedTime) => {
+    updateCumulativeWatchTime: (educationId, watchedTime, dateKey = getKSTDateString()) => {
         const data = storage.get(educationProgress.getCumulativeStorageKey(), {});
-        const currentCumulative = data[educationId] || 0;
-        // 이번 세션에서 더 많이 봤다면 그 차이만큼 누적
-        if (watchedTime > currentCumulative) {
-            data[educationId] = watchedTime;
+        const entryKey = educationProgress.getDailyEntryKey(educationId, dateKey);
+        const currentCumulative = toSafeInt(data[entryKey]);
+        const normalizedWatchedTime = toSafeInt(watchedTime);
+
+        if (normalizedWatchedTime > currentCumulative) {
+            data[entryKey] = normalizedWatchedTime;
             storage.set(educationProgress.getCumulativeStorageKey(), data);
         }
-        return data[educationId];
+
+        return toSafeInt(data[entryKey]);
     },
 
     // 세션 시청 시간 추적 (현재 재생 세션에서 시청한 시간)
     getSessionStorageKey: () => 'safety_quest_session_watch_time',
 
-    getSessionWatchTime: (educationId) => {
+    getSessionWatchTime: (educationId, dateKey = getKSTDateString()) => {
         const data = storage.get(educationProgress.getSessionStorageKey(), {});
-        return data[educationId] || 0;
+        return toSafeInt(data[educationProgress.getDailyEntryKey(educationId, dateKey)]);
     },
 
-    updateSessionWatchTime: (educationId, sessionTime) => {
+    updateSessionWatchTime: (educationId, sessionTime, dateKey = getKSTDateString()) => {
         const data = storage.get(educationProgress.getSessionStorageKey(), {});
-        data[educationId] = sessionTime;
+        data[educationProgress.getDailyEntryKey(educationId, dateKey)] = toSafeInt(sessionTime);
         storage.set(educationProgress.getSessionStorageKey(), data);
-        return sessionTime;
+        return toSafeInt(sessionTime);
     },
 
-    resetSessionWatchTime: (educationId) => {
+    resetSessionWatchTime: (educationId, dateKey = getKSTDateString()) => {
         const data = storage.get(educationProgress.getSessionStorageKey(), {});
-        data[educationId] = 0;
+        data[educationProgress.getDailyEntryKey(educationId, dateKey)] = 0;
         storage.set(educationProgress.getSessionStorageKey(), data);
     },
 
     // 교육 시작
     startEducation: (educationId) => {
+        const today = getKSTDateString();
         // 기존 누적 시청 시간 불러오기
-        const cumulativeTime = educationProgress.getCumulativeWatchTime(educationId);
+        const cumulativeTime = educationProgress.getCumulativeWatchTime(educationId, today);
 
         // 새 세션 시작 - 세션 시청 시간 초기화
-        educationProgress.resetSessionWatchTime(educationId);
+        educationProgress.resetSessionWatchTime(educationId, today);
 
         const progress = {
             currentEducationId: educationId,
+            progressDate: today,
             watchedTime: 0,
             maxWatchedTime: 0,  // 세션 내 최대 위치 (빨리감기 방지용)
             cumulativeWatchedTime: cumulativeTime,  // 누적 시청 시간
+            baseCumulativeWatchedTime: cumulativeTime,
             videoCompleted: false,
             quizCompleted: false,
             quizScore: 0,
@@ -1452,24 +1483,33 @@ export const educationProgress = {
     },
 
     // 시청 시간 업데이트
-    updateWatchTime: (watchedTime) => {
+    updateWatchTime: (watchedTime, trackedWatchedTime = null) => {
         const progress = educationProgress.get();
         const educationId = progress.currentEducationId;
+        const progressDate = progress.progressDate || getKSTDateString();
+
+        if (!educationId) {
+            return progress;
+        }
 
         progress.watchedTime = watchedTime;
         progress.maxWatchedTime = Math.max(progress.maxWatchedTime, watchedTime);
 
-        // 세션 시청 시간 업데이트
-        const sessionTime = educationProgress.updateSessionWatchTime(educationId, watchedTime);
+        let cumulativeTime;
 
-        // 누적 시청 시간 계산: 기존 누적 + 이번 세션
-        const previousCumulative = educationProgress.getCumulativeWatchTime(educationId);
-        // 이번 세션에서 새로 본 시간만 추가 (영상 처음부터 다시 보면 추가됨)
-        const newCumulative = previousCumulative + sessionTime;
+        if (Number.isFinite(trackedWatchedTime) && trackedWatchedTime >= 0) {
+            cumulativeTime = toSafeInt(trackedWatchedTime);
+            const sessionTime = Math.max(0, cumulativeTime - progress.baseCumulativeWatchedTime);
+            educationProgress.updateSessionWatchTime(educationId, sessionTime, progressDate);
+        } else {
+            const sessionTime = educationProgress.updateSessionWatchTime(educationId, watchedTime, progressDate);
+            cumulativeTime = progress.baseCumulativeWatchedTime + sessionTime;
+        }
 
-        progress.cumulativeWatchedTime = newCumulative;
+        progress.cumulativeWatchedTime = cumulativeTime;
         progress.lastUpdatedAt = new Date().toISOString();
 
+        educationProgress.updateCumulativeWatchTime(educationId, cumulativeTime, progressDate);
         educationProgress.set(progress);
         return progress;
     },
@@ -1478,12 +1518,19 @@ export const educationProgress = {
     completeVideo: () => {
         const progress = educationProgress.get();
         const educationId = progress.currentEducationId;
+        const progressDate = progress.progressDate || getKSTDateString();
+
+        if (!educationId) {
+            return progress;
+        }
 
         // 최종 누적 시간 저장
-        const sessionTime = educationProgress.getSessionWatchTime(educationId);
-        const previousCumulative = educationProgress.getCumulativeWatchTime(educationId);
-        educationProgress.updateCumulativeWatchTime(educationId, previousCumulative + sessionTime);
+        const sessionTime = educationProgress.getSessionWatchTime(educationId, progressDate);
+        const fallbackCumulative = progress.baseCumulativeWatchedTime + sessionTime;
+        const finalCumulative = Math.max(progress.cumulativeWatchedTime, fallbackCumulative);
+        educationProgress.updateCumulativeWatchTime(educationId, finalCumulative, progressDate);
 
+        progress.cumulativeWatchedTime = finalCumulative;
         progress.videoCompleted = true;
         progress.lastUpdatedAt = new Date().toISOString();
         educationProgress.set(progress);
@@ -1502,17 +1549,7 @@ export const educationProgress = {
 
     // 진행 상태 초기화 (다음 교육을 위해)
     reset: () => {
-        return educationProgress.set({
-            currentEducationId: null,
-            watchedTime: 0,
-            maxWatchedTime: 0,
-            cumulativeWatchedTime: 0,
-            videoCompleted: false,
-            quizCompleted: false,
-            quizScore: 0,
-            startedAt: null,
-            lastUpdatedAt: null
-        });
+        return educationProgress.set(createEmptyEducationProgress());
     }
 };
 
@@ -1555,7 +1592,7 @@ export const educationHistory = {
         const history = educationHistory.get();
         const today = getLocalDateString();
         return history.filter(record =>
-            record.completedAt.split('T')[0] === today
+            extractDateOnly(record.completedAt) === today
         );
     },
 
@@ -1568,10 +1605,9 @@ export const educationHistory = {
     // 이번 달 완료한 교육
     getThisMonthCompleted: () => {
         const history = educationHistory.get();
-        const now = new Date();
-        const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const currentMonth = getKSTMonth();
         return history.filter(record =>
-            record.completedAt.startsWith(currentMonth)
+            extractDateOnly(record.completedAt)?.startsWith(currentMonth)
         );
     },
 

@@ -75,9 +75,10 @@ export const startEducation = (educationId) => {
  * 시청 시간 업데이트
  * @param {number} currentTime - 현재 시청 시간 (초)
  * @param {number} maxAllowedJump - 허용 최대 점프 시간 (초, 빨리감기 방지)
+ * @param {number|null} trackedWatchedTime - 플레이어가 계산한 누적 시청 시간 (초)
  * @returns {Object} 업데이트 결과
  */
-export const updateWatchTime = (currentTime, maxAllowedJump = 5) => {
+export const updateWatchTime = (currentTime, trackedWatchedTime = null, maxAllowedJump = 5) => {
     const progress = educationProgress.get();
 
     if (!progress.currentEducationId) {
@@ -95,7 +96,7 @@ export const updateWatchTime = (currentTime, maxAllowedJump = 5) => {
         };
     }
 
-    const updatedProgress = educationProgress.updateWatchTime(currentTime);
+    const updatedProgress = educationProgress.updateWatchTime(currentTime, trackedWatchedTime);
 
     return {
         success: true,
@@ -465,6 +466,7 @@ export const getCurrentProgress = () => {
         progress: {
             watchedTime: progress.watchedTime,
             maxWatchedTime: progress.maxWatchedTime,
+            cumulativeWatchedTime: progress.cumulativeWatchedTime,
             watchProgress: education
                 ? Math.round((progress.maxWatchedTime / education.duration) * 100)
                 : 0,

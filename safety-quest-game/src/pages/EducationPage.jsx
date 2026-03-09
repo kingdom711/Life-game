@@ -13,8 +13,7 @@ import {
     getLegalHoursProgress,
     getCurrentProgress,
     getAllEducationsWithStatus,
-    getCumulativeWatchTime,
-    saveCumulativeWatchTime
+    getCumulativeWatchTime
 } from '../utils/educationManager';
 import { CATEGORY_INFO } from '../data/educationData';
 import { quizAttempts, getKSTDateString } from '../utils/storage';
@@ -33,8 +32,6 @@ const EducationPage = () => {
     const [showQuizModal, setShowQuizModal] = useState(false);
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [legalProgress, setLegalProgress] = useState(null);
-    const [watchedTime, setWatchedTime] = useState(0);
-    const [maxWatchedTime, setMaxWatchedTime] = useState(0);
     const [cumulativeWatchedTime, setCumulativeWatchedTime] = useState(0);  // 누적 시청 시간
     const [alreadyCompleted, setAlreadyCompleted] = useState(false);
     const [remainingAttempts, setRemainingAttempts] = useState(3);
@@ -69,8 +66,7 @@ const EducationPage = () => {
         // Reset transient UI state so day rollover does not keep old progress UI.
         setIsEducationStarted(false);
         setVideoCompleted(false);
-        setWatchedTime(0);
-        setMaxWatchedTime(0);
+        setCumulativeWatchedTime(0);
 
         const completed = hasCompletedTodayEducation();
         setAlreadyCompleted(completed);
@@ -79,15 +75,24 @@ const EducationPage = () => {
         setLegalProgress(progress);
 
         const currentProgress = getCurrentProgress();
-        if (currentProgress.inProgress && currentProgress.education?.id === education?.id) {
-            setIsEducationStarted(true);
-            setVideoCompleted(currentProgress.progress.videoCompleted);
-            setMaxWatchedTime(currentProgress.progress.maxWatchedTime);
+        if (education) {
             const cumulative = getCumulativeWatchTime(education.id);
             setCumulativeWatchedTime(cumulative);
-        } else if (education) {
-            const cumulative = getCumulativeWatchTime(education.id);
-            setCumulativeWatchedTime(cumulative);
+
+            const hasSavedWatchProgress = cumulative > 0;
+            const isSameEducationInProgress =
+                currentProgress.inProgress && currentProgress.education?.id === education.id;
+
+            if (isSameEducationInProgress) {
+                setIsEducationStarted(true);
+                setVideoCompleted(
+                    currentProgress.progress.videoCompleted ||
+                    cumulative >= education.requiredWatchTime
+                );
+            } else {
+                setIsEducationStarted(hasSavedWatchProgress);
+                setVideoCompleted(cumulative >= education.requiredWatchTime);
+            }
         }
 
         if (education) {
@@ -117,25 +122,17 @@ const EducationPage = () => {
 
     // 시청 시간 업데이트
     const handleTimeUpdate = useCallback((currentTime, totalWatchedTime) => {
-        setWatchedTime(currentTime);
-        setMaxWatchedTime(totalWatchedTime);
         setCumulativeWatchedTime(totalWatchedTime);  // 누적 시간 state 업데이트
-
-        // 누적 시간 localStorage에 저장
-        if (todayEducation) {
-            saveCumulativeWatchTime(todayEducation.id, totalWatchedTime);
-        }
-
-        updateWatchTime(currentTime);
-    }, [todayEducation]);
+        updateWatchTime(currentTime, totalWatchedTime);
+    }, []);
 
     // 영상 시청 완료
     const handleVideoComplete = useCallback(() => {
-        const result = completeVideo(maxWatchedTime);
+        const result = completeVideo(cumulativeWatchedTime);
         if (result.success) {
             setVideoCompleted(true);
         }
-    }, [maxWatchedTime]);
+    }, [cumulativeWatchedTime]);
 
     // 빨리감기 시도
     const handleSeekAttempt = useCallback(() => {
@@ -321,13 +318,16 @@ const EducationPage = () => {
                             {isEducationStarted ? (
                                 <div className="space-y-4">
                                     <EducationVideoPlayer
+                                        key={todayEducation.id}
                                         videoUrl={todayEducation.videoUrl}
                                         youtubeVideoId={todayEducation.youtubeVideoId}
                                         educationId={todayEducation.id}
                                         duration={todayEducation.duration}
                                         requiredWatchTime={todayEducation.requiredWatchTime}
+                                        initialWatchedTime={cumulativeWatchedTime}
                                         onTimeUpdate={handleTimeUpdate}
                                         onVideoComplete={handleVideoComplete}
+                                        onSeekAttempt={handleSeekAttempt}
                                     />
 
                                     {/* 퀴즈 시작 버튼 */}

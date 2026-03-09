@@ -38,7 +38,7 @@ const EducationVideoPlayer = (props) => {
  * - [교육 수료 증거] 30초 간격 서버 체크포인트 전송
  * - [교육 수료 증거] 탭 비활성화 감지 및 서버 기록
  */
-const LocalVideoPlayer = ({
+    const LocalVideoPlayer = ({
     educationId,
     videoUrl,
     duration,
@@ -53,7 +53,7 @@ const LocalVideoPlayer = ({
     const [currentTime, setCurrentTime] = useState(0);
     const [maxWatchedTime, setMaxWatchedTime] = useState(initialWatchedTime);
     const [progress, setProgress] = useState(0);
-    const [isCompleted, setIsCompleted] = useState(false);
+    const [isCompleted, setIsCompleted] = useState(initialWatchedTime >= requiredWatchTime);
     const [showSeekWarning, setShowSeekWarning] = useState(false);
     const [volume, setVolume] = useState(1);
     const [isMuted, setIsMuted] = useState(false);
@@ -155,12 +155,16 @@ const LocalVideoPlayer = ({
         }
 
         // 최대 시청 시간 업데이트
-        if (currentVideoTime > maxWatchedTime) {
-            setMaxWatchedTime(currentVideoTime);
+        const nextWatchedTime = currentVideoTime > maxWatchedTime
+            ? currentVideoTime
+            : maxWatchedTime;
+
+        if (nextWatchedTime !== maxWatchedTime) {
+            setMaxWatchedTime(nextWatchedTime);
         }
 
         // 부모에게 시간 업데이트 알림
-        onTimeUpdate?.(currentVideoTime, maxWatchedTime);
+        onTimeUpdate?.(currentVideoTime, nextWatchedTime);
     }, [maxWatchedTime, onTimeUpdate, onSeekAttempt]);
 
     // 재생/일시정지 토글
