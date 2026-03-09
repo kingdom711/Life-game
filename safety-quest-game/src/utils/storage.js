@@ -61,6 +61,10 @@ const parseJSON = (value, defaultValue = null) => {
 };
 
 const normalizeText = (value) => (value || '').toString().trim().toLowerCase();
+const normalizeProfileText = (value) => {
+    const text = (value || '').toString().trim();
+    return text || null;
+};
 
 const toActiveUser = (user = null) => {
     if (!user) return null;
@@ -318,15 +322,39 @@ export const storage = {
 // 사용자 프로필
 export const userProfile = {
     get: () => {
-        return storage.get(STORAGE_KEYS.USER_PROFILE, {
-            role: null,
-            name: null,
-            joinDate: new Date().toISOString()
-        });
+        const storedProfile = storage.get(STORAGE_KEYS.USER_PROFILE, {});
+        const legacyAffiliation = normalizeProfileText(localStorage.getItem('companyName'));
+        const affiliation =
+            normalizeProfileText(storedProfile.affiliation ?? storedProfile.companyName) || legacyAffiliation;
+
+        return {
+            role: storedProfile.role ?? null,
+            name: storedProfile.name ?? null,
+            affiliation,
+            companyName: affiliation,
+            joinDate: storedProfile.joinDate || new Date().toISOString()
+        };
     },
 
-    set: (profile) => {
-        return storage.set(STORAGE_KEYS.USER_PROFILE, profile);
+    set: (profile = {}) => {
+        const currentProfile = userProfile.get();
+        const affiliation =
+            normalizeProfileText(profile.affiliation ?? profile.companyName ?? currentProfile.affiliation);
+        const nextProfile = {
+            ...currentProfile,
+            ...profile,
+            affiliation,
+            companyName: affiliation,
+            joinDate: profile.joinDate || currentProfile.joinDate || new Date().toISOString()
+        };
+
+        if (affiliation) {
+            localStorage.setItem('companyName', affiliation);
+        } else {
+            localStorage.removeItem('companyName');
+        }
+
+        return storage.set(STORAGE_KEYS.USER_PROFILE, nextProfile);
     },
 
     getRole: () => {
@@ -348,6 +376,18 @@ export const userProfile = {
     setName: (name) => {
         const profile = userProfile.get();
         profile.name = name;
+        return userProfile.set(profile);
+    },
+
+    getAffiliation: () => {
+        const profile = userProfile.get();
+        return profile.affiliation;
+    },
+
+    setAffiliation: (affiliation) => {
+        const profile = userProfile.get();
+        profile.affiliation = affiliation;
+        profile.companyName = affiliation;
         return userProfile.set(profile);
     }
 };

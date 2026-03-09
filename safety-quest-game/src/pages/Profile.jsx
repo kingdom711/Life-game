@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { points, level, streak, userProfile, storage } from '../utils/storage';
 import { calculateLevel, getPointsToNextLevel, TIERS } from '../utils/pointsCalculator';
 import { getRoleById } from '../data/rolesData';
@@ -18,6 +18,8 @@ const COLOR = {
 function Profile({ role }) {
     const { logout } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+    const affiliationInputRef = useRef(null);
 
     const [stats, setStats] = useState({
         points: 0,
@@ -40,10 +42,20 @@ function Profile({ role }) {
         inventory: {},
         profile: {}
     });
+    const [affiliationInput, setAffiliationInput] = useState('');
+    const [affiliationError, setAffiliationError] = useState('');
+    const [affiliationMessage, setAffiliationMessage] = useState('');
+    const shouldSetupAffiliation = new URLSearchParams(location.search).get('setup') === 'affiliation';
 
     useEffect(() => {
         loadData();
     }, []);
+
+    useEffect(() => {
+        if (shouldSetupAffiliation) {
+            affiliationInputRef.current?.focus();
+        }
+    }, [shouldSetupAffiliation]);
 
     const loadData = () => {
         const currentPoints = points.get();
@@ -52,6 +64,8 @@ function Profile({ role }) {
         const streakData = streak.get();
         const inventoryStats = getInventoryStats();
         const profileData = userProfile.get();
+
+        setAffiliationInput(profileData.affiliation || profileData.companyName || '');
 
         setStats({
             points: currentPoints,
@@ -75,6 +89,37 @@ function Profile({ role }) {
     };
 
     const roleInfo = getRoleById(role);
+    const currentAffiliation = stats.profile.affiliation || stats.profile.companyName || '';
+    const hasAffiliation = Boolean(currentAffiliation);
+
+    const handleAffiliationSubmit = (e) => {
+        e.preventDefault();
+
+        const normalizedAffiliation = affiliationInput.trim();
+        if (!normalizedAffiliation) {
+            setAffiliationError('소속을 입력해주세요.');
+            setAffiliationMessage('');
+            affiliationInputRef.current?.focus();
+            return;
+        }
+
+        userProfile.setAffiliation(normalizedAffiliation);
+        setStats(prev => ({
+            ...prev,
+            profile: {
+                ...prev.profile,
+                affiliation: normalizedAffiliation,
+                companyName: normalizedAffiliation
+            }
+        }));
+        setAffiliationInput(normalizedAffiliation);
+        setAffiliationError('');
+        setAffiliationMessage('소속이 저장되었습니다.');
+
+        if (shouldSetupAffiliation) {
+            navigate('/profile', { replace: true });
+        }
+    };
 
     return (
         <div className="page">
@@ -84,6 +129,21 @@ function Profile({ role }) {
                         ← 대시보드로 돌아가기
                     </Link>
                 </div>
+                {shouldSetupAffiliation && (
+                    <div
+                        className="card"
+                        style={{
+                            marginBottom: '1rem',
+                            borderColor: 'var(--color-primary)',
+                            background: 'rgba(59, 130, 246, 0.08)'
+                        }}
+                    >
+                        <div className="card-body">
+                            <div style={{ fontWeight: 700, marginBottom: '0.35rem' }}>역할 선택이 완료되었습니다.</div>
+                            <div className="text-muted">대시보드에 표시할 소속을 먼저 입력해 주세요.</div>
+                        </div>
+                    </div>
+                )}
                 {/* ... existing header code ... */}
                 <div className="mb-8 text-center">
                     <div className="text-7xl mb-4 h-40 flex items-center justify-center relative">
@@ -104,9 +164,90 @@ function Profile({ role }) {
                     </div>
                     <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-green-600 
                       via-teal-600 to-green-600 bg-clip-text text-transparent">
-                        {stats.profile.name}
+                        {stats.profile.name || '사용자'}
                     </h1>
                     <p className="text-slate-600 text-lg">{roleInfo?.name}</p>
+                    {hasAffiliation && (
+                        <p className="text-slate-500 text-sm" style={{ marginTop: '0.5rem' }}>
+                            {currentAffiliation}
+                        </p>
+                    )}
+                </div>
+
+                <div
+                    className="card"
+                    style={{
+                        marginBottom: '1.5rem',
+                        borderColor: shouldSetupAffiliation || !hasAffiliation ? 'var(--color-primary)' : 'var(--color-border)'
+                    }}
+                >
+                    <div className="card-header">
+                        <h3 className="card-title">🏢 소속 설정</h3>
+                    </div>
+                    <div className="card-body">
+                        <p className="text-muted mb-md">
+                            회원가입 단계에서는 받지 않고, 역할 선택 후 프로필에서 입력하도록 구성했습니다.
+                        </p>
+                        <form onSubmit={handleAffiliationSubmit}>
+                            <div className="mb-md">
+                                <label className="font-bold mb-sm" style={{ display: 'block' }}>
+                                    소속
+                                </label>
+                                <input
+                                    ref={affiliationInputRef}
+                                    type="text"
+                                    value={affiliationInput}
+                                    onChange={(e) => {
+                                        setAffiliationInput(e.target.value);
+                                        if (affiliationError) {
+                                            setAffiliationError('');
+                                        }
+                                        if (affiliationMessage) {
+                                            setAffiliationMessage('');
+                                        }
+                                    }}
+                                    className="form-input"
+                                    placeholder="예: 한화건설 · 3공구 철근팀"
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.75rem',
+                                        borderRadius: 'var(--radius-md)',
+                                        border: '1px solid var(--color-border)',
+                                        background: 'var(--color-bg-lighter)',
+                                        color: 'var(--color-text)',
+                                        fontSize: '1rem'
+                                    }}
+                                />
+                            </div>
+
+                            <p className="text-muted" style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>
+                                입력한 값은 대시보드 프로필 카드와 교육 이수 증명서 소속 정보에 사용됩니다.
+                            </p>
+
+                            {affiliationError && (
+                                <div className="text-danger mb-sm font-bold">
+                                    {affiliationError}
+                                </div>
+                            )}
+
+                            {affiliationMessage && (
+                                <div className="mb-sm font-bold" style={{ color: 'var(--color-success)' }}>
+                                    {affiliationMessage}
+                                </div>
+                            )}
+
+                            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                                <button type="submit" className="btn btn-primary btn-sm">
+                                    {hasAffiliation ? '소속 업데이트' : '소속 저장'}
+                                </button>
+                                {shouldSetupAffiliation && (
+                                    <Link to="/" className="btn btn-secondary btn-sm">
+                                        나중에 입력하고 대시보드로
+                                    </Link>
+                                )}
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
                 {/* 레벨 정보 */}

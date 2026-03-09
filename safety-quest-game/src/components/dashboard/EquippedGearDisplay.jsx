@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 const GEAR_DISPLAY = [
     { key: 'helmet', label: '안전모', icon: '🪖' },
     { key: 'vest', label: '안전조끼', icon: '🦺' },
@@ -6,13 +8,14 @@ const GEAR_DISPLAY = [
 ];
 
 function EquippedGearDisplay({ equippedItems = {} }) {
+    const navigate = useNavigate();
     const equippedCategories = Object.values(equippedItems).reduce((acc, item) => {
         if (item?.category) acc[item.category] = true;
         return acc;
     }, {});
 
     return (
-        <div className="new-gear-section">
+        <div className="new-gear-section new-gear-section--clickable" onClick={() => navigate('/inventory')} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && navigate('/inventory')}>
             <h3 className="new-gear-title">
                 <span className="new-gear-title-icon">🛡️</span>
                 장착 안전장비

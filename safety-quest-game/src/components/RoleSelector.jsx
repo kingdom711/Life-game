@@ -1,6 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import { roles } from '../data/rolesData';
 
 function RoleSelector({ onSelectRole }) {
+    const navigate = useNavigate();
+
     return (
         <div className="page" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
             <div className="container">
@@ -11,6 +14,9 @@ function RoleSelector({ onSelectRole }) {
                     </h1>
                     <p className="text-muted" style={{ fontSize: '1.25rem' }}>
                         역할을 선택하여 안전관리 퀘스트를 시작하세요
+                    </p>
+                    <p className="text-muted" style={{ fontSize: '0.95rem', marginTop: '0.75rem' }}>
+                        역할 선택 후 프로필에서 소속을 입력할 수 있습니다
                     </p>
                 </div>
 
@@ -54,7 +60,10 @@ function RoleSelector({ onSelectRole }) {
 
                             <div className="card-footer">
                                 <button
-                                    onClick={() => onSelectRole(role.id)}
+                                    onClick={() => {
+                                        onSelectRole(role.id);
+                                        navigate('/profile?setup=affiliation');
+                                    }}
                                     className="btn btn-primary"
                                     style={{
                                         width: '100%',

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const ALERT_ICONS = {
     danger: '⚠️',
@@ -12,7 +13,8 @@ const SAFETY_QUOTES = [
     { text: '"한 번의 확인이 사고를 예방한다"', author: '현장 격언' },
 ];
 
-function SiteInfoSection({ alerts = [] }) {
+function SiteInfoSection({ alerts = [], alertCount = 0 }) {
+    const navigate = useNavigate();
     const [weatherData] = useState({
         temp: 18,
         warning: '오후 강풍 주의',
@@ -33,7 +35,20 @@ function SiteInfoSection({ alerts = [] }) {
 
     return (
         <div className="new-siteinfo-section">
-            <h2 className="new-siteinfo-title">현장 정보</h2>
+            <div className="new-siteinfo-header">
+                <h2 className="new-siteinfo-title">현장 정보</h2>
+                <button
+                    type="button"
+                    className="new-siteinfo-alert-btn"
+                    onClick={() => navigate('/alert-management')}
+                >
+                    <span className="new-siteinfo-alert-btn-icon">🔔</span>
+                    {alertCount > 0 && (
+                        <span className="new-siteinfo-alert-btn-badge">{alertCount}</span>
+                    )}
+                    <span className="new-siteinfo-alert-btn-text">알림 상세</span>
+                </button>
+            </div>
 
             <div className="new-siteinfo-alerts">
                 {displayAlerts.map((alert, i) => (

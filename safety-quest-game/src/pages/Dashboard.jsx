@@ -442,7 +442,7 @@ function Dashboard({ role }) {
                             quests={enrichedQuests}
                             onQuestAction={handleCompleteQuest}
                         />
-                        <SiteInfoSection alerts={latestAlerts} />
+                        <SiteInfoSection alerts={latestAlerts} alertCount={latestAlerts.length} />
                     </main>
 
                     {/* Right sidebar */}
@@ -455,7 +455,7 @@ function Dashboard({ role }) {
                         <EquippedGearDisplay equippedItems={equippedItems} />
                         <RecentRewards />
                         <OurTeamSection weeklyProgress={78} />
-                        <QuickNavigation alertCount={latestAlerts.length} />
+                        <QuickNavigation />
                     </aside>
                 </div>
             </div>

@@ -8,8 +8,6 @@ const ROLE_LABELS = {
     safetyManager: '안전관리자'
 };
 
-const COMPANY_INFO = '한화건설 · 3공구 철근팀';
-
 function UserProfileCard({ playerStats, role, equippedItems, educationCompleted }) {
     const pointsValue = Number(playerStats?.points || 0);
     const levelInfo = playerStats?.level || {};
@@ -18,6 +16,7 @@ function UserProfileCard({ playerStats, role, equippedItems, educationCompleted 
     const levelRank = levelInfo.rank || 1;
     const streakDays = Number(playerStats?.streak?.current || 0);
     const displayName = userProfile.getName() || '김현수';
+    const affiliation = userProfile.getAffiliation();
     const safetyScore = 92; // TODO: integrate with safetyScoreCalculator
 
     const currentXP = pointsValue;
@@ -43,7 +42,13 @@ function UserProfileCard({ playerStats, role, equippedItems, educationCompleted 
                             <span className="new-profile-name">{displayName}</span>
                             <span className="new-profile-role-badge">{ROLE_LABELS[role] || '기술인'}</span>
                         </div>
-                        <div className="new-profile-company">{COMPANY_INFO}</div>
+                        {affiliation ? (
+                            <div className="new-profile-company">{affiliation}</div>
+                        ) : (
+                            <Link to="/profile?setup=affiliation" className="new-profile-company">
+                                소속 미입력 · 프로필에서 설정
+                            </Link>
+                        )}
                     </div>
                 </div>
                 <div className="new-profile-streak-badge">
