@@ -28,6 +28,7 @@ import EquippedGearDisplay from '../components/dashboard/EquippedGearDisplay';
 import RecentRewards from '../components/dashboard/RecentRewards';
 import OurTeamSection from '../components/dashboard/OurTeamSection';
 import QuickNavigation from '../components/dashboard/QuickNavigation';
+import DashboardHeader from '../components/dashboard/DashboardHeader';
 
 // [New] 援먯쑁 ?쒖뒪??
 import { getTodayEducationContent, hasCompletedTodayEducation } from '../utils/educationManager';
@@ -429,6 +430,7 @@ function Dashboard({ role }) {
     return (
         <div className="page dashboard-page">
             <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+                <DashboardHeader playerStats={playerStats} role={role} />
                 <div className="new-dashboard-layout">
                     {/* Left main column */}
                     <main className="new-dashboard-left">

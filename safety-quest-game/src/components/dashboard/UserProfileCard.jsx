@@ -51,10 +51,6 @@ function UserProfileCard({ playerStats, role, equippedItems, educationCompleted 
                         )}
                     </div>
                 </div>
-                <div className="new-profile-streak-badge">
-                    <span className="new-profile-streak-icon">🔥</span>
-                    <span className="new-profile-streak-value">{streakDays}일</span>
-                </div>
             </div>
 
             <div className="new-profile-stats-row">
@@ -71,10 +67,6 @@ function UserProfileCard({ playerStats, role, equippedItems, educationCompleted 
                             style={{ width: `${Math.max(0, Math.min(100, levelProgress))}%` }}
                         />
                     </div>
-                </div>
-                <div className="new-profile-safety-score">
-                    <span className="new-profile-safety-label">안전점수</span>
-                    <span className="new-profile-safety-value">{safetyScore}</span>
                 </div>
             </div>
 

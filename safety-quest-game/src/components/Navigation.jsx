@@ -31,10 +31,11 @@ function Navigation() {
     const isAdmin = currentRole === 'supervisor' || currentRole === 'safetyManager';
 
     const navItems = [
+        { path: '/education', label: '교육', icon: '📚', active: location.pathname.startsWith('/education') },
+        { path: '/daily', label: '퀘스트', icon: '🎯', active: location.pathname === '/daily' },
+        { path: '/safety-score', label: 'AI분석', icon: '🤖', active: location.pathname.startsWith('/safety-score') },
         { path: '/shop', label: '상점', icon: '🛒', active: location.pathname === '/shop' },
-        { path: '/inventory', label: '인벤토리', icon: '🎒', active: location.pathname === '/inventory' },
-        { path: '/profile', label: '보상센터', icon: '🏆', active: location.pathname === '/profile' },
-        { path: '/daily', label: '더보기', icon: '⊞', active: ['/daily', '/education', '/hazard-cycle', '/specialization', '/safety-score'].some(p => location.pathname.startsWith(p)) }
+        { path: '/profile', label: '내프로필', icon: '👤', active: location.pathname === '/profile' }
     ];
 
     return (
