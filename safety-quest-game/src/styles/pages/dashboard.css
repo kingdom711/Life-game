@@ -2512,9 +2512,10 @@
 }
 
 .new-gear-icons {
-  display: flex;
-  justify-content: space-around;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem 0.45rem;
+  justify-items: center;
 }
 
 .new-gear-item {
@@ -2522,24 +2523,38 @@
   flex-direction: column;
   align-items: center;
   gap: 0.35rem;
+  min-width: 0;
 }
 
 .new-gear-icon-circle {
   width: 50px;
   height: 50px;
   border-radius: 50%;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 2px solid rgba(71, 85, 105, 0.5);
   background: rgba(15, 23, 42, 0.6);
   transition: all 0.2s;
+  overflow: hidden;
 }
 
 .new-gear-item--equipped .new-gear-icon-circle {
-  border-color: rgba(56, 189, 248, 0.5);
-  background: rgba(56, 189, 248, 0.1);
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.15);
+  border-color: var(--gear-rarity-color, rgba(56, 189, 248, 0.75));
+  background: radial-gradient(circle at 50% 35%, var(--gear-rarity-bg, rgba(56, 189, 248, 0.14)) 0%, rgba(15, 23, 42, 0.92) 72%);
+  box-shadow:
+    0 0 0 2px var(--gear-rarity-ring, rgba(56, 189, 248, 0.24)),
+    0 0 16px var(--gear-rarity-shadow, rgba(56, 189, 248, 0.2));
+}
+
+.new-gear-item--equipped .new-gear-icon-circle::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  border: 1px solid var(--gear-rarity-ring, rgba(56, 189, 248, 0.35));
+  pointer-events: none;
 }
 
 .new-gear-item--empty .new-gear-icon-circle {
@@ -2550,11 +2565,20 @@
   font-size: 1.3rem;
 }
 
+.new-gear-image {
+  width: 84%;
+  height: 84%;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 6px rgba(15, 23, 42, 0.45));
+}
+
 .new-gear-label {
   font-size: 0.68rem;
   color: #94a3b8;
   font-weight: 600;
   text-align: center;
+  line-height: 1.25;
+  word-break: keep-all;
 }
 
 /* ── RecentRewards ── */
@@ -2887,8 +2911,16 @@
     height: 44px;
   }
 
+  .new-gear-icons {
+    gap: 0.7rem 0.25rem;
+  }
+
   .new-gear-icon {
     font-size: 1.15rem;
+  }
+
+  .new-gear-label {
+    font-size: 0.64rem;
   }
 }
 
