@@ -861,7 +861,17 @@ const extractDateOnly = (value) => {
 
     if (typeof value === 'string') {
         const trimmed = value.trim();
-        const directMatch = trimmed.match(/\d{4}-\d{2}-\d{2}/);
+
+        // ISO 8601 타임스탬프(시간 정보 포함)는 KST 변환 후 날짜 추출
+        if (trimmed.includes('T') || trimmed.endsWith('Z')) {
+            const parsedISO = new Date(trimmed);
+            if (!Number.isNaN(parsedISO.getTime())) {
+                return formatKSTDate(parsedISO);
+            }
+        }
+
+        // 순수 날짜 문자열 (YYYY-MM-DD)
+        const directMatch = trimmed.match(/^\d{4}-\d{2}-\d{2}$/);
         if (directMatch) {
             return directMatch[0];
         }
