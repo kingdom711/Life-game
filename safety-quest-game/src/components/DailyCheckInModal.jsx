@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/index.css';
 
-const DailyCheckInModal = ({ isOpen, onClose, streakCount, bonus }) => {
+const DailyCheckInModal = ({ isOpen, onClose, streakCount, bonus, onShowMonthlyRewards }) => {
     const [showFire, setShowFire] = useState(false);
     const [shieldLevel, setShieldLevel] = useState(1);
 
@@ -55,9 +55,17 @@ const DailyCheckInModal = ({ isOpen, onClose, streakCount, bonus }) => {
                         </p>
                     </div>
 
-                    <button className="confirm-btn" onClick={onClose}>
-                        확인
-                    </button>
+                    <div className="check-in-buttons">
+                        <button className="monthly-reward-btn" onClick={() => {
+                            onClose();
+                            if (onShowMonthlyRewards) onShowMonthlyRewards();
+                        }}>
+                            📅 월간 출석 보상 확인
+                        </button>
+                        <button className="confirm-btn" onClick={onClose}>
+                            확인
+                        </button>
+                    </div>
                 </div>
 
                 <style jsx>{`
@@ -110,16 +118,43 @@ const DailyCheckInModal = ({ isOpen, onClose, streakCount, bonus }) => {
                     .point { color: #fbbf24; }
                     .bonus { color: #f472b6; animation: pulse 1s infinite; }
                     
+                    .check-in-buttons {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 10px;
+                        margin-top: 20px;
+                        align-items: center;
+                    }
+                    .monthly-reward-btn {
+                        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                        color: white;
+                        border: none;
+                        padding: 12px 30px;
+                        border-radius: 20px;
+                        font-size: 1.05rem;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+                        width: 100%;
+                        max-width: 280px;
+                    }
+                    .monthly-reward-btn:hover {
+                        background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+                        transform: translateY(-1px);
+                        box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+                    }
                     .confirm-btn {
                         background: #3b82f6;
                         color: white;
                         border: none;
                         padding: 10px 30px;
                         border-radius: 20px;
-                        font-size: 1.1rem;
+                        font-size: 1rem;
                         cursor: pointer;
-                        margin-top: 20px;
                         transition: background 0.2s;
+                        width: 100%;
+                        max-width: 280px;
                     }
                     .confirm-btn:hover {
                         background: #2563eb;

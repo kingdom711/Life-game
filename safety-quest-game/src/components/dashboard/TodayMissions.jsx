@@ -51,7 +51,7 @@ function TodayMissions({ quests = [], onQuestAction }) {
                         <div
                             key={quest.id}
                             className={`new-mission-card new-mission-card--${quest.state}`}
-                            onClick={() => quest.isActive && onQuestAction?.(quest)}
+                            onClick={() => (quest.isActive || quest.id === 'daily_login_1') && onQuestAction?.(quest)}
                         >
                             <div className="new-mission-icon-wrap">
                                 <span className="new-mission-icon">{icon}</span>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { points, streak, dailyQuestInstances, userProfile, getKSTDateString, questProgress, dailyQuestSnapshots } from '../utils/storage';
+import { points, streak, dailyQuestInstances, userProfile, getKSTDateString, questProgress, dailyQuestSnapshots, monthlyAttendance } from '../utils/storage';
 import { calculateLevel } from '../utils/pointsCalculator';
 import { getQuestsByTypeRoleAndSpec } from '../data/questsData';
 import { getAllEquippedItems } from '../utils/inventoryManager';
@@ -10,6 +10,7 @@ import HazardQuestModal from '../components/HazardQuestModal';
 import DailyCheckInModal from '../components/DailyCheckInModal';
 import MonthlyAttendanceModal from '../components/MonthlyAttendanceModal';
 import { completeQuest, triggerQuestAction } from '../utils/questManager';
+import questApi from '../api/questApi';
 
 import AvatarWindow from '../components/AvatarWindow';
 import PointsHistoryModal from '../components/PointsHistoryModal';
@@ -213,7 +214,13 @@ function Dashboard({ role }) {
             streak: currentStreak
         });
         setEquippedItems(equipped);
-        setDailyQuests(quests.slice(0, 4)); // 泥섏쓬 4媛??쒖떆
+        // 출근 도장(daily_login_1)은 항상 표시되도록 보장
+        const loginQuest = quests.find(q => q.id === 'daily_login_1');
+        const otherQuests = quests.filter(q => q.id !== 'daily_login_1');
+        const visibleQuests = loginQuest
+            ? [...otherQuests.slice(0, 3), loginQuest]
+            : quests.slice(0, 4);
+        setDailyQuests(visibleQuests); // 泥섏쓬 4媛??쒖떆
 
         const todayInstance = dailyQuestInstances.getTodayInstance(userProfile.getName() || 'guest');
         setIsHazardQuestCompleted(todayInstance.isCompleted);
@@ -362,12 +369,69 @@ function Dashboard({ role }) {
         loadData();
     };
 
+    const handleLoginCheckIn = async () => {
+        if (streak.isCheckedInToday()) {
+            // 이미 출석한 경우 월간 보상 팝업만 표시
+            setIsMonthlyModalOpen(true);
+            return;
+        }
+
+        const token = localStorage.getItem('accessToken');
+        let checkInSuccess = false;
+        let resultStreak = 0;
+        let resultBonus = 0;
+
+        if (token) {
+            try {
+                const data = await questApi.checkIn();
+                streak.set({
+                    current: data.currentStreak,
+                    longest: data.longestStreak,
+                    lastLoginDate: getKSTDateString()
+                });
+                resultStreak = data.currentStreak;
+                resultBonus = data.bonusAwarded ? 5 : 0;
+                checkInSuccess = true;
+            } catch (err) {
+                console.log('[Dashboard] API check-in failed, falling back:', err.message);
+                if (err.data?.code === 'AT001') {
+                    setIsMonthlyModalOpen(true);
+                    return;
+                }
+            }
+        }
+
+        if (!checkInSuccess) {
+            const result = streak.checkIn();
+            if (!result.success) {
+                if (result.message) alert(result.message);
+                return;
+            }
+            resultStreak = result.streak;
+            resultBonus = 0;
+            checkInSuccess = true;
+        }
+
+        if (checkInSuccess) {
+            monthlyAttendance.recordAttendance();
+            triggerQuestAction('daily_login', role);
+            completeQuest('daily_login_1');
+            setCheckInResult({ streak: resultStreak, bonus: resultBonus });
+            setIsCheckInModalOpen(true);
+            loadData();
+        }
+    };
+
     const handleCompleteQuest = (quest) => {
         // 援먯쑁 寃뚯씠?? 援먯쑁/濡쒓렇???섏뒪???쒖쇅 ?섎㉧吏??援먯쑁 ?꾨즺 ?꾩슂
         if (!NON_GATED_QUESTS.includes(quest.id) && !checkPermission()) {
             return;
         }
 
+        if (quest.id === 'daily_login_1') {
+            handleLoginCheckIn();
+            return;
+        }
         if (quest.id === 'daily_education_1') {
             navigate('/education');
             return;
@@ -477,6 +541,7 @@ function Dashboard({ role }) {
                 onClose={() => setIsCheckInModalOpen(false)}
                 streakCount={checkInResult.streak}
                 bonus={checkInResult.bonus}
+                onShowMonthlyRewards={() => setIsMonthlyModalOpen(true)}
             />
 
             <MonthlyAttendanceModal
