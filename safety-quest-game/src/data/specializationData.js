@@ -178,6 +178,39 @@ export const SPECIALIZATIONS = [
             exp: 300,
             title: '안전담당자 자격 취득'
         }
+    },
+    // [New] 안전 수호자 - 작업중지권 전문가 전직 경로
+    {
+        id: 'safetyGuardian',
+        name: '안전 수호자',
+        icon: '🛡️',
+        color: '#dc2626',
+        bgGradient: 'linear-gradient(135deg, #dc2626, #b91c1c)',
+        parentRole: 'technician',
+        description: '작업중지권과 안전 권리에 정통한 전문가로, 동료의 안전 판단을 멘토링하는 역할',
+        shortDescription: '작업중지권·안전 권리 전문가',
+        unlockRequirements: {
+            minLevel: 4,  // Silver I 이상
+            minLevelName: 'Silver I',
+            requiredEducations: ['edu_ws_001', 'edu_ws_002', 'edu_ws_003'],
+            requiredScore: 90
+        },
+        features: [
+            '작업중지권 교육 3과목 90% 이상 합격',
+            '동료 안전 판단 멘토링 퀘스트',
+            '작업중지 신고 시 우선 처리',
+            '안전 수호자 전용 배지'
+        ],
+        bonuses: {
+            pointMultiplier: 1.3,
+            exclusiveQuests: true,
+            specialBadge: 'safety_guardian_badge'
+        },
+        classChangeReward: {
+            points: 1500,
+            exp: 250,
+            title: '안전 수호자 자격 취득'
+        }
     }
 ];
 

@@ -31,20 +31,20 @@ const DailyCheckInModal = ({ isOpen, onClose, streakCount, bonus, onShowMonthlyR
                 </div>
 
                 <div className="check-in-body">
-                    <div className="shield-container">
-                        <div className={`shield level-${shieldLevel}`}>
-                            <img src="/assets/safety_road_logo-removebg-preview.png" alt="안전의 길" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
-                        </div>
-                        {shieldLevel > 0 && <div className="shield-label">Level {shieldLevel} Shield</div>}
-                    </div>
-
                     <div className="streak-container">
-                        <h3>연속 안전 작업</h3>
+                        <div className="streak-title-row">
+                            <span className="streak-title-text">연속 안전 작업</span>
+                            {showFire && <span className="fire-inline">🔥</span>}
+                        </div>
+                        <div className="streak-badge-row">
+                            <div className={`shield-inline level-${shieldLevel}`}>
+                                <img src="/assets/safety_road_logo-removebg-preview.png" alt="안전의 길" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
+                            </div>
+                        </div>
                         <div className="streak-count">
                             <span className="number">{streakCount}</span>
                             <span className="days">일째</span>
                         </div>
-                        {showFire && <div className="fire-effect">🔥</div>}
                     </div>
 
                     <div className="message-box">
@@ -77,34 +77,46 @@ const DailyCheckInModal = ({ isOpen, onClose, streakCount, bonus, onShowMonthlyR
                         text-align: center;
                         max-width: 400px;
                     }
-                    .shield-container {
-                        margin: 20px 0;
-                        position: relative;
-                    }
-                    .shield {
-                        font-size: 4rem;
-                        transition: all 0.5s ease;
-                    }
-                    .shield.level-1 { filter: drop-shadow(0 0 10px #cd7f32); } /* Bronze */
-                    .shield.level-2 { filter: drop-shadow(0 0 15px #c0c0c0); transform: scale(1.1); } /* Silver */
-                    .shield.level-3 { filter: drop-shadow(0 0 20px #ffd700); transform: scale(1.2); } /* Gold */
-                    
                     .streak-container {
                         margin: 20px 0;
                         position: relative;
                     }
+                    .streak-title-row {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 6px;
+                        margin-bottom: 8px;
+                    }
+                    .streak-title-text {
+                        font-size: 1.1rem;
+                        font-weight: 600;
+                        color: #e2e8f0;
+                    }
+                    .fire-inline {
+                        font-size: 1.3rem;
+                        animation: bounce 1s infinite;
+                        display: inline-block;
+                    }
+                    .streak-badge-row {
+                        display: flex;
+                        justify-content: center;
+                        margin-bottom: 4px;
+                    }
+                    .shield-inline {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.5s ease;
+                    }
+                    .shield-inline.level-1 { filter: drop-shadow(0 0 8px #cd7f32); } /* Bronze */
+                    .shield-inline.level-2 { filter: drop-shadow(0 0 10px #c0c0c0); transform: scale(1.1); } /* Silver */
+                    .shield-inline.level-3 { filter: drop-shadow(0 0 12px #ffd700); transform: scale(1.2); } /* Gold */
                     .streak-count {
                         font-size: 3rem;
                         font-weight: bold;
                         color: #10b981;
                         text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-                    }
-                    .fire-effect {
-                        position: absolute;
-                        top: -20px;
-                        right: 20%;
-                        font-size: 2rem;
-                        animation: bounce 1s infinite;
                     }
                     .pledge {
                         font-style: italic;

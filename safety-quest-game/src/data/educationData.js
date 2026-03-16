@@ -16,7 +16,8 @@ export const EDUCATION_CATEGORY = {
     PPE: 'ppe',                              // 개인보호구
     ELECTRICAL: 'electrical',                // 전기 안전
     CONFINED_SPACE: 'confined_space',        // 밀폐공간
-    CHEMICAL: 'chemical'                     // 화학물질
+    CHEMICAL: 'chemical',                    // 화학물질
+    WORK_STOP_RIGHT: 'work_stop_right'       // [New] 작업중지권
 };
 
 // 카테고리 표시 정보
@@ -60,6 +61,11 @@ export const CATEGORY_INFO = {
         name: '화학물질',
         icon: '🧪',
         color: '#a855f7'
+    },
+    [EDUCATION_CATEGORY.WORK_STOP_RIGHT]: {
+        name: '작업중지권',
+        icon: '✋',
+        color: '#dc2626'
     }
 };
 
@@ -617,6 +623,169 @@ export const educationContents = [
                 options: ['장비 없이 즉시 뛰어든다', '숨을 크게 들이마시고 들어간다', '밖에서 구경한다', '송기마스크 등 보호구 착용 후 구조', '119에 신고만 하고 퇴근한다'],
                 correctAnswer: 3,
                 explanation: '밀폐공간 구조 시에는 반드시 송기마스크 등 적절한 보호구를 착용한 후 구조해야 합니다.'
+            }
+        ]
+    },
+    // ─── [New] 작업중지권 교육 모듈 (추가 1~3) ───
+    {
+        id: 'edu_ws_001',
+        category: EDUCATION_CATEGORY.WORK_STOP_RIGHT,
+        title: '작업중지권이란 무엇인가',
+        description: '산업안전보건법 제52조에 근거한 작업중지권의 개념과 2025년 확대 기준을 학습합니다.',
+        videoUrl: '/videos/safety/work_stop_right_intro.mp4',
+        youtubeVideoId: null,
+        thumbnailUrl: '/images/education/work_stop_thumbnail.png',
+        duration: 600,
+        requiredWatchTime: 540,
+        legalHours: 0.17,
+        requiredScore: 80,
+        points: 50,
+        exp: 20,
+        weekNumber: 6,
+        dayOfWeek: 3,
+        quiz: [
+            {
+                id: 'qws_001',
+                question: '작업중지권은 어떤 법률에 근거한 권리인가요?',
+                options: ['근로기준법 제30조', '산업안전보건법 제52조', '건설산업기본법 제10조', '소방기본법 제25조', '환경보호법 제15조'],
+                correctAnswer: 1,
+                explanation: '작업중지권은 산업안전보건법 제52조에 근거한 근로자의 법적 권리입니다.'
+            },
+            {
+                id: 'qws_002',
+                question: '2025년 확대된 작업중지권 행사 기준은?',
+                options: ['사고가 발생한 후', '급박한 위험이 있을 때만', '산업재해 발생 우려 시', '관리자 허가를 받은 후', '안전관리자가 판단한 경우만'],
+                correctAnswer: 2,
+                explanation: '2025년 노동안전 종합대책에서 작업중지권 행사 기준이 "급박한 위험"에서 "발생 우려" 시로 완화되었습니다.'
+            },
+            {
+                id: 'qws_003',
+                question: '2025년 정책에서 작업중지권 행사 주체로 새롭게 추가된 것은?',
+                options: ['안전관리자', '노동조합', '고용노동부 장관', '원청 사업주', '현장 소장'],
+                correctAnswer: 1,
+                explanation: '2025년 확대 정책에서 근로자 개인 외에 노동조합도 작업중지권 행사 주체로 추가되었습니다.'
+            },
+            {
+                id: 'qws_004',
+                question: '작업중지권을 행사할 수 있는 상황으로 적절한 것은?',
+                options: ['작업이 힘들어서 쉬고 싶을 때', '비계 연결부 볼트가 풀려 추락 위험이 있을 때', '점심시간이 되었을 때', '동료와 의견 충돌이 있을 때', '작업 도구가 부족할 때'],
+                correctAnswer: 1,
+                explanation: '비계 연결부 볼트 풀림은 추락 위험이 우려되는 상황으로 작업중지권 행사가 가능합니다.'
+            },
+            {
+                id: 'qws_005',
+                question: '근로자가 사업주에게 작업중지를 요청하는 제도는 언제 신설되었나요?',
+                options: ['2020년', '2023년', '2025년', '아직 신설되지 않았다', '2018년'],
+                correctAnswer: 2,
+                explanation: '2025년 노동안전 종합대책에서 근로자가 사업주에게 작업중지를 요청할 수 있는 제도가 신설되었습니다.'
+            }
+        ]
+    },
+    {
+        id: 'edu_ws_002',
+        category: EDUCATION_CATEGORY.WORK_STOP_RIGHT,
+        title: '작업중지권 행사 5단계',
+        description: '위험 인지부터 기록까지, 작업중지권 행사의 구체적인 5단계 절차를 학습합니다.',
+        videoUrl: '/videos/safety/work_stop_5steps.mp4',
+        youtubeVideoId: null,
+        thumbnailUrl: '/images/education/work_stop_steps_thumbnail.png',
+        duration: 600,
+        requiredWatchTime: 540,
+        legalHours: 0.17,
+        requiredScore: 80,
+        points: 50,
+        exp: 20,
+        weekNumber: 7,
+        dayOfWeek: 3,
+        quiz: [
+            {
+                id: 'qws2_001',
+                question: '작업중지권 행사 5단계의 올바른 순서는?',
+                options: ['신고→대피→중지→기록→인지', '인지→중지→대피→신고→기록', '중지→인지→신고→대피→기록', '대피→중지→인지→기록→신고', '기록→신고→인지→중지→대피'],
+                correctAnswer: 1,
+                explanation: '올바른 순서는 ① 위험 인지 → ② 작업 중지 → ③ 대피 → ④ 신고 → ⑤ 기록입니다.'
+            },
+            {
+                id: 'qws2_002',
+                question: '고소작업 중 비계 연결부 볼트가 풀려 있고 관리감독자가 없습니다. 올바른 행동은?',
+                options: ['볼트를 직접 조이고 작업 계속', '작업을 중지하고 대피 후 신고', '동료에게 알리고 작업 계속', '퇴근 시 관리감독자에게 보고', '다른 구역으로 이동해서 작업'],
+                correctAnswer: 1,
+                explanation: '추락 위험이 우려되는 상황에서는 작업을 즉시 중지하고 대피한 후 신고해야 합니다.'
+            },
+            {
+                id: 'qws2_003',
+                question: '밀폐공간 작업 전 가스 측정기 경고등이 깜빡입니다. 관리감독자가 "괜찮으니 들어가라"고 합니다. 올바른 행동은?',
+                options: ['관리감독자 지시를 따른다', '작업중지권을 행사하고 대피한다', '잠시 기다렸다 들어간다', '마스크를 쓰고 들어간다', '동료에게 먼저 들어가라고 한다'],
+                correctAnswer: 1,
+                explanation: '가스 측정기 경고는 위험 신호이므로 관리감독자의 지시와 무관하게 작업중지권을 행사해야 합니다.'
+            },
+            {
+                id: 'qws2_004',
+                question: '작업중지 후 반드시 기록해야 할 항목이 아닌 것은?',
+                options: ['위험 유형', '발생 시간', '발생 위치', '당일 점심 메뉴', '조치 사항'],
+                correctAnswer: 3,
+                explanation: '작업중지 기록에는 위험 유형, 발생 시간, 위치, 조치 사항 등을 기록해야 합니다.'
+            },
+            {
+                id: 'qws2_005',
+                question: '작업중지 후 작업 재개의 조건은?',
+                options: ['30분이 경과하면 자동 재개', '관리감독자/안전관리자의 위험 해결 확인 후', '작업자 본인 판단으로 재개', '다른 팀이 작업 시작 시', '원청 사업주의 전화 승인'],
+                correctAnswer: 1,
+                explanation: '작업 재개는 관리감독자 또는 안전관리자가 위험을 해결하고 안전을 확인한 후에 가능합니다.'
+            }
+        ]
+    },
+    {
+        id: 'edu_ws_003',
+        category: EDUCATION_CATEGORY.WORK_STOP_RIGHT,
+        title: '보복 금지와 나의 보호',
+        description: '작업중지권 행사 후 보복 금지 규정과 근로자 보호 방법을 학습합니다.',
+        videoUrl: '/videos/safety/work_stop_protection.mp4',
+        youtubeVideoId: null,
+        thumbnailUrl: '/images/education/work_stop_protect_thumbnail.png',
+        duration: 600,
+        requiredWatchTime: 540,
+        legalHours: 0.17,
+        requiredScore: 80,
+        points: 50,
+        exp: 20,
+        weekNumber: 8,
+        dayOfWeek: 3,
+        quiz: [
+            {
+                id: 'qws3_001',
+                question: '작업중지권을 행사한 후 관리감독자가 "다음부터 이러면 불이익이 있을 것"이라고 합니다. 이는?',
+                options: ['정당한 관리 행위', '불법 보복으로 형사처벌 대상', '구두 경고일 뿐 문제없음', '작업자가 참아야 할 사항', '노동조합에만 해당'],
+                correctAnswer: 1,
+                explanation: '2025년 정책에서 작업중지권 행사에 대한 보복은 형사처벌 대상으로 규정되었습니다.'
+            },
+            {
+                id: 'qws3_002',
+                question: '작업중지권 행사 후 보호 기간은?',
+                options: ['7일', '14일', '30일', '90일', '보호 기간 없음'],
+                correctAnswer: 2,
+                explanation: '작업중지권 행사 후 30일간 보호 기간이 적용되며, 이 기간 내 보복 행위가 모니터링됩니다.'
+            },
+            {
+                id: 'qws3_003',
+                question: '보복으로 인정될 수 있는 행위가 아닌 것은?',
+                options: ['업무 배제', '부당 전보', '임금 삭감', '정상적인 안전 교육 배정', '비공식적 냉대'],
+                correctAnswer: 3,
+                explanation: '정상적인 안전 교육 배정은 보복이 아닌 정당한 관리 행위입니다.'
+            },
+            {
+                id: 'qws3_004',
+                question: '소규모 사업장에서 익명 신고가 중요한 이유는?',
+                options: ['신고 절차가 간편해서', '신고자 특정이 쉬워 보복 위험이 높아서', '관리자가 귀찮아해서', '법적으로 실명만 가능해서', '포인트를 더 받을 수 있어서'],
+                correctAnswer: 1,
+                explanation: '소규모 사업장은 인원이 적어 신고자 특정이 용이하므로 익명 신고가 보복 방지에 중요합니다.'
+            },
+            {
+                id: 'qws3_005',
+                question: '보복을 당했을 때 가장 올바른 대응 방법은?',
+                options: ['그냥 참고 넘어간다', '직접 관리자에게 항의한다', '앱 내 보복 신고 + 증거 보존 후 노동부 신고', '즉시 퇴사한다', '동료에게만 이야기한다'],
+                correctAnswer: 2,
+                explanation: '보복 발생 시 앱 내 보복 신고로 기록을 남기고 증거를 보존한 후 노동부에 신고하는 것이 올바른 대응입니다.'
             }
         ]
     }

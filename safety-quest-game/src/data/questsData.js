@@ -12,7 +12,8 @@ export const QUEST_CATEGORY = {
     REVIEW: 'review',
     SAFETY: 'safety',
     LOGIN: 'login',
-    EDUCATION: 'education' // [New] 교육 카테고리
+    EDUCATION: 'education', // [New] 교육 카테고리
+    WORK_STOP: 'work_stop'  // [New] 작업중지권 카테고리
 };
 
 // 일간 퀘스트
@@ -225,6 +226,70 @@ export const dailyQuests = [
         icon: '🌬️',
         requirement: { type: 'count', target: 1, action: 'oxygen_measurement' },
         reward: { points: 130, exp: 28 }
+    },
+
+    // ─── [New] 작업중지권 퀘스트 ───
+
+    // 기술인 - 작업중지권 일일 퀘스트
+    {
+        id: 'daily_work_stop_tip',
+        type: QUEST_TYPE.DAILY,
+        category: QUEST_CATEGORY.WORK_STOP,
+        role: 'technician',
+        title: '✋ 오늘의 안전 권리',
+        description: '작업중지권 관련 법률 팁 1건을 읽고 확인하세요.',
+        icon: '✋',
+        requirement: { type: 'action', target: 1, action: 'read_work_stop_tip' },
+        reward: { points: 30, exp: 10 }
+    },
+    {
+        id: 'daily_work_stop_quiz',
+        type: QUEST_TYPE.DAILY,
+        category: QUEST_CATEGORY.WORK_STOP,
+        role: 'technician',
+        title: '🧠 안전 판단 훈련',
+        description: '시나리오 기반 작업중지 판단 퀴즈 1건을 풀어보세요.',
+        icon: '🧠',
+        requirement: { type: 'action', target: 1, action: 'complete_work_stop_quiz' },
+        reward: { points: 50, exp: 15 }
+    },
+
+    // 관리감독자 - 작업중지 대응 퀘스트
+    {
+        id: 'daily_work_stop_response',
+        type: QUEST_TYPE.DAILY,
+        category: QUEST_CATEGORY.WORK_STOP,
+        role: 'supervisor',
+        title: '⚡ 신속 대응자',
+        description: '작업중지 신고를 30분 내에 접수 확인하세요.',
+        icon: '⚡',
+        requirement: { type: 'action', target: 1, action: 'confirm_work_stop_report' },
+        reward: { points: 200, exp: 40 }
+    },
+    {
+        id: 'daily_work_stop_feedback',
+        type: QUEST_TYPE.DAILY,
+        category: QUEST_CATEGORY.WORK_STOP,
+        role: 'supervisor',
+        title: '👏 격려 한마디',
+        description: '작업중지를 행사한 기술인에게 긍정 피드백을 남기세요.',
+        icon: '👏',
+        requirement: { type: 'action', target: 1, action: 'send_work_stop_feedback' },
+        reward: { points: 50, exp: 10 }
+    },
+
+    // 안전 수호자 전직 전용 퀘스트
+    {
+        id: 'daily_guardian_mentor',
+        type: QUEST_TYPE.DAILY,
+        category: QUEST_CATEGORY.WORK_STOP,
+        role: 'technician',
+        specialization: 'safetyGuardian',
+        title: '🛡️ 동료 안전 멘토링',
+        description: '동료에게 작업중지권 관련 안전 판단 멘토링을 제공하세요.',
+        icon: '🛡️',
+        requirement: { type: 'action', target: 1, action: 'mentor_work_stop' },
+        reward: { points: 150, exp: 35 }
     }
 ];
 
@@ -319,6 +384,29 @@ export const weeklyQuests = [
             points: 800,
             exp: 150
         }
+    },
+    // [New] 작업중지권 주간 퀘스트
+    {
+        id: 'weekly_work_stop_master',
+        type: QUEST_TYPE.WEEKLY,
+        category: QUEST_CATEGORY.WORK_STOP,
+        role: 'technician',
+        title: '✋ 안전 판단 마스터',
+        description: '주간 작업중지 시나리오 퀴즈 3건을 통과하세요.',
+        icon: '✋',
+        requirement: { type: 'count', target: 3, action: 'complete_work_stop_quiz' },
+        reward: { points: 500, exp: 100 }
+    },
+    {
+        id: 'weekly_work_stop_resolver',
+        type: QUEST_TYPE.WEEKLY,
+        category: QUEST_CATEGORY.WORK_STOP,
+        role: 'supervisor',
+        title: '🔧 안전 해결사',
+        description: '작업중지 위험요인을 해결하고 작업재개를 승인하세요.',
+        icon: '🔧',
+        requirement: { type: 'count', target: 1, action: 'resolve_work_stop' },
+        reward: { points: 300, exp: 60 }
     }
 ];
 
@@ -413,6 +501,18 @@ export const monthlyQuests = [
             points: 7000,
             exp: 1200
         }
+    },
+    // [New] 작업중지권 월간 퀘스트
+    {
+        id: 'monthly_safety_guardian',
+        type: QUEST_TYPE.MONTHLY,
+        category: QUEST_CATEGORY.WORK_STOP,
+        role: 'technician',
+        title: '🛡️ 안전 수호자',
+        description: '월간 작업중지권 교육 전체를 이수하세요.',
+        icon: '🛡️',
+        requirement: { type: 'count', target: 3, action: 'complete_work_stop_education' },
+        reward: { points: 3000, exp: 500 }
     }
 ];
 

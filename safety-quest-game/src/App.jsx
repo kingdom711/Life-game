@@ -29,10 +29,13 @@ import HazardCyclePage from './pages/HazardCyclePage';
 import CycleHistoryPage from './pages/CycleHistoryPage';
 import SafetyScoreDashboard from './pages/SafetyScoreDashboard';
 import AdminRewardApproval from './pages/AdminRewardApproval';
+import WorkStopHistoryPage from './pages/WorkStopHistoryPage'; // [New] 작업중지 이력
 
 // Components
 import RoleSelector from './components/RoleSelector';
 import Navigation from './components/Navigation';
+import WorkStopButton from './components/WorkStopButton'; // [New] 작업중지 플로팅 버튼
+import WorkStopReportModal from './components/WorkStopReportModal'; // [New] 작업중지 신고 모달
 
 import LaunchScreen from './pages/LaunchScreen';
 import BackgroundMusic from './components/BackgroundMusic';
@@ -50,6 +53,7 @@ function App() {
     const [isPlayingBgm, setIsPlayingBgm] = useState(false);
     // const [user, setUser] = useState(null); // AuthContext로 대체
     const [selectedRole, setSelectedRole] = useState(null);
+    const [isWorkStopModalOpen, setIsWorkStopModalOpen] = useState(false); // [New] 작업중지 모달
     // const [loading, setLoading] = useState(true); // AuthContext로 대체
 
     const { user, loading } = useAuth();
@@ -257,9 +261,17 @@ function App() {
                                     <Route path="/specialization/training/:specId" element={<SpecializationTrainingPage />} />
                                     <Route path="/safety-score" element={<SafetyScoreDashboard role={selectedRole} />} />
                                     <Route path="/admin/reward-approval" element={<AdminRewardApproval />} />
+                                    <Route path="/work-stop-history" element={<WorkStopHistoryPage />} />
                                     <Route path="*" element={<Navigate to="/" replace />} />
                                 </Routes>
                             </div>
+
+                            {/* [New] 긴급 작업중지 플로팅 버튼 - 모든 화면에서 표시 */}
+                            <WorkStopButton onActivate={() => setIsWorkStopModalOpen(true)} />
+                            <WorkStopReportModal
+                                isOpen={isWorkStopModalOpen}
+                                onClose={() => setIsWorkStopModalOpen(false)}
+                            />
                         </>
                     )}
                 </div>

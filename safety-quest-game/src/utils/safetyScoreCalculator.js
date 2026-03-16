@@ -3,23 +3,28 @@
  *
  * 기획서 4-7: 사업장 전체의 안전 수준을 0~100점으로 시각화
  *
- * 5개 카테고리:
- * 1. 교육 이수율 (30점) - 최근 7일 교육 완료 비율
- * 2. 퀴즈 평균 점수 (20점) - 전체 퀴즈 평균
- * 3. 체크리스트 작성률 (20점) - 최근 7일 작성 비율
- * 4. 위험 발견·해결 건수 (20점) - 위험 발견 및 조치 기록
- * 5. 연속 참여율 (10점) - 출석 스트릭 및 월간 참여
+ * 7개 카테고리 (작업중지 대응력 추가):
+ * 1. 교육 이수율 (22점)
+ * 2. 퀴즈 평균 점수 (13점)
+ * 3. 체크리스트 작성률 (9점)
+ * 4. 위험 발견·해결 건수 (23점)
+ * 5. 위험 해결률 (18점)
+ * 6. 연속 참여율 (5점)
+ * 7. 작업중지 대응력 (10점) [New]
  */
 
 import { educationHistory, streak, hazardLogs, hazardIdentificationLogs, actionRecords } from './storage';
+import { getWorkStopStats } from './workStopManager';
 
 const SCORE_HISTORY_KEY = 'safety_quest_safety_score_history';
 const CATEGORY_MAX_SCORES = {
-    education: 30,
-    quiz: 20,
-    checklist: 20,
-    hazard: 20,
-    participation: 10
+    education: 22,
+    quiz: 13,
+    checklist: 9,
+    hazard: 23,
+    hazardResolution: 18,
+    participation: 5,
+    workStopResponse: 10
 };
 
 /**
@@ -206,6 +211,51 @@ const calculateParticipationScore = () => {
 };
 
 /**
+ * 6. 작업중지 대응력 (10점 만점) [New]
+ * 작업중지권 교육 이수 + 시나리오 퀴즈 + 대응 시간 + 보복 미발생
+ */
+const calculateWorkStopResponseScore = () => {
+    const stats = getWorkStopStats();
+
+    // 교육 이수 (3점): 작업중지권 교육 3개 모듈 이수 여부
+    const history = educationHistory.get();
+    const wsEducations = history.filter(r =>
+        r.educationId && r.educationId.startsWith('edu_ws_')
+    );
+    const uniqueWsModules = new Set(wsEducations.map(r => r.educationId));
+    const educationScore = Math.min(uniqueWsModules.size, 3); // 0~3점
+
+    // 시나리오 퀴즈 (3점): 최근 30일 퀴즈 통과율
+    const quizScore = stats.recentReports > 0 ? 2 : (uniqueWsModules.size > 0 ? 1 : 0);
+    const quizBased = Math.min(quizScore + (wsEducations.length >= 3 ? 1 : 0), 3);
+
+    // 대응 시간 (2점): 30분 이내 만점
+    let responseScore = 0;
+    if (stats.avgResponseTime === 0 && stats.totalReports === 0) {
+        responseScore = 2; // 신고 없으면 만점
+    } else if (stats.avgResponseTime <= 30) {
+        responseScore = 2;
+    } else if (stats.avgResponseTime <= 60) {
+        responseScore = 1;
+    }
+
+    // 보복 미발생 (2점): 90일간 보복 신고 0건
+    const retaliationScore = stats.retaliationCount === 0 ? 2 : 0;
+
+    const totalScore = educationScore + quizBased + responseScore + retaliationScore;
+    const score = Math.min(totalScore, CATEGORY_MAX_SCORES.workStopResponse);
+    const rate = Math.round((score / CATEGORY_MAX_SCORES.workStopResponse) * 100);
+
+    return {
+        score,
+        maxScore: CATEGORY_MAX_SCORES.workStopResponse,
+        rate,
+        detail: `교육 ${educationScore}/3, 퀴즈 ${quizBased}/3, 대응 ${responseScore}/2, 보복방지 ${retaliationScore}/2`,
+        label: '작업중지 대응력'
+    };
+};
+
+/**
  * 전체 안전 점수 계산
  */
 export const calculateSafetyScore = () => {
@@ -214,7 +264,8 @@ export const calculateSafetyScore = () => {
         quiz: calculateQuizScore(),
         checklist: calculateChecklistScore(),
         hazard: calculateHazardScore(),
-        participation: calculateParticipationScore()
+        participation: calculateParticipationScore(),
+        workStopResponse: calculateWorkStopResponseScore()
     };
 
     const totalScore = Object.values(categories).reduce((sum, cat) => sum + cat.score, 0);
@@ -311,7 +362,9 @@ export const getImprovementSuggestion = (categories) => {
         quiz: '퀴즈에서 더 높은 점수를 받으면 안전 지식이 향상됩니다. 오답 해설을 꼼꼼히 확인하세요.',
         checklist: '매일 안전 체크리스트를 작성하면 점수가 올라갑니다. 작업 시작 전 점검을 습관화하세요.',
         hazard: '위험요인을 적극적으로 발견하고 조치 기록을 남기면 점수가 향상됩니다.',
-        participation: '매일 꾸준히 접속하여 스트릭을 이어가면 참여율 점수가 올라갑니다.'
+        hazardResolution: '발견된 위험요인을 신속하게 해결하면 해결률 점수가 향상됩니다.',
+        participation: '매일 꾸준히 접속하여 스트릭을 이어가면 참여율 점수가 올라갑니다.',
+        workStopResponse: '작업중지권 교육 3개 모듈을 이수하고 시나리오 퀴즈를 통과하면 대응력 점수가 올라갑니다.'
     };
 
     // 가장 낮은 비율의 카테고리 찾기
