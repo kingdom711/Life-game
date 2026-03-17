@@ -13,7 +13,8 @@ const CATEGORY_ICONS = {
     quiz: '📝',
     checklist: '✅',
     hazard: '⚠️',
-    participation: '🔥'
+    participation: '🔥',
+    workStopResponse: '🛑'
 };
 
 const CATEGORY_COLORS = {
@@ -21,7 +22,8 @@ const CATEGORY_COLORS = {
     quiz: { bar: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)' },
     checklist: { bar: '#10b981', bg: 'rgba(16, 185, 129, 0.15)' },
     hazard: { bar: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)' },
-    participation: { bar: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)' }
+    participation: { bar: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)' },
+    workStopResponse: { bar: '#ec4899', bg: 'rgba(236, 72, 153, 0.15)' }
 };
 
 function getScoreGrade(score) {
