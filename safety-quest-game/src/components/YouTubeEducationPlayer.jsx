@@ -4,7 +4,8 @@ import { educationProgress } from '../utils/storage';
 /**
  * YouTube 교육 비디오 플레이어 컴포넌트
  * 
- * 누적 시청 시간을 직접 localStorage에서 관리합니다.
+ * - 누적 시청 시간을 직접 localStorage에서 관리합니다.
+ * - youtubeVideoId가 배열이면 연속 재생을 지원합니다.
  */
 const YouTubeEducationPlayer = ({
     youtubeVideoId,
@@ -14,6 +15,12 @@ const YouTubeEducationPlayer = ({
     onVideoComplete,
     educationId  // 교육 ID (localStorage 저장용)
 }) => {
+    // ─── 다중 영상 연속 재생 지원 ───
+    // youtubeVideoId가 문자열이면 배열로 변환, 배열이면 그대로 사용
+    const videoIds = Array.isArray(youtubeVideoId) ? youtubeVideoId : [youtubeVideoId];
+    const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+    const currentVideoIndexRef = useRef(0);  // 이벤트 핸들러에서 최신 인덱스 참조용
+
     const playerContainerRef = useRef(null);
     const playerRef = useRef(null);
     const timeCheckIntervalRef = useRef(null);
@@ -23,6 +30,11 @@ const YouTubeEducationPlayer = ({
     const [currentTime, setCurrentTime] = useState(0);
     const [totalWatchedTime, setTotalWatchedTime] = useState(0);  // 총 누적 시간
     const [isCompleted, setIsCompleted] = useState(false);
+
+    // currentVideoIndex ref 동기화
+    useEffect(() => {
+        currentVideoIndexRef.current = currentVideoIndex;
+    }, [currentVideoIndex]);
 
     // localStorage에서 누적 시간 불러오기
     const loadCumulativeTime = useCallback(() => {
@@ -85,7 +97,7 @@ const YouTubeEducationPlayer = ({
         if (!playerContainerRef.current || playerRef.current) return;
 
         playerRef.current = new window.YT.Player(playerContainerRef.current, {
-            videoId: youtubeVideoId,
+            videoId: videoIds[0],  // 첫 번째 영상으로 시작
             playerVars: {
                 'playsinline': 1,
                 'controls': 1,
@@ -98,7 +110,7 @@ const YouTubeEducationPlayer = ({
                 'onStateChange': onPlayerStateChange,
             }
         });
-    }, [youtubeVideoId]);
+    }, [videoIds[0]]);
 
     // 플레이어 상태 변경
     const onPlayerStateChange = (event) => {
@@ -107,6 +119,21 @@ const YouTubeEducationPlayer = ({
         if (state === window.YT.PlayerState.PLAYING) {
             setIsPlaying(true);
             startTimeCheck();
+        } else if (state === window.YT.PlayerState.ENDED) {
+            // ─── 다중 영상: 현재 영상이 끝났을 때 다음 영상으로 자동 전환 ───
+            const idx = currentVideoIndexRef.current;
+            if (idx < videoIds.length - 1) {
+                // 다음 영상이 있으면 로드 및 자동 재생
+                const nextIndex = idx + 1;
+                setCurrentVideoIndex(nextIndex);
+                currentVideoIndexRef.current = nextIndex;
+                playerRef.current.loadVideoById(videoIds[nextIndex]);
+                // loadVideoById는 자동으로 재생을 시작하므로 PLAYING 상태로 전환됨
+            } else {
+                // 마지막 영상까지 끝남
+                setIsPlaying(false);
+                stopTimeCheck();
+            }
         } else {
             setIsPlaying(false);
             stopTimeCheck();
@@ -192,6 +219,13 @@ const YouTubeEducationPlayer = ({
                     </div>
                 )}
             </div>
+
+            {/* 다중 영상 인디케이터 */}
+            {videoIds.length > 1 && (
+                <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm z-10">
+                    📺 {currentVideoIndex + 1} / {videoIds.length}
+                </div>
+            )}
 
             {/* 완료 배지 */}
             {isCompleted && (

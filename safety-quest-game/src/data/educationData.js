@@ -633,7 +633,7 @@ export const educationContents = [
         title: '작업중지권이란 무엇인가',
         description: '산업안전보건법 제52조에 근거한 작업중지권의 개념과 2025년 확대 기준을 학습합니다.',
         videoUrl: '/videos/safety/work_stop_right_intro.mp4',
-        youtubeVideoId: null,
+        youtubeVideoId: ['GYg7en3Pf88', '7pR4y1SBMb4'],  // 두 영상 연속 재생 (10분 충족)
         thumbnailUrl: '/images/education/work_stop_thumbnail.png',
         duration: 600,
         requiredWatchTime: 540,
