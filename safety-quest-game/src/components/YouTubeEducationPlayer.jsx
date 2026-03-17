@@ -30,6 +30,7 @@ const YouTubeEducationPlayer = ({
     const [currentTime, setCurrentTime] = useState(0);
     const [totalWatchedTime, setTotalWatchedTime] = useState(0);  // 총 누적 시간
     const [isCompleted, setIsCompleted] = useState(false);
+    const [playlistEnded, setPlaylistEnded] = useState(false);  // 모든 영상 재생 완료 여부
 
     // currentVideoIndex ref 동기화
     useEffect(() => {
@@ -133,6 +134,7 @@ const YouTubeEducationPlayer = ({
                 // 마지막 영상까지 끝남
                 setIsPlaying(false);
                 stopTimeCheck();
+                setPlaylistEnded(true);  // 다시 보기 버튼 표시용
             }
         } else {
             setIsPlaying(false);
@@ -204,6 +206,16 @@ const YouTubeEducationPlayer = ({
     const remainingTime = Math.max(0, requiredWatchTime - totalWatchedTime);
     const remainingMinutes = Math.ceil(remainingTime / 60);
 
+    // 처음부터 다시 보기 (새로고침 없이)
+    const replayFromStart = () => {
+        setCurrentVideoIndex(0);
+        currentVideoIndexRef.current = 0;
+        setPlaylistEnded(false);
+        if (playerRef.current) {
+            playerRef.current.loadVideoById(videoIds[0]);
+        }
+    };
+
     return (
         <div className="relative w-full bg-black rounded-xl overflow-hidden shadow-2xl">
             {/* YouTube 플레이어 */}
@@ -215,6 +227,25 @@ const YouTubeEducationPlayer = ({
                         <div className="text-center">
                             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
                             <p className="text-white">영상을 불러오는 중...</p>
+                        </div>
+                    </div>
+                )}
+
+                {/* 모든 영상 재생 완료 후 다시 보기 오버레이 */}
+                {playlistEnded && !isCompleted && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-20">
+                        <div className="text-center">
+                            <div className="text-5xl mb-4">🔄</div>
+                            <p className="text-white text-lg font-bold mb-2">영상이 모두 끝났습니다</p>
+                            <p className="text-yellow-400 text-sm mb-4">
+                                필수 시청 시간까지 <span className="font-bold">{remainingMinutes}분</span> 더 필요합니다
+                            </p>
+                            <button
+                                onClick={replayFromStart}
+                                className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-full transition-colors text-lg"
+                            >
+                                ▶️ 처음부터 다시 보기
+                            </button>
                         </div>
                     </div>
                 )}
