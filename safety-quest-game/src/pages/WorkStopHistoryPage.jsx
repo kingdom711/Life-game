@@ -1,25 +1,35 @@
 /**
  * 작업중지 이력 페이지
  *
- * 계획서 2-3, 2-6:
  * - 작업중지 신고 이력 목록
  * - 상태별 필터 (신고→접수확인→조사중→해결→작업재개)
  * - 보복 방지 모니터링 현황
- * - 관리감독자/안전관리자의 상태 업데이트 기능
+ * - 모든 역할(기술인/관리감독자/안전관리자)이 상태 업데이트 가능
+ * - 누구든 먼저 해결하면 완료 처리
  */
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     getWorkStopReports,
+    getWorkStopReportsAsync,
     getWorkStopStats,
+    getWorkStopStatsAsync,
     getActiveProtections,
-    updateReportStatus,
+    getActiveProtectionsAsync,
+    updateReportStatusAsync,
+    createRetaliationReport,
     REPORT_STATUS,
     REPORT_STATUS_INFO,
     HAZARD_TYPES
 } from '../utils/workStopManager';
 import { userProfile } from '../utils/storage';
+
+const ROLE_LABELS = {
+    technician: '기술인',
+    supervisor: '관리감독자',
+    safetyManager: '안전관리자'
+};
 
 function WorkStopHistoryPage() {
     const navigate = useNavigate();
@@ -27,26 +37,73 @@ function WorkStopHistoryPage() {
     const [stats, setStats] = useState(null);
     const [filter, setFilter] = useState('all');
     const [protections, setProtections] = useState([]);
+    const [isUpdating, setIsUpdating] = useState(null);
+    // 보복 신고 상태
+    const [showRetaliationForm, setShowRetaliationForm] = useState(null); // protectionId
+    const [retaliationType, setRetaliationType] = useState('');
+    const [retaliationDesc, setRetaliationDesc] = useState('');
+    const [retaliationSubmitting, setRetaliationSubmitting] = useState(false);
     const role = userProfile.getRole();
-    const isAdmin = role === 'supervisor' || role === 'safetyManager';
+    const userName = userProfile.getName() || '사용자';
 
     useEffect(() => {
         loadData();
     }, []);
 
-    const loadData = () => {
+    const loadData = async () => {
+        // localStorage로 즉시 렌더링 (빠른 응답)
         setReports(getWorkStopReports());
         setStats(getWorkStopStats());
         setProtections(getActiveProtections());
+
+        // API에서 최신 데이터 가져오기 (비동기)
+        try {
+            const [apiReports, apiStats, apiProtections] = await Promise.all([
+                getWorkStopReportsAsync(),
+                getWorkStopStatsAsync(),
+                getActiveProtectionsAsync()
+            ]);
+            setReports(apiReports);
+            setStats(apiStats);
+            setProtections(apiProtections);
+        } catch {
+            // API 실패 시 localStorage 데이터 유지
+        }
     };
 
     const filteredReports = filter === 'all'
         ? reports
         : reports.filter(r => r.status === filter);
 
-    const handleStatusUpdate = (reportId, newStatus) => {
-        const updaterName = userProfile.getName() || '관리자';
-        updateReportStatus(reportId, newStatus, updaterName);
+    const handleStatusUpdate = async (reportId, newStatus) => {
+        setIsUpdating(reportId);
+        await updateReportStatusAsync(reportId, newStatus, userName);
+        await loadData();
+        setIsUpdating(null);
+    };
+
+    const RETALIATION_TYPES = [
+        { id: 'dismissal', label: '해고/계약 해지' },
+        { id: 'demotion', label: '보직 변경/강등' },
+        { id: 'pay_cut', label: '임금 삭감/수당 제외' },
+        { id: 'exclusion', label: '업무 배제/따돌림' },
+        { id: 'verbal', label: '폭언/위협' },
+        { id: 'other', label: '기타 불이익' },
+    ];
+
+    const handleRetaliationSubmit = () => {
+        if (!retaliationType || !retaliationDesc.trim()) return;
+        setRetaliationSubmitting(true);
+        createRetaliationReport({
+            workerName: userName,
+            protectionId: showRetaliationForm,
+            retaliationType,
+            description: retaliationDesc.trim(),
+        });
+        setRetaliationSubmitting(false);
+        setShowRetaliationForm(null);
+        setRetaliationType('');
+        setRetaliationDesc('');
         loadData();
     };
 
@@ -99,6 +156,17 @@ function WorkStopHistoryPage() {
                     }}>
                         ✋ 작업중지 이력
                     </h1>
+                    <span style={{
+                        marginLeft: 'auto',
+                        padding: '0.25rem 0.625rem',
+                        borderRadius: '12px',
+                        background: 'rgba(99, 102, 241, 0.15)',
+                        color: '#818cf8',
+                        fontSize: '0.75rem',
+                        fontWeight: 600
+                    }}>
+                        {ROLE_LABELS[role] || '기술인'}
+                    </span>
                 </div>
 
                 {/* 통계 카드 */}
@@ -133,7 +201,7 @@ function WorkStopHistoryPage() {
                     </div>
                 )}
 
-                {/* 보호 기간 안내 */}
+                {/* 보호 기간 안내 + 보복 신고 */}
                 {protections.length > 0 && (
                     <div style={{
                         background: 'rgba(99, 102, 241, 0.1)',
@@ -153,10 +221,169 @@ function WorkStopHistoryPage() {
                         }}>
                             🛡️ 보호 기간 활성 ({protections.length}건)
                         </div>
-                        <div style={{ color: 'rgba(203,213,225,0.7)', fontSize: '0.8rem', lineHeight: 1.6 }}>
+                        <div style={{ color: 'rgba(203,213,225,0.7)', fontSize: '0.8rem', lineHeight: 1.6, marginBottom: '0.75rem' }}>
                             작업중지 행사 후 30일간 보복 방지 모니터링이 진행 중입니다.
-                            불이익 발생 시 앱 내에서 즉시 보복 신고가 가능합니다.
                         </div>
+
+                        {/* 보호 기간 목록 + 보복 신고 버튼 */}
+                        {protections.map((p, idx) => {
+                            const daysLeft = Math.max(0, Math.ceil((new Date(p.endDate) - new Date()) / (1000 * 60 * 60 * 24)));
+                            return (
+                                <div key={p.reportId || idx} style={{
+                                    background: 'rgba(99, 102, 241, 0.08)',
+                                    borderRadius: '8px',
+                                    padding: '0.75rem',
+                                    marginBottom: idx < protections.length - 1 ? '0.5rem' : 0
+                                }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center'
+                                    }}>
+                                        <div>
+                                            <span style={{ color: '#a5b4fc', fontSize: '0.8rem', fontWeight: 600 }}>
+                                                {p.workerName || userName}
+                                            </span>
+                                            <span style={{ color: 'rgba(203,213,225,0.5)', fontSize: '0.7rem', marginLeft: '0.5rem' }}>
+                                                잔여 {daysLeft}일
+                                            </span>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowRetaliationForm(
+                                                showRetaliationForm === p.reportId ? null : p.reportId
+                                            )}
+                                            style={{
+                                                padding: '0.3rem 0.625rem',
+                                                borderRadius: '8px',
+                                                border: '1px solid rgba(239, 68, 68, 0.4)',
+                                                background: showRetaliationForm === p.reportId
+                                                    ? 'rgba(239, 68, 68, 0.2)'
+                                                    : 'rgba(239, 68, 68, 0.08)',
+                                                color: '#f87171',
+                                                fontSize: '0.7rem',
+                                                fontWeight: 700,
+                                                cursor: 'pointer',
+                                                transition: 'all 0.15s ease'
+                                            }}
+                                        >
+                                            🚨 보복 신고
+                                        </button>
+                                    </div>
+
+                                    {/* 보복 신고 인라인 폼 */}
+                                    {showRetaliationForm === p.reportId && (
+                                        <div style={{
+                                            marginTop: '0.75rem',
+                                            padding: '0.75rem',
+                                            background: 'rgba(239, 68, 68, 0.06)',
+                                            borderRadius: '8px',
+                                            border: '1px solid rgba(239, 68, 68, 0.2)'
+                                        }}>
+                                            <div style={{
+                                                color: '#f87171',
+                                                fontSize: '0.8rem',
+                                                fontWeight: 700,
+                                                marginBottom: '0.625rem'
+                                            }}>
+                                                보복 유형 선택
+                                            </div>
+                                            <div style={{
+                                                display: 'flex',
+                                                flexWrap: 'wrap',
+                                                gap: '0.375rem',
+                                                marginBottom: '0.625rem'
+                                            }}>
+                                                {RETALIATION_TYPES.map(rt => (
+                                                    <button
+                                                        key={rt.id}
+                                                        onClick={() => setRetaliationType(rt.id)}
+                                                        style={{
+                                                            padding: '0.3rem 0.6rem',
+                                                            borderRadius: '16px',
+                                                            border: retaliationType === rt.id
+                                                                ? '1px solid rgba(239, 68, 68, 0.6)'
+                                                                : '1px solid rgba(148,163,184,0.2)',
+                                                            background: retaliationType === rt.id
+                                                                ? 'rgba(239, 68, 68, 0.15)'
+                                                                : 'rgba(30,27,46,0.5)',
+                                                            color: retaliationType === rt.id
+                                                                ? '#f87171'
+                                                                : 'rgba(203,213,225,0.7)',
+                                                            fontSize: '0.7rem',
+                                                            fontWeight: 600,
+                                                            cursor: 'pointer'
+                                                        }}
+                                                    >
+                                                        {rt.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <textarea
+                                                value={retaliationDesc}
+                                                onChange={(e) => setRetaliationDesc(e.target.value)}
+                                                placeholder="구체적인 상황을 설명해 주세요..."
+                                                style={{
+                                                    width: '100%',
+                                                    minHeight: '60px',
+                                                    padding: '0.5rem',
+                                                    borderRadius: '8px',
+                                                    border: '1px solid rgba(148,163,184,0.2)',
+                                                    background: 'rgba(15, 23, 42, 0.6)',
+                                                    color: '#e2e8f0',
+                                                    fontSize: '0.8rem',
+                                                    resize: 'vertical',
+                                                    outline: 'none',
+                                                    boxSizing: 'border-box',
+                                                    marginBottom: '0.5rem'
+                                                }}
+                                            />
+                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                <button
+                                                    onClick={() => {
+                                                        setShowRetaliationForm(null);
+                                                        setRetaliationType('');
+                                                        setRetaliationDesc('');
+                                                    }}
+                                                    style={{
+                                                        padding: '0.375rem 0.75rem',
+                                                        borderRadius: '8px',
+                                                        border: '1px solid rgba(148,163,184,0.2)',
+                                                        background: 'transparent',
+                                                        color: 'rgba(203,213,225,0.7)',
+                                                        fontSize: '0.75rem',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    취소
+                                                </button>
+                                                <button
+                                                    onClick={handleRetaliationSubmit}
+                                                    disabled={!retaliationType || !retaliationDesc.trim() || retaliationSubmitting}
+                                                    style={{
+                                                        padding: '0.375rem 0.75rem',
+                                                        borderRadius: '8px',
+                                                        border: 'none',
+                                                        background: (!retaliationType || !retaliationDesc.trim())
+                                                            ? 'rgba(148,163,184,0.15)'
+                                                            : 'rgba(239, 68, 68, 0.2)',
+                                                        color: (!retaliationType || !retaliationDesc.trim())
+                                                            ? 'rgba(148,163,184,0.4)'
+                                                            : '#f87171',
+                                                        fontSize: '0.75rem',
+                                                        fontWeight: 700,
+                                                        cursor: (!retaliationType || !retaliationDesc.trim())
+                                                            ? 'not-allowed'
+                                                            : 'pointer'
+                                                    }}
+                                                >
+                                                    {retaliationSubmitting ? '접수중...' : '🚨 보복 신고 접수'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
 
@@ -277,7 +504,7 @@ function WorkStopHistoryPage() {
                                         </p>
                                     )}
 
-                                    {/* 하단: 시간 + 신고자 */}
+                                    {/* 하단: 시간 + 신고자 + 조치 버튼 */}
                                     <div style={{
                                         display: 'flex',
                                         justifyContent: 'space-between',
@@ -290,10 +517,11 @@ function WorkStopHistoryPage() {
                                             {formatDate(report.createdAt)} · {report.reporterName}
                                         </span>
 
-                                        {/* 관리자: 다음 상태로 이동 버튼 */}
-                                        {isAdmin && nextStatus && (
+                                        {/* 모든 역할: 다음 상태로 이동 버튼 (누구든 먼저 해결하면 완료) */}
+                                        {nextStatus && (
                                             <button
                                                 onClick={() => handleStatusUpdate(report.id, nextStatus)}
+                                                disabled={isUpdating === report.id}
                                                 style={{
                                                     padding: '0.375rem 0.75rem',
                                                     borderRadius: '8px',
@@ -302,10 +530,14 @@ function WorkStopHistoryPage() {
                                                     color: REPORT_STATUS_INFO[nextStatus].color,
                                                     fontSize: '0.75rem',
                                                     fontWeight: 700,
-                                                    cursor: 'pointer'
+                                                    cursor: isUpdating === report.id ? 'wait' : 'pointer',
+                                                    opacity: isUpdating === report.id ? 0.6 : 1
                                                 }}
                                             >
-                                                → {REPORT_STATUS_INFO[nextStatus].label}
+                                                {isUpdating === report.id
+                                                    ? '처리중...'
+                                                    : `→ ${REPORT_STATUS_INFO[nextStatus].label}`
+                                                }
                                             </button>
                                         )}
                                     </div>
@@ -327,6 +559,24 @@ function WorkStopHistoryPage() {
                                                     {report.resolutionNote}
                                                 </div>
                                             )}
+                                        </div>
+                                    )}
+
+                                    {/* 상태 이력 (최근 변경자 표시) */}
+                                    {report.statusHistory && report.statusHistory.length > 1 && (
+                                        <div style={{
+                                            marginTop: '0.5rem',
+                                            paddingTop: '0.5rem',
+                                            borderTop: '1px solid rgba(148,163,184,0.1)'
+                                        }}>
+                                            <div style={{
+                                                color: 'rgba(203,213,225,0.35)',
+                                                fontSize: '0.7rem'
+                                            }}>
+                                                최근 조치: {report.statusHistory[report.statusHistory.length - 1].by || '시스템'}
+                                                {' · '}
+                                                {formatDate(report.statusHistory[report.statusHistory.length - 1].timestamp)}
+                                            </div>
                                         </div>
                                     )}
                                 </div>

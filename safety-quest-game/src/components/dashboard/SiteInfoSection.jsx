@@ -13,7 +13,7 @@ const SAFETY_QUOTES = [
     { text: '"한 번의 확인이 사고를 예방한다"', author: '현장 격언' },
 ];
 
-function SiteInfoSection({ alerts = [], alertCount = 0 }) {
+function SiteInfoSection({ alerts = [], alertCount = 0, workStopCount = 0 }) {
     const navigate = useNavigate();
     const [weatherData] = useState({
         temp: 18,
@@ -37,17 +37,32 @@ function SiteInfoSection({ alerts = [], alertCount = 0 }) {
         <div className="new-siteinfo-section">
             <div className="new-siteinfo-header">
                 <h2 className="new-siteinfo-title">현장 정보</h2>
-                <button
-                    type="button"
-                    className="new-siteinfo-alert-btn"
-                    onClick={() => navigate('/alert-management')}
-                >
-                    <span className="new-siteinfo-alert-btn-icon">🔔</span>
-                    {alertCount > 0 && (
-                        <span className="new-siteinfo-alert-btn-badge">{alertCount}</span>
-                    )}
-                    <span className="new-siteinfo-alert-btn-text">알림 상세</span>
-                </button>
+                <div className="new-siteinfo-header-actions">
+                    {/* 작업중지 현황 버튼 */}
+                    <button
+                        type="button"
+                        className="new-siteinfo-workstop-btn"
+                        onClick={() => navigate('/work-stop-history')}
+                    >
+                        <span className="new-siteinfo-workstop-btn-icon">✋</span>
+                        {workStopCount > 0 && (
+                            <span className="new-siteinfo-workstop-btn-badge">{workStopCount}</span>
+                        )}
+                        <span className="new-siteinfo-workstop-btn-text">작업중지</span>
+                    </button>
+                    {/* 알림 상세 버튼 */}
+                    <button
+                        type="button"
+                        className="new-siteinfo-alert-btn"
+                        onClick={() => navigate('/alert-management')}
+                    >
+                        <span className="new-siteinfo-alert-btn-icon">🔔</span>
+                        {alertCount > 0 && (
+                            <span className="new-siteinfo-alert-btn-badge">{alertCount}</span>
+                        )}
+                        <span className="new-siteinfo-alert-btn-text">알림 상세</span>
+                    </button>
+                </div>
             </div>
 
             <div className="new-siteinfo-alerts">

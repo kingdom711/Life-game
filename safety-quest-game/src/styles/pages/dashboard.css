@@ -2258,6 +2258,56 @@
   color: #f8fafc;
 }
 
+.new-siteinfo-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.new-siteinfo-workstop-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.75rem;
+  font-weight: 700;
+  position: relative;
+}
+
+.new-siteinfo-workstop-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.6);
+  transform: translateY(-1px);
+}
+
+.new-siteinfo-workstop-btn-icon {
+  font-size: 0.9rem;
+}
+
+.new-siteinfo-workstop-btn-badge {
+  min-width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.55rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+}
+
+.new-siteinfo-workstop-btn-text {
+  white-space: nowrap;
+}
+
 .new-siteinfo-alert-btn {
   display: flex;
   align-items: center;
@@ -3071,6 +3121,29 @@
 .dash-hero-badge--star {
   border-color: rgba(250, 204, 21, 0.35);
   box-shadow: 0 0 14px rgba(250, 204, 21, 0.12);
+}
+
+.dash-hero-badge--stop {
+  border-color: rgba(148, 163, 184, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dash-hero-badge--stop:hover {
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.15);
+  transform: translateY(-1px);
+}
+
+.dash-hero-badge--stop-active {
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.2);
+  animation: workStopBadgePulse 2s ease-in-out infinite;
+}
+
+@keyframes workStopBadgePulse {
+  0%, 100% { box-shadow: 0 0 14px rgba(239, 68, 68, 0.2); }
+  50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
 }
 
 .dash-hero-badge-icon {

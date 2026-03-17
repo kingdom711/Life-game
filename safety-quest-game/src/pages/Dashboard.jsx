@@ -30,6 +30,7 @@ import RecentRewards from '../components/dashboard/RecentRewards';
 import OurTeamSection from '../components/dashboard/OurTeamSection';
 import QuickNavigation from '../components/dashboard/QuickNavigation';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
+import { getActiveWorkStopCount } from '../utils/workStopManager';
 
 // [New] 援먯쑁 ?쒖뒪??
 import { getTodayEducationContent, hasCompletedTodayEducation } from '../utils/educationManager';
@@ -138,6 +139,9 @@ function Dashboard({ role }) {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [shareModal, setShareModal] = useState({ isOpen: false, type: null, data: null });
 
+    // 작업중지 미해결 건수
+    const [activeWorkStopCount, setActiveWorkStopCount] = useState(0);
+
     // 愿由ъ옄 沅뚰븳 泥댄겕
     const isAdmin = role === 'supervisor' || role === 'safetyManager';
 
@@ -233,6 +237,9 @@ function Dashboard({ role }) {
         } catch (error) {
             console.error('교육 데이터 로드 실패:', error);
         }
+
+        // 작업중지 미해결 건수 로드
+        setActiveWorkStopCount(getActiveWorkStopCount());
 
         // 諛깆뿏?쒖뿉??理쒖떊 ?곗씠???숆린??(濡쒓렇???곹깭????
         const token = localStorage.getItem('accessToken');
@@ -494,7 +501,7 @@ function Dashboard({ role }) {
     return (
         <div className="page dashboard-page">
             <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-                <DashboardHeader playerStats={playerStats} role={role} />
+                <DashboardHeader playerStats={playerStats} role={role} activeWorkStopCount={activeWorkStopCount} />
                 <div className="new-dashboard-layout">
                     {/* Left main column */}
                     <main className="new-dashboard-left">
@@ -508,7 +515,7 @@ function Dashboard({ role }) {
                             quests={enrichedQuests}
                             onQuestAction={handleCompleteQuest}
                         />
-                        <SiteInfoSection alerts={latestAlerts} alertCount={latestAlerts.length} />
+                        <SiteInfoSection alerts={latestAlerts} alertCount={latestAlerts.length} workStopCount={activeWorkStopCount} />
                     </main>
 
                     {/* Right sidebar */}

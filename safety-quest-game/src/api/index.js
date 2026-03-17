@@ -15,6 +15,7 @@ import reviewApi from './reviewApi';
 import riskApi from './riskApi';
 import aiApi from './aiApi';
 import hazardCycleApi from './hazardCycleApi';
+import workStopApi from './workStopApi';
 import config from '../config/environment';
 
 // 모든 API를 하나의 객체로 통합
@@ -32,6 +33,7 @@ const api = {
     risk: riskApi,
     ai: aiApi,
     hazardCycle: hazardCycleApi,
+    workStop: workStopApi,
     config,
 };
 
@@ -51,6 +53,7 @@ export {
     riskApi,
     aiApi,
     hazardCycleApi,
+    workStopApi,
     config,
 };
 

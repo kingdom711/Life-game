@@ -7,7 +7,10 @@
  * - 보복 방지 모니터링 (30일 보호 기간)
  * - 익명/실명 신고 지원
  * - 오프라인 저장 → 연결 후 동기화
+ * - API 우선 + localStorage 폴백 (Async 함수)
  */
+
+import workStopApi from '../api/workStopApi';
 
 const STORAGE_KEYS = {
     WORK_STOP_REPORTS: 'safety_quest_work_stop_reports',
@@ -255,16 +258,138 @@ export const getWorkStopStats = () => {
     };
 };
 
+// ============================================================
+// Async 함수 (API 우선 + localStorage 폴백)
+// 백엔드 서버 연결 시 데이터가 공유되어 기술인/관리감독자/안전관리자 모두 확인 가능
+// ============================================================
+
+/**
+ * [Async] 작업중지 신고 등록 — API 우선, 실패 시 localStorage
+ */
+export const createWorkStopReportAsync = async (params) => {
+    // localStorage에는 항상 저장 (오프라인 지원)
+    const localReport = createWorkStopReport(params);
+
+    try {
+        const response = await workStopApi.createReport({
+            ...localReport,
+            reporterActualName: params.reporterName // 서버에 실명 전달
+        });
+        // API 성공 시 서버 ID로 교체
+        if (response?.data?.id) {
+            const reports = getWorkStopReports();
+            const idx = reports.findIndex(r => r.id === localReport.id);
+            if (idx !== -1) {
+                reports[idx] = { ...reports[idx], ...response.data, _synced: true };
+                localStorage.setItem(STORAGE_KEYS.WORK_STOP_REPORTS, JSON.stringify(reports));
+                return reports[idx];
+            }
+        }
+        return localReport;
+    } catch {
+        // API 실패 — localStorage 데이터 사용
+        return localReport;
+    }
+};
+
+/**
+ * [Async] 작업중지 신고 목록 조회 — API 우선, 실패 시 localStorage
+ */
+export const getWorkStopReportsAsync = async () => {
+    try {
+        const response = await workStopApi.getReports();
+        if (response?.data && Array.isArray(response.data)) {
+            // API 성공 시 localStorage에도 동기화
+            localStorage.setItem(STORAGE_KEYS.WORK_STOP_REPORTS, JSON.stringify(response.data));
+            return response.data;
+        }
+        return getWorkStopReports();
+    } catch {
+        return getWorkStopReports();
+    }
+};
+
+/**
+ * [Async] 신고 상태 업데이트 — API 우선, 실패 시 localStorage
+ * 누구든(기술인/관리감독자/안전관리자) 호출 가능 → 먼저 해결한 사람이 완료 처리
+ */
+export const updateReportStatusAsync = async (reportId, newStatus, updaterName = '', note = '') => {
+    // localStorage에 즉시 반영 (오프라인/빠른 응답)
+    const localResult = updateReportStatus(reportId, newStatus, updaterName, note);
+
+    try {
+        const response = await workStopApi.updateStatus(reportId, newStatus, updaterName, note);
+        if (response?.data) {
+            // 서버 응답으로 동기화
+            const reports = getWorkStopReports();
+            const idx = reports.findIndex(r => r.id === reportId);
+            if (idx !== -1) {
+                reports[idx] = { ...reports[idx], ...response.data, _synced: true };
+                localStorage.setItem(STORAGE_KEYS.WORK_STOP_REPORTS, JSON.stringify(reports));
+                return reports[idx];
+            }
+        }
+        return localResult;
+    } catch {
+        return localResult;
+    }
+};
+
+/**
+ * [Async] 통계 조회 — API 우선, 실패 시 localStorage 기반 계산
+ */
+export const getWorkStopStatsAsync = async () => {
+    try {
+        const response = await workStopApi.getStats();
+        if (response?.data) return response.data;
+        return getWorkStopStats();
+    } catch {
+        return getWorkStopStats();
+    }
+};
+
+/**
+ * [Async] 보호 기간 조회 — API 우선, 실패 시 localStorage
+ */
+export const getActiveProtectionsAsync = async (workerName = null) => {
+    try {
+        const response = await workStopApi.getProtections(workerName);
+        if (response?.data && Array.isArray(response.data)) {
+            localStorage.setItem(STORAGE_KEYS.WORK_STOP_PROTECTION, JSON.stringify(response.data));
+            return response.data;
+        }
+        return getActiveProtections(workerName);
+    } catch {
+        return getActiveProtections(workerName);
+    }
+};
+
+/**
+ * 미해결(진행중) 작업중지 건수 조회
+ */
+export const getActiveWorkStopCount = () => {
+    const reports = getWorkStopReports();
+    return reports.filter(r =>
+        r.status !== REPORT_STATUS.RESOLVED && r.status !== REPORT_STATUS.RESUMED
+    ).length;
+};
+
 export default {
     HAZARD_TYPES,
     REPORT_STATUS,
     REPORT_STATUS_INFO,
     createWorkStopReport,
+    createWorkStopReportAsync,
     getWorkStopReports,
+    getWorkStopReportsAsync,
     getWorkStopReportById,
     updateReportStatus,
+    updateReportStatusAsync,
     getActiveProtections,
+    getActiveProtectionsAsync,
+    getWorkStopStats,
+    getWorkStopStatsAsync,
+    getActiveWorkStopCount,
     createRetaliationReport,
     getRetaliationReports,
-    getWorkStopStats
 };

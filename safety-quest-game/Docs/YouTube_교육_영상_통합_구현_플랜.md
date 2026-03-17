@@ -39,11 +39,19 @@ YouTube IFrame API를 활용한 새 교육 전용 플레이어 컴포넌트:
 ```
 
 **주요 Props:**
-- `youtubeVideoId`: YouTube 비디오 ID (예: "dQw4w9WgXcQ")
+- `youtubeVideoId`: 단일 YouTube 비디오 ID (예: "dQw4w9WgXcQ") 또는 연속 재생을 위한 비디오 ID 배열 (예: `['GYg7en3Pf88', '7pR4y1SBMb4']`)
 - `duration`: 영상 총 길이 (초)
 - `requiredWatchTime`: 필수 시청 시간 (초)
 - `onTimeUpdate`: 시간 업데이트 콜백
 - `onVideoComplete`: 시청 완료 콜백
+
+**다중 영상 연속 재생 로직:**
+```javascript
+// youtubeVideoId가 배열로 전달될 경우
+// 1. 첫 번째 영상(인덱스 0) 재생 완료 시 (onStateChange: YT.PlayerState.ENDED)
+// 2. 다음 영상(인덱스 1) 로드 (player.loadVideoById) 및 자동 재생
+// 3. 모든 배열의 영상을 차례대로 끝까지 시청해야 onVideoComplete 콜백 호출
+```
 
 **빨리감기 방지 로직:**
 ```javascript
@@ -241,6 +249,7 @@ npm run dev
 | edu_008 | 화재 안전 | 소화기 사용법 | `BgJ2p9zdXJk` | [소방안전자료] 소화기 사용법, 정말 제대로 알고 계신가요? | 국립소방연구원 | 4:24 | 3만 |
 | edu_009 | 전기 안전 | 전기 안전 기본 | `0UjrtwwaCl4` | [내 일은 안전 Ep.5] '감전 재해'편 | 삼물가게 / 삼성물산 건설부문 | 10:48 | 1만 |
 | edu_010 | 밀폐공간 | 밀폐공간 작업 안전 | `fBiwQvg22tk` | (안전교육) 밀폐공간 작업 안전 | KOEN 한국남동발전 | 11:27 | 1.7천 |
+| edu_011 | 근로자 권리 | 작업중지권 교육 | `["GYg7en3Pf88", "7pR4y1SBMb4"]` | (다중 영상 연속 재생: 10분 권장 분량 충족 목적) | - | ~10:00 | - |
 
 ### 영상 선정 기준
 - **YouTube Data API v3** 검색 결과 중 **조회수 1위** 영상을 선정

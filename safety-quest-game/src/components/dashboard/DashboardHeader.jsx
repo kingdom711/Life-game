@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { userProfile } from '../../utils/storage';
 
 const ROLE_LABELS = {
@@ -6,7 +7,8 @@ const ROLE_LABELS = {
     safetyManager: '안전관리자'
 };
 
-function DashboardHeader({ playerStats, role }) {
+function DashboardHeader({ playerStats, role, activeWorkStopCount = 0 }) {
+    const navigate = useNavigate();
     const today = new Date().toLocaleDateString('ko-KR', {
         year: 'numeric', month: '2-digit', day: '2-digit'
     });
@@ -42,6 +44,20 @@ function DashboardHeader({ playerStats, role }) {
 
                 {/* 우측 배지 */}
                 <div className="dash-hero-badges">
+                    {/* 작업중지 현황 배지 — 미해결 건이 있을 때 표시 */}
+                    <div
+                        className={`dash-hero-badge dash-hero-badge--stop${activeWorkStopCount > 0 ? ' dash-hero-badge--stop-active' : ''}`}
+                        onClick={() => navigate('/work-stop-history')}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && navigate('/work-stop-history')}
+                    >
+                        <span className="dash-hero-badge-icon">✋</span>
+                        <span className="dash-hero-badge-value">
+                            {activeWorkStopCount > 0 ? `${activeWorkStopCount}건` : '-'}
+                        </span>
+                        <span className="dash-hero-badge-label">작업중지</span>
+                    </div>
                     <div className="dash-hero-badge dash-hero-badge--fire">
                         <span className="dash-hero-badge-icon">🔥</span>
                         <span className="dash-hero-badge-value">{streakDays}일</span>
