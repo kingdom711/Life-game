@@ -5,6 +5,7 @@ import { CATEGORY_NAMES, getRarityColor, RARITY_NAMES } from '../data/itemsData'
 import { userInventoryInstances } from '../utils/storage';
 import { ensureItemInstance, getCalibrationInfo } from '../utils/calibrationService';
 import CalibrationModal from '../components/CalibrationModal';
+import ForgeModal from '../components/ForgeModal';
 import StatsHUD from '../components/StatsHUD';
 import { LoadingState, ErrorState, EmptyState } from '../components/PageState';
 
@@ -21,6 +22,7 @@ function Inventory() {
     const [inventoryItems, setInventoryItems] = useState([]);
     const [stats, setStats] = useState({});
     const [calibrationModal, setCalibrationModal] = useState({ isOpen: false, itemId: null });
+    const [isForgeOpen, setIsForgeOpen] = useState(false);
     const [itemInstances, setItemInstances] = useState({});
     const [imageErrors, setImageErrors] = useState({});
     const [isLoading, setIsLoading] = useState(true);
@@ -150,6 +152,26 @@ function Inventory() {
                         🎒 인벤토리
                     </h1>
                     <p className="text-lg" style={{ color: COLOR.textMuted }}>보유 중인 안전용품을 관리하세요</p>
+                </div>
+
+                {/* 장비 합성 버튼 */}
+                <div style={{ marginBottom: '1rem' }}>
+                    <button
+                        onClick={() => setIsForgeOpen(true)}
+                        style={{
+                            width: '100%', padding: '0.85rem 1.25rem',
+                            borderRadius: '12px', border: '2px solid rgba(168, 85, 247, 0.3)',
+                            background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(99, 102, 241, 0.15))',
+                            color: '#c084fc', fontWeight: 700, fontSize: '0.95rem',
+                            cursor: 'pointer', display: 'flex', alignItems: 'center',
+                            justifyContent: 'center', gap: '0.5rem'
+                        }}
+                    >
+                        ⚒️ 장비 합성소
+                        <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 400 }}>
+                            같은 등급 장비 2개 → 상위 등급
+                        </span>
+                    </button>
                 </div>
 
                 {/* 활성 스탯 HUD */}
@@ -341,6 +363,13 @@ function Inventory() {
                 onClose={closeCalibrationModal}
                 itemId={calibrationModal.itemId}
                 onCalibrationComplete={handleCalibrationComplete}
+            />
+
+            {/* 장비 합성 모달 */}
+            <ForgeModal
+                isOpen={isForgeOpen}
+                onClose={() => setIsForgeOpen(false)}
+                onComplete={() => loadData()}
             />
         </div>
     );

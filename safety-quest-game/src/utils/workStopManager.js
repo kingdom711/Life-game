@@ -116,7 +116,7 @@ export const getWorkStopReportById = (reportId) => {
 /**
  * 신고 상태 업데이트
  */
-export const updateReportStatus = (reportId, newStatus, updaterName = '', note = '') => {
+export const updateReportStatus = (reportId, newStatus, updaterName = '', note = '', actionData = null) => {
     const reports = getWorkStopReports();
     const index = reports.findIndex(r => r.id === reportId);
     if (index === -1) return null;
@@ -128,16 +128,27 @@ export const updateReportStatus = (reportId, newStatus, updaterName = '', note =
         status: newStatus,
         timestamp: now,
         by: updaterName,
-        note
+        note,
+        ...(actionData ? { actionData } : {})
     });
 
     if (newStatus === REPORT_STATUS.RESOLVED) {
         reports[index].resolvedAt = now;
         reports[index].resolverName = updaterName;
         reports[index].resolutionNote = note;
+        // 조치 내용 저장
+        if (actionData) {
+            reports[index].actionPlan = actionData.actionPlan;       // 어떤 조치를 했는지
+            reports[index].actionMethod = actionData.actionMethod;   // 어떻게 조치했는지
+        }
     }
     if (newStatus === REPORT_STATUS.RESUMED) {
         reports[index].resumedAt = now;
+        // 작업 재개 시 확인/조치 내용 저장
+        if (actionData) {
+            reports[index].resumeVerification = actionData.resumeVerification;   // 확인 사항
+            reports[index].resumeActionNote = actionData.resumeActionNote;       // 조치 완료 확인 내용
+        }
     }
 
     localStorage.setItem(STORAGE_KEYS.WORK_STOP_REPORTS, JSON.stringify(reports));
@@ -313,9 +324,9 @@ export const getWorkStopReportsAsync = async () => {
  * [Async] 신고 상태 업데이트 — API 우선, 실패 시 localStorage
  * 누구든(기술인/관리감독자/안전관리자) 호출 가능 → 먼저 해결한 사람이 완료 처리
  */
-export const updateReportStatusAsync = async (reportId, newStatus, updaterName = '', note = '') => {
+export const updateReportStatusAsync = async (reportId, newStatus, updaterName = '', note = '', actionData = null) => {
     // localStorage에 즉시 반영 (오프라인/빠른 응답)
-    const localResult = updateReportStatus(reportId, newStatus, updaterName, note);
+    const localResult = updateReportStatus(reportId, newStatus, updaterName, note, actionData);
 
     try {
         const response = await workStopApi.updateStatus(reportId, newStatus, updaterName, note);

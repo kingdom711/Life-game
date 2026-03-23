@@ -30,6 +30,19 @@ import CycleHistoryPage from './pages/CycleHistoryPage';
 import SafetyScoreDashboard from './pages/SafetyScoreDashboard';
 import AdminRewardApproval from './pages/AdminRewardApproval';
 import WorkStopHistoryPage from './pages/WorkStopHistoryPage'; // [New] 작업중지 이력
+import AchievementPage from './pages/AchievementPage'; // [Phase1] 업적
+
+// [Phase2] 고도화 페이지
+import SeasonRankingPage from './pages/SeasonRankingPage';
+import LearningPathPage from './pages/LearningPathPage';
+import TeamQuestPage from './pages/TeamQuestPage';
+import DepartmentBattlePage from './pages/DepartmentBattlePage';
+import DailyBriefingPage from './pages/DailyBriefingPage';
+
+// [Phase3] 고도화 페이지
+import HazardHeatmapPage from './pages/HazardHeatmapPage';
+import ScenarioPage from './pages/ScenarioPage';
+import ComplianceReportPage from './pages/ComplianceReportPage';
 
 // Components
 import RoleSelector from './components/RoleSelector';
@@ -40,6 +53,7 @@ import WorkStopReportModal from './components/WorkStopReportModal'; // [New] 작
 import LaunchScreen from './pages/LaunchScreen';
 import BackgroundMusic from './components/BackgroundMusic';
 import ErrorBoundary from './components/ErrorBoundary';
+import { LanguageProvider } from './context/LanguageContext';
 
 // ...
 
@@ -189,6 +203,7 @@ function App() {
     console.log("App Render State:", { showLandingPage, showPricingPage, showLaunchScreen, user, selectedRole });
 
     return (
+        <LanguageProvider>
         <BrowserRouter>
             <ErrorBoundary>
                 <div className="app" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -262,6 +277,15 @@ function App() {
                                     <Route path="/safety-score" element={<SafetyScoreDashboard role={selectedRole} />} />
                                     <Route path="/admin/reward-approval" element={<AdminRewardApproval />} />
                                     <Route path="/work-stop-history" element={<WorkStopHistoryPage />} />
+                                    <Route path="/achievements" element={<AchievementPage />} />
+                                    <Route path="/season-ranking" element={<SeasonRankingPage />} />
+                                    <Route path="/learning-path" element={<LearningPathPage />} />
+                                    <Route path="/team-quest" element={<TeamQuestPage />} />
+                                    <Route path="/department-battle" element={<DepartmentBattlePage />} />
+                                    <Route path="/daily-briefing" element={<DailyBriefingPage />} />
+                                    <Route path="/hazard-heatmap" element={<HazardHeatmapPage />} />
+                                    <Route path="/scenario" element={<ScenarioPage />} />
+                                    <Route path="/compliance-report" element={<ComplianceReportPage />} />
                                     <Route path="*" element={<Navigate to="/" replace />} />
                                 </Routes>
                             </div>
@@ -277,6 +301,7 @@ function App() {
                 </div>
             </ErrorBoundary>
         </BrowserRouter>
+        </LanguageProvider>
     );
 }
 

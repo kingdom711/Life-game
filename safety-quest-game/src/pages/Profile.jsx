@@ -8,6 +8,7 @@ import { getActiveSpecialization, getUnlockedSpecializations } from '../utils/sp
 import { getAllSpecializationProgress } from '../utils/specializationManager';
 import { SPECIALIZATIONS, SPECIALIZATION_STATUS } from '../data/specializationData';
 import { useAuth } from '../context/AuthContext';
+import LanguageSelector from '../components/LanguageSelector';
 
 const COLOR = {
     text: 'var(--color-text)',
@@ -478,6 +479,16 @@ function Profile({ role }) {
                             </div>
                         );
                     })()}
+                </div>
+
+                {/* [Phase3] 언어 설정 */}
+                <div className="card mb-lg">
+                    <div className="card-header">
+                        <h3 className="card-title">🌐 언어 설정</h3>
+                    </div>
+                    <div className="card-body">
+                        <LanguageSelector />
+                    </div>
                 </div>
 
                 {/* 로그아웃 & 초기화 버튼 */}

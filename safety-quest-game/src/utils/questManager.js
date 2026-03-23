@@ -1,6 +1,8 @@
 import { questProgress, points, level, attendanceLogs, weeklyQuestProgress, dailyQuestSnapshots, streak, userProfile, storage, getKSTDateString, getKSTYesterdayString, getKSTDayOfWeek, getKSTDay, getKSTMonth } from './storage';
 import { getQuestById, dailyQuests, weeklyQuests, monthlyQuests, allQuests, QUEST_TYPE } from '../data/questsData';
 import { addPoints, addExperience } from './pointsCalculator';
+import { trackQuestComplete } from './achievementManager';
+import { addSeasonPoints } from './seasonManager';
 
 const WEEKLY_COMPLETE_DAILY_TRACK_KEY = 'safety_quest_weekly_complete_daily_track';
 
@@ -74,6 +76,12 @@ export const completeQuest = (questId) => {
 
     questProgress.completeQuest(questId);
     grantQuestReward(quest);
+
+    // 업적 추적
+    try { trackQuestComplete(); } catch (e) { /* silent */ }
+
+    // 시즌 포인트 추가
+    try { addSeasonPoints(quest.reward?.points || 10, 'quest'); } catch (e) { /* silent */ }
 
     return true;
 };

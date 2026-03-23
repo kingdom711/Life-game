@@ -44,6 +44,19 @@ import ChecklistFormModal from '../components/ChecklistFormModal';
 import PhotoUploadModal from '../components/PhotoUploadModal';
 import ChecklistReviewModal from '../components/ChecklistReviewModal';
 
+// [Phase1] 고도화 기능
+import MicroLearningCard from '../components/MicroLearningCard';
+import AchievementToast from '../components/AchievementToast';
+import PraiseModal from '../components/PraiseModal';
+import { checkAllAchievements, getAchievementSummary, trackQuestComplete } from '../utils/achievementManager';
+
+// [Phase2] 이벤트 퀘스트 배너
+import EventQuestBanner from '../components/EventQuestBanner';
+
+// [Phase3] 알림 센터
+import NotificationCenter from '../components/NotificationCenter';
+import { initMockNotifications, getUnreadCount } from '../utils/notificationManager';
+
 const NON_GATED_QUESTS = ['daily_education_1', 'daily_login_1'];
 
 const COLOR = {
@@ -139,8 +152,17 @@ function Dashboard({ role }) {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [shareModal, setShareModal] = useState({ isOpen: false, type: null, data: null });
 
+    // [Phase1] 업적 토스트, 칭찬 모달
+    const [achievementToast, setAchievementToast] = useState(null);
+    const [praiseModal, setPraiseModal] = useState({ isOpen: false, targetUser: null });
+    const [achievementSummary, setAchievementSummary] = useState({ unlocked: 0, total: 0, unclaimed: 0 });
+
     // 작업중지 미해결 건수
     const [activeWorkStopCount, setActiveWorkStopCount] = useState(0);
+
+    // [Phase3] 알림 센터
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+    const [unreadNotifCount, setUnreadNotifCount] = useState(0);
 
     // 愿由ъ옄 沅뚰븳 泥댄겕
     const isAdmin = role === 'supervisor' || role === 'safetyManager';
@@ -240,6 +262,19 @@ function Dashboard({ role }) {
 
         // 작업중지 미해결 건수 로드
         setActiveWorkStopCount(getActiveWorkStopCount());
+
+        // [Phase1] 업적 체크
+        const newAchievements = checkAllAchievements();
+        if (newAchievements.length > 0) {
+            setAchievementToast(newAchievements[0]);
+        }
+        setAchievementSummary(getAchievementSummary());
+
+        // [Phase3] 알림 초기화
+        try {
+            initMockNotifications();
+            setUnreadNotifCount(getUnreadCount());
+        } catch (e) { /* silent */ }
 
         // 諛깆뿏?쒖뿉??理쒖떊 ?곗씠???숆린??(濡쒓렇???곹깭????
         const token = localStorage.getItem('accessToken');
@@ -501,7 +536,33 @@ function Dashboard({ role }) {
     return (
         <div className="page dashboard-page">
             <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-                <DashboardHeader playerStats={playerStats} role={role} activeWorkStopCount={activeWorkStopCount} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div style={{ flex: 1 }}>
+                        <DashboardHeader playerStats={playerStats} role={role} activeWorkStopCount={activeWorkStopCount} />
+                    </div>
+                    {/* [Phase3] 알림 버튼 */}
+                    <button
+                        onClick={() => setIsNotificationOpen(true)}
+                        style={{
+                            position: 'relative', background: 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px',
+                            padding: '0.5rem 0.75rem', cursor: 'pointer', fontSize: '1.2rem',
+                            color: '#e2e8f0', marginTop: '0.5rem'
+                        }}
+                    >
+                        🔔
+                        {unreadNotifCount > 0 && (
+                            <span style={{
+                                position: 'absolute', top: '-4px', right: '-4px',
+                                background: '#ef4444', color: '#fff', borderRadius: '50%',
+                                width: '18px', height: '18px', fontSize: '0.65rem', fontWeight: 700,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            }}>
+                                {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
+                            </span>
+                        )}
+                    </button>
+                </div>
                 <div className="new-dashboard-layout">
                     {/* Left main column */}
                     <main className="new-dashboard-left">
@@ -511,6 +572,12 @@ function Dashboard({ role }) {
                             equippedItems={equippedItems}
                             educationCompleted={educationCompleted}
                         />
+                        {/* [Phase2] 이벤트 퀘스트 배너 */}
+                        <EventQuestBanner onComplete={() => loadData()} />
+
+                        {/* [Phase1] 마이크로 러닝 카드 */}
+                        <MicroLearningCard onComplete={() => loadData()} />
+
                         <TodayMissions
                             quests={enrichedQuests}
                             onQuestAction={handleCompleteQuest}
@@ -797,6 +864,28 @@ function Dashboard({ role }) {
                 onClose={() => setShareModal({ isOpen: false, type: null, data: null })}
                 shareType={shareModal.type}
                 shareData={shareModal.data}
+            />
+
+            {/* [Phase3] 알림 센터 */}
+            <NotificationCenter
+                isOpen={isNotificationOpen}
+                onClose={() => {
+                    setIsNotificationOpen(false);
+                    setUnreadNotifCount(getUnreadCount());
+                }}
+            />
+
+            {/* [Phase1] 업적 달성 토스트 */}
+            <AchievementToast
+                achievement={achievementToast}
+                onClose={() => setAchievementToast(null)}
+            />
+
+            {/* [Phase1] 칭찬하기 모달 */}
+            <PraiseModal
+                isOpen={praiseModal.isOpen}
+                onClose={() => setPraiseModal({ isOpen: false, targetUser: null })}
+                targetUser={praiseModal.targetUser}
             />
         </div>
     );

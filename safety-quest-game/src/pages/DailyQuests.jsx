@@ -9,6 +9,7 @@ import EducationRequiredModal from '../components/EducationRequiredModal';
 import ChecklistFormModal from '../components/ChecklistFormModal';
 import PhotoUploadModal from '../components/PhotoUploadModal';
 import ChecklistReviewModal from '../components/ChecklistReviewModal';
+import ChainQuestCard from '../components/ChainQuestCard';
 
 const NON_GATED_QUESTS = ['daily_education_1', 'daily_login_1'];
 
@@ -75,6 +76,9 @@ function DailyQuests({ role }) {
                         />
                     ))}
                 </div>
+
+                {/* 체인 퀘스트 */}
+                <ChainQuestCard role={role} onComplete={() => refreshQuests()} />
             </div>
 
             <EducationRequiredModal

@@ -2,6 +2,7 @@ import { inventory, equippedItems, points, userInventoryInstances } from './stor
 import { getItemById, getItemPrice, ITEM_CATEGORY } from '../data/itemsData';
 import { ensureItemInstance } from './calibrationService';
 import userApi from '../api/userApi';
+import { trackEquip } from './achievementManager';
 
 // 아이템 구매
 export const purchaseItem = (itemId) => {
@@ -83,6 +84,9 @@ export const equipItem = (itemId) => {
 
     // 착용 처리 (검교정 레벨 포함)
     equippedItems.equip(item.category, itemId, calibrationLevel);
+
+    // 업적 추적
+    try { trackEquip(); } catch (e) { /* silent */ }
 
     return {
         success: true,

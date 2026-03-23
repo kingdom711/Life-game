@@ -5,7 +5,15 @@ const NAV_ITEMS = [
     { path: '/daily', label: '퀘스트', icon: '🎯', color: '#22c55e' },
     { path: '/safety-score', label: 'AI 분석', icon: '🤖', color: '#8b5cf6' },
     { path: '/shop', label: '상점', icon: '🛒', color: '#f59e0b' },
-    { path: '/reward-center', label: '보상센터', icon: '🏆', color: '#ec4899' }
+    { path: '/reward-center', label: '보상센터', icon: '🏆', color: '#ec4899' },
+    { path: '/season-ranking', label: '시즌 랭킹', icon: '🏅', color: '#eab308' },
+    { path: '/learning-path', label: '학습 경로', icon: '📖', color: '#6366f1' },
+    { path: '/team-quest', label: '팀 퀘스트', icon: '🤝', color: '#06b6d4' },
+    { path: '/department-battle', label: '부서 대항전', icon: '⚔️', color: '#a855f7' },
+    { path: '/daily-briefing', label: 'AI 브리핑', icon: '📋', color: '#14b8a6' },
+    { path: '/hazard-heatmap', label: '위험 히트맵', icon: '🗺️', color: '#ef4444' },
+    { path: '/scenario', label: '시나리오', icon: '🎬', color: '#f97316' },
+    { path: '/compliance-report', label: '리포트', icon: '📊', color: '#0ea5e9' }
 ];
 
 function QuickNavigation() {

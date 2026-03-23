@@ -38,6 +38,12 @@ function WorkStopHistoryPage() {
     const [filter, setFilter] = useState('all');
     const [protections, setProtections] = useState([]);
     const [isUpdating, setIsUpdating] = useState(null);
+    // 조치 작성 폼 상태
+    const [actionForm, setActionForm] = useState(null); // { reportId, nextStatus }
+    const [actionPlan, setActionPlan] = useState('');
+    const [actionMethod, setActionMethod] = useState('');
+    const [resumeVerification, setResumeVerification] = useState('');
+    const [resumeActionNote, setResumeActionNote] = useState('');
     // 보복 신고 상태
     const [showRetaliationForm, setShowRetaliationForm] = useState(null); // protectionId
     const [retaliationType, setRetaliationType] = useState('');
@@ -74,6 +80,52 @@ function WorkStopHistoryPage() {
     const filteredReports = filter === 'all'
         ? reports
         : reports.filter(r => r.status === filter);
+
+    // 조치 작성이 필요한 상태 전환인지 확인
+    const needsActionForm = (nextStatus) => {
+        return nextStatus === REPORT_STATUS.RESOLVED || nextStatus === REPORT_STATUS.RESUMED;
+    };
+
+    // 상태 전환 버튼 클릭 핸들러
+    const handleStatusButtonClick = (reportId, nextStatus) => {
+        if (needsActionForm(nextStatus)) {
+            // 조치 작성 폼 표시
+            setActionForm({ reportId, nextStatus });
+            setActionPlan('');
+            setActionMethod('');
+            setResumeVerification('');
+            setResumeActionNote('');
+        } else {
+            // 조치 작성 불필요 - 바로 상태 업데이트
+            handleStatusUpdate(reportId, nextStatus);
+        }
+    };
+
+    // 조치 작성 폼 제출 (위험 해결)
+    const handleActionFormSubmit = async () => {
+        if (!actionForm) return;
+        const { reportId, nextStatus } = actionForm;
+
+        if (nextStatus === REPORT_STATUS.RESOLVED) {
+            if (!actionPlan.trim() || !actionMethod.trim()) return;
+            setIsUpdating(reportId);
+            await updateReportStatusAsync(reportId, nextStatus, userName, actionPlan.trim(), {
+                actionPlan: actionPlan.trim(),
+                actionMethod: actionMethod.trim()
+            });
+        } else if (nextStatus === REPORT_STATUS.RESUMED) {
+            if (!resumeVerification.trim() || !resumeActionNote.trim()) return;
+            setIsUpdating(reportId);
+            await updateReportStatusAsync(reportId, nextStatus, userName, resumeActionNote.trim(), {
+                resumeVerification: resumeVerification.trim(),
+                resumeActionNote: resumeActionNote.trim()
+            });
+        }
+
+        setActionForm(null);
+        await loadData();
+        setIsUpdating(null);
+    };
 
     const handleStatusUpdate = async (reportId, newStatus) => {
         setIsUpdating(reportId);
@@ -520,7 +572,7 @@ function WorkStopHistoryPage() {
                                         {/* 모든 역할: 다음 상태로 이동 버튼 (누구든 먼저 해결하면 완료) */}
                                         {nextStatus && (
                                             <button
-                                                onClick={() => handleStatusUpdate(report.id, nextStatus)}
+                                                onClick={() => handleStatusButtonClick(report.id, nextStatus)}
                                                 disabled={isUpdating === report.id}
                                                 style={{
                                                     padding: '0.375rem 0.75rem',
@@ -542,7 +594,7 @@ function WorkStopHistoryPage() {
                                         )}
                                     </div>
 
-                                    {/* 해결 정보 */}
+                                    {/* 해결 정보 + 조치 내역 */}
                                     {report.resolverName && (
                                         <div style={{
                                             marginTop: '0.75rem',
@@ -551,12 +603,57 @@ function WorkStopHistoryPage() {
                                             background: 'rgba(34, 197, 94, 0.08)',
                                             border: '1px solid rgba(34, 197, 94, 0.2)'
                                         }}>
-                                            <div style={{ color: '#4ade80', fontSize: '0.8rem', fontWeight: 600 }}>
+                                            <div style={{ color: '#4ade80', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
                                                 ✅ 해결: {report.resolverName}
                                             </div>
-                                            {report.resolutionNote && (
-                                                <div style={{ color: 'rgba(203,213,225,0.6)', fontSize: '0.8rem', marginTop: '0.25rem' }}>
+                                            {report.actionPlan && (
+                                                <div style={{ marginBottom: '0.375rem' }}>
+                                                    <span style={{ color: '#86efac', fontSize: '0.7rem', fontWeight: 700 }}>조치 내용</span>
+                                                    <div style={{ color: 'rgba(203,213,225,0.7)', fontSize: '0.8rem', marginTop: '0.125rem', lineHeight: 1.5 }}>
+                                                        {report.actionPlan}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {report.actionMethod && (
+                                                <div style={{ marginBottom: '0.375rem' }}>
+                                                    <span style={{ color: '#86efac', fontSize: '0.7rem', fontWeight: 700 }}>조치 방법</span>
+                                                    <div style={{ color: 'rgba(203,213,225,0.7)', fontSize: '0.8rem', marginTop: '0.125rem', lineHeight: 1.5 }}>
+                                                        {report.actionMethod}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {report.resolutionNote && !report.actionPlan && (
+                                                <div style={{ color: 'rgba(203,213,225,0.6)', fontSize: '0.8rem' }}>
                                                     {report.resolutionNote}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* 작업 재개 확인 내역 */}
+                                    {report.resumeVerification && (
+                                        <div style={{
+                                            marginTop: '0.5rem',
+                                            padding: '0.75rem',
+                                            borderRadius: '8px',
+                                            background: 'rgba(20, 184, 166, 0.08)',
+                                            border: '1px solid rgba(20, 184, 166, 0.2)'
+                                        }}>
+                                            <div style={{ color: '#2dd4bf', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                                                🔄 작업 재개 확인
+                                            </div>
+                                            <div style={{ marginBottom: '0.375rem' }}>
+                                                <span style={{ color: '#5eead4', fontSize: '0.7rem', fontWeight: 700 }}>확인 사항</span>
+                                                <div style={{ color: 'rgba(203,213,225,0.7)', fontSize: '0.8rem', marginTop: '0.125rem', lineHeight: 1.5 }}>
+                                                    {report.resumeVerification}
+                                                </div>
+                                            </div>
+                                            {report.resumeActionNote && (
+                                                <div>
+                                                    <span style={{ color: '#5eead4', fontSize: '0.7rem', fontWeight: 700 }}>조치 완료 확인</span>
+                                                    <div style={{ color: 'rgba(203,213,225,0.7)', fontSize: '0.8rem', marginTop: '0.125rem', lineHeight: 1.5 }}>
+                                                        {report.resumeActionNote}
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>
@@ -585,6 +682,327 @@ function WorkStopHistoryPage() {
                     )}
                 </div>
             </div>
+
+            {/* 조치 작성 모달 */}
+            {actionForm && (
+                <div
+                    onClick={() => setActionForm(null)}
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'rgba(0,0,0,0.7)',
+                        backdropFilter: 'blur(8px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 2000,
+                        padding: '1rem'
+                    }}
+                >
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            background: 'linear-gradient(135deg, #1e1b2e 0%, #0f172a 100%)',
+                            borderRadius: '20px',
+                            padding: '1.5rem',
+                            width: '100%',
+                            maxWidth: '420px',
+                            maxHeight: '85vh',
+                            overflowY: 'auto',
+                            border: actionForm.nextStatus === REPORT_STATUS.RESOLVED
+                                ? '1px solid rgba(34, 197, 94, 0.3)'
+                                : '1px solid rgba(20, 184, 166, 0.3)'
+                        }}
+                    >
+                        {/* 모달 헤더 */}
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: '1.25rem'
+                        }}>
+                            <h2 style={{
+                                margin: 0,
+                                fontSize: '1.15rem',
+                                fontWeight: 800,
+                                color: actionForm.nextStatus === REPORT_STATUS.RESOLVED ? '#4ade80' : '#2dd4bf'
+                            }}>
+                                {actionForm.nextStatus === REPORT_STATUS.RESOLVED
+                                    ? '✅ 위험 해결 - 조치 내용 작성'
+                                    : '🔄 작업 재개 - 확인 및 조치 작성'
+                                }
+                            </h2>
+                            <button
+                                onClick={() => setActionForm(null)}
+                                style={{
+                                    background: 'rgba(255,255,255,0.1)',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    color: 'rgba(203,213,225,0.6)',
+                                    padding: '0.375rem 0.625rem',
+                                    cursor: 'pointer',
+                                    fontSize: '0.9rem'
+                                }}
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* 안내 문구 */}
+                        <div style={{
+                            background: actionForm.nextStatus === REPORT_STATUS.RESOLVED
+                                ? 'rgba(34, 197, 94, 0.08)'
+                                : 'rgba(20, 184, 166, 0.08)',
+                            border: actionForm.nextStatus === REPORT_STATUS.RESOLVED
+                                ? '1px solid rgba(34, 197, 94, 0.15)'
+                                : '1px solid rgba(20, 184, 166, 0.15)',
+                            borderRadius: '10px',
+                            padding: '0.75rem',
+                            marginBottom: '1.25rem'
+                        }}>
+                            <div style={{
+                                color: 'rgba(203,213,225,0.8)',
+                                fontSize: '0.8rem',
+                                lineHeight: 1.6
+                            }}>
+                                {actionForm.nextStatus === REPORT_STATUS.RESOLVED
+                                    ? '⚠️ 작업중지권 행사 후 위험을 해결하려면, 어떤 조치를 했는지와 어떻게 조치했는지를 반드시 작성해야 합니다.'
+                                    : '⚠️ 작업을 재개하려면, 조치 사항을 확인하고 안전하게 조치가 완료되었는지 반드시 작성해야 합니다.'
+                                }
+                            </div>
+                        </div>
+
+                        {/* 위험 해결 폼 */}
+                        {actionForm.nextStatus === REPORT_STATUS.RESOLVED && (
+                            <>
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <label style={{
+                                        display: 'block',
+                                        color: '#86efac',
+                                        fontSize: '0.85rem',
+                                        fontWeight: 700,
+                                        marginBottom: '0.5rem'
+                                    }}>
+                                        📋 어떤 조치를 했는지 <span style={{ color: '#ef4444' }}>*</span>
+                                    </label>
+                                    <textarea
+                                        value={actionPlan}
+                                        onChange={(e) => setActionPlan(e.target.value)}
+                                        placeholder="예: 추락 방지 안전망 설치, 위험 구역 바리케이드 설치, 불량 자재 교체 등"
+                                        style={{
+                                            width: '100%',
+                                            minHeight: '80px',
+                                            padding: '0.75rem',
+                                            borderRadius: '10px',
+                                            border: actionPlan.trim()
+                                                ? '1px solid rgba(34, 197, 94, 0.3)'
+                                                : '1px solid rgba(239, 68, 68, 0.3)',
+                                            background: 'rgba(15, 23, 42, 0.6)',
+                                            color: '#e2e8f0',
+                                            fontSize: '0.85rem',
+                                            resize: 'vertical',
+                                            outline: 'none',
+                                            boxSizing: 'border-box',
+                                            lineHeight: 1.5
+                                        }}
+                                    />
+                                    {!actionPlan.trim() && (
+                                        <div style={{ color: '#f87171', fontSize: '0.7rem', marginTop: '0.25rem' }}>
+                                            조치 내용을 반드시 입력해 주세요
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div style={{ marginBottom: '1.25rem' }}>
+                                    <label style={{
+                                        display: 'block',
+                                        color: '#86efac',
+                                        fontSize: '0.85rem',
+                                        fontWeight: 700,
+                                        marginBottom: '0.5rem'
+                                    }}>
+                                        🔧 어떻게 조치했는지 <span style={{ color: '#ef4444' }}>*</span>
+                                    </label>
+                                    <textarea
+                                        value={actionMethod}
+                                        onChange={(e) => setActionMethod(e.target.value)}
+                                        placeholder="예: 안전관리자 입회 하에 안전망 3개소 설치 완료, 위험 구역 출입 통제 후 바리케이드 설치, 자재 검수 후 교체 완료 등"
+                                        style={{
+                                            width: '100%',
+                                            minHeight: '80px',
+                                            padding: '0.75rem',
+                                            borderRadius: '10px',
+                                            border: actionMethod.trim()
+                                                ? '1px solid rgba(34, 197, 94, 0.3)'
+                                                : '1px solid rgba(239, 68, 68, 0.3)',
+                                            background: 'rgba(15, 23, 42, 0.6)',
+                                            color: '#e2e8f0',
+                                            fontSize: '0.85rem',
+                                            resize: 'vertical',
+                                            outline: 'none',
+                                            boxSizing: 'border-box',
+                                            lineHeight: 1.5
+                                        }}
+                                    />
+                                    {!actionMethod.trim() && (
+                                        <div style={{ color: '#f87171', fontSize: '0.7rem', marginTop: '0.25rem' }}>
+                                            조치 방법을 반드시 입력해 주세요
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        )}
+
+                        {/* 작업 재개 폼 */}
+                        {actionForm.nextStatus === REPORT_STATUS.RESUMED && (
+                            <>
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <label style={{
+                                        display: 'block',
+                                        color: '#5eead4',
+                                        fontSize: '0.85rem',
+                                        fontWeight: 700,
+                                        marginBottom: '0.5rem'
+                                    }}>
+                                        🔍 확인 사항 <span style={{ color: '#ef4444' }}>*</span>
+                                    </label>
+                                    <textarea
+                                        value={resumeVerification}
+                                        onChange={(e) => setResumeVerification(e.target.value)}
+                                        placeholder="예: 안전망 설치 상태 확인, 바리케이드 견고성 확인, 전기 차단기 복구 확인, 작업자 안전교육 재실시 등"
+                                        style={{
+                                            width: '100%',
+                                            minHeight: '80px',
+                                            padding: '0.75rem',
+                                            borderRadius: '10px',
+                                            border: resumeVerification.trim()
+                                                ? '1px solid rgba(20, 184, 166, 0.3)'
+                                                : '1px solid rgba(239, 68, 68, 0.3)',
+                                            background: 'rgba(15, 23, 42, 0.6)',
+                                            color: '#e2e8f0',
+                                            fontSize: '0.85rem',
+                                            resize: 'vertical',
+                                            outline: 'none',
+                                            boxSizing: 'border-box',
+                                            lineHeight: 1.5
+                                        }}
+                                    />
+                                    {!resumeVerification.trim() && (
+                                        <div style={{ color: '#f87171', fontSize: '0.7rem', marginTop: '0.25rem' }}>
+                                            확인 사항을 반드시 입력해 주세요
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div style={{ marginBottom: '1.25rem' }}>
+                                    <label style={{
+                                        display: 'block',
+                                        color: '#5eead4',
+                                        fontSize: '0.85rem',
+                                        fontWeight: 700,
+                                        marginBottom: '0.5rem'
+                                    }}>
+                                        ✅ 조치 완료 확인 내용 <span style={{ color: '#ef4444' }}>*</span>
+                                    </label>
+                                    <textarea
+                                        value={resumeActionNote}
+                                        onChange={(e) => setResumeActionNote(e.target.value)}
+                                        placeholder="예: 상기 조치 사항 모두 이행 확인 완료, 안전관리자 현장 점검 완료, 작업자 전원 안전 브리핑 완료 후 재개 승인 등"
+                                        style={{
+                                            width: '100%',
+                                            minHeight: '80px',
+                                            padding: '0.75rem',
+                                            borderRadius: '10px',
+                                            border: resumeActionNote.trim()
+                                                ? '1px solid rgba(20, 184, 166, 0.3)'
+                                                : '1px solid rgba(239, 68, 68, 0.3)',
+                                            background: 'rgba(15, 23, 42, 0.6)',
+                                            color: '#e2e8f0',
+                                            fontSize: '0.85rem',
+                                            resize: 'vertical',
+                                            outline: 'none',
+                                            boxSizing: 'border-box',
+                                            lineHeight: 1.5
+                                        }}
+                                    />
+                                    {!resumeActionNote.trim() && (
+                                        <div style={{ color: '#f87171', fontSize: '0.7rem', marginTop: '0.25rem' }}>
+                                            조치 완료 확인 내용을 반드시 입력해 주세요
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        )}
+
+                        {/* 버튼 영역 */}
+                        <div style={{ display: 'flex', gap: '0.75rem' }}>
+                            <button
+                                onClick={() => setActionForm(null)}
+                                style={{
+                                    flex: 1,
+                                    padding: '0.75rem',
+                                    borderRadius: '12px',
+                                    border: '1px solid rgba(148,163,184,0.2)',
+                                    background: 'transparent',
+                                    color: 'rgba(203,213,225,0.7)',
+                                    fontSize: '0.85rem',
+                                    fontWeight: 600,
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                취소
+                            </button>
+                            <button
+                                onClick={handleActionFormSubmit}
+                                disabled={
+                                    isUpdating === actionForm.reportId ||
+                                    (actionForm.nextStatus === REPORT_STATUS.RESOLVED && (!actionPlan.trim() || !actionMethod.trim())) ||
+                                    (actionForm.nextStatus === REPORT_STATUS.RESUMED && (!resumeVerification.trim() || !resumeActionNote.trim()))
+                                }
+                                style={{
+                                    flex: 2,
+                                    padding: '0.75rem',
+                                    borderRadius: '12px',
+                                    border: 'none',
+                                    background: (
+                                        (actionForm.nextStatus === REPORT_STATUS.RESOLVED && actionPlan.trim() && actionMethod.trim()) ||
+                                        (actionForm.nextStatus === REPORT_STATUS.RESUMED && resumeVerification.trim() && resumeActionNote.trim())
+                                    )
+                                        ? actionForm.nextStatus === REPORT_STATUS.RESOLVED
+                                            ? 'linear-gradient(135deg, #22c55e, #16a34a)'
+                                            : 'linear-gradient(135deg, #14b8a6, #0d9488)'
+                                        : 'rgba(148,163,184,0.15)',
+                                    color: (
+                                        (actionForm.nextStatus === REPORT_STATUS.RESOLVED && actionPlan.trim() && actionMethod.trim()) ||
+                                        (actionForm.nextStatus === REPORT_STATUS.RESUMED && resumeVerification.trim() && resumeActionNote.trim())
+                                    )
+                                        ? '#ffffff'
+                                        : 'rgba(148,163,184,0.4)',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 800,
+                                    cursor: (
+                                        (actionForm.nextStatus === REPORT_STATUS.RESOLVED && actionPlan.trim() && actionMethod.trim()) ||
+                                        (actionForm.nextStatus === REPORT_STATUS.RESUMED && resumeVerification.trim() && resumeActionNote.trim())
+                                    )
+                                        ? 'pointer'
+                                        : 'not-allowed',
+                                    transition: 'all 0.2s ease'
+                                }}
+                            >
+                                {isUpdating === actionForm.reportId
+                                    ? '처리중...'
+                                    : actionForm.nextStatus === REPORT_STATUS.RESOLVED
+                                        ? '✅ 조치 완료 및 위험 해결'
+                                        : '🔄 확인 완료 및 작업 재개'
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

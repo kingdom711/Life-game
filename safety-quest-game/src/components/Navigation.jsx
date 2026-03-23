@@ -33,7 +33,7 @@ function Navigation() {
     const navItems = [
         { path: '/education', label: '교육', icon: '📚', active: location.pathname.startsWith('/education') },
         { path: '/daily', label: '퀘스트', icon: '🎯', active: location.pathname === '/daily' },
-        { path: '/safety-score', label: 'AI분석', icon: '🤖', active: location.pathname.startsWith('/safety-score') },
+        { path: '/achievements', label: '업적', icon: '🏆', active: location.pathname === '/achievements' },
         { path: '/shop', label: '상점', icon: '🛒', active: location.pathname === '/shop' },
         { path: '/profile', label: '내프로필', icon: '👤', active: location.pathname === '/profile' }
     ];

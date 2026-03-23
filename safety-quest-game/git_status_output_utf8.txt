@@ -1,0 +1,53 @@
+﻿ M dist/index.html
+ M src/App.jsx
+ M src/components/Navigation.jsx
+ M src/components/dashboard/QuickNavigation.jsx
+ M src/pages/DailyQuests.jsx
+ M src/pages/Dashboard.jsx
+ M src/pages/Inventory.jsx
+ M src/pages/Profile.jsx
+ M src/pages/WorkStopHistoryPage.jsx
+ M src/utils/inventoryManager.js
+ M src/utils/questManager.js
+ M src/utils/workStopManager.js
+?? git_status_output.txt
+?? git_status_output_utf8.txt
+?? src/components/AchievementToast.jsx
+?? src/components/ChainQuestCard.jsx
+?? src/components/EventQuestBanner.jsx
+?? src/components/ForgeModal.jsx
+?? src/components/LanguageSelector.jsx
+?? src/components/MicroLearningCard.jsx
+?? src/components/NotificationCenter.jsx
+?? src/components/PhotoCompareView.jsx
+?? src/components/PraiseModal.jsx
+?? src/components/QRScanModal.jsx
+?? src/context/LanguageContext.jsx
+?? src/data/achievementData.js
+?? src/data/learningPathData.js
+?? src/data/microLearningData.js
+?? src/data/scenarioData.js
+?? src/data/translations.js
+?? src/pages/AchievementPage.jsx
+?? src/pages/ComplianceReportPage.jsx
+?? src/pages/DailyBriefingPage.jsx
+?? src/pages/DepartmentBattlePage.jsx
+?? src/pages/HazardHeatmapPage.jsx
+?? src/pages/LearningPathPage.jsx
+?? src/pages/ScenarioPage.jsx
+?? src/pages/SeasonRankingPage.jsx
+?? src/pages/TeamQuestPage.jsx
+?? src/utils/achievementManager.js
+?? src/utils/chainQuestManager.js
+?? src/utils/complianceReportManager.js
+?? src/utils/departmentBattleManager.js
+?? src/utils/eventQuestManager.js
+?? src/utils/forgeManager.js
+?? src/utils/heatmapManager.js
+?? src/utils/i18n.js
+?? src/utils/learningPathManager.js
+?? src/utils/notificationManager.js
+?? src/utils/praiseManager.js
+?? src/utils/scenarioManager.js
+?? src/utils/seasonManager.js
+?? src/utils/teamQuestManager.js
