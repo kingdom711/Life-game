@@ -32,6 +32,9 @@ import AdminRewardApproval from './pages/AdminRewardApproval';
 import WorkStopHistoryPage from './pages/WorkStopHistoryPage'; // [New] 작업중지 이력
 import AchievementPage from './pages/AchievementPage'; // [Phase1] 업적
 
+// [Phase1] 팀 상세
+import TeamDetailPage from './pages/TeamDetailPage';
+
 // [Phase2] 고도화 페이지
 import SeasonRankingPage from './pages/SeasonRankingPage';
 import LearningPathPage from './pages/LearningPathPage';
@@ -280,6 +283,7 @@ function App() {
                                     <Route path="/achievements" element={<AchievementPage />} />
                                     <Route path="/season-ranking" element={<SeasonRankingPage />} />
                                     <Route path="/learning-path" element={<LearningPathPage />} />
+                                    <Route path="/my-team" element={<TeamDetailPage />} />
                                     <Route path="/team-quest" element={<TeamQuestPage />} />
                                     <Route path="/department-battle" element={<DepartmentBattlePage />} />
                                     <Route path="/daily-briefing" element={<DailyBriefingPage />} />

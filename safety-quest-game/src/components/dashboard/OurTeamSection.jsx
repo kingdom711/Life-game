@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 const TEAM_RANKINGS = [
     { rank: 1, name: '철근팀 A조', score: 96, icon: '🥇', isMine: false },
     { rank: 2, name: '철근팀 B조', score: 92, icon: '🥈', isMine: true, label: '내 팀' },
@@ -6,9 +8,14 @@ const TEAM_RANKINGS = [
 ];
 
 function OurTeamSection({ weeklyProgress = 78 }) {
+    const navigate = useNavigate();
+
     return (
-        <div className="new-team-section">
-            <h3 className="new-team-title">우리 팀</h3>
+        <div className="new-team-section" onClick={() => navigate('/my-team')} style={{ cursor: 'pointer' }}>
+            <h3 className="new-team-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                우리 팀
+                <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 400 }}>더보기 ›</span>
+            </h3>
 
             <div className="new-team-progress-card">
                 <div className="new-team-progress-header">

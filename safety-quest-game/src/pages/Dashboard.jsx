@@ -47,7 +47,6 @@ import ChecklistReviewModal from '../components/ChecklistReviewModal';
 // [Phase1] 고도화 기능
 import MicroLearningCard from '../components/MicroLearningCard';
 import AchievementToast from '../components/AchievementToast';
-import PraiseModal from '../components/PraiseModal';
 import { checkAllAchievements, getAchievementSummary, trackQuestComplete } from '../utils/achievementManager';
 
 // [Phase2] 이벤트 퀘스트 배너
@@ -152,9 +151,8 @@ function Dashboard({ role }) {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [shareModal, setShareModal] = useState({ isOpen: false, type: null, data: null });
 
-    // [Phase1] 업적 토스트, 칭찬 모달
+    // [Phase1] 업적 토스트
     const [achievementToast, setAchievementToast] = useState(null);
-    const [praiseModal, setPraiseModal] = useState({ isOpen: false, targetUser: null });
     const [achievementSummary, setAchievementSummary] = useState({ unlocked: 0, total: 0, unclaimed: 0 });
 
     // 작업중지 미해결 건수
@@ -881,12 +879,6 @@ function Dashboard({ role }) {
                 onClose={() => setAchievementToast(null)}
             />
 
-            {/* [Phase1] 칭찬하기 모달 */}
-            <PraiseModal
-                isOpen={praiseModal.isOpen}
-                onClose={() => setPraiseModal({ isOpen: false, targetUser: null })}
-                targetUser={praiseModal.targetUser}
-            />
         </div>
     );
 }

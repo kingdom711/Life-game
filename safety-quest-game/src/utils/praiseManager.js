@@ -5,6 +5,8 @@
 
 import { storage, getKSTDateString, userProfile } from './storage';
 import { addPoints } from './pointsCalculator';
+import { addNotification, NOTIFICATION_TYPES } from './notificationManager';
+import { trackPraiseReceived } from './achievementManager';
 
 const PRAISE_LOG_KEY = 'safety_quest_praise_log';
 const PRAISE_RECEIVED_KEY = 'safety_quest_praise_received';
@@ -87,6 +89,17 @@ export const sendPraise = (targetUserId, targetName, praiseTypeId, message = '')
 
     // 수신자에게 포인트 지급 (시스템 지급)
     addPoints(PRAISE_REWARD_POINTS, '칭찬 보상', `${senderId}님의 칭찬: ${praiseType.label}`);
+
+    // 알림 생성
+    addNotification(
+        NOTIFICATION_TYPES.PRAISE,
+        '칭찬을 받았습니다!',
+        `${senderId}님이 "${praiseType.label}" 칭찬을 보냈습니다.${message ? ' - ' + message : ''}`,
+        { from: senderId, praiseType: praiseTypeId, praiseId: praiseEntry.id }
+    );
+
+    // 업적 추적
+    trackPraiseReceived();
 
     return {
         success: true,
