@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Coins, Zap, ShieldCheck, Sparkles, BarChart2 } from 'lucide-react';
 import { getActiveStatsForHUD, getTotalCombinedStats } from '../utils/pointsCalculator';
 import { ITEM_SETS } from '../data/setsData';
 
@@ -43,25 +44,25 @@ const StatsHUD = ({ compact = false, showSetBonuses = true }) => {
             <div className="stats-hud-compact">
                 {statsData.totalPointBoost > 0 && (
                     <div className="stat-chip point-boost">
-                        <span className="stat-icon">💰</span>
+                        <Coins size={14} strokeWidth={2} className="stat-icon" aria-hidden="true" />
                         <span className="stat-value">+{statsData.totalPointBoost}%</span>
                     </div>
                 )}
                 {statsData.totalXpAccelerator > 0 && (
                     <div className="stat-chip xp-boost">
-                        <span className="stat-icon">⚡</span>
+                        <Zap size={14} strokeWidth={2} className="stat-icon" aria-hidden="true" />
                         <span className="stat-value">+{statsData.totalXpAccelerator}%</span>
                     </div>
                 )}
                 {statsData.totalStreakSaver > 0 && (
                     <div className="stat-chip streak-protect">
-                        <span className="stat-icon">🛡️</span>
+                        <ShieldCheck size={14} strokeWidth={2} className="stat-icon" aria-hidden="true" />
                         <span className="stat-value">{statsData.totalStreakSaver}%</span>
                     </div>
                 )}
                 {statsData.activeSetBonuses?.length > 0 && (
                     <div className="stat-chip set-bonus">
-                        <span className="stat-icon">✨</span>
+                        <Sparkles size={14} strokeWidth={2} className="stat-icon" aria-hidden="true" />
                         <span className="stat-value">{statsData.activeSetBonuses.length}</span>
                     </div>
                 )}
@@ -77,7 +78,7 @@ const StatsHUD = ({ compact = false, showSetBonuses = true }) => {
                 onClick={() => setIsExpanded(!isExpanded)}
             >
                 <h3>
-                    <span className="hud-icon">📊</span>
+                    <BarChart2 size={16} strokeWidth={2} className="hud-icon" aria-hidden="true" />
                     활성 스탯
                 </h3>
                 <button className="expand-btn">
@@ -90,7 +91,7 @@ const StatsHUD = ({ compact = false, showSetBonuses = true }) => {
                 <div className="stats-main">
                     <div className="stat-item">
                         <div className="stat-header">
-                            <span className="stat-icon-large">💰</span>
+                            <Coins size={20} strokeWidth={1.75} className="stat-icon-large" aria-hidden="true" />
                             <span className="stat-name">포인트 부스트</span>
                         </div>
                         <div className="stat-value-large">
@@ -104,7 +105,7 @@ const StatsHUD = ({ compact = false, showSetBonuses = true }) => {
 
                     <div className="stat-item">
                         <div className="stat-header">
-                            <span className="stat-icon-large">⚡</span>
+                            <Zap size={20} strokeWidth={1.75} className="stat-icon-large" aria-hidden="true" />
                             <span className="stat-name">XP 가속기</span>
                         </div>
                         <div className="stat-value-large">
@@ -118,7 +119,7 @@ const StatsHUD = ({ compact = false, showSetBonuses = true }) => {
 
                     <div className="stat-item">
                         <div className="stat-header">
-                            <span className="stat-icon-large">🛡️</span>
+                            <ShieldCheck size={20} strokeWidth={1.75} className="stat-icon-large" aria-hidden="true" />
                             <span className="stat-name">스트릭 보호</span>
                         </div>
                         <div className="stat-value-large">
@@ -153,7 +154,7 @@ const StatsHUD = ({ compact = false, showSetBonuses = true }) => {
                 {/* 시각 효과 표시 */}
                 {statsData.visualAuraName && (
                     <div className="stats-aura-info">
-                        <span className="aura-icon">✨</span>
+                        <Sparkles size={16} strokeWidth={1.75} className="aura-icon" aria-hidden="true" />
                         <span className="aura-name">{statsData.visualAuraName} 활성화</span>
                     </div>
                 )}
@@ -167,20 +168,21 @@ const StatsHUD = ({ compact = false, showSetBonuses = true }) => {
  */
 export const StatsBadge = ({ type, value }) => {
     const configs = {
-        pointBoost: { icon: '💰', label: '포인트', color: 'var(--color-safe)' },
-        xpAccelerator: { icon: '⚡', label: 'XP', color: 'var(--color-warning)' },
-        streakSaver: { icon: '🛡️', label: '보호', color: 'var(--color-primary-light)' }
+        pointBoost:    { Icon: Coins,       label: '포인트', color: 'var(--color-safe)' },
+        xpAccelerator: { Icon: Zap,         label: 'XP',    color: 'var(--color-warning)' },
+        streakSaver:   { Icon: ShieldCheck, label: '보호',   color: 'var(--color-primary-light)' }
     };
 
     const config = configs[type];
     if (!config || value <= 0) return null;
 
     return (
-        <span 
+        <span
             className="stats-badge"
             style={{ '--badge-color': config.color }}
         >
-            {config.icon} +{value}%
+            <config.Icon size={12} strokeWidth={2} aria-hidden="true" />
+            +{value}%
         </span>
     );
 };

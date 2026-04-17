@@ -15,8 +15,9 @@
 }
 
 .modal-content {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.95) 100%);
-  border-radius: 24px;
+  background: var(--glass-primary-bg);
+  backdrop-filter: var(--glass-primary-blur);
+  border-radius: var(--radius-xl);
   padding: 2rem;
   box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.5),
@@ -1269,10 +1270,10 @@
   min-height: 240px;
   padding: 2rem 1.5rem;
   text-align: center;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(71, 85, 105, 0.45);
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.82) 0%, rgba(15, 23, 42, 0.82) 100%);
-  backdrop-filter: blur(10px);
+  background: var(--glass-secondary-bg);
+  backdrop-filter: var(--glass-secondary-blur);
 }
 
 .page-state-spinner {

@@ -96,7 +96,7 @@
   backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(71, 85, 105, 0.3);
   border-radius: 20px;
-  padding: 1.25rem;
+  padding: var(--spacing-md);
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
@@ -756,7 +756,7 @@
 .top-progress-sub-row .streak-content {
   flex-direction: row;
   align-items: center;
-  gap: 0.4rem;
+  gap: var(--spacing-xs);
 }
 
 .top-progress-sub-row .streak-content .icon {
@@ -776,7 +776,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  padding: 0.4rem 0.55rem;
+  padding: var(--spacing-xs) 0.55rem;
   border-radius: 999px;
   background: rgba(30, 41, 59, 0.82);
   border: 1px solid rgba(148, 163, 184, 0.35);
@@ -1180,7 +1180,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
+  gap: var(--spacing-xs);
   color: #94a3b8;
   padding: 0.7rem 0;
 }
@@ -1314,7 +1314,7 @@
 .weekly-progress-days {
   display: flex;
   justify-content: center;
-  gap: 0.4rem;
+  gap: var(--spacing-xs);
   margin-top: 0.5rem;
 }
 
@@ -1725,7 +1725,7 @@
   /* sub-row: 세로 스택 */
   .top-progress-sub-row {
     flex-direction: column;
-    gap: 0.4rem;
+    gap: var(--spacing-xs);
   }
 
   .top-progress-sub-row .top-progress-checkin-area {
@@ -1761,7 +1761,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
+    gap: var(--spacing-xs);
     padding: 0.6rem 0.8rem;
     border-radius: 12px;
     border: 1px solid rgba(148, 163, 184, 0.3);
@@ -2008,7 +2008,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.1rem;
-  padding: 0.4rem 0.8rem;
+  padding: var(--spacing-xs) 0.8rem;
   border-radius: 12px;
   background: rgba(34, 197, 94, 0.12);
   border: 1px solid rgba(34, 197, 94, 0.35);
@@ -2030,7 +2030,7 @@
 .new-profile-hint {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: var(--spacing-xs);
   padding: 0.6rem 0.8rem;
   border-radius: 10px;
   background: rgba(251, 191, 36, 0.1);
@@ -2268,7 +2268,7 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.4rem 0.75rem;
+  padding: var(--spacing-xs) 0.75rem;
   border-radius: 20px;
   border: 1px solid rgba(239, 68, 68, 0.35);
   background: rgba(239, 68, 68, 0.1);
@@ -2312,7 +2312,7 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.4rem 0.75rem;
+  padding: var(--spacing-xs) 0.75rem;
   border-radius: 20px;
   border: 1px solid rgba(251, 191, 36, 0.35);
   background: rgba(251, 191, 36, 0.1);
@@ -2554,7 +2554,7 @@
   color: #f8fafc;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: var(--spacing-xs);
 }
 
 .new-gear-title-icon {
@@ -2647,7 +2647,7 @@
   color: #f8fafc;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: var(--spacing-xs);
 }
 
 .new-rewards-title-icon {
@@ -2767,7 +2767,7 @@
 .new-team-ranking-header {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: var(--spacing-xs);
   margin-bottom: 0.6rem;
 }
 
@@ -2886,28 +2886,41 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.9rem 0.5rem;
-  border-radius: 14px;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) 0.5rem;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(71, 85, 105, 0.35);
   background: rgba(15, 23, 42, 0.5);
   cursor: pointer;
   transition: all 0.2s ease;
-  color: #e2e8f0;
+  color: #94a3b8;
 }
 
 .new-quicknav-btn:hover {
   background: rgba(var(--qn-color-rgb, 59, 130, 246), 0.15);
   border-color: var(--qn-color, #3b82f6);
+  color: var(--qn-color, #3b82f6);
   transform: translateY(-2px);
 }
 
 .new-quicknav-icon-wrap {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-sm);
+  background: rgba(var(--qn-color-rgb, 59, 130, 246), 0.12);
+  color: var(--qn-color, #3b82f6);
+  transition: background 0.2s ease;
 }
 
 .new-quicknav-icon {
-  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
 }
 
 .new-quicknav-badge {
@@ -3232,7 +3245,7 @@
   }
 
   .dash-hero-badge {
-    padding: 0.4rem 0.5rem;
+    padding: var(--spacing-xs) 0.5rem;
     min-width: 46px;
   }
 

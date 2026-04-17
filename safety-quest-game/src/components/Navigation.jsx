@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { BookOpen, Target, Trophy, ShoppingCart, User } from 'lucide-react';
 import { hasCompletedTodayEducation } from '../utils/educationManager';
 import { userProfile } from '../utils/storage';
 import { useAuth } from '../context/AuthContext';
@@ -31,11 +32,11 @@ function Navigation() {
     const isAdmin = currentRole === 'supervisor' || currentRole === 'safetyManager';
 
     const navItems = [
-        { path: '/education', label: '교육', icon: '📚', active: location.pathname.startsWith('/education') },
-        { path: '/daily', label: '퀘스트', icon: '🎯', active: location.pathname === '/daily' },
-        { path: '/achievements', label: '업적', icon: '🏆', active: location.pathname === '/achievements' },
-        { path: '/shop', label: '상점', icon: '🛒', active: location.pathname === '/shop' },
-        { path: '/profile', label: '내프로필', icon: '👤', active: location.pathname === '/profile' }
+        { path: '/education', label: '교육', Icon: BookOpen, active: location.pathname.startsWith('/education') },
+        { path: '/daily', label: '퀘스트', Icon: Target, active: location.pathname === '/daily' },
+        { path: '/achievements', label: '업적', Icon: Trophy, active: location.pathname === '/achievements' },
+        { path: '/shop', label: '상점', Icon: ShoppingCart, active: location.pathname === '/shop' },
+        { path: '/profile', label: '내프로필', Icon: User, active: location.pathname === '/profile' }
     ];
 
     return (
@@ -71,9 +72,13 @@ function Navigation() {
                         />
                     )}
 
-                    <div className="mobile-nav-icon text-2xl mb-1 group-hover:scale-105 
-                      transition-transform duration-300">
-                        {item.icon}
+                    <div className="mobile-nav-icon mb-1 group-hover:scale-105
+                      transition-transform duration-300 flex items-center justify-center">
+                        <item.Icon
+                            size={22}
+                            strokeWidth={item.active ? 2.25 : 1.75}
+                            className={item.active ? 'text-blue-400' : 'text-slate-400'}
+                        />
                     </div>
                     <div className="mobile-nav-label text-xs font-semibold">
                         {item.label}

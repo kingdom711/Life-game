@@ -68,7 +68,7 @@
   --spacing-2xl: 3rem;
 
   /* Typography - Mobile First */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -77,11 +77,11 @@
   --font-size-2xl: 1.5rem;
   --font-size-3xl: 1.875rem;
 
-  /* Border Radius */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
+  /* Border Radius — 4-step scale */
+  --radius-sm: 0.5rem;   /* 8px  — 태그, 배지 */
+  --radius-md: 0.75rem;  /* 12px — 버튼, 인풋 */
+  --radius-lg: 1rem;     /* 16px — 카드 */
+  --radius-xl: 1.5rem;   /* 24px — 모달 */
   --radius-full: 9999px;
 
   /* Shadows (Softer for Light Mode) */
@@ -95,9 +95,15 @@
   --transition-base: 250ms ease-in-out;
   --transition-slow: 350ms ease-in-out;
 
-  /* Glass Effect - Dark */
-  --glass-bg: rgba(30, 41, 59, 0.7);
-  --glass-border: rgba(71, 85, 105, 0.5);
+  /* Glass Effect — 3-level intensity scale */
+  --glass-bg: rgba(30, 41, 59, 0.7);           /* legacy alias */
+  --glass-border: rgba(71, 85, 105, 0.5);       /* legacy alias */
+  --glass-primary-bg: rgba(30, 41, 59, 0.92);   /* 모달, 중요 카드 */
+  --glass-primary-blur: blur(20px);
+  --glass-secondary-bg: rgba(30, 41, 59, 0.72); /* 일반 카드 */
+  --glass-secondary-blur: blur(10px);
+  --glass-subtle-bg: rgba(30, 41, 59, 0.48);    /* 배경 보조 요소 */
+  --glass-subtle-blur: blur(4px);
 
   /* Page Theme Colors */
   --theme-dashboard-blue: #3b82f6;
@@ -307,8 +313,8 @@ a:hover {
 
 /* ==================== Cards - Mobile Optimized - Dark Theme ==================== */
 .card {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.75) 100%);
-  backdrop-filter: blur(20px);
+  background: var(--glass-secondary-bg);
+  backdrop-filter: var(--glass-secondary-blur);
   border: 1px solid rgba(71, 85, 105, 0.6);
   border-radius: var(--radius-xl);
   padding: var(--spacing-md);
@@ -1131,4 +1137,4 @@ textarea {
     height: 400px;
   }
 }
-
+
