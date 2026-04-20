@@ -4,5 +4,6 @@
 @import "./core/base.css";
 @import "./components/ui-components.css";
 @import "./features/item-systems.css";
+@import "./features/quiz.css";
 @import "./pages/dashboard.css";
 
