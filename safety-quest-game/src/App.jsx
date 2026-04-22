@@ -26,6 +26,7 @@ import SpecializationTrainingPage from './pages/SpecializationTrainingPage'; // 
 import Exchange from './pages/Exchange'; // [New] 포인트→골드 교환소
 import RewardCenter from './pages/RewardCenter'; // [New] 보상센터
 import HazardCyclePage from './pages/HazardCyclePage';
+import HazardCycleAckPage from './pages/HazardCycleAckPage';
 import CycleHistoryPage from './pages/CycleHistoryPage';
 import SafetyScoreDashboard from './pages/SafetyScoreDashboard';
 import AdminRewardApproval from './pages/AdminRewardApproval';
@@ -270,6 +271,7 @@ function App() {
                                     <Route path="/reward-center" element={<RewardCenter />} />
                                     <Route path="/hazard-cycle" element={<HazardCyclePage />} />
                                     <Route path="/hazard-cycle/history" element={<CycleHistoryPage />} />
+                                    <Route path="/hazard-ack/:cycleId" element={<HazardCycleAckPage />} />
                                     <Route path="/inventory" element={<Inventory />} />
                                     <Route path="/profile" element={<Profile role={selectedRole} />} />
                                     <Route path="/risk-solution" element={<RiskSolutionPage />} />

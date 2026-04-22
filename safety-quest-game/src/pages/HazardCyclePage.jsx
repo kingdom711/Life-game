@@ -189,12 +189,42 @@ function HazardCyclePage() {
                 <div className="space-y-4">
                     <AiVisionResult analysis={cycle.aiAnalysis} />
                     <CycleRewardAnimation tier={1} points={cycle.tier1Reward?.pointsAwarded || 100} />
-                    <button
-                        onClick={() => setStep('action')}
-                        className="w-full rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
-                    >
-                        조치하기
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setStep('action')}
+                            className="flex-1 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
+                        >
+                            조치하기
+                        </button>
+                        <button
+                            onClick={async () => {
+                                try {
+                                    await hazardCycleApi.downloadRiskAssessmentPdf(cycle.id);
+                                } catch (e) {
+                                    setError(e?.message || '위험성평가표 PDF 다운로드에 실패했습니다.');
+                                }
+                            }}
+                            className="rounded-xl border border-blue-400/40 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-200 hover:bg-blue-500/20"
+                            title="고용노동부 제출용 위험성평가표"
+                        >
+                            평가표 PDF
+                        </button>
+                        <button
+                            onClick={async () => {
+                                const url = `${window.location.origin}/hazard-ack/${cycle.id}`;
+                                try {
+                                    await navigator.clipboard.writeText(url);
+                                    setNotice('동료 확인 URL을 복사했습니다. 현장 근로자에게 공유하세요.');
+                                } catch (_) {
+                                    setNotice(`URL: ${url}`);
+                                }
+                            }}
+                            className="rounded-xl border border-purple-400/40 bg-purple-500/10 px-4 py-2 text-sm font-semibold text-purple-200 hover:bg-purple-500/20"
+                            title="산안법 제36조 근로자 참여 증빙용"
+                        >
+                            동료 확인 공유
+                        </button>
+                    </div>
                 </div>
             )}
 
@@ -219,12 +249,27 @@ function HazardCyclePage() {
                         총 획득 포인트: <strong>{cycle.totalPointsEarned}P</strong>
                     </div>
 
-                    <button
-                        onClick={reset}
-                        className="w-full rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500"
-                    >
-                        새 사이클 시작
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={reset}
+                            className="flex-1 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500"
+                        >
+                            새 사이클 시작
+                        </button>
+                        <button
+                            onClick={async () => {
+                                try {
+                                    await hazardCycleApi.downloadRiskAssessmentPdf(cycle.id);
+                                } catch (e) {
+                                    setError(e?.message || '위험성평가표 PDF 다운로드에 실패했습니다.');
+                                }
+                            }}
+                            className="rounded-xl border border-blue-400/40 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-200 hover:bg-blue-500/20"
+                            title="고용노동부 제출용 위험성평가표"
+                        >
+                            평가표 PDF
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
