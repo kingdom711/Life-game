@@ -32,6 +32,7 @@ import {
 
 import { addPoints, addExperience } from './pointsCalculator';
 import { applyDailyQuestCompletionToWeekly } from './questManager';
+import educationApi from '../api/educationApi';
 
 /**
  * 오늘의 교육 콘텐츠 가져오기
@@ -232,6 +233,39 @@ export const submitQuiz = (educationId, answers) => {
 };
 
 /**
+ * [교육 수료 증거] 백엔드에 최종 수료 레코드 저장
+ * 실패해도 로컬 완료 처리를 막지 않음 (fire-and-forget)
+ */
+const recordCompletionOnServer = (education, progress, quizScore) => {
+    if (!education) return;
+
+    const totalSec = Math.max(1, Math.floor(education.duration || 0));
+    const watchSec = Math.max(0, Math.floor(progress?.cumulativeWatchedTime ?? progress?.maxWatchedTime ?? 0));
+    const watchRatio = Math.min(1, watchSec / totalSec);
+    const startedAt = progress?.startedAt || new Date().toISOString();
+    const attemptCount = quizAttempts.getAttempts(education.id) || 1;
+
+    try {
+        educationApi.complete({
+            educationId: education.id,
+            educationTitle: education.title,
+            educationType: 'GENERAL',
+            startedAt: startedAt.replace(/Z$/, ''),  // 서버가 ISO_LOCAL_DATE_TIME 형식 기대
+            videoWatchSeconds: watchSec,
+            videoTotalSeconds: totalSec,
+            videoWatchRatio: Number(watchRatio.toFixed(4)),
+            quizScore,
+            quizPassed: true,
+            attemptCount,
+        }).catch(() => {
+            // 네트워크 오류 시 조용히 무시 — 로컬 상태는 이미 합격 처리됨
+        });
+    } catch (e) {
+        // 예상치 못한 오류가 UX를 막지 않도록 방어
+    }
+};
+
+/**
  * 교육 완료 처리 (보상 지급)
  * @param {string} educationId - 교육 ID
  * @param {number} quizScore - 퀴즈 점수
@@ -240,6 +274,10 @@ export const submitQuiz = (educationId, answers) => {
 const completeEducation = (educationId, quizScore) => {
     const education = getEducationById(educationId);
     const progress = educationProgress.get();
+
+    // [교육 수료 증거] 백엔드에 최종 수료 레코드 저장 (fire-and-forget)
+    // SHA-256 해시 체인 + IP/User-Agent + 수료증 번호가 서버에서 발급됨
+    recordCompletionOnServer(education, progress, quizScore);
 
     // 기본 보상
     let pointsReward = education.points;

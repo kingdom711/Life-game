@@ -1,11 +1,16 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { educationProgress } from '../utils/storage';
+import educationApi from '../api/educationApi';
+
+// 체크포인트 전송 간격 (30초)
+const CHECKPOINT_INTERVAL_MS = 30_000;
 
 /**
  * YouTube 교육 비디오 플레이어 컴포넌트
- * 
+ *
  * - 누적 시청 시간을 직접 localStorage에서 관리합니다.
  * - youtubeVideoId가 배열이면 연속 재생을 지원합니다.
+ * - [교육 수료 증거] 30초 간격 서버 체크포인트 + 탭 비활성화 감지
  */
 const YouTubeEducationPlayer = ({
     youtubeVideoId,
@@ -32,10 +37,68 @@ const YouTubeEducationPlayer = ({
     const [isCompleted, setIsCompleted] = useState(false);
     const [playlistEnded, setPlaylistEnded] = useState(false);  // 모든 영상 재생 완료 여부
 
+    // ─── [교육 수료 증거] 체크포인트 관련 ref ─────────────────────────
+    const isPlayingRef          = useRef(false);  // interval 내에서 최신 재생 상태 참조
+    const currentTimeRef        = useRef(0);      // interval 내에서 최신 재생 위치 참조
+    const tabVisibleRef         = useRef(true);   // 탭 활성화 여부
+    const checkpointIntervalRef = useRef(null);
+
     // currentVideoIndex ref 동기화
     useEffect(() => {
         currentVideoIndexRef.current = currentVideoIndex;
     }, [currentVideoIndex]);
+
+    /**
+     * [교육 수료 증거] 체크포인트 서버 전송
+     * fire-and-forget — 실패해도 플레이어 동작에 영향 없음
+     */
+    const sendCheckpoint = useCallback((playing) => {
+        if (!educationId) return;
+
+        educationApi.saveCheckpoint({
+            educationId,
+            checkpointSec: Math.floor(currentTimeRef.current),
+            totalSec:      Math.floor(duration),
+            isPlaying:     playing,
+            tabVisible:    tabVisibleRef.current,
+        }).catch(() => {
+            // 네트워크 오류 시 조용히 무시
+        });
+    }, [educationId, duration]);
+
+    // ─── [교육 수료 증거] 탭 가시성 변경 감지 ────────────────────────
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            const visible = document.visibilityState === 'visible';
+            tabVisibleRef.current = visible;
+
+            // 탭이 숨겨지면 영상 일시정지 + 체크포인트 즉시 전송
+            if (!visible) {
+                try {
+                    playerRef.current?.pauseVideo?.();
+                } catch (e) { /* noop */ }
+                sendCheckpoint(false);
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }, [sendCheckpoint]);
+
+    // ─── [교육 수료 증거] 30초 체크포인트 인터벌 ─────────────────────
+    useEffect(() => {
+        checkpointIntervalRef.current = setInterval(() => {
+            if (isPlayingRef.current && educationId) {
+                sendCheckpoint(true);
+            }
+        }, CHECKPOINT_INTERVAL_MS);
+
+        return () => {
+            if (checkpointIntervalRef.current) {
+                clearInterval(checkpointIntervalRef.current);
+            }
+        };
+    }, [educationId, sendCheckpoint]);
 
     // localStorage에서 누적 시간 불러오기
     const loadCumulativeTime = useCallback(() => {
@@ -119,6 +182,7 @@ const YouTubeEducationPlayer = ({
 
         if (state === window.YT.PlayerState.PLAYING) {
             setIsPlaying(true);
+            isPlayingRef.current = true;
             startTimeCheck();
         } else if (state === window.YT.PlayerState.ENDED) {
             // ─── 다중 영상: 현재 영상이 끝났을 때 다음 영상으로 자동 전환 ───
@@ -133,12 +197,19 @@ const YouTubeEducationPlayer = ({
             } else {
                 // 마지막 영상까지 끝남
                 setIsPlaying(false);
+                isPlayingRef.current = false;
                 stopTimeCheck();
                 setPlaylistEnded(true);  // 다시 보기 버튼 표시용
+                sendCheckpoint(false);   // 종료 시 최종 체크포인트
             }
         } else {
             setIsPlaying(false);
+            isPlayingRef.current = false;
             stopTimeCheck();
+            // PAUSED 상태에서 즉시 체크포인트 전송 (BUFFERING/CUED에서도 전송되지만 무해)
+            if (state === window.YT.PlayerState.PAUSED) {
+                sendCheckpoint(false);
+            }
         }
     };
 
@@ -153,6 +224,7 @@ const YouTubeEducationPlayer = ({
                 const player = playerRef.current;
                 const currentVideoTime = player.getCurrentTime();
                 setCurrentTime(currentVideoTime);
+                currentTimeRef.current = currentVideoTime;  // 체크포인트용 ref 동기화
 
                 // 누적 시간 1초 증가
                 setTotalWatchedTime(prev => {
