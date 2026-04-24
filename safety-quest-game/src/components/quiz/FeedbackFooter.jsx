@@ -32,7 +32,7 @@ const FeedbackFooter = ({
         );
     }
 
-    // Post-grade: feedback panel (full-width) + next CTA inside
+    // Post-grade: feedback panel (inline) + next CTA inside
     const panelBg = isCorrect ? 'bg-emerald-500/15' : 'bg-orange-500/15';
     const panelBorder = isCorrect ? 'border-emerald-500/40' : 'border-orange-500/40';
     const titleColor = isCorrect ? 'text-emerald-400' : 'text-orange-400';
@@ -42,8 +42,8 @@ const FeedbackFooter = ({
     const Icon = isCorrect ? CheckCircle2 : Lightbulb;
 
     return (
-        <div className={`quiz-slide-up shrink-0 z-10 backdrop-blur-sm border-t-2 quiz-safe-footer ${panelBg} ${panelBorder}`}>
-            <div className="quiz-center max-w-2xl w-full px-6 pt-5 pb-5">
+        <div className={`quiz-slide-up mt-5 rounded-2xl border-2 backdrop-blur-sm ${panelBg} ${panelBorder}`}>
+            <div className="w-full px-5 pt-5 pb-5">
                 <div className={`font-bold mb-2 flex items-center gap-2 ${titleColor}`}>
                     <Icon size={20} strokeWidth={2.5} />
                     <span>{isCorrect ? '정답입니다!' : '해설'}</span>

@@ -218,21 +218,21 @@ const EducationQuizModal = ({
                             확인
                         </button>
                     )}
+
+                    {isGraded && (
+                        <FeedbackFooter
+                            isGraded={isGraded}
+                            isCorrect={isCorrect}
+                            selectedAnswer={selectedAnswer}
+                            explanation={currentQuestion.explanation}
+                            isLastQuestion={isLastQuestion}
+                            isSubmitting={isSubmitting}
+                            onConfirm={handleConfirm}
+                            onNext={handleNextQuestion}
+                        />
+                    )}
                 </div>
             </div>
-
-            {isGraded && (
-                <FeedbackFooter
-                    isGraded={isGraded}
-                    isCorrect={isCorrect}
-                    selectedAnswer={selectedAnswer}
-                    explanation={currentQuestion.explanation}
-                    isLastQuestion={isLastQuestion}
-                    isSubmitting={isSubmitting}
-                    onConfirm={handleConfirm}
-                    onNext={handleNextQuestion}
-                />
-            )}
         </div>
     );
 };
