@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getCachedOrFetchWeather, getWeatherSafetyTip, getStaticSafetyTip } from '../../utils/weatherService';
+import { getCachedOrFetchWeather, getWeatherSafetyTip } from '../../utils/weatherService';
 
 const STATIC_TIPS = [
     '3점 지지 원칙을 잊지 마세요!',

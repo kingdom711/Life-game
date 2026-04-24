@@ -90,6 +90,10 @@
   transform: translateY(1px);
 }
 
+.quiz-safe-footer {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 /* prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   .quiz-shake,

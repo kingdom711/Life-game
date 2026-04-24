@@ -13,8 +13,8 @@ const CACHE_DURATION_MS = 60 * 60 * 1000; // 1시간
 // 기본 위치 (서울)
 const DEFAULT_LOCATION = { lat: 37.5665, lng: 126.978 };
 
-// OpenWeatherMap API 키 (환경변수 또는 기본값)
-const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY || '';
+// OpenWeatherMap API 키 (환경변수)
+const getWeatherApiKey = () => import.meta.env?.['VITE_OPENWEATHER_API_KEY'] || '';
 
 /**
  * 날씨 조건별 안전 팁 매핑 테이블
@@ -192,11 +192,13 @@ const getUserLocation = () => {
  * OpenWeatherMap API로 날씨 데이터 가져오기
  */
 const fetchWeatherFromAPI = async (lat, lng) => {
-    if (!API_KEY) return null;
+    const apiKey = getWeatherApiKey();
+
+    if (!apiKey) return null;
 
     try {
         const response = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${API_KEY}&units=metric&lang=kr`
+            `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${apiKey}&units=metric&lang=kr`
         );
 
         if (!response.ok) return null;
@@ -216,7 +218,7 @@ export const getCachedOrFetchWeather = async () => {
     if (cached) return cached;
 
     // 2. API 키가 없으면 null (폴백 팁 사용)
-    if (!API_KEY) return null;
+    if (!getWeatherApiKey()) return null;
 
     // 3. 위치 가져오기
     const location = await getUserLocation();

@@ -30,6 +30,7 @@ import RecentRewards from '../components/dashboard/RecentRewards';
 import OurTeamSection from '../components/dashboard/OurTeamSection';
 import QuickNavigation from '../components/dashboard/QuickNavigation';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
+import SafetyTipBar from '../components/dashboard/SafetyTipBar';
 import { getActiveWorkStopCount } from '../utils/workStopManager';
 
 // [New] 援먯쑁 ?쒖뒪??
@@ -561,6 +562,7 @@ function Dashboard({ role }) {
                         )}
                     </button>
                 </div>
+                <SafetyTipBar />
                 <div className="new-dashboard-layout">
                     {/* Left main column */}
                     <main className="new-dashboard-left">

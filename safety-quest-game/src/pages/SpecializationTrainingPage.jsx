@@ -11,6 +11,7 @@ import {
 import { specializationProgress as specProgressStorage } from '../utils/storage';
 import ShareRewardModal from '../components/ShareRewardModal';
 import { buildSpecializationShareData } from '../utils/shareManager';
+import EducationQuizModal from '../components/EducationQuizModal';
 
 /**
  * 전직 교육 페이지
@@ -28,7 +29,6 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
     const [isWatching, setIsWatching] = useState(false);
     const [videoCompleted, setVideoCompleted] = useState(false);
     const [showQuiz, setShowQuiz] = useState(false);
-    const [quizAnswers, setQuizAnswers] = useState({});
     const [quizResult, setQuizResult] = useState(null);
     const [showClassChangeModal, setShowClassChangeModal] = useState(false);
     const [classChangeResult, setClassChangeResult] = useState(null);
@@ -90,7 +90,6 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
             setIsWatching(false);
             setVideoCompleted(false);
             setShowQuiz(false);
-            setQuizAnswers({});
             setQuizResult(null);
             setWatchedTime(0);
             setMaxWatchedTime(0);
@@ -111,24 +110,25 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
     };
 
     const handleStartQuiz = () => {
+        setIsWatching(false);
         setShowQuiz(true);
-        setQuizAnswers({});
         setQuizResult(null);
     };
 
-    const handleAnswerSelect = (questionIdx, answerIdx) => {
-        setQuizAnswers(prev => ({
-            ...prev,
-            [questionIdx]: answerIdx
-        }));
-    };
-
-    const handleSubmitQuiz = () => {
+    const handleSubmitQuiz = async (modalAnswers) => {
         if (!selectedEdu) return;
 
-        const answersArray = selectedEdu.quiz.map((_, idx) => quizAnswers[idx] ?? -1);
+        const answersArray = selectedEdu.quiz.map(q => modalAnswers?.[q.id] ?? -1);
         const result = submitSpecializationQuiz(specId, selectedEdu.id, answersArray);
-        setQuizResult(result);
+        const normalizedResult = {
+            ...result,
+            rewards: result.passed ? {
+                points: selectedEdu.points || SPECIALIZATION_EDUCATION_CONFIG.POINTS_REWARD,
+                exp: selectedEdu.exp || SPECIALIZATION_EDUCATION_CONFIG.EXP_REWARD,
+                legalHours: selectedEdu.legalHours || 0
+            } : undefined
+        };
+        setQuizResult(normalizedResult);
 
         if (result.passed) {
             // 교육 완료 후 데이터 갱신
@@ -144,6 +144,8 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                 }, 1500);
             }
         }
+
+        return normalizedResult;
     };
 
     const handleClassChange = () => {
@@ -315,7 +317,7 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                     좌측 목록에서 이수할 교육을 선택하세요
                                 </p>
                             </div>
-                        ) : !isWatching && !showQuiz ? (
+                        ) : !isWatching ? (
                             /* 교육 상세 정보 */
                             <div className="card">
                                 <div className="card-header" style={{ textAlign: 'center' }}>
@@ -414,193 +416,6 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                         >
                                             ▶️ 교육 영상 시청 시작
                                         </button>
-                                    )}
-                                </div>
-                            </div>
-                        ) : showQuiz ? (
-                            /* 퀴즈 영역 */
-                            <div className="card">
-                                <div className="card-header">
-                                    <h2 style={{ fontSize: '1.25rem' }}>📝 {selectedEdu.title} - 퀴즈</h2>
-                                    <p className="card-subtitle" style={{ fontSize: '0.8rem' }}>
-                                        {selectedEdu.quiz.length}문항 중 {SPECIALIZATION_EDUCATION_CONFIG.REQUIRED_SCORE}% 이상 정답 시 합격
-                                    </p>
-                                </div>
-                                <div className="card-body">
-                                    {quizResult ? (
-                                        /* 퀴즈 결과 */
-                                        <div>
-                                            <div style={{
-                                                textAlign: 'center',
-                                                padding: '2rem',
-                                                marginBottom: '1.5rem',
-                                                borderRadius: '0.75rem',
-                                                background: quizResult.passed
-                                                    ? 'rgba(34, 197, 94, 0.1)'
-                                                    : 'rgba(239, 68, 68, 0.1)',
-                                                border: `1px solid ${quizResult.passed ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
-                                            }}>
-                                                <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>
-                                                    {quizResult.passed ? '🎉' : '😔'}
-                                                </div>
-                                                <h3 style={{
-                                                    color: quizResult.passed ? '#22c55e' : '#ef4444'
-                                                }}>
-                                                    {quizResult.passed ? '합격!' : '불합격'}
-                                                </h3>
-                                                <div style={{ fontSize: '2rem', fontWeight: 700, margin: '0.5rem 0' }}>
-                                                    {quizResult.score}%
-                                                </div>
-                                                <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
-                                                    {quizResult.correctCount}/{quizResult.totalQuestions} 정답
-                                                    {!quizResult.passed && ` · 남은 시도: ${quizResult.remainingAttempts}회`}
-                                                </div>
-                                            </div>
-
-                                            {/* 문제별 결과 */}
-                                            {quizResult.results.map((r, idx) => (
-                                                <div key={idx} style={{
-                                                    padding: '1rem',
-                                                    marginBottom: '0.75rem',
-                                                    borderRadius: '0.5rem',
-                                                    background: r.isCorrect
-                                                        ? 'rgba(34, 197, 94, 0.05)'
-                                                        : 'rgba(239, 68, 68, 0.05)',
-                                                    border: `1px solid ${r.isCorrect ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`
-                                                }}>
-                                                    <div style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '0.5rem',
-                                                        marginBottom: '0.5rem'
-                                                    }}>
-                                                        <span style={{ color: r.isCorrect ? '#22c55e' : '#ef4444' }}>
-                                                            {r.isCorrect ? '✓' : '✗'}
-                                                        </span>
-                                                        <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>
-                                                            Q{idx + 1}. {selectedEdu.quiz[idx].question}
-                                                        </span>
-                                                    </div>
-                                                    {!r.isCorrect && (
-                                                        <div style={{
-                                                            fontSize: '0.8rem',
-                                                            color: 'var(--color-text-secondary)',
-                                                            paddingLeft: '1.25rem'
-                                                        }}>
-                                                            💡 {r.explanation}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ))}
-
-                                            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
-                                                {quizResult.passed ? (
-                                                    <button
-                                                        className="btn btn-primary"
-                                                        style={{ flex: 1, background: spec.bgGradient }}
-                                                        onClick={() => {
-                                                            setSelectedEdu(null);
-                                                            setShowQuiz(false);
-                                                            setQuizResult(null);
-                                                        }}
-                                                    >
-                                                        다음 교육으로 →
-                                                    </button>
-                                                ) : (
-                                                    <>
-                                                        <button
-                                                            className="btn btn-secondary"
-                                                            style={{ flex: 1 }}
-                                                            onClick={() => {
-                                                                setShowQuiz(false);
-                                                                setQuizResult(null);
-                                                                setIsWatching(false);
-                                                            }}
-                                                        >
-                                                            교육 다시 보기
-                                                        </button>
-                                                        {quizResult.remainingAttempts > 0 && (
-                                                            <button
-                                                                className="btn btn-primary"
-                                                                style={{ flex: 1, background: spec.bgGradient }}
-                                                                onClick={() => {
-                                                                    setQuizResult(null);
-                                                                    setQuizAnswers({});
-                                                                }}
-                                                            >
-                                                                재시도 ({quizResult.remainingAttempts}회 남음)
-                                                            </button>
-                                                        )}
-                                                    </>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        /* 퀴즈 문제 */
-                                        <div>
-                                            {selectedEdu.quiz.map((q, qIdx) => (
-                                                <div key={q.id} style={{
-                                                    marginBottom: '1.5rem',
-                                                    padding: '1rem',
-                                                    borderRadius: '0.5rem',
-                                                    background: 'rgba(255,255,255,0.03)',
-                                                    border: '1px solid rgba(255,255,255,0.06)'
-                                                }}>
-                                                    <div style={{
-                                                        fontWeight: 600,
-                                                        marginBottom: '0.75rem',
-                                                        fontSize: '0.9rem'
-                                                    }}>
-                                                        Q{qIdx + 1}. {q.question}
-                                                    </div>
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                                        {q.options.map((opt, oIdx) => (
-                                                            <label
-                                                                key={oIdx}
-                                                                style={{
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '0.5rem',
-                                                                    padding: '0.5rem 0.75rem',
-                                                                    borderRadius: '0.375rem',
-                                                                    cursor: 'pointer',
-                                                                    fontSize: '0.85rem',
-                                                                    background: quizAnswers[qIdx] === oIdx
-                                                                        ? `${spec.color}20`
-                                                                        : 'rgba(255,255,255,0.02)',
-                                                                    border: quizAnswers[qIdx] === oIdx
-                                                                        ? `1px solid ${spec.color}50`
-                                                                        : '1px solid rgba(255,255,255,0.06)',
-                                                                    transition: 'all 0.2s'
-                                                                }}
-                                                            >
-                                                                <input
-                                                                    type="radio"
-                                                                    name={`q_${qIdx}`}
-                                                                    checked={quizAnswers[qIdx] === oIdx}
-                                                                    onChange={() => handleAnswerSelect(qIdx, oIdx)}
-                                                                    style={{ accentColor: spec.color }}
-                                                                />
-                                                                <span>{opt}</span>
-                                                            </label>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            ))}
-
-                                            <button
-                                                className="btn btn-primary"
-                                                style={{
-                                                    width: '100%',
-                                                    background: spec.bgGradient,
-                                                    marginTop: '1rem'
-                                                }}
-                                                onClick={handleSubmitQuiz}
-                                                disabled={Object.keys(quizAnswers).length < selectedEdu.quiz.length}
-                                            >
-                                                📝 답안 제출 ({Object.keys(quizAnswers).length}/{selectedEdu.quiz.length})
-                                            </button>
-                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -708,6 +523,23 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                         )}
                     </div>
                 </div>
+
+                {selectedEdu && (
+                    <EducationQuizModal
+                        isOpen={showQuiz}
+                        onClose={() => {
+                            setShowQuiz(false);
+                            setQuizResult(null);
+                            loadData();
+                        }}
+                        quiz={selectedEdu.quiz}
+                        educationId={selectedEdu.id}
+                        educationTitle={selectedEdu.title}
+                        requiredScore={SPECIALIZATION_EDUCATION_CONFIG.REQUIRED_SCORE}
+                        remainingAttempts={quizResult?.remainingAttempts ?? SPECIALIZATION_EDUCATION_CONFIG.MAX_DAILY_ATTEMPTS}
+                        onSubmit={handleSubmitQuiz}
+                    />
+                )}
 
                 {/* 전직 완료 모달 */}
                 {showClassChangeModal && (

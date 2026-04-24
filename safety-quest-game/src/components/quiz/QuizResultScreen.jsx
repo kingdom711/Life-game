@@ -5,9 +5,9 @@ const QuizResultScreen = ({ quizResult, requiredScore, onRetry, onClose }) => {
     const HeroIcon = passed ? PartyPopper : Frown;
 
     return (
-        <div className="fixed inset-0 bg-gray-900 z-[1200] flex flex-col">
-            <div className="flex-1 overflow-y-auto">
-                <div className="quiz-center max-w-lg w-full px-6 py-10">
+        <div className="fixed inset-0 bg-gray-900 z-[1200] flex flex-col overflow-hidden">
+            <div className="flex-1 min-h-0 overflow-y-auto">
+                <div className="quiz-center max-w-lg w-full px-6 py-10 pb-28">
                     {/* 히어로 */}
                     <div className="text-center mb-8">
                         <div className={`w-24 h-24 mx-auto mb-5 rounded-full flex items-center justify-center ${
@@ -123,8 +123,8 @@ const QuizResultScreen = ({ quizResult, requiredScore, onRetry, onClose }) => {
             </div>
 
             {/* 하단 고정 CTA */}
-            <div className="sticky bottom-0 z-10 bg-gray-900/95 backdrop-blur-sm border-t border-gray-800">
-                <div className="quiz-center max-w-lg w-full px-6 py-4 flex gap-3">
+            <div className="shrink-0 z-10 bg-gray-900/95 backdrop-blur-sm border-t border-gray-800 quiz-safe-footer">
+                <div className="quiz-center max-w-lg w-full px-6 pt-4 pb-4 flex gap-3">
                     {!passed && quizResult.remainingAttempts > 0 && (
                         <button
                             onClick={onRetry}

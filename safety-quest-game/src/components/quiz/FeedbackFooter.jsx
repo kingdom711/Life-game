@@ -14,8 +14,8 @@ const FeedbackFooter = ({
     if (!isGraded) {
         const canConfirm = selectedAnswer !== null && selectedAnswer !== undefined;
         return (
-            <div className="sticky bottom-0 z-10 bg-gray-900/95 backdrop-blur-sm border-t border-gray-800">
-                <div className="quiz-center max-w-2xl w-full px-6 py-4">
+            <div className="shrink-0 z-10 bg-gray-900/95 backdrop-blur-sm border-t border-gray-800 quiz-safe-footer">
+                <div className="quiz-center max-w-2xl w-full px-6 pt-4 pb-4">
                     <button
                         onClick={onConfirm}
                         disabled={!canConfirm}
@@ -42,8 +42,8 @@ const FeedbackFooter = ({
     const Icon = isCorrect ? CheckCircle2 : Lightbulb;
 
     return (
-        <div className={`quiz-slide-up sticky bottom-0 z-10 backdrop-blur-sm border-t-2 ${panelBg} ${panelBorder}`}>
-            <div className="quiz-center max-w-2xl w-full px-6 py-5">
+        <div className={`quiz-slide-up shrink-0 z-10 backdrop-blur-sm border-t-2 quiz-safe-footer ${panelBg} ${panelBorder}`}>
+            <div className="quiz-center max-w-2xl w-full px-6 pt-5 pb-5">
                 <div className={`font-bold mb-2 flex items-center gap-2 ${titleColor}`}>
                     <Icon size={20} strokeWidth={2.5} />
                     <span>{isCorrect ? '정답입니다!' : '해설'}</span>

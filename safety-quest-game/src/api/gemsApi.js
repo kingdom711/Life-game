@@ -12,59 +12,88 @@
 import apiClient, { ApiError } from './apiClient';
 import config from '../config/environment';
 
-// Mock 응답 데이터 (폴백용) - KOSHA 코드 기반
+// Mock 응답 데이터 (서버 미가동 시 폴백용)
+// 고용노동부 고시 제2023-19호 위험성평가 양식 + 실제 KOSHA Guide 코드 준수.
 const MOCK_RESPONSES = [
     {
-        riskFactor: '고소 작업 중 안전대 미체결',
-        remediationSteps: [
-            '즉시 작업을 중단하고 안전한 장소로 이동하십시오.',
-            '안전대 및 부속품의 상태를 점검하십시오.',
-            '안전대 체결 후 2인 1조로 작업을 재개하십시오.'
+        riskFactor: '[Mock] 2m 이상 개구부 안전난간 미설치',
+        riskLevel: 'HIGH',
+        hazardClassification: '작업특성',
+        unsafeCondition: '2m 이상 개구부에 안전난간/덮개 미설치',
+        unsafeAct: null,
+        possibleAccident: '추락',
+        severity: { score: 4, rationale: '2m 이상 추락은 사망 가능' },
+        likelihood: { score: 3, rationale: '다수 작업자가 근접' },
+        riskScore: 12,
+        legalBasis: [
+            { law: '산업안전보건기준에 관한 규칙', article: '제42조', content: '추락의 방지 — 2m 이상 작업장소 안전난간 등 설치' },
+            { law: '산업안전보건기준에 관한 규칙', article: '제43조', content: '개구부 등의 방호 조치' }
         ],
-        referenceCode: 'KOSHA-G-2023-01',
-        riskLevel: 'HIGH'
+        koshaGuide: 'G-99-2012',
+        referenceCode: 'G-99-2012',
+        controlMeasures: {
+            immediate: ['해당 구역 출입 통제', '경고 표지 부착'],
+            engineering: ['안전난간 1.0m 이상 설치', '개구부 덮개 설치'],
+            administrative: ['작업허가서 발급', 'TBM에서 개구부 위치 공유'],
+            ppe: ['안전대 생명줄 체결']
+        },
+        responsibleRole: '현장소장',
+        dueDays: 1,
+        confidence: 0.9,
+        remediationSteps: ['출입 통제', '안전난간 설치', '안전대 체결 후 작업']
     },
     {
-        riskFactor: '가연성 물질 주변 화기 작업',
-        remediationSteps: [
-            '반경 10m 이내 가연성 물질을 제거하거나 방염포로 덮으십시오.',
-            '소화기를 작업 장소 바로 옆에 비치하십시오.',
-            '화기 감시자를 배치하고 작업을 진행하십시오.'
+        riskFactor: '[Mock] 용접 작업 반경 내 가연물 방치 + 화재감시자 미배치',
+        riskLevel: 'CRITICAL',
+        hazardClassification: '화학적',
+        unsafeCondition: '용접 반경 5m 내 가연물 존재',
+        unsafeAct: '화재감시자 없이 용접 중',
+        possibleAccident: '화재',
+        severity: { score: 4, rationale: '화재 확산 시 인명/설비 피해 중대' },
+        likelihood: { score: 4, rationale: '착화원 상시 존재' },
+        riskScore: 16,
+        legalBasis: [
+            { law: '산업안전보건기준에 관한 규칙', article: '제241조', content: '화재위험작업 시의 준수사항' },
+            { law: '산업안전보건기준에 관한 규칙', article: '제236조', content: '화재감시자 배치' }
         ],
-        referenceCode: 'KOSHA-M-2023-05',
-        riskLevel: 'CRITICAL'
+        koshaGuide: 'M-58-2012',
+        referenceCode: 'M-58-2012',
+        controlMeasures: {
+            immediate: ['용접 즉시 중단', '반경 10m 내 가연물 제거'],
+            engineering: ['불꽃 비산 방지막', '소화기 2대 비치'],
+            administrative: ['화기작업 허가서 발급', '화재감시자 배치'],
+            ppe: ['용접면', '내열 장갑', '안전화']
+        },
+        responsibleRole: '안전관리자',
+        dueDays: 1,
+        confidence: 0.95,
+        remediationSteps: ['용접 중단', '가연물 제거', '화재감시자 배치']
     },
     {
-        riskFactor: '개인보호구(안전모) 미착용',
-        remediationSteps: [
-            '작업자에게 즉시 안전모 착용을 지시하십시오.',
-            '안전모의 턱끈 체결 상태를 확인하십시오.',
-            '개인보호구 착용 교육을 실시하십시오.'
+        riskFactor: '[Mock] 밀폐공간 산소농도 미확인 진입',
+        riskLevel: 'CRITICAL',
+        hazardClassification: '화학적',
+        unsafeCondition: '환기설비 미가동, 농도 미측정',
+        possibleAccident: '질식',
+        severity: { score: 4, rationale: '질식은 수분 내 사망 가능' },
+        likelihood: { score: 3, rationale: '보수적 추정' },
+        riskScore: 12,
+        legalBasis: [
+            { law: '산업안전보건기준에 관한 규칙', article: '제619조', content: '밀폐공간 작업 프로그램의 수립·시행' },
+            { law: '산업안전보건기준에 관한 규칙', article: '제622조', content: '산소·유해가스 농도 측정' }
         ],
-        referenceCode: 'KOSHA-P-2023-12',
-        riskLevel: 'MEDIUM'
-    },
-    {
-        riskFactor: '밀폐공간 산소 농도 미확인',
-        remediationSteps: [
-            '밀폐공간 진입을 즉시 금지하십시오.',
-            '산소 농도 측정기로 농도를 확인하십시오 (18% 이상 필요).',
-            '환기 장치를 가동하고 충분히 환기하십시오.',
-            '밀폐공간 작업 허가서를 발급받은 후 진입하십시오.'
-        ],
-        referenceCode: 'KOSHA-S-2023-03',
-        riskLevel: 'CRITICAL'
-    },
-    {
-        riskFactor: '비계 안전난간 불량',
-        remediationSteps: [
-            '해당 구역 작업을 즉시 중단하십시오.',
-            '안전난간 고정 상태를 점검하고 보수하십시오.',
-            '비계 구조물 전체 안전 점검을 실시하십시오.',
-            '작업 재개 전 관리감독자의 확인을 받으십시오.'
-        ],
-        referenceCode: 'KOSHA-C-2023-08',
-        riskLevel: 'HIGH'
+        koshaGuide: 'H-80-2012',
+        referenceCode: 'H-80-2012',
+        controlMeasures: {
+            immediate: ['밀폐공간 진입 즉시 금지'],
+            engineering: ['환기설비 가동', '산소농도 측정 18% 이상 확인'],
+            administrative: ['밀폐공간 작업허가서', '감시인 상주'],
+            ppe: ['송기마스크 또는 공기호흡기']
+        },
+        responsibleRole: '안전관리자',
+        dueDays: 1,
+        confidence: 0.9,
+        remediationSteps: ['진입 금지', '산소농도 측정', '환기 후 작업허가서 발급']
     }
 ];
 
@@ -78,10 +107,7 @@ const getMockResponse = () => {
             const mockResponse = MOCK_RESPONSES[Math.floor(Math.random() * MOCK_RESPONSES.length)];
             resolve({
                 success: true,
-                riskFactor: mockResponse.riskFactor,
-                remediationSteps: mockResponse.remediationSteps,
-                referenceCode: mockResponse.referenceCode,
-                riskLevel: mockResponse.riskLevel,
+                ...mockResponse,
                 actionRecordId: `action-${Date.now()}`,
                 analysisId: `mock-${Date.now()}`,
                 analyzedAt: new Date().toISOString(),
@@ -178,16 +204,30 @@ const gemsApi = {
             const normalizedResponse = {
                 success: true,
                 riskFactor: responseData.riskFactor || responseData.risk_factor || '위험 요인 분석 완료',
-                remediationSteps: Array.isArray(responseData.remediationSteps) 
-                    ? responseData.remediationSteps 
+                remediationSteps: Array.isArray(responseData.remediationSteps)
+                    ? responseData.remediationSteps
                     : Array.isArray(responseData.remediation_steps)
                         ? responseData.remediation_steps
                         : [],
-                referenceCode: responseData.referenceCode || responseData.reference_code || 'KOSHA-AI-2024',
+                referenceCode: responseData.referenceCode || responseData.reference_code || null,
                 riskLevel: responseData.riskLevel || responseData.risk_level || 'MEDIUM',
                 actionRecordId: responseData.actionRecordId || responseData.action_record_id || null,
                 analysisId: responseData.analysisId || responseData.analysis_id || `analysis-${Date.now()}`,
                 analyzedAt: responseData.analyzedAt || responseData.analyzed_at || new Date().toISOString(),
+                // 확장 위험성평가 필드 (고용노동부 고시 제2023-19호)
+                hazardClassification: responseData.hazardClassification || null,
+                unsafeCondition: responseData.unsafeCondition || null,
+                unsafeAct: responseData.unsafeAct || null,
+                possibleAccident: responseData.possibleAccident || null,
+                severity: responseData.severity || null,
+                likelihood: responseData.likelihood || null,
+                riskScore: responseData.riskScore ?? null,
+                legalBasis: Array.isArray(responseData.legalBasis) ? responseData.legalBasis : [],
+                koshaGuide: responseData.koshaGuide || null,
+                controlMeasures: responseData.controlMeasures || null,
+                responsibleRole: responseData.responsibleRole || null,
+                dueDays: responseData.dueDays ?? null,
+                confidence: responseData.confidence ?? null,
                 // Gemini API 사용량 정보 (백엔드에서 제공하는 경우)
                 usage: responseData.usage || null,
                 rawResponse: response // 원본 응답 보관 (디버깅용)
