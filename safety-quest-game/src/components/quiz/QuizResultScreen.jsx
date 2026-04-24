@@ -5,7 +5,7 @@ const QuizResultScreen = ({ quizResult, requiredScore, onRetry, onClose }) => {
     const HeroIcon = passed ? PartyPopper : Frown;
 
     return (
-        <div className="fixed inset-0 bg-gray-900 z-[1200] flex flex-col overflow-hidden">
+        <div className="fixed inset-0 bg-gray-900 flex flex-col overflow-hidden" style={{ zIndex: 2000 }}>
             <div className="flex-1 min-h-0 overflow-y-auto">
                 <div className="quiz-center max-w-lg w-full px-6 py-10 pb-28">
                     {/* 히어로 */}

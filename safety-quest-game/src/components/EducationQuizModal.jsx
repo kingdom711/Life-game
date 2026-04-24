@@ -176,7 +176,7 @@ const EducationQuizModal = ({
     }
 
     return (
-        <div className="fixed inset-0 bg-gray-900 z-[1200] flex flex-col overflow-hidden">
+        <div className="fixed inset-0 bg-gray-900 flex flex-col overflow-hidden" style={{ zIndex: 2000 }}>
             <QuizHeader
                 educationTitle={educationTitle}
                 remainingAttempts={remainingAttempts}
@@ -188,7 +188,7 @@ const EducationQuizModal = ({
             <div className="flex-1 min-h-0 overflow-y-auto">
                 <div
                     key={currentQuestionIndex}
-                    className="quiz-fade-in quiz-center max-w-2xl w-full px-6 py-8 pb-28"
+                    className={`quiz-fade-in quiz-center max-w-2xl w-full px-6 py-8 ${isGraded ? 'pb-28' : 'pb-8'}`}
                 >
                     <QuestionView
                         currentIndex={currentQuestionIndex}
@@ -204,19 +204,35 @@ const EducationQuizModal = ({
                         correctAnswer={currentQuestion.correctAnswer}
                         onSelect={handleSelectAnswer}
                     />
+
+                    {!isGraded && (
+                        <button
+                            onClick={handleConfirm}
+                            disabled={selectedAnswer === null || selectedAnswer === undefined}
+                            className={`quiz-tap w-full mt-6 py-4 font-bold rounded-xl transition-all uppercase tracking-wide ${
+                                selectedAnswer !== null && selectedAnswer !== undefined
+                                    ? 'bg-[var(--color-safe)] hover:bg-[var(--color-safe-dark)] text-white shadow-lg shadow-emerald-500/20'
+                                    : 'bg-gray-800 text-gray-600 cursor-not-allowed'
+                            }`}
+                        >
+                            확인
+                        </button>
+                    )}
                 </div>
             </div>
 
-            <FeedbackFooter
-                isGraded={isGraded}
-                isCorrect={isCorrect}
-                selectedAnswer={selectedAnswer}
-                explanation={currentQuestion.explanation}
-                isLastQuestion={isLastQuestion}
-                isSubmitting={isSubmitting}
-                onConfirm={handleConfirm}
-                onNext={handleNextQuestion}
-            />
+            {isGraded && (
+                <FeedbackFooter
+                    isGraded={isGraded}
+                    isCorrect={isCorrect}
+                    selectedAnswer={selectedAnswer}
+                    explanation={currentQuestion.explanation}
+                    isLastQuestion={isLastQuestion}
+                    isSubmitting={isSubmitting}
+                    onConfirm={handleConfirm}
+                    onNext={handleNextQuestion}
+                />
+            )}
         </div>
     );
 };

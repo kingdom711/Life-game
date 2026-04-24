@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getSpecializationById } from '../data/specializationData';
 import { getEducationsBySpecialization, getSpecializationEducationById, SPECIALIZATION_EDUCATION_CONFIG } from '../data/specializationEducationData';
@@ -35,6 +35,8 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
     const [shareModal, setShareModal] = useState({ isOpen: false, data: null });
     const [watchedTime, setWatchedTime] = useState(0);
     const [maxWatchedTime, setMaxWatchedTime] = useState(0);
+    const videoFrameRef = useRef(null);
+    const [isVideoFullscreen, setIsVideoFullscreen] = useState(false);
     const [isMobileViewport, setIsMobileViewport] = useState(
         typeof window !== 'undefined' ? window.innerWidth <= 768 : false
     );
@@ -52,6 +54,15 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
 
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsVideoFullscreen(document.fullscreenElement === videoFrameRef.current);
+        };
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
     }, []);
 
     const loadData = () => {
@@ -107,6 +118,21 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
 
     const handleVideoComplete = () => {
         setVideoCompleted(true);
+    };
+
+    const handleToggleVideoFullscreen = async () => {
+        const frame = videoFrameRef.current;
+        if (!frame) return;
+
+        try {
+            if (document.fullscreenElement) {
+                await document.exitFullscreen();
+            } else if (frame.requestFullscreen) {
+                await frame.requestFullscreen();
+            }
+        } catch (error) {
+            console.warn('전체화면 전환 실패:', error);
+        }
     };
 
     const handleStartQuiz = () => {
@@ -427,12 +453,15 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                 </div>
                                 <div className="card-body">
                                     {/* 비디오 플레이어 */}
-                                    <div style={{
+                                    <div
+                                        ref={videoFrameRef}
+                                        style={{
                                         position: 'relative',
                                         width: '100%',
-                                        paddingTop: '56.25%',
+                                        height: isVideoFullscreen ? '100vh' : undefined,
+                                        paddingTop: isVideoFullscreen ? 0 : '56.25%',
                                         background: '#000',
-                                        borderRadius: '0.5rem',
+                                        borderRadius: isVideoFullscreen ? 0 : '0.5rem',
                                         overflow: 'hidden',
                                         marginBottom: '1rem'
                                     }}>
@@ -446,9 +475,9 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                                     height: '100%',
                                                     border: 'none'
                                                 }}
-                                                src={`https://www.youtube.com/embed/${selectedEdu.youtubeVideoId}?rel=0`}
+                                                src={`https://www.youtube.com/embed/${selectedEdu.youtubeVideoId}?rel=0&fs=1`}
                                                 title={selectedEdu.title}
-                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                                                 allowFullScreen
                                             />
                                         ) : (
@@ -462,6 +491,29 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                             }}>
                                                 영상을 불러올 수 없습니다
                                             </div>
+                                        )}
+                                        {selectedEdu.youtubeVideoId && (
+                                            <button
+                                                type="button"
+                                                onClick={handleToggleVideoFullscreen}
+                                                title={isVideoFullscreen ? '전체화면 종료' : '전체화면'}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '0.75rem',
+                                                    right: '0.75rem',
+                                                    zIndex: 2,
+                                                    padding: '0.45rem 0.75rem',
+                                                    borderRadius: '999px',
+                                                    border: '1px solid rgba(255,255,255,0.2)',
+                                                    background: 'rgba(0,0,0,0.72)',
+                                                    color: '#fff',
+                                                    fontSize: '0.8rem',
+                                                    fontWeight: 700,
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                {isVideoFullscreen ? '⤢ 종료' : '⛶ 전체화면'}
+                                            </button>
                                         )}
                                     </div>
 

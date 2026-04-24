@@ -48,6 +48,7 @@ const EducationVideoPlayer = (props) => {
     onSeekAttempt,
     initialWatchedTime = 0
 }) => {
+    const playerFrameRef = useRef(null);
     const videoRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
@@ -58,6 +59,7 @@ const EducationVideoPlayer = (props) => {
     const [volume, setVolume] = useState(1);
     const [isMuted, setIsMuted] = useState(false);
     const [showControls, setShowControls] = useState(true);
+    const [isFullscreen, setIsFullscreen] = useState(false);
     const controlsTimeoutRef = useRef(null);
 
     // ─── [교육 수료 증거] 체크포인트 관련 ref ─────────────────────────
@@ -100,6 +102,15 @@ const EducationVideoPlayer = (props) => {
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [educationId]);
+
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(document.fullscreenElement === playerFrameRef.current);
+        };
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    }, []);
 
     /**
      * 체크포인트 서버 전송 (fire-and-forget, 실패해도 플레이어 동작에 영향 없음)
@@ -239,6 +250,24 @@ const EducationVideoPlayer = (props) => {
         }, 3000);
     };
 
+    const toggleFullscreen = async () => {
+        const frame = playerFrameRef.current;
+        const video = videoRef.current;
+        if (!frame) return;
+
+        try {
+            if (document.fullscreenElement) {
+                await document.exitFullscreen();
+            } else if (frame.requestFullscreen) {
+                await frame.requestFullscreen();
+            } else if (video?.webkitEnterFullscreen) {
+                video.webkitEnterFullscreen();
+            }
+        } catch (error) {
+            console.warn('전체화면 전환 실패:', error);
+        }
+    };
+
     // 시간 포맷팅
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
@@ -252,6 +281,7 @@ const EducationVideoPlayer = (props) => {
 
     return (
         <div
+            ref={playerFrameRef}
             className="relative w-full bg-black rounded-xl overflow-hidden shadow-2xl"
             onMouseMove={handleMouseMove}
             onMouseLeave={() => isPlaying && setShowControls(false)}
@@ -396,6 +426,15 @@ const EducationVideoPlayer = (props) => {
                                 <span className="text-gray-400"> 더 시청 필요</span>
                             </div>
                         )}
+
+                        <button
+                            type="button"
+                            onClick={toggleFullscreen}
+                            className="text-white text-sm font-bold hover:text-blue-400 transition-colors"
+                            title={isFullscreen ? '전체화면 종료' : '전체화면'}
+                        >
+                            {isFullscreen ? '⤢ 종료' : '⛶ 전체화면'}
+                        </button>
                     </div>
                 </div>
             </div>

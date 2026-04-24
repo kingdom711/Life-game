@@ -27,6 +27,7 @@ const YouTubeEducationPlayer = ({
     const currentVideoIndexRef = useRef(0);  // 이벤트 핸들러에서 최신 인덱스 참조용
 
     const playerContainerRef = useRef(null);
+    const playerFrameRef = useRef(null);
     const playerRef = useRef(null);
     const timeCheckIntervalRef = useRef(null);
 
@@ -36,6 +37,7 @@ const YouTubeEducationPlayer = ({
     const [totalWatchedTime, setTotalWatchedTime] = useState(0);  // 총 누적 시간
     const [isCompleted, setIsCompleted] = useState(false);
     const [playlistEnded, setPlaylistEnded] = useState(false);  // 모든 영상 재생 완료 여부
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
     // ─── [교육 수료 증거] 체크포인트 관련 ref ─────────────────────────
     const isPlayingRef          = useRef(false);  // interval 내에서 최신 재생 상태 참조
@@ -260,6 +262,15 @@ const YouTubeEducationPlayer = ({
         };
     }, []);
 
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(document.fullscreenElement === playerFrameRef.current);
+        };
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    }, []);
+
     // 시청 완료 체크
     useEffect(() => {
         if (totalWatchedTime >= requiredWatchTime && !isCompleted) {
@@ -288,10 +299,28 @@ const YouTubeEducationPlayer = ({
         }
     };
 
+    const toggleFullscreen = async () => {
+        const frame = playerFrameRef.current;
+        if (!frame) return;
+
+        try {
+            if (document.fullscreenElement) {
+                await document.exitFullscreen();
+            } else if (frame.requestFullscreen) {
+                await frame.requestFullscreen();
+            }
+        } catch (error) {
+            console.warn('전체화면 전환 실패:', error);
+        }
+    };
+
     return (
-        <div className="relative w-full bg-black rounded-xl overflow-hidden shadow-2xl">
+        <div
+            ref={playerFrameRef}
+            className="relative w-full bg-black rounded-xl overflow-hidden shadow-2xl"
+        >
             {/* YouTube 플레이어 */}
-            <div className="relative aspect-video">
+            <div className={isFullscreen ? 'relative w-full h-full' : 'relative aspect-video'}>
                 <div ref={playerContainerRef} className="absolute inset-0 w-full h-full" />
 
                 {!isReady && (
@@ -329,6 +358,16 @@ const YouTubeEducationPlayer = ({
                     📺 {currentVideoIndex + 1} / {videoIds.length}
                 </div>
             )}
+
+            <button
+                type="button"
+                onClick={toggleFullscreen}
+                className="absolute top-4 left-4 bg-black/70 hover:bg-black/90 text-white px-3 py-1 rounded-full text-sm font-bold z-20 transition-colors"
+                style={{ left: videoIds.length > 1 ? '5.75rem' : '1rem' }}
+                title={isFullscreen ? '전체화면 종료' : '전체화면'}
+            >
+                {isFullscreen ? '⤢ 종료' : '⛶ 전체화면'}
+            </button>
 
             {/* 완료 배지 */}
             {isCompleted && (

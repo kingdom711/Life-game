@@ -412,7 +412,18 @@ function Dashboard({ role }) {
 
     const handleLoginCheckIn = async () => {
         if (streak.isCheckedInToday()) {
-            // 이미 출석한 경우 월간 보상 팝업만 표시
+            const claimedLoginQuestReward = completeQuest('daily_login_1');
+            if (claimedLoginQuestReward) {
+                setCheckInResult({
+                    streak: streak.get().current || 0,
+                    bonus: 0
+                });
+                setIsCheckInModalOpen(true);
+                loadData();
+                return;
+            }
+
+            // 이미 출석/보상 수령이 모두 끝난 경우 월간 보상 팝업만 표시
             setIsMonthlyModalOpen(true);
             return;
         }
@@ -436,7 +447,28 @@ function Dashboard({ role }) {
             } catch (err) {
                 console.log('[Dashboard] API check-in failed, falling back:', err.message);
                 if (err.data?.code === 'AT001') {
-                    setIsMonthlyModalOpen(true);
+                    const syncedStreak = streak.get();
+                    if (!streak.isCheckedInToday()) {
+                        streak.set({
+                            ...syncedStreak,
+                            current: syncedStreak.current || 1,
+                            longest: Math.max(syncedStreak.longest || 0, syncedStreak.current || 1),
+                            lastLoginDate: getKSTDateString()
+                        });
+                    }
+
+                    monthlyAttendance.recordAttendance();
+                    const claimedLoginQuestReward = completeQuest('daily_login_1');
+                    if (claimedLoginQuestReward) {
+                        setCheckInResult({
+                            streak: streak.get().current || 0,
+                            bonus: 0
+                        });
+                        setIsCheckInModalOpen(true);
+                        loadData();
+                    } else {
+                        setIsMonthlyModalOpen(true);
+                    }
                     return;
                 }
             }

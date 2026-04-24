@@ -104,6 +104,16 @@ const StreakButton = ({ onCheckIn, onShowMonthlyRewards }) => {
                         console.log('[StreakButton] failed to sync streak after AT001:', syncErr.message);
                     }
                     setIsCheckedIn(true);
+                    const currentStreak = streak.get();
+                    setStreakCount(currentStreak.current || 0);
+                    if (onCheckIn) {
+                        onCheckIn({
+                            success: true,
+                            streak: currentStreak.current || 0,
+                            bonus: 0,
+                            alreadyCheckedIn: true
+                        });
+                    }
                     return;
                 }
             }
