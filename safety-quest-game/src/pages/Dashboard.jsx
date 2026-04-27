@@ -567,33 +567,13 @@ function Dashboard({ role }) {
     return (
         <div className="page dashboard-page">
             <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div style={{ flex: 1 }}>
-                        <DashboardHeader playerStats={playerStats} role={role} activeWorkStopCount={activeWorkStopCount} />
-                    </div>
-                    {/* [Phase3] 알림 버튼 */}
-                    <button
-                        onClick={() => setIsNotificationOpen(true)}
-                        style={{
-                            position: 'relative', background: 'rgba(255,255,255,0.05)',
-                            border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px',
-                            padding: '0.5rem 0.75rem', cursor: 'pointer', fontSize: '1.2rem',
-                            color: '#e2e8f0', marginTop: '0.5rem'
-                        }}
-                    >
-                        🔔
-                        {unreadNotifCount > 0 && (
-                            <span style={{
-                                position: 'absolute', top: '-4px', right: '-4px',
-                                background: '#ef4444', color: '#fff', borderRadius: '50%',
-                                width: '18px', height: '18px', fontSize: '0.65rem', fontWeight: 700,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center'
-                            }}>
-                                {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
-                            </span>
-                        )}
-                    </button>
-                </div>
+                <DashboardHeader
+                    playerStats={playerStats}
+                    role={role}
+                    activeWorkStopCount={activeWorkStopCount}
+                    unreadNotifCount={unreadNotifCount}
+                    onNotificationClick={() => setIsNotificationOpen(true)}
+                />
                 <SafetyTipBar />
                 <div className="new-dashboard-layout">
                     {/* Left main column */}

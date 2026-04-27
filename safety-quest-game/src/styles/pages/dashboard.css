@@ -3008,6 +3008,24 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
+.dash-hero-notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border: 2px solid rgba(15, 23, 42, 0.85);
+}
+
 /* 글로우 오브 */
 .dash-hero-glow {
   position: absolute;
@@ -3111,12 +3129,15 @@
   display: flex;
   gap: 0.5rem;
   flex-shrink: 0;
+  align-items: stretch;
 }
 
 .dash-hero-badge {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.08rem;
   padding: 0.45rem 0.7rem;
   background: rgba(15, 23, 42, 0.65);
@@ -3124,6 +3145,18 @@
   border: 1px solid rgba(71, 85, 105, 0.4);
   min-width: 54px;
   backdrop-filter: blur(8px);
+}
+
+.dash-hero-badge-button {
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dash-hero-badge-button:hover {
+  background: rgba(30, 41, 59, 0.86);
+  transform: translateY(-1px);
 }
 
 .dash-hero-badge--fire {
@@ -3134,6 +3167,23 @@
 .dash-hero-badge--star {
   border-color: rgba(250, 204, 21, 0.35);
   box-shadow: 0 0 14px rgba(250, 204, 21, 0.12);
+}
+
+.dash-hero-badge--notif {
+  border-color: rgba(250, 204, 21, 0.35);
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.12);
+}
+
+.dash-hero-badge--notif:hover {
+  border-color: rgba(250, 204, 21, 0.5);
+  box-shadow: 0 0 16px rgba(250, 204, 21, 0.18);
+}
+
+.dash-hero-sound-slot {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  min-width: 46px;
 }
 
 .dash-hero-badge--stop {
@@ -3233,6 +3283,14 @@
     border-radius: 1rem;
   }
 
+  .dash-hero-content {
+    gap: 0.5rem;
+  }
+
+  .dash-hero-brand {
+    gap: 0.6rem;
+  }
+
   .dash-hero-logo-wrap {
     width: 44px;
     height: 44px;
@@ -3244,13 +3302,29 @@
     height: 32px;
   }
 
+  .dash-hero-badges {
+    gap: 0.35rem;
+  }
+
   .dash-hero-badge {
-    padding: var(--spacing-xs) 0.5rem;
-    min-width: 46px;
+    padding: 0.38rem 0.45rem;
+    min-width: 42px;
+  }
+
+  .dash-hero-sound-slot {
+    min-width: 42px;
+  }
+
+  .dash-hero-badge-icon {
+    font-size: 0.95rem;
   }
 
   .dash-hero-badge-value {
-    font-size: 0.78rem;
+    font-size: 0.76rem;
+  }
+
+  .dash-hero-badge-label {
+    font-size: 0.54rem;
   }
 
   .dash-hero-meta {

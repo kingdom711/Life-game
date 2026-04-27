@@ -7,7 +7,7 @@ const ROLE_LABELS = {
     safetyManager: '안전관리자'
 };
 
-function DashboardHeader({ playerStats, role, activeWorkStopCount = 0 }) {
+function DashboardHeader({ playerStats, role, activeWorkStopCount = 0, unreadNotifCount = 0, onNotificationClick }) {
     const navigate = useNavigate();
     const today = new Date().toLocaleDateString('ko-KR', {
         year: 'numeric', month: '2-digit', day: '2-digit'
@@ -16,7 +16,6 @@ function DashboardHeader({ playerStats, role, activeWorkStopCount = 0 }) {
     const affiliation = userProfile.getAffiliation() || 'ESQ실';
     const levelName = playerStats?.level?.name || 'Lv.1';
     const streakDays = Number(playerStats?.streak?.current || 0);
-    const safetyScore = 92;
     const roleLabel = ROLE_LABELS[role] || '기술인';
 
     return (
@@ -63,11 +62,32 @@ function DashboardHeader({ playerStats, role, activeWorkStopCount = 0 }) {
                         <span className="dash-hero-badge-value">{streakDays}일</span>
                         <span className="dash-hero-badge-label">연속</span>
                     </div>
-                    <div className="dash-hero-badge dash-hero-badge--star">
-                        <span className="dash-hero-badge-icon">⭐</span>
-                        <span className="dash-hero-badge-value">{safetyScore}</span>
-                        <span className="dash-hero-badge-label">안전점수</span>
-                    </div>
+                    {onNotificationClick && (
+                        <button
+                            type="button"
+                            className="dash-hero-badge dash-hero-badge-button dash-hero-badge--notif"
+                            onClick={onNotificationClick}
+                            aria-label="알림 센터"
+                        >
+                            <span className="dash-hero-badge-icon">🔔</span>
+                            <span className="dash-hero-badge-value">
+                                {unreadNotifCount > 0 ? `${unreadNotifCount > 9 ? '9+' : unreadNotifCount}` : '0'}
+                            </span>
+                            <span className="dash-hero-badge-label">
+                                {unreadNotifCount > 0 ? '새 알림' : '알림'}
+                            </span>
+                            {unreadNotifCount > 0 && (
+                                <span className="dash-hero-notif-badge">
+                                    {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
+                                </span>
+                            )}
+                        </button>
+                    )}
+                    <div
+                        id="dashboard-bgm-control-slot"
+                        className="dash-hero-sound-slot"
+                        aria-label="배경음악 제어"
+                    />
                 </div>
             </div>
 

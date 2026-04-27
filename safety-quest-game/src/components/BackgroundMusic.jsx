@@ -1,15 +1,33 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Volume2, VolumeX } from 'lucide-react';
 
 const BackgroundMusic = ({ src, isPlaying, volume = 0.5 }) => {
     const audioRef = useRef(null);
     const [isMuted, setIsMuted] = useState(false);
     const [hasStarted, setHasStarted] = useState(false);
+    const [controlTarget, setControlTarget] = useState(null);
 
     useEffect(() => {
         if (audioRef.current) {
             audioRef.current.volume = volume;
         }
     }, [volume]);
+
+    useEffect(() => {
+        const updateControlTarget = () => {
+            setControlTarget(document.getElementById('dashboard-bgm-control-slot'));
+        };
+
+        updateControlTarget();
+
+        const observer = new MutationObserver(updateControlTarget);
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        return () => {
+            observer.disconnect();
+        };
+    }, []);
 
     // 사용자 상호작용 후 자동 재생
     useEffect(() => {
@@ -60,29 +78,13 @@ const BackgroundMusic = ({ src, isPlaying, volume = 0.5 }) => {
         }
     };
 
-    return (
-        <div 
-            className="bgm-controls" 
-            style={{
-                position: 'fixed',
-                bottom: '20px',
-                right: '20px',
-                zIndex: 9999,
-                background: 'rgba(15, 23, 42, 0.8)',
-                backdropFilter: 'blur(10px)',
-                padding: '10px',
-                borderRadius: '50%',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '40px',
-                height: '40px',
-                transition: 'all 0.3s ease'
-            }} 
+    const control = (
+        <button
+            type="button"
+            className={`bgm-controls${controlTarget ? ' bgm-controls--inline' : ''}`}
             onClick={toggleMute}
+            aria-label={isMuted ? '배경음악 켜기' : '배경음악 음소거'}
+            title={isMuted ? '배경음악 켜기' : '배경음악 음소거'}
         >
             <audio
                 ref={audioRef}
@@ -90,11 +92,11 @@ const BackgroundMusic = ({ src, isPlaying, volume = 0.5 }) => {
                 loop
                 preload="auto"
             />
-            <span style={{ fontSize: '1.2rem' }}>
-                {isMuted ? '🔇' : '🔊'}
-            </span>
-        </div>
+            {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+        </button>
     );
+
+    return controlTarget ? createPortal(control, controlTarget) : control;
 };
 
 export default BackgroundMusic;
