@@ -54,7 +54,7 @@ function TeamQuestPage() {
         setMessage('');
         try {
             const result = await questApi.claimTeamQuestReward(questId);
-            setMessage(`팀 보상 수령 완료: ${result.rewardedMembers}명에게 +${result.reward?.points || 0}P 지급`);
+            setMessage(`팀 보상 확인 완료: ${result.rewardedMembers}명에게 +${result.reward?.points || 0}P 지급`);
             const data = await questApi.getTeamQuests(period);
             setQuests(Array.isArray(data) ? data : data?.quests || []);
         } catch (err) {
@@ -247,7 +247,7 @@ function TeamQuestPage() {
                                                 className="btn btn-primary btn-sm"
                                                 onClick={() => handleClaim(quest.id)}
                                             >
-                                                보상 수령
+                                                보상 확인
                                             </button>
                                         ) : (
                                             <span style={{
@@ -255,7 +255,7 @@ function TeamQuestPage() {
                                                 fontWeight: 700,
                                                 whiteSpace: 'nowrap'
                                             }}>
-                                                {quest.rewardClaimed ? '보상 수령 완료' : myMember?.completed ? '내 몫 완료' : '활동 대기'}
+                                                {quest.rewardClaimed ? '자동 지급 완료' : myMember?.completed ? '내 몫 완료' : '활동 대기'}
                                             </span>
                                         )}
                                     </div>
