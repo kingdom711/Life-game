@@ -63,7 +63,11 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
         } catch (_) {
             // Membership refresh is best-effort; the gate hook will retry.
         }
-        await onComplete?.(nextResult);
+        try {
+            await onComplete?.(nextResult);
+        } catch (_) {
+            // Follow-up gate refresh should not turn a successful team action into a failure.
+        }
         setStep(3);
     };
 
