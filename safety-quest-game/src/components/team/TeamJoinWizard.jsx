@@ -14,7 +14,7 @@ const panelStyle = {
 };
 
 function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
-    const { refreshUser } = useAuth();
+    const { refreshUser, setUser } = useAuth();
     const [step, setStep] = useState(1);
     const [siteName, setSiteName] = useState('');
     const [query, setQuery] = useState('');
@@ -27,6 +27,17 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
     const [result, setResult] = useState(null);
 
     const canSearch = siteName.trim().length > 0;
+
+    const moveToStep = (nextStep) => {
+        setError('');
+        setStep(nextStep);
+    };
+
+    const selectCreateMode = (enabled) => {
+        setError('');
+        setSelectedTeam(null);
+        setCreateMode(enabled);
+    };
 
     useEffect(() => {
         if (!isOpen || step !== 2 || !canSearch) return;
@@ -58,6 +69,11 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
 
     const finish = async (nextResult) => {
         setResult(nextResult);
+        if (nextResult?.type === 'created' && nextResult.team) {
+            setUser?.((currentUser) => currentUser
+                ? { ...currentUser, team: { ...nextResult.team, leader: true } }
+                : currentUser);
+        }
         try {
             await refreshUser?.();
         } catch (_) {
@@ -68,7 +84,7 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
         } catch (_) {
             // Follow-up gate refresh should not turn a successful team action into a failure.
         }
-        setStep(3);
+        moveToStep(3);
     };
 
     const handleSubmit = async (event) => {
@@ -80,7 +96,7 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
                 setError('현장명을 입력해 주세요.');
                 return;
             }
-            setStep(2);
+            moveToStep(2);
             return;
         }
 
@@ -167,7 +183,10 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
                             </label>
                             <input
                                 value={siteName}
-                                onChange={(event) => setSiteName(event.target.value)}
+                                onChange={(event) => {
+                                    setError('');
+                                    setSiteName(event.target.value);
+                                }}
                                 className="form-input"
                                 placeholder="예: 진성이엔지 3공구"
                                 style={{ width: '100%', padding: '0.8rem' }}
@@ -182,10 +201,10 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
                     {step === 2 && (
                         <div>
                             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-                                <button type="button" className={`btn btn-sm ${!createMode ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setCreateMode(false)}>
+                                <button type="button" className={`btn btn-sm ${!createMode ? 'btn-primary' : 'btn-secondary'}`} onClick={() => selectCreateMode(false)}>
                                     <Search size={16} /> 팀 찾기
                                 </button>
-                                <button type="button" className={`btn btn-sm ${createMode ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setCreateMode(true)}>
+                                <button type="button" className={`btn btn-sm ${createMode ? 'btn-primary' : 'btn-secondary'}`} onClick={() => selectCreateMode(true)}>
                                     <Users size={16} /> 새 팀 만들기
                                 </button>
                             </div>
@@ -197,7 +216,10 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
                                     </label>
                                     <input
                                         value={newTeamName}
-                                        onChange={(event) => setNewTeamName(event.target.value)}
+                                        onChange={(event) => {
+                                            setError('');
+                                            setNewTeamName(event.target.value);
+                                        }}
                                         className="form-input"
                                         placeholder="예: 철근 A팀"
                                         style={{ width: '100%', padding: '0.8rem' }}
@@ -213,7 +235,10 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
                                     </label>
                                     <input
                                         value={query}
-                                        onChange={(event) => setQuery(event.target.value)}
+                                        onChange={(event) => {
+                                            setError('');
+                                            setQuery(event.target.value);
+                                        }}
                                         className="form-input"
                                         placeholder="팀 이름 일부를 입력하세요"
                                         style={{ width: '100%', padding: '0.8rem', marginBottom: '0.75rem' }}
@@ -227,7 +252,10 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
                                             <button
                                                 type="button"
                                                 key={team.id}
-                                                onClick={() => setSelectedTeam(team)}
+                                                onClick={() => {
+                                                    setError('');
+                                                    setSelectedTeam(team);
+                                                }}
                                                 style={{
                                                     textAlign: 'left',
                                                     padding: '0.85rem',
@@ -275,7 +303,7 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
 
                 <div style={{ padding: '1rem 1.25rem', borderTop: '1px solid rgba(148,163,184,0.16)', display: 'flex', justifyContent: 'space-between', gap: '0.75rem' }}>
                     {step > 1 && step < 3 ? (
-                        <button type="button" className="btn btn-secondary btn-sm" onClick={() => setStep(step - 1)}>
+                        <button type="button" className="btn btn-secondary btn-sm" onClick={() => moveToStep(step - 1)}>
                             이전
                         </button>
                     ) : <span />}
