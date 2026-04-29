@@ -165,7 +165,7 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
                                 value={siteName}
                                 onChange={(event) => setSiteName(event.target.value)}
                                 className="form-input"
-                                placeholder="예: 세화건설 3공구"
+                                placeholder="예: 진성이엔지 3공구"
                                 style={{ width: '100%', padding: '0.8rem' }}
                                 autoFocus
                             />
