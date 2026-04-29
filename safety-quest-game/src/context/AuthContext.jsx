@@ -152,6 +152,22 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const refreshUser = async () => {
+        if (AUTH_BYPASS_ENABLED) {
+            setUser(DEV_BYPASS_USER);
+            return DEV_BYPASS_USER;
+        }
+
+        const response = await authApi.getMe();
+        const userData = response.user || response;
+        applyUserScope(userData);
+        setUser(userData);
+        if (userData?.name) {
+            userProfile.setName(userData.name);
+        }
+        return userData;
+    };
+
     // Check for existing session on mount
     useEffect(() => {
         const initAuth = async () => {
@@ -260,6 +276,8 @@ export const AuthProvider = ({ children }) => {
         error,
         login,
         logout,
+        refreshUser,
+        setUser,
         isAuthenticated: !!user
     };
 

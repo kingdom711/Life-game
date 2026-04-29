@@ -1,35 +1,116 @@
-import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getMyTeam, getTeamMembers, getTeamPraiseSummary, getRecentPraiseHistory } from '../utils/teamManager';
-import { userProfile } from '../utils/storage';
-import PraiseModal from '../components/PraiseModal';
+import { useCallback, useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Check, Shield, UserMinus, X } from 'lucide-react';
+import teamApi from '../api/teamApi';
+import useTeamGate from '../hooks/useTeamGate';
+
+const cardStyle = {
+    background: 'rgba(30,41,59,0.82)',
+    borderRadius: '14px',
+    border: '1px solid rgba(148,163,184,0.14)',
+    padding: '1rem'
+};
 
 function TeamDetailPage() {
     const navigate = useNavigate();
-    const [praiseModal, setPraiseModal] = useState({ isOpen: false, targetUser: null });
-    const [refreshKey, setRefreshKey] = useState(0);
+    const teamGate = useTeamGate();
+    const [members, setMembers] = useState([]);
+    const [pendingMembers, setPendingMembers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
 
-    const team = getMyTeam();
-    const members = getTeamMembers();
-    const praiseSummary = getTeamPraiseSummary();
-    const recentHistory = getRecentPraiseHistory(10);
-    const myName = userProfile.getName() || 'guest';
+    const teamId = teamGate.team?.id || teamGate.membership?.teamId;
 
-    const handlePraiseClose = useCallback(() => {
-        setPraiseModal({ isOpen: false, targetUser: null });
-        setRefreshKey(k => k + 1);
-    }, []);
+    const loadTeamData = useCallback(async () => {
+        if (!teamId || !teamGate.isActive) {
+            setMembers([]);
+            setPendingMembers([]);
+            setLoading(false);
+            return;
+        }
 
-    const formatRelativeTime = (timestamp) => {
-        const diff = Date.now() - new Date(timestamp).getTime();
-        const minutes = Math.floor(diff / 60000);
-        if (minutes < 1) return '방금 전';
-        if (minutes < 60) return `${minutes}분 전`;
-        const hours = Math.floor(minutes / 60);
-        if (hours < 24) return `${hours}시간 전`;
-        const days = Math.floor(hours / 24);
-        return `${days}일 전`;
+        setLoading(true);
+        setError('');
+        try {
+            const memberResult = await teamApi.listTeamMembers(teamId);
+            setMembers(Array.isArray(memberResult) ? memberResult : []);
+
+            if (teamGate.isLeader) {
+                const pendingResult = await teamApi.listPendingMembers(teamId);
+                setPendingMembers(Array.isArray(pendingResult) ? pendingResult : []);
+            } else {
+                setPendingMembers([]);
+            }
+        } catch (err) {
+            setError(err.message || '팀 정보를 불러오지 못했습니다.');
+        } finally {
+            setLoading(false);
+        }
+    }, [teamGate.isActive, teamGate.isLeader, teamId]);
+
+    useEffect(() => {
+        loadTeamData();
+    }, [loadTeamData]);
+
+    const runAction = async (action, successMessage) => {
+        setMessage('');
+        setError('');
+        try {
+            await action();
+            setMessage(successMessage);
+            await Promise.all([teamGate.refresh(), loadTeamData()]);
+        } catch (err) {
+            setError(err.message || '처리 중 오류가 발생했습니다.');
+        }
     };
+
+    const handleApprove = (userId) => runAction(
+        () => teamApi.approveMember(teamId, userId),
+        '가입 신청을 승인했습니다.'
+    );
+
+    const handleReject = (userId) => runAction(
+        () => teamApi.rejectMember(teamId, userId),
+        '가입 신청을 거절했습니다.'
+    );
+
+    const handleKick = (member) => {
+        if (!window.confirm(`${member.userName}님을 팀에서 내보낼까요?`)) return;
+        runAction(
+            () => teamApi.kickMember(teamId, member.userId),
+            '팀원을 내보냈습니다.'
+        );
+    };
+
+    const handleLeave = () => {
+        if (!window.confirm('팀에서 탈퇴할까요?')) return;
+        runAction(
+            () => teamApi.leaveTeam(teamId),
+            '팀에서 탈퇴했습니다.'
+        ).then(() => navigate('/profile'));
+    };
+
+    if (!teamGate.loading && !teamGate.isActive) {
+        return (
+            <div className="page">
+                <div className="container">
+                    <Link to="/" className="btn btn-secondary btn-sm">대시보드</Link>
+                    <div className="card" style={{ marginTop: '1rem' }}>
+                        <div className="card-header">
+                            <h3 className="card-title">팀 설정 필요</h3>
+                        </div>
+                        <div className="card-body">
+                            <p className="text-muted">
+                                {teamGate.isPending ? '팀 리더의 승인을 기다리고 있습니다.' : '팀에 가입하면 팀 정보를 볼 수 있습니다.'}
+                            </p>
+                            <Link to="/profile" className="btn btn-primary btn-sm">팀 설정으로 이동</Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div style={{
@@ -38,7 +119,6 @@ function TeamDetailPage() {
             color: '#f1f5f9',
             paddingBottom: '6rem'
         }}>
-            {/* 헤더 */}
             <div style={{
                 padding: '1rem 1.25rem',
                 display: 'flex',
@@ -46,222 +126,109 @@ function TeamDetailPage() {
                 gap: '0.75rem',
                 borderBottom: '1px solid rgba(255,255,255,0.08)',
                 background: 'rgba(15,23,42,0.9)',
-                backdropFilter: 'blur(10px)',
                 position: 'sticky',
                 top: 0,
                 zIndex: 100
             }}>
-                <button
-                    onClick={() => navigate('/')}
-                    style={{
-                        background: 'rgba(255,255,255,0.1)',
-                        border: 'none',
-                        borderRadius: '10px',
-                        width: '36px',
-                        height: '36px',
-                        color: '#94a3b8',
-                        fontSize: '1.1rem',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}
-                >←</button>
+                <button onClick={() => navigate('/')} className="btn btn-secondary btn-sm">뒤로</button>
                 <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>우리 팀</h2>
             </div>
 
-            <div style={{ padding: '1rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {/* 팀 정보 카드 */}
+            <div style={{ padding: '1rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: 900, margin: '0 auto' }}>
                 <div style={{
-                    background: 'linear-gradient(135deg, rgba(30,41,59,0.9), rgba(51,65,85,0.6))',
-                    borderRadius: '16px',
-                    padding: '1.25rem',
-                    border: '1px solid rgba(59,130,246,0.2)'
+                    ...cardStyle,
+                    background: 'linear-gradient(135deg, rgba(14,165,233,0.16), rgba(30,41,59,0.84))'
                 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                        <span style={{ fontSize: '2rem' }}>{team.icon}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
                         <div>
-                            <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700 }}>{team.name}</h3>
-                            <p style={{ margin: '0.2rem 0 0', color: '#94a3b8', fontSize: '0.8rem' }}>
-                                안전 참여 점수: {team.score}점 · 랭킹 {team.rank}위
+                            <div style={{ color: '#38bdf8', fontSize: '0.8rem', fontWeight: 800 }}>
+                                {teamGate.team?.siteName || '현장'}
+                            </div>
+                            <h3 style={{ margin: '0.25rem 0 0', fontSize: '1.35rem', fontWeight: 800 }}>
+                                {teamGate.team?.name || teamGate.membership?.teamName}
+                            </h3>
+                            <p style={{ margin: '0.35rem 0 0', color: '#94a3b8', fontSize: '0.85rem' }}>
+                                ACTIVE 멤버 {members.length}명
                             </p>
                         </div>
-                    </div>
-                    <div style={{ marginTop: '0.5rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-                            <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>이번 주 퀘스트 수행률</span>
-                            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#60a5fa' }}>{team.weeklyProgress}%</span>
-                        </div>
-                        <div style={{
-                            height: '8px',
-                            borderRadius: '4px',
-                            background: 'rgba(255,255,255,0.1)',
-                            overflow: 'hidden'
-                        }}>
-                            <div style={{
-                                width: `${team.weeklyProgress}%`,
-                                height: '100%',
-                                borderRadius: '4px',
-                                background: 'linear-gradient(90deg, #3b82f6, #38bdf8)',
-                                transition: 'width 0.8s ease-out'
-                            }} />
-                        </div>
+                        {teamGate.isLeader ? (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: '#38bdf8', fontWeight: 800 }}>
+                                <Shield size={18} /> 리더 관리 모드
+                            </span>
+                        ) : (
+                            <button className="btn btn-secondary btn-sm" onClick={handleLeave}>
+                                팀 탈퇴
+                            </button>
+                        )}
                     </div>
                 </div>
 
-                {/* 칭찬 현황 */}
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr 1fr',
-                    gap: '0.5rem'
-                }}>
-                    {[
-                        { label: '보낸 칭찬', value: praiseSummary.totalSent, color: '#fbbf24' },
-                        { label: '받은 칭찬', value: praiseSummary.totalReceived, color: '#34d399' },
-                        { label: '오늘 남은', value: `${praiseSummary.todayRemaining}/5`, color: '#60a5fa' }
-                    ].map((stat) => (
-                        <div key={stat.label} style={{
-                            background: 'rgba(30,41,59,0.8)',
-                            borderRadius: '12px',
-                            padding: '0.75rem',
-                            textAlign: 'center',
-                            border: '1px solid rgba(255,255,255,0.06)'
-                        }}>
-                            <div style={{ fontSize: '1.3rem', fontWeight: 800, color: stat.color }}>{stat.value}</div>
-                            <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.2rem' }}>{stat.label}</div>
-                        </div>
-                    ))}
-                </div>
+                {message && <div style={{ ...cardStyle, color: '#4ade80', fontWeight: 800 }}>{message}</div>}
+                {error && <div style={{ ...cardStyle, color: '#f87171', fontWeight: 800 }}>{error}</div>}
 
-                {/* 팀원 목록 */}
-                <div>
-                    <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: '0 0 0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                        <span>👥</span> 팀원 ({members.length}명)
-                    </h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        {members.map(member => (
-                            <div key={member.id} style={{
-                                background: 'rgba(30,41,59,0.8)',
-                                borderRadius: '14px',
-                                padding: '1rem 1.1rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.75rem',
-                                border: '1px solid rgba(255,255,255,0.06)',
-                                transition: 'border-color 0.2s'
-                            }}>
-                                <div style={{
-                                    width: '44px',
-                                    height: '44px',
-                                    borderRadius: '12px',
-                                    background: 'rgba(59,130,246,0.15)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '1.4rem',
-                                    flexShrink: 0
-                                }}>
-                                    {member.avatar}
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{member.name}</div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.15rem' }}>
-                                        <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>{member.roleLabel}</span>
-                                        {member.praiseCount > 0 && (
-                                            <span style={{
-                                                fontSize: '0.68rem',
-                                                color: '#fbbf24',
-                                                background: 'rgba(251,191,36,0.12)',
-                                                padding: '0.1rem 0.4rem',
-                                                borderRadius: '6px'
-                                            }}>
-                                                칭찬 {member.praiseCount}회
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => setPraiseModal({ isOpen: true, targetUser: { id: member.id, name: member.name } })}
-                                    style={{
-                                        background: 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.15))',
-                                        border: '1px solid rgba(251,191,36,0.3)',
-                                        borderRadius: '10px',
-                                        padding: '0.45rem 0.75rem',
-                                        color: '#fbbf24',
-                                        fontSize: '0.78rem',
-                                        fontWeight: 600,
-                                        cursor: 'pointer',
-                                        whiteSpace: 'nowrap',
-                                        transition: 'all 0.2s',
-                                        flexShrink: 0
-                                    }}
-                                >
-                                    👏 칭찬
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* 최근 칭찬 내역 */}
-                <div>
-                    <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: '0 0 0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                        <span>📋</span> 최근 칭찬 내역
-                    </h3>
-                    {recentHistory.length === 0 ? (
-                        <div style={{
-                            background: 'rgba(30,41,59,0.6)',
-                            borderRadius: '14px',
-                            padding: '2rem',
-                            textAlign: 'center',
-                            color: '#64748b',
-                            fontSize: '0.85rem'
-                        }}>
-                            아직 칭찬 내역이 없습니다.
-                            <br />팀원에게 첫 칭찬을 보내보세요!
-                        </div>
-                    ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                            {recentHistory.map(item => (
-                                <div key={item.id} style={{
-                                    background: 'rgba(30,41,59,0.6)',
-                                    borderRadius: '12px',
-                                    padding: '0.75rem 1rem',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.6rem',
-                                    border: '1px solid rgba(255,255,255,0.04)'
-                                }}>
-                                    <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{item.praiseIcon}</span>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{ fontSize: '0.8rem', color: '#e2e8f0' }}>
-                                            {item.direction === 'sent'
-                                                ? <><strong>{item.targetName}</strong>님에게 <span style={{ color: '#fbbf24' }}>"{item.praiseLabel}"</span> 칭찬</>
-                                                : <><strong>{item.senderId}</strong>님이 <span style={{ color: '#34d399' }}>"{item.praiseLabel}"</span> 칭찬</>
-                                            }
+                {teamGate.isLeader && (
+                    <section style={cardStyle}>
+                        <h3 style={{ margin: '0 0 0.75rem', fontSize: '1rem', fontWeight: 800 }}>
+                            가입 신청 {pendingMembers.length}건
+                        </h3>
+                        {loading ? (
+                            <p style={{ color: '#94a3b8' }}>불러오는 중입니다.</p>
+                        ) : pendingMembers.length === 0 ? (
+                            <p style={{ color: '#94a3b8', margin: 0 }}>대기 중인 신청이 없습니다.</p>
+                        ) : (
+                            <div style={{ display: 'grid', gap: '0.5rem' }}>
+                                {pendingMembers.map((member) => (
+                                    <div key={member.membershipId} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.8rem', borderRadius: 10, background: 'rgba(15,23,42,0.56)' }}>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontWeight: 800 }}>{member.userName}</div>
+                                            <div style={{ color: '#94a3b8', fontSize: '0.8rem' }}>{member.username}</div>
                                         </div>
-                                        {item.message && (
-                                            <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '0.15rem' }}>
-                                                "{item.message}"
-                                            </div>
-                                        )}
+                                        <button className="btn btn-primary btn-sm" onClick={() => handleApprove(member.userId)}>
+                                            <Check size={16} /> 승인
+                                        </button>
+                                        <button className="btn btn-secondary btn-sm" onClick={() => handleReject(member.userId)}>
+                                            <X size={16} /> 거절
+                                        </button>
                                     </div>
-                                    <span style={{ fontSize: '0.68rem', color: '#64748b', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                                        {formatRelativeTime(item.timestamp)}
-                                    </span>
+                                ))}
+                            </div>
+                        )}
+                    </section>
+                )}
+
+                <section style={cardStyle}>
+                    <h3 style={{ margin: '0 0 0.75rem', fontSize: '1rem', fontWeight: 800 }}>
+                        팀원 목록
+                    </h3>
+                    {loading ? (
+                        <p style={{ color: '#94a3b8' }}>불러오는 중입니다.</p>
+                    ) : members.length === 0 ? (
+                        <p style={{ color: '#94a3b8', margin: 0 }}>ACTIVE 멤버가 없습니다.</p>
+                    ) : (
+                        <div style={{ display: 'grid', gap: '0.5rem' }}>
+                            {members.map((member) => (
+                                <div key={member.membershipId} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.8rem', borderRadius: 10, background: 'rgba(15,23,42,0.56)' }}>
+                                    <div style={{ width: 40, height: 40, borderRadius: 12, display: 'grid', placeItems: 'center', background: member.leader ? 'rgba(56,189,248,0.16)' : 'rgba(148,163,184,0.12)', color: member.leader ? '#38bdf8' : '#cbd5e1', fontWeight: 900 }}>
+                                        {member.userName?.slice(0, 1) || 'U'}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: 800 }}>
+                                            {member.userName}
+                                            {member.leader && <span style={{ color: '#38bdf8', marginLeft: 8, fontSize: '0.78rem' }}>리더</span>}
+                                        </div>
+                                        <div style={{ color: '#94a3b8', fontSize: '0.8rem' }}>{member.username}</div>
+                                    </div>
+                                    {teamGate.isLeader && !member.leader && (
+                                        <button className="btn btn-danger btn-sm" onClick={() => handleKick(member)}>
+                                            <UserMinus size={16} /> 강퇴
+                                        </button>
+                                    )}
                                 </div>
                             ))}
                         </div>
                     )}
-                </div>
+                </section>
             </div>
-
-            {/* 칭찬 모달 */}
-            <PraiseModal
-                isOpen={praiseModal.isOpen}
-                onClose={handlePraiseClose}
-                targetUser={praiseModal.targetUser}
-            />
         </div>
     );
 }

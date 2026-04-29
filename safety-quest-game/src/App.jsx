@@ -54,6 +54,8 @@ import Navigation from './components/Navigation';
 import WorkStopButton from './components/WorkStopButton'; // [New] 작업중지 플로팅 버튼
 import WorkStopReportModal from './components/WorkStopReportModal'; // [New] 작업중지 신고 모달
 
+import TeamJoinWizard from './components/team/TeamJoinWizard';
+import useTeamGate from './hooks/useTeamGate';
 import LaunchScreen from './pages/LaunchScreen';
 import BackgroundMusic from './components/BackgroundMusic';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -75,6 +77,8 @@ function App() {
     // const [loading, setLoading] = useState(true); // AuthContext로 대체
 
     const { user, loading } = useAuth();
+    const teamGate = useTeamGate({ autoLoad: Boolean(user && selectedRole) });
+    const shouldForceTeamJoin = Boolean(user && selectedRole && !teamGate.loading && !teamGate.isActive);
 
     useEffect(() => {
         const initApp = async () => {
@@ -164,10 +168,6 @@ function App() {
 
         // // 요금제 정보 저장 (추후 사용을 위해)
         // localStorage.setItem('selectedPlan', JSON.stringify(plan));
-        // if (userData.companyName) {
-        //     localStorage.setItem('companyName', userData.companyName);
-        // }
-
         setShowPricingPage(false);
         // setShowLaunchScreen(true); // LaunchScreen 건너뛰기
         // setIsPlayingBgm(true); // 바로 게임 시작
@@ -301,6 +301,11 @@ function App() {
                             <WorkStopReportModal
                                 isOpen={isWorkStopModalOpen}
                                 onClose={() => setIsWorkStopModalOpen(false)}
+                            />
+                            <TeamJoinWizard
+                                isOpen={shouldForceTeamJoin}
+                                force
+                                onComplete={teamGate.refresh}
                             />
                         </>
                     )}

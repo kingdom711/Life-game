@@ -112,10 +112,6 @@ function App() {
 
         // 요금제 정보 저장 (추후 사용을 위해)
         localStorage.setItem('selectedPlan', JSON.stringify(plan));
-        if (userData.companyName) {
-            localStorage.setItem('companyName', userData.companyName);
-        }
-
         setShowPricingPage(false);
         // setShowLaunchScreen(true); // LaunchScreen 건너뛰기
         setIsPlayingBgm(true); // 바로 게임 시작

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { userProfile } from '../../utils/storage';
+import useTeamGate from '../../hooks/useTeamGate';
 
 const ROLE_LABELS = {
     technician: '기술인',
@@ -9,11 +9,12 @@ const ROLE_LABELS = {
 
 function DashboardHeader({ playerStats, role, activeWorkStopCount = 0, unreadNotifCount = 0, onNotificationClick }) {
     const navigate = useNavigate();
+    const teamGate = useTeamGate();
     const today = new Date().toLocaleDateString('ko-KR', {
         year: 'numeric', month: '2-digit', day: '2-digit'
     });
 
-    const affiliation = userProfile.getAffiliation() || 'ESQ실';
+    const teamLabel = teamGate.team?.name || (teamGate.isPending ? '팀 승인 대기' : '팀 미설정');
     const levelName = playerStats?.level?.name || 'Lv.1';
     const streakDays = Number(playerStats?.streak?.current || 0);
     const roleLabel = ROLE_LABELS[role] || '기술인';
@@ -103,7 +104,7 @@ function DashboardHeader({ playerStats, role, activeWorkStopCount = 0, unreadNot
                 <span className="dash-hero-meta-sep">·</span>
                 <span className="dash-hero-meta-item">
                     <span className="dash-hero-meta-icon">🏗️</span>
-                    {affiliation}
+                    {teamLabel}
                 </span>
                 <span className="dash-hero-meta-sep">·</span>
                 <span className="dash-hero-meta-item">

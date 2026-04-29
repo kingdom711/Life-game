@@ -7,6 +7,7 @@ import {
     NOTIFICATION_TYPES,
     NOTIFICATION_ICONS
 } from '../utils/notificationManager';
+import { getAlerts } from '../api/alertApi';
 
 /**
  * 알림 센터 모달 컴포넌트
@@ -22,13 +23,34 @@ const NotificationCenter = ({ isOpen, onClose }) => {
         }
     }, [isOpen]);
 
-    const loadNotifications = () => {
-        const list = getNotifications(20);
-        setNotifications(list);
-        setUnreadCount(getUnreadCount());
+    const loadNotifications = async () => {
+        const localList = getNotifications(20);
+        try {
+            const alerts = await getAlerts();
+            const serverList = alerts.map((alert) => ({
+                id: `alert-${alert.id}`,
+                type: alert.type || NOTIFICATION_TYPES.SYSTEM,
+                title: alert.message || alert.zone || '알림',
+                message: alert.detail || '',
+                timestamp: alert.createdAt || new Date().toISOString(),
+                read: false
+            }));
+            setNotifications([...serverList, ...localList].slice(0, 20));
+            setUnreadCount(getUnreadCount() + serverList.length);
+        } catch (_) {
+            setNotifications(localList);
+            setUnreadCount(getUnreadCount());
+        }
     };
 
     const handleMarkAsRead = (notificationId) => {
+        if (String(notificationId).startsWith('alert-')) {
+            setNotifications((prev) => prev.map((item) => (
+                item.id === notificationId ? { ...item, read: true } : item
+            )));
+            setUnreadCount((count) => Math.max(0, count - 1));
+            return;
+        }
         markAsRead(notificationId);
         loadNotifications();
     };

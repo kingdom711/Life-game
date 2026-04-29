@@ -4,8 +4,10 @@ import {
     getDeptRankings, getMyDeptInfo, getBattleRemainingDays,
     getScoreCategories, getBattleRewards
 } from '../utils/departmentBattleManager';
+import useTeamGate from '../hooks/useTeamGate';
 
 function DepartmentBattlePage() {
+    const teamGate = useTeamGate();
     const [rankings, setRankings] = useState([]);
     const [myDept, setMyDept] = useState(null);
     const [selectedDept, setSelectedDept] = useState(null);
@@ -22,6 +24,27 @@ function DepartmentBattlePage() {
     const remainingDays = getBattleRemainingDays();
     const categories = getScoreCategories();
     const rewards = getBattleRewards();
+
+    if (!teamGate.loading && !teamGate.isActive) {
+        return (
+            <div className="page">
+                <div className="container">
+                    <Link to="/" className="btn btn-secondary btn-sm">대시보드</Link>
+                    <div className="card" style={{ marginTop: '1rem' }}>
+                        <div className="card-header">
+                            <h3 className="card-title">팀 설정 필요</h3>
+                        </div>
+                        <div className="card-body">
+                            <p className="text-muted">
+                                {teamGate.isPending ? '팀 리더의 승인을 기다리고 있습니다.' : '팀에 가입해야 부서 대전에 참여할 수 있습니다.'}
+                            </p>
+                            <Link to="/profile" className="btn btn-primary btn-sm">팀 설정으로 이동</Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="page">

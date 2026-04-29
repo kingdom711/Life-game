@@ -62,7 +62,7 @@ function RoleSelector({ onSelectRole }) {
                                 <button
                                     onClick={() => {
                                         onSelectRole(role.id);
-                                        navigate('/profile?setup=affiliation');
+                                        navigate('/');
                                     }}
                                     className="btn btn-primary"
                                     style={{

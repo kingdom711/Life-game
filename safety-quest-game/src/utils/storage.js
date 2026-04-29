@@ -348,12 +348,6 @@ export const userProfile = {
             joinDate: profile.joinDate || currentProfile.joinDate || new Date().toISOString()
         };
 
-        if (affiliation) {
-            localStorage.setItem('companyName', affiliation);
-        } else {
-            localStorage.removeItem('companyName');
-        }
-
         return storage.set(STORAGE_KEYS.USER_PROFILE, nextProfile);
     },
 
