@@ -140,7 +140,7 @@ export const attemptCalibration = (instanceId) => {
     // 포인트 차감
     points.subtract(cost);
 
-    // 백엔드 동기화 (Supabase)
+    // 백엔드 동기화 (Spring API → Supabase)
     const token = localStorage.getItem('accessToken');
     if (token) {
         userApi.spendPoints(cost, '검교정', `${item.name} +${currentCalibrationLevel + 1} 시도`).catch(err => {

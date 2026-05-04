@@ -7,6 +7,7 @@
 import { storage, getKSTDateString } from './storage';
 import { addPoints, addExperience } from './pointsCalculator';
 import { addSeasonPoints } from './seasonManager';
+import { addNotification, NOTIFICATION_TYPES } from './notificationManager';
 
 const EVENT_QUEST_KEY = 'safety_quest_event_quests';
 
@@ -204,6 +205,15 @@ export const completeEventAction = (questId, actionIndex) => {
             addSeasonPoints(quest.reward.points, 'quest');
         }
         if (quest.reward.exp) addExperience(quest.reward.exp);
+
+        try {
+            addNotification(
+                NOTIFICATION_TYPES.EVENT_QUEST,
+                '이벤트 퀘스트 완료!',
+                `${quest.title} 완료 - ${quest.reward.points || 0}P 획득`,
+                { questId: quest.id, points: quest.reward.points }
+            );
+        } catch (e) { /* silent */ }
     }
 
     storage.set(EVENT_QUEST_KEY, data);
@@ -237,6 +247,15 @@ export const completeEventQuest = (questId) => {
     if (quest.reward.exp) addExperience(quest.reward.exp);
 
     storage.set(EVENT_QUEST_KEY, data);
+
+    try {
+        addNotification(
+            NOTIFICATION_TYPES.EVENT_QUEST,
+            '이벤트 퀘스트 완료!',
+            `${quest.title} 완료 - ${quest.reward.points || 0}P 획득`,
+            { questId: quest.id, points: quest.reward.points }
+        );
+    } catch (e) { /* silent */ }
 
     return { success: true, reward: quest.reward };
 };

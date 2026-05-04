@@ -4,6 +4,9 @@ import {
     getUnreadCount,
     markAsRead,
     markAllAsRead,
+    isAlertRead,
+    markAlertRead,
+    markAllAlertsRead,
     NOTIFICATION_TYPES,
     NOTIFICATION_ICONS
 } from '../utils/notificationManager';
@@ -27,16 +30,20 @@ const NotificationCenter = ({ isOpen, onClose }) => {
         const localList = getNotifications(20);
         try {
             const alerts = await getAlerts();
-            const serverList = alerts.map((alert) => ({
-                id: `alert-${alert.id}`,
-                type: alert.type || NOTIFICATION_TYPES.SYSTEM,
-                title: alert.message || alert.zone || '알림',
-                message: alert.detail || '',
-                timestamp: alert.createdAt || new Date().toISOString(),
-                read: false
-            }));
-            setNotifications([...serverList, ...localList].slice(0, 20));
-            setUnreadCount(getUnreadCount() + serverList.length);
+            const serverList = alerts.map((alert) => {
+                const id = `alert-${alert.id}`;
+                return {
+                    id,
+                    type: alert.type || NOTIFICATION_TYPES.SYSTEM,
+                    title: alert.message || alert.zone || '알림',
+                    message: alert.detail || '',
+                    timestamp: alert.createdAt || new Date().toISOString(),
+                    read: isAlertRead(id)
+                };
+            });
+            const merged = [...serverList, ...localList].slice(0, 20);
+            setNotifications(merged);
+            setUnreadCount(merged.filter((n) => !n.read).length);
         } catch (_) {
             setNotifications(localList);
             setUnreadCount(getUnreadCount());
@@ -45,6 +52,7 @@ const NotificationCenter = ({ isOpen, onClose }) => {
 
     const handleMarkAsRead = (notificationId) => {
         if (String(notificationId).startsWith('alert-')) {
+            markAlertRead(notificationId);
             setNotifications((prev) => prev.map((item) => (
                 item.id === notificationId ? { ...item, read: true } : item
             )));
@@ -57,6 +65,10 @@ const NotificationCenter = ({ isOpen, onClose }) => {
 
     const handleMarkAllAsRead = () => {
         markAllAsRead();
+        const alertKeys = notifications
+            .filter((n) => String(n.id).startsWith('alert-'))
+            .map((n) => n.id);
+        if (alertKeys.length > 0) markAllAlertsRead(alertKeys);
         loadNotifications();
     };
 

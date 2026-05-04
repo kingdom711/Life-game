@@ -36,7 +36,7 @@ export const purchaseItem = (itemId) => {
     points.subtract(itemPrice);
     inventory.addItem(itemId);
 
-    // 백엔드 동기화 (Supabase)
+    // 백엔드 동기화 (Spring API → Supabase)
     const token = localStorage.getItem('accessToken');
     if (token) {
         userApi.spendPoints(itemPrice, '아이템 구매', `${item.name} 구매`).catch(err => {

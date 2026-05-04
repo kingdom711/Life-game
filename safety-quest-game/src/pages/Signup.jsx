@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { User, Mail, Lock, AlertCircle } from 'lucide-react';
 import { userProfile } from '../utils/storage';
 import { analytics } from '../utils/analytics';
 import authApi from '../api/authApi';
+import AuthLayout from '../components/auth/AuthLayout';
+import IconInput from '../components/auth/IconInput';
 
 function Signup({ onSignupComplete, onLogin }) {
-    // ... existing state ...
     const [formData, setFormData] = useState({
         nickname: '',
         email: '',
@@ -16,7 +17,6 @@ function Signup({ onSignupComplete, onLogin }) {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        // GA4 페이지뷰 추적
         analytics.pageView('/signup', 'Signup - 회원가입');
     }, []);
 
@@ -32,7 +32,6 @@ function Signup({ onSignupComplete, onLogin }) {
         e.preventDefault();
         setError('');
 
-        // 유효성 검사
         if (!formData.nickname || !formData.email || !formData.password) {
             setError('모든 필수 정보를 입력해주세요.');
             return;
@@ -44,24 +43,20 @@ function Signup({ onSignupComplete, onLogin }) {
         }
 
         if (!formData.isOver14) {
-            alert('만 14세 미만은 법정대리인의 동의가 필요합니다.\n보호자와 함께 가입을 진행해주세요.');
+            setError('만 14세 이상이어야 가입할 수 있습니다.');
             return;
         }
 
         setIsLoading(true);
 
         try {
-            // 백엔드 API로 회원가입 요청
-            const response = await authApi.signup({
+            await authApi.signup({
                 email: formData.email,
                 password: formData.password,
                 name: formData.nickname
             });
 
-            // localStorage에도 유저 정보 저장 (기존 앱 흐름 유지)
             userProfile.setName(formData.nickname);
-
-            // GA4 회원가입 완료 이벤트
             analytics.conversion.signupComplete('free');
 
             if (onSignupComplete) {
@@ -79,140 +74,116 @@ function Signup({ onSignupComplete, onLogin }) {
     };
 
     return (
-        <div className="page" style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            minHeight: '100vh',
-            paddingBottom: 0,
-            position: 'relative',
-            zIndex: 10
-        }}>
-            <div className="container" style={{ maxWidth: '400px' }}>
-                <div className="card" style={{ background: 'var(--color-surface)', backdropFilter: 'blur(10px)' }}>
-                    <div className="card-header text-center">
-                        <h1>📝 회원가입</h1>
-                        <p className="text-muted">안전관리 퀘스트 게임에 오신 것을 환영합니다</p>
+        <AuthLayout>
+            <section className="auth-card" aria-labelledby="signup-title">
+                <div className="auth-card__label">NEW AGENT REGISTRATION</div>
+                <h1 id="signup-title" className="auth-card__title">회원가입</h1>
+                <p className="auth-card__subtitle">
+                    안전관리 작전에 합류할 신원 정보를 입력하세요
+                </p>
+
+                <form onSubmit={handleSubmit} className="auth-form" noValidate>
+                    <div className="auth-form__error" aria-live="polite">
+                        {error && (
+                            <div className="auth-form__error-message" role="alert">
+                                <AlertCircle size={16} strokeWidth={2} />
+                                <span>{error}</span>
+                            </div>
+                        )}
                     </div>
 
-                    <div className="card-body">
-                        <form onSubmit={handleSubmit}>
-                            {/* ... existing fields ... */}
-                            <div className="mb-md">
-                                <label className="font-bold mb-sm" style={{ display: 'block' }}>닉네임 (필수)</label>
-                                <input
-                                    type="text"
-                                    name="nickname"
-                                    value={formData.nickname}
-                                    onChange={handleChange}
-                                    className="form-input"
-                                    placeholder="게임에서 사용할 닉네임"
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.75rem',
-                                        borderRadius: 'var(--radius-md)',
-                                        border: '1px solid var(--color-border)',
-                                        background: 'var(--color-bg-lighter)',
-                                        color: 'var(--color-text)',
-                                        fontSize: '1rem'
-                                    }}
-                                />
-                            </div>
+                    <IconInput
+                        id="signup-nickname"
+                        label="닉네임"
+                        icon={User}
+                        type="text"
+                        name="nickname"
+                        value={formData.nickname}
+                        onChange={handleChange}
+                        placeholder="게임에서 사용할 닉네임"
+                        required
+                    />
 
-                            <div className="mb-md">
-                                <label className="font-bold mb-sm" style={{ display: 'block' }}>이메일 ID (필수)</label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    className="form-input"
-                                    placeholder="example@email.com"
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.75rem',
-                                        borderRadius: 'var(--radius-md)',
-                                        border: '1px solid var(--color-border)',
-                                        background: 'var(--color-bg-lighter)',
-                                        color: 'var(--color-text)',
-                                        fontSize: '1rem'
-                                    }}
-                                />
-                            </div>
+                    <IconInput
+                        id="signup-email"
+                        label="이메일 ID"
+                        icon={Mail}
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder="example@email.com"
+                        required
+                    />
 
-                            <div className="mb-lg">
-                                <label className="font-bold mb-sm" style={{ display: 'block' }}>비밀번호 (필수)</label>
-                                <input
-                                    type="password"
-                                    name="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    className="form-input"
-                                    placeholder="비밀번호 입력"
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.75rem',
-                                        borderRadius: 'var(--radius-md)',
-                                        border: '1px solid var(--color-border)',
-                                        background: 'var(--color-bg-lighter)',
-                                        color: 'var(--color-text)',
-                                        fontSize: '1rem'
-                                    }}
-                                />
-                            </div>
+                    <IconInput
+                        id="signup-password"
+                        label="비밀번호 (6자 이상)"
+                        icon={Lock}
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        placeholder="비밀번호 입력"
+                        required
+                    />
 
-                            <div className="mb-lg" style={{ padding: '1rem', background: 'rgba(59, 130, 246, 0.1)', borderRadius: 'var(--radius-md)' }}>
-                                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                                    <input
-                                        type="checkbox"
-                                        name="isOver14"
-                                        checked={formData.isOver14}
-                                        onChange={handleChange}
-                                        style={{ width: '20px', height: '20px', marginRight: '0.5rem' }}
-                                    />
-                                    <span className="font-medium">[필수] 만 14세 이상입니다</span>
-                                </label>
-                            </div>
+                    <label
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.75rem 0.875rem',
+                            background: 'rgba(15, 23, 42, 0.4)',
+                            border: '1px solid rgba(71, 85, 105, 0.4)',
+                            borderRadius: 'var(--radius-md)',
+                            cursor: 'pointer',
+                            fontSize: 'var(--font-size-sm)',
+                            color: 'var(--color-text-secondary)'
+                        }}
+                    >
+                        <input
+                            type="checkbox"
+                            name="isOver14"
+                            checked={formData.isOver14}
+                            onChange={handleChange}
+                            style={{ width: 18, height: 18, minHeight: 18, accentColor: 'var(--color-warning-light)' }}
+                        />
+                        <span>[필수] 만 14세 이상입니다</span>
+                    </label>
 
-                            {error && (
-                                <div className="text-danger text-center mb-md font-bold">
-                                    {error}
-                                </div>
-                            )}
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="auth-form__submit"
+                    >
+                        {isLoading ? (
+                            <>
+                                <span className="spinner" style={{ width: 18, height: 18, borderWidth: 2 }} />
+                                가입 처리 중...
+                            </>
+                        ) : (
+                            '회원가입 완료'
+                        )}
+                    </button>
 
-                            <div className="text-center mb-sm">
-                                <p style={{ fontSize: '10pt', color: 'var(--color-text-muted)', marginBottom: '0.5rem' }}>
-                                    본 앱은 최소한의 정보로 가입을 진행하며,<br />
-                                    추후 포인트 보상 수령 시 <strong>[본인 인증 및 실명 확인 절차]</strong>가<br />
-                                    추가로 요구됩니다.
-                                </p>
-                            </div>
+                    <p style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', textAlign: 'center', margin: 0, lineHeight: 1.5 }}>
+                        포인트 보상 수령 시 본인 인증 및 실명 확인 절차가 추가로 요구됩니다.
+                    </p>
 
-                            <button
-                                type="submit"
-                                disabled={isLoading}
-                                className="btn btn-primary btn-lg"
-                                style={{ width: '100%', opacity: isLoading ? 0.7 : 1 }}
-                            >
-                                {isLoading ? '가입 처리 중...' : '회원가입 완료'}
-                            </button>
-                        </form>
+                    <div className="auth-form__footer">
+                        이미 계정이 있으신가요?
+                        <button
+                            type="button"
+                            onClick={onLogin}
+                            className="auth-form__link"
+                        >
+                            로그인하기
+                        </button>
                     </div>
-
-                    <div className="card-footer justify-center border-t border-slate-700/50 pt-4 mt-2 text-center">
-                        <p className="text-sm text-slate-400 mb-0">
-                            이미 계정이 있으신가요?{' '}
-                            <button
-                                onClick={onLogin}
-                                className="text-blue-400 hover:text-blue-300 font-medium bg-transparent border-none p-0 cursor-pointer underline hover:no-underline"
-                            >
-                                로그인하기
-                            </button>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+                </form>
+            </section>
+        </AuthLayout>
     );
 }
 

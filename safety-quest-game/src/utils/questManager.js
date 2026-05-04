@@ -3,6 +3,7 @@ import { getQuestById, dailyQuests, weeklyQuests, monthlyQuests, allQuests, QUES
 import { addPoints, addExperience } from './pointsCalculator';
 import { trackQuestComplete } from './achievementManager';
 import { addSeasonPoints } from './seasonManager';
+import { addNotification, NOTIFICATION_TYPES } from './notificationManager';
 
 const WEEKLY_COMPLETE_DAILY_TRACK_KEY = 'safety_quest_weekly_complete_daily_track';
 
@@ -82,6 +83,16 @@ export const completeQuest = (questId) => {
 
     // 시즌 포인트 추가
     try { addSeasonPoints(quest.reward?.points || 10, 'quest'); } catch (e) { /* silent */ }
+
+    try {
+        const points = quest.reward?.points || 0;
+        addNotification(
+            NOTIFICATION_TYPES.QUEST_COMPLETE,
+            '퀘스트 완료!',
+            `${quest.title || quest.name || '퀘스트'}을(를) 완료하여 ${points}P를 획득했습니다.`,
+            { questId, points }
+        );
+    } catch (e) { /* silent */ }
 
     return true;
 };

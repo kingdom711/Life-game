@@ -11,6 +11,7 @@
  */
 
 import workStopApi from '../api/workStopApi';
+import { addNotification, NOTIFICATION_TYPES } from './notificationManager';
 
 const STORAGE_KEYS = {
     WORK_STOP_REPORTS: 'safety_quest_work_stop_reports',
@@ -94,6 +95,15 @@ export const createWorkStopReport = ({
 
     // 보호 기간 시작
     startProtectionPeriod(reporterName, report.id);
+
+    try {
+        addNotification(
+            NOTIFICATION_TYPES.WORK_STOP,
+            '작업중지 신고 접수',
+            `${zone || '현장'} - ${report.hazardLabel} 신고가 등록되었습니다.`,
+            { reportId: report.id, hazardType, zone }
+        );
+    } catch (e) { /* silent */ }
 
     return report;
 };

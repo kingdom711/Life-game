@@ -55,7 +55,7 @@ import EventQuestBanner from '../components/EventQuestBanner';
 
 // [Phase3] 알림 센터
 import NotificationCenter from '../components/NotificationCenter';
-import { initMockNotifications, getUnreadCount } from '../utils/notificationManager';
+import { getUnreadCount } from '../utils/notificationManager';
 
 const NON_GATED_QUESTS = ['daily_education_1', 'daily_login_1'];
 
@@ -269,9 +269,8 @@ function Dashboard({ role }) {
         }
         setAchievementSummary(getAchievementSummary());
 
-        // [Phase3] 알림 초기화
+        // [Phase3] 알림 카운트
         try {
-            initMockNotifications();
             setUnreadNotifCount(getUnreadCount());
         } catch (e) { /* silent */ }
 

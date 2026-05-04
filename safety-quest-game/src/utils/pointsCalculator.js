@@ -246,7 +246,7 @@ export const addPoints = (basePoints, questType = 'all', source = '기타', sour
 
     points.add(totalPoints, source, sourceDetail);
 
-    // 백엔드 동기화 (Supabase)
+    // 백엔드 동기화 (Spring API → Supabase)
     syncPointsToBackend(totalPoints, 'EARN', source, sourceDetail);
 
     return {
@@ -268,7 +268,7 @@ export const subtractPoints = (amount, reason = '아이템 구매', description 
 
     points.subtract(amount);
 
-    // 백엔드 동기화 (Supabase)
+    // 백엔드 동기화 (Spring API → Supabase)
     syncPointsToBackend(amount, 'SPEND', reason, description);
 
     return {
@@ -373,7 +373,7 @@ export const getLevelUpReward = (newLevel) => {
 
     points.add(reward, '레벨업 보상', `레벨 ${newLevel} 달성`);
 
-    // 백엔드 동기화 (Supabase)
+    // 백엔드 동기화 (Spring API → Supabase)
     syncPointsToBackend(reward, 'EARN', '레벨업 보상', `레벨 ${newLevel} 달성`);
 
     return {

@@ -20,9 +20,18 @@ function RoleSelector({ onSelectRole }) {
                     </p>
                 </div>
 
-                <div className="grid grid-3">
+                <div className="grid grid-3" style={{ alignItems: 'stretch' }}>
                     {roles.map(role => (
-                        <div key={role.id} className="card" style={{ cursor: 'pointer' }}>
+                        <div
+                            key={role.id}
+                            className="card"
+                            style={{
+                                cursor: 'pointer',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                height: '100%'
+                            }}
+                        >
                             <div className="card-header" style={{ textAlign: 'center' }}>
                                 <div style={{ marginBottom: '1rem', height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     {role.image ? (
@@ -44,7 +53,7 @@ function RoleSelector({ onSelectRole }) {
                                 <p className="card-subtitle">{role.description}</p>
                             </div>
 
-                            <div className="card-body">
+                            <div className="card-body" style={{ flex: 1 }}>
                                 <h4 style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: 'var(--color-text-secondary)' }}>
                                     주요 기능
                                 </h4>
