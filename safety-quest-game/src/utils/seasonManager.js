@@ -6,6 +6,7 @@
  * - 명예의 전당
  */
 import { storage, getKSTDateString, getKSTMonth, points } from './storage';
+import { addNotification, NOTIFICATION_TYPES } from './notificationManager';
 
 const SEASON_KEY = 'safety_quest_season_data';
 const SEASON_HISTORY_KEY = 'safety_quest_season_history';
@@ -47,6 +48,15 @@ export const getSeasonData = () => {
         archiveSeason(data);
         const fresh = createFreshSeason(currentSeason);
         storage.set(SEASON_KEY, fresh);
+        try {
+            const [year, month] = currentSeason.split('-');
+            addNotification(
+                NOTIFICATION_TYPES.SEASON,
+                `${parseInt(month)}월 시즌 시작!`,
+                `새로운 시즌이 시작되었습니다. 이전 시즌은 ${data.seasonPoints}P로 종료. 시즌 랭킹에 도전하세요!`,
+                { seasonId: currentSeason, previousSeasonPoints: data.seasonPoints }
+            );
+        } catch (e) { /* silent */ }
         return fresh;
     }
 

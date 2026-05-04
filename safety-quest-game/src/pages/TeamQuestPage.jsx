@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import questApi from '../api/questApi';
 import useTeamGate from '../hooks/useTeamGate';
+import { addNotification, NOTIFICATION_TYPES } from '../utils/notificationManager';
 
 const questIcons = {
     HAZARD_REPORTED: '!',
@@ -54,7 +55,16 @@ function TeamQuestPage() {
         setMessage('');
         try {
             const result = await questApi.claimTeamQuestReward(questId);
-            setMessage(`팀 보상 확인 완료: ${result.rewardedMembers}명에게 +${result.reward?.points || 0}P 지급`);
+            const points = result.reward?.points || 0;
+            setMessage(`팀 보상 확인 완료: ${result.rewardedMembers}명에게 +${points}P 지급`);
+            try {
+                addNotification(
+                    NOTIFICATION_TYPES.TEAM_QUEST,
+                    '팀 퀘스트 보상 수령',
+                    `팀원 ${result.rewardedMembers || 0}명에게 ${points}P가 지급되었습니다.`,
+                    { questId, points, members: result.rewardedMembers }
+                );
+            } catch (e) { /* silent */ }
             const data = await questApi.getTeamQuests(period);
             setQuests(Array.isArray(data) ? data : data?.quests || []);
         } catch (err) {
