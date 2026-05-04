@@ -55,7 +55,7 @@ import EventQuestBanner from '../components/EventQuestBanner';
 
 // [Phase3] 알림 센터
 import NotificationCenter from '../components/NotificationCenter';
-import { getUnreadCount } from '../utils/notificationManager';
+import { getUnreadCount, clearOldNotifications } from '../utils/notificationManager';
 
 const NON_GATED_QUESTS = ['daily_education_1', 'daily_login_1'];
 
@@ -269,8 +269,9 @@ function Dashboard({ role }) {
         }
         setAchievementSummary(getAchievementSummary());
 
-        // [Phase3] 알림 카운트
+        // [Phase3] 알림 카운트 + 오래된 알림 정리(30일)
         try {
+            clearOldNotifications(30);
             setUnreadNotifCount(getUnreadCount());
         } catch (e) { /* silent */ }
 

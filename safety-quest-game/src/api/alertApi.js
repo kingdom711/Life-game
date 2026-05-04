@@ -24,12 +24,24 @@ const formatTimeAgo = (dateString) => {
 };
 
 /**
+ * 백엔드 AlertType (INFO/WARNING/DANGER)을 알림센터 표시용 NOTIFICATION_TYPES로 매핑
+ * - DANGER → work_stop (🛑 빨강)
+ * - WARNING/INFO → system (🔔 회색)
+ */
+const mapAlertType = (backendType) => {
+    const t = (backendType || '').toUpperCase();
+    if (t === 'DANGER') return 'work_stop';
+    return 'system';
+};
+
+/**
  * 백엔드 응답을 프론트엔드 형식으로 변환
  */
 const transformAlert = (alert) => ({
     id: alert.id,
-    type: alert.type?.toLowerCase() || 'info', // DANGER -> danger
-    zone: alert.title?.split(' - ')[0] || '전체', // 제목에서 구역 추출 또는 기본값
+    type: mapAlertType(alert.type),
+    backendType: alert.type, // 원본 보존 (관리자 화면용)
+    zone: alert.title?.split(' - ')[0] || '전체',
     message: alert.title,
     detail: alert.message,
     time: formatTimeAgo(alert.createdAt),

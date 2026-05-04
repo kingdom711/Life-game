@@ -100,7 +100,7 @@ function AlertManagement({ role }) {
     const handleEdit = (alert) => {
         setEditingAlert(alert);
         setFormData({
-            type: alert.type,
+            type: (alert.backendType || alert.type || 'warning').toLowerCase(),
             zone: alert.zone,
             message: alert.message,
             detail: alert.detail
@@ -403,7 +403,7 @@ function AlertManagement({ role }) {
                     ) : (
                         <div>
                             {alerts.map((alert, index) => {
-                                const typeInfo = getTypeLabel(alert.type);
+                                const typeInfo = getTypeLabel((alert.backendType || alert.type || 'info').toLowerCase());
                                 return (
                                     <div
                                         key={alert.id}
