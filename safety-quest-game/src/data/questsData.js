@@ -32,6 +32,7 @@ export const dailyQuests = [
             target: 1,
             action: 'complete_education'
         },
+        link: '/education',
         reward: {
             points: 100,
             exp: 30

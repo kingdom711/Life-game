@@ -15,6 +15,19 @@ function QuestCard({ quest, onComplete, isLocked = false }) {
         }
     };
 
+    const handleCardClick = (event) => {
+        if (!quest.link || isCompleted) return;
+        if (event.target.closest('button, a')) return;
+        navigate(quest.link);
+    };
+
+    const handleCardKeyDown = (event) => {
+        if (!quest.link || isCompleted) return;
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        navigate(quest.link);
+    };
+
     return (
         <div className={`
             quest-card
@@ -25,7 +38,12 @@ function QuestCard({ quest, onComplete, isLocked = false }) {
                 : 'hover:border-blue-400/50'
             }
             ${isCompleted ? 'completed' : ''}
-        `}>
+        `}
+            onClick={handleCardClick}
+            onKeyDown={handleCardKeyDown}
+            role={quest.link && !isCompleted ? 'button' : undefined}
+            tabIndex={quest.link && !isCompleted ? 0 : undefined}
+        >
             {isCompleted && (
                 <div className="completed-overlay absolute inset-0 bg-emerald-500/15 pointer-events-none z-0 rounded-xl"></div>
             )}

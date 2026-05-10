@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     getNotifications,
     getUnreadCount,
@@ -17,6 +18,7 @@ import { getAlerts } from '../api/alertApi';
  * 알림 목록 표시, 읽음 처리, 상대 시간 표시
  */
 const NotificationCenter = ({ isOpen, onClose }) => {
+    const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
 
@@ -70,6 +72,14 @@ const NotificationCenter = ({ isOpen, onClose }) => {
             .map((n) => n.id);
         if (alertKeys.length > 0) markAllAlertsRead(alertKeys);
         loadNotifications();
+    };
+
+    const handleNotificationClick = (notification) => {
+        if (!notification.read) {
+            handleMarkAsRead(notification.id);
+        }
+        onClose?.();
+        navigate('/alert-management');
     };
 
     /**
@@ -180,11 +190,7 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                                             : 'rgba(30, 41, 59, 0.7)',
                                         borderLeft: `3px solid ${typeColor}`
                                     }}
-                                    onClick={() => {
-                                        if (!notification.read) {
-                                            handleMarkAsRead(notification.id);
-                                        }
-                                    }}
+                                    onClick={() => handleNotificationClick(notification)}
                                     onMouseOver={(e) => {
                                         e.currentTarget.style.background = 'rgba(30, 41, 59, 0.9)';
                                         e.currentTarget.style.borderColor = `${typeColor}`;
