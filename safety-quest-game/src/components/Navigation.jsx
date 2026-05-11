@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, Target, Trophy, ShoppingCart, User } from 'lucide-react';
+import { BookOpen, ShieldCheck, Target, Trophy, ShoppingCart, User } from 'lucide-react';
 import { hasCompletedTodayEducation } from '../utils/educationManager';
 import { userProfile } from '../utils/storage';
 import { useAuth } from '../context/AuthContext';
@@ -29,7 +29,7 @@ function Navigation() {
 
     const currentRole = userProfile.getRole();
     const isTechnician = currentRole === 'technician';
-    const isAdmin = currentRole === 'supervisor' || currentRole === 'safetyManager';
+    const isProjectAdmin = user?.role === 'ROLE_PROJECT_ADMIN';
 
     const navItems = [
         { path: '/education', label: '교육', Icon: BookOpen, active: location.pathname.startsWith('/education') },
@@ -38,6 +38,15 @@ function Navigation() {
         { path: '/shop', label: '상점', Icon: ShoppingCart, active: location.pathname === '/shop' },
         { path: '/profile', label: '내프로필', Icon: User, active: location.pathname === '/profile' }
     ];
+
+    if (isProjectAdmin) {
+        navItems.splice(4, 0, {
+            path: '/admin',
+            label: '관리',
+            Icon: ShieldCheck,
+            active: location.pathname.startsWith('/admin')
+        });
+    }
 
     return (
         <nav className="mobile-nav backdrop-blur-2xl bg-slate-900/90 border-t border-slate-700/50 

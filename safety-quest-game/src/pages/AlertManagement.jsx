@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllAlerts, createAlert, updateAlert, deleteAlert } from '../api/alertApi';
 import { LoadingState, EmptyState, ResultNotice } from '../components/PageState';
+import { useAuth } from '../context/AuthContext';
 
 const COLOR = {
     text: 'var(--color-text)',
@@ -22,7 +23,13 @@ const COLOR = {
  */
 function AlertManagement({ role }) {
     const navigate = useNavigate();
-    const isAdmin = role === 'supervisor' || role === 'safetyManager';
+    const { user } = useAuth();
+    const isAdmin = role === 'supervisor'
+        || role === 'safetyManager'
+        || user?.role === 'ROLE_ADMIN'
+        || user?.role === 'ROLE_SAFETY_MANAGER'
+        || user?.role === 'ROLE_SUPERVISOR'
+        || user?.role === 'ROLE_PROJECT_ADMIN';
 
     const [alerts, setAlerts] = useState([]);
     const [loading, setLoading] = useState(true);

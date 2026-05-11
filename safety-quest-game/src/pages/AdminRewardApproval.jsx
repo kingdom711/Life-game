@@ -33,7 +33,7 @@ const TABS = [
 function AdminRewardApproval() {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const isProjectAdmin = user?.username === 'admin';
+    const isProjectAdmin = user?.role === 'ROLE_PROJECT_ADMIN';
 
     const [exchanges, setExchanges] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -206,7 +206,7 @@ function AdminRewardApproval() {
                                                 {item.rewardName}
                                             </div>
                                             <div style={{ color: COLOR.secondaryLight, fontSize: '0.8rem', marginTop: 4, fontWeight: 600 }}>
-                                                👤 {item.requestedByName || item.requestedBy || '알 수 없음'}
+                                                👤 {item.requestedByName || item.requestedBy || item.userName || item.userEmail || '알 수 없음'}
                                                 {item.requestedBy && item.requestedBy !== item.requestedByName && (
                                                     <span style={{ color: COLOR.textMuted, fontWeight: 400 }}> (@{item.requestedBy})</span>
                                                 )}

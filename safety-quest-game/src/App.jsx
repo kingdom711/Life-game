@@ -29,6 +29,7 @@ import HazardCyclePage from './pages/HazardCyclePage';
 import HazardCycleAckPage from './pages/HazardCycleAckPage';
 import CycleHistoryPage from './pages/CycleHistoryPage';
 import SafetyScoreDashboard from './pages/SafetyScoreDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import AdminRewardApproval from './pages/AdminRewardApproval';
 import WorkStopHistoryPage from './pages/WorkStopHistoryPage'; // [New] 작업중지 이력
 import AchievementPage from './pages/AchievementPage'; // [Phase1] 업적
@@ -77,8 +78,9 @@ function App() {
     // const [loading, setLoading] = useState(true); // AuthContext로 대체
 
     const { user, loading } = useAuth();
-    const teamGate = useTeamGate({ autoLoad: Boolean(user && selectedRole) });
-    const shouldForceTeamJoin = Boolean(user && selectedRole && !teamGate.loading && !teamGate.isActive);
+    const isProjectAdmin = user?.role === 'ROLE_PROJECT_ADMIN';
+    const teamGate = useTeamGate({ autoLoad: Boolean(user && selectedRole && !isProjectAdmin) });
+    const shouldForceTeamJoin = Boolean(user && selectedRole && !isProjectAdmin && !teamGate.loading && !teamGate.isActive);
 
     useEffect(() => {
         const initApp = async () => {
@@ -230,7 +232,7 @@ function App() {
                         <Login onSignup={handleSignup} />
                     ) : !user ? (
                         <Signup onSignupComplete={handleSignupComplete} onLogin={handleLogin} />
-                    ) : !selectedRole ? (
+                    ) : !selectedRole && !isProjectAdmin ? (
                         <RoleSelector onSelectRole={handleRoleSelect} />
                     ) : (
                         <>
@@ -262,7 +264,7 @@ function App() {
                             <Navigation />
                             <div className="relative z-10">
                                 <Routes>
-                                    <Route path="/" element={<Dashboard role={selectedRole} />} />
+                                    <Route path="/" element={isProjectAdmin ? <Navigate to="/admin" replace /> : <Dashboard role={selectedRole} />} />
                                     <Route path="/daily" element={<DailyQuests role={selectedRole} />} />
                                     <Route path="/weekly" element={<WeeklyQuests role={selectedRole} />} />
                                     <Route path="/monthly" element={<MonthlyQuests role={selectedRole} />} />
@@ -280,6 +282,7 @@ function App() {
                                     <Route path="/specialization" element={<SpecializationPage role={selectedRole} />} />
                                     <Route path="/specialization/training/:specId" element={<SpecializationTrainingPage />} />
                                     <Route path="/safety-score" element={<SafetyScoreDashboard role={selectedRole} />} />
+                                    <Route path="/admin" element={<AdminDashboard />} />
                                     <Route path="/admin/reward-approval" element={<AdminRewardApproval />} />
                                     <Route path="/work-stop-history" element={<WorkStopHistoryPage />} />
                                     <Route path="/achievements" element={<AchievementPage />} />
@@ -297,11 +300,15 @@ function App() {
                             </div>
 
                             {/* [New] 긴급 작업중지 플로팅 버튼 - 모든 화면에서 표시 */}
-                            <WorkStopButton onActivate={() => setIsWorkStopModalOpen(true)} />
-                            <WorkStopReportModal
-                                isOpen={isWorkStopModalOpen}
-                                onClose={() => setIsWorkStopModalOpen(false)}
-                            />
+                            {!isProjectAdmin && (
+                                <>
+                                    <WorkStopButton onActivate={() => setIsWorkStopModalOpen(true)} />
+                                    <WorkStopReportModal
+                                        isOpen={isWorkStopModalOpen}
+                                        onClose={() => setIsWorkStopModalOpen(false)}
+                                    />
+                                </>
+                            )}
                             <TeamJoinWizard
                                 isOpen={shouldForceTeamJoin}
                                 force
