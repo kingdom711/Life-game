@@ -294,7 +294,6 @@ function AlertManagement({ role }) {
                                         value={formData.message}
                                         onChange={handleInputChange}
                                         placeholder="예: 낙하물 주의"
-                                        required
                                         style={{
                                             width: '100%',
                                             padding: '0.75rem',
@@ -404,6 +403,7 @@ function AlertManagement({ role }) {
                         <div>
                             {alerts.map((alert, index) => {
                                 const typeInfo = getTypeLabel((alert.backendType || alert.type || 'info').toLowerCase());
+                                const displayTitle = alert.message ? `${alert.zone} - ${alert.message}` : alert.zone;
                                 return (
                                     <div
                                         key={alert.id}
@@ -455,7 +455,7 @@ function AlertManagement({ role }) {
                                                     color: COLOR.text,
                                                     fontWeight: 600
                                                 }}>
-                                                    {alert.zone} - {alert.message}
+                                                    {displayTitle}
                                                 </span>
                                             </div>
                                             <p style={{

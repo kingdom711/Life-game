@@ -1,29 +1,31 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import {
-    getDeptRankings, getMyDeptInfo, getBattleRemainingDays,
-    getScoreCategories, getBattleRewards
-} from '../utils/departmentBattleManager';
+import departmentBattleApi from '../api/departmentBattleApi';
 import useTeamGate from '../hooks/useTeamGate';
 
 function DepartmentBattlePage() {
     const teamGate = useTeamGate();
-    const [rankings, setRankings] = useState([]);
-    const [myDept, setMyDept] = useState(null);
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
     const [selectedDept, setSelectedDept] = useState(null);
 
     useEffect(() => {
-        loadData();
+        let cancelled = false;
+        setLoading(true);
+        setError('');
+        departmentBattleApi.getBattle()
+            .then((result) => {
+                if (!cancelled) setData(result || null);
+            })
+            .catch((err) => {
+                if (!cancelled) setError(err?.message || '부서 대항전 데이터를 불러오지 못했습니다.');
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+        return () => { cancelled = true; };
     }, []);
-
-    const loadData = () => {
-        setRankings(getDeptRankings());
-        setMyDept(getMyDeptInfo());
-    };
-
-    const remainingDays = getBattleRemainingDays();
-    const categories = getScoreCategories();
-    const rewards = getBattleRewards();
 
     if (!teamGate.loading && !teamGate.isActive) {
         return (
@@ -45,6 +47,13 @@ function DepartmentBattlePage() {
             </div>
         );
     }
+
+    const rankings = data?.departments || [];
+    const myDeptId = data?.myDeptId ?? null;
+    const myDept = rankings.find(d => d.id === myDeptId) || null;
+    const remainingDays = data?.remainingDays ?? 0;
+    const categories = data?.categories || {};
+    const rewards = data?.rewards || [];
 
     return (
         <div className="page">
@@ -108,7 +117,29 @@ function DepartmentBattlePage() {
                     )}
                 </div>
 
+                {/* 로딩/에러/빈 상태 */}
+                {loading && (
+                    <div style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
+                        불러오는 중...
+                    </div>
+                )}
+                {!loading && error && (
+                    <div style={{
+                        padding: '1rem', borderRadius: '12px', marginBottom: '1rem',
+                        background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)',
+                        color: '#fca5a5', fontSize: '0.85rem'
+                    }}>
+                        {error}
+                    </div>
+                )}
+                {!loading && !error && rankings.length === 0 && (
+                    <div style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
+                        아직 등록된 부서가 없습니다.
+                    </div>
+                )}
+
                 {/* 순위 목록 */}
+                {!loading && !error && rankings.length > 0 && (
                 <div style={{ marginBottom: '1.5rem' }}>
                     <h3 style={{ color: '#e2e8f0', fontWeight: 700, marginBottom: '0.75rem', fontSize: '1rem' }}>
                         부서별 순위
@@ -170,7 +201,10 @@ function DepartmentBattlePage() {
                                             marginTop: '0.75rem', paddingTop: '0.75rem',
                                             borderTop: '1px solid rgba(255,255,255,0.06)'
                                         }}>
-                                            {Object.entries(categories).map(([key, cat]) => (
+                                            {Object.entries(categories).map(([key, cat]) => {
+                                                const score = dept.scores?.[key] ?? 0;
+                                                const max = cat.maxScore || 1;
+                                                return (
                                                 <div key={key} style={{
                                                     display: 'flex', alignItems: 'center', gap: '0.5rem',
                                                     marginBottom: '0.4rem'
@@ -187,17 +221,18 @@ function DepartmentBattlePage() {
                                                         <div style={{
                                                             background: '#c084fc',
                                                             height: '100%', borderRadius: '3px',
-                                                            width: `${(dept.scores[key] / cat.maxScore) * 100}%`
+                                                            width: `${Math.min(100, (score / max) * 100)}%`
                                                         }} />
                                                     </div>
                                                     <div style={{
                                                         fontSize: '0.75rem', color: '#e2e8f0',
                                                         fontWeight: 600, width: '50px', textAlign: 'right'
                                                     }}>
-                                                        {dept.scores[key]}/{cat.maxScore}
+                                                        {score}/{max}
                                                     </div>
                                                 </div>
-                                            ))}
+                                                );
+                                            })}
                                         </div>
                                     )}
                                 </div>
@@ -205,8 +240,10 @@ function DepartmentBattlePage() {
                         })}
                     </div>
                 </div>
+                )}
 
                 {/* 보상 테이블 */}
+                {rewards.length > 0 && (
                 <div style={{
                     background: 'rgba(255,255,255,0.02)', borderRadius: '14px',
                     border: '1px solid rgba(255,255,255,0.06)', padding: '1.25rem'
@@ -230,6 +267,7 @@ function DepartmentBattlePage() {
                         </div>
                     ))}
                 </div>
+                )}
             </div>
         </div>
     );

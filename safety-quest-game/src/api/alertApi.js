@@ -1,15 +1,8 @@
-/**
- * 실시간 위험 알림 API
- * 백엔드 Alert API와 연동
- */
-
 import apiClient from './apiClient';
 
-/**
- * 시간 표시 포맷팅
- */
 const formatTimeAgo = (dateString) => {
     if (!dateString) return '';
+
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = now - date;
@@ -23,55 +16,73 @@ const formatTimeAgo = (dateString) => {
     return `${diffDays}일 전`;
 };
 
-/**
- * 백엔드 AlertType (INFO/WARNING/DANGER)을 알림센터 표시용 NOTIFICATION_TYPES로 매핑
- * - DANGER → work_stop (🛑 빨강)
- * - WARNING/INFO → system (🔔 회색)
- */
 const mapAlertType = (backendType) => {
     const t = (backendType || '').toUpperCase();
     if (t === 'DANGER') return 'work_stop';
     return 'system';
 };
 
-/**
- * 백엔드 응답을 프론트엔드 형식으로 변환
- */
-const transformAlert = (alert) => ({
-    id: alert.id,
-    type: mapAlertType(alert.type),
-    backendType: alert.type, // 원본 보존 (관리자 화면용)
-    zone: alert.title?.split(' - ')[0] || '전체',
-    message: alert.title,
-    detail: alert.message,
-    time: formatTimeAgo(alert.createdAt),
-    createdAt: alert.createdAt,
-    priority: alert.priority,
-    active: alert.active
-});
+const splitAlertTitle = (title) => {
+    const rawTitle = (title || '').trim();
+    const separator = ' - ';
+    const separatorIndex = rawTitle.indexOf(separator);
 
-/**
- * 프론트엔드 데이터를 백엔드 형식으로 변환
- */
-const transformToBackend = (data) => ({
-    title: data.zone ? `${data.zone} - ${data.message}` : data.message,
-    message: data.detail,
-    type: data.type?.toUpperCase() || 'INFO', // danger -> DANGER
-    priority: data.priority || 0,
-    active: data.active !== false,
-    startDate: data.startDate || null,
-    endDate: data.endDate || null
-});
+    if (separatorIndex === -1) {
+        return {
+            zone: '전체',
+            message: rawTitle
+        };
+    }
 
-/**
- * 활성 알림 목록 조회 (인증 불필요)
- * @returns {Promise<Array>} 알림 목록
- */
+    const zone = rawTitle.slice(0, separatorIndex).trim();
+    const duplicatePrefix = `${zone}${separator}`;
+    const rawMessage = rawTitle.slice(separatorIndex + separator.length).trim();
+    const message = rawMessage.startsWith(duplicatePrefix)
+        ? rawMessage.slice(duplicatePrefix.length).trim()
+        : rawMessage;
+
+    return {
+        zone: zone || '전체',
+        message
+    };
+};
+
+const transformAlert = (alert) => {
+    const title = splitAlertTitle(alert.title);
+
+    return {
+        id: alert.id,
+        type: mapAlertType(alert.type),
+        backendType: alert.type,
+        zone: title.zone,
+        message: title.message,
+        detail: alert.message || '',
+        time: formatTimeAgo(alert.createdAt),
+        createdAt: alert.createdAt,
+        priority: alert.priority,
+        active: alert.active
+    };
+};
+
+const transformToBackend = (data) => {
+    const zone = (data.zone || '').trim();
+    const message = (data.message || '').trim();
+    const detail = (data.detail || '').trim();
+
+    return {
+        title: zone && message ? `${zone} - ${message}` : message || zone,
+        message: detail,
+        type: data.type?.toUpperCase() || 'INFO',
+        priority: data.priority || 0,
+        active: data.active !== false,
+        startDate: data.startDate || null,
+        endDate: data.endDate || null
+    };
+};
+
 export const getAlerts = async () => {
     try {
-        // apiClient는 이미 data 필드를 추출해서 반환함
         const alerts = await apiClient.get('/alerts/active');
-        // alerts가 배열인지 확인 (배열이 아니면 빈 배열 반환)
         const alertList = Array.isArray(alerts) ? alerts : [];
         return alertList.map(transformAlert);
     } catch (error) {
@@ -80,10 +91,6 @@ export const getAlerts = async () => {
     }
 };
 
-/**
- * 모든 알림 목록 조회 (관리자용)
- * @returns {Promise<Array>} 알림 목록
- */
 export const getAllAlerts = async () => {
     try {
         const alerts = await apiClient.get('/alerts');
@@ -95,11 +102,6 @@ export const getAllAlerts = async () => {
     }
 };
 
-/**
- * 새 알림 생성 (SAFETY_MANAGER 권한 필요)
- * @param {Object} data - 알림 데이터
- * @returns {Promise<Object>} 생성된 알림
- */
 export const createAlert = async (data) => {
     try {
         const backendData = transformToBackend(data);
@@ -111,12 +113,6 @@ export const createAlert = async (data) => {
     }
 };
 
-/**
- * 알림 수정 (SAFETY_MANAGER 권한 필요)
- * @param {string|number} id - 알림 ID
- * @param {Object} data - 수정할 데이터
- * @returns {Promise<Object>} 수정된 알림
- */
 export const updateAlert = async (id, data) => {
     try {
         const backendData = transformToBackend(data);
@@ -128,11 +124,6 @@ export const updateAlert = async (id, data) => {
     }
 };
 
-/**
- * 알림 삭제 (SAFETY_MANAGER 권한 필요)
- * @param {string|number} id - 알림 ID
- * @returns {Promise<void>}
- */
 export const deleteAlert = async (id) => {
     try {
         await apiClient.delete(`/alerts/${id}`);
@@ -143,9 +134,6 @@ export const deleteAlert = async (id) => {
     }
 };
 
-/**
- * 알림 API 객체
- */
 const alertApi = {
     getAlerts,
     getAllAlerts,

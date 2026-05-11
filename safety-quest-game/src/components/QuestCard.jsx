@@ -16,13 +16,13 @@ function QuestCard({ quest, onComplete, isLocked = false }) {
     };
 
     const handleCardClick = (event) => {
-        if (!quest.link || isCompleted) return;
+        if (!quest.link || isCompleted || isLocked) return;
         if (event.target.closest('button, a')) return;
         navigate(quest.link);
     };
 
     const handleCardKeyDown = (event) => {
-        if (!quest.link || isCompleted) return;
+        if (!quest.link || isCompleted || isLocked) return;
         if (event.key !== 'Enter' && event.key !== ' ') return;
         event.preventDefault();
         navigate(quest.link);
@@ -41,8 +41,8 @@ function QuestCard({ quest, onComplete, isLocked = false }) {
         `}
             onClick={handleCardClick}
             onKeyDown={handleCardKeyDown}
-            role={quest.link && !isCompleted ? 'button' : undefined}
-            tabIndex={quest.link && !isCompleted ? 0 : undefined}
+            role={quest.link && !isCompleted && !isLocked ? 'button' : undefined}
+            tabIndex={quest.link && !isCompleted && !isLocked ? 0 : undefined}
         >
             {isCompleted && (
                 <div className="completed-overlay absolute inset-0 bg-emerald-500/15 pointer-events-none z-0 rounded-xl"></div>
@@ -111,7 +111,8 @@ function QuestCard({ quest, onComplete, isLocked = false }) {
                 </button>
             ) : quest.link ? (
                 <button
-                    onClick={() => navigate(quest.link)}
+                    onClick={() => !isLocked && navigate(quest.link)}
+                    disabled={isLocked}
                     className="btn-action w-full py-3 rounded-lg font-bold transition-all duration-300 relative z-10 bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:-translate-y-0.5 hover:shadow-lg hover:shadow-purple-500/30"
                 >
                     바로가기
