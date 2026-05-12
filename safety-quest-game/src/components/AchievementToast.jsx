@@ -99,7 +99,7 @@ function AchievementToast({ achievement, onClose }) {
                 </div>
 
                 {/* 보상 */}
-                {achievement.reward?.gold && (
+                {achievement.reward?.points && (
                     <div style={{
                         background: 'rgba(234, 179, 8, 0.15)',
                         border: '1px solid rgba(234, 179, 8, 0.3)',
@@ -110,7 +110,7 @@ function AchievementToast({ achievement, onClose }) {
                         color: '#fbbf24',
                         flexShrink: 0
                     }}>
-                        +{achievement.reward.gold}G
+                        +{achievement.reward.points}P
                     </div>
                 )}
             </div>

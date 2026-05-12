@@ -249,7 +249,6 @@ function TeamQuestPage() {
                                     }}>
                                         <span>
                                             팀 완료 보상 +{quest.reward?.points || 0}P +{quest.reward?.exp || 0}EXP
-                                            {quest.reward?.gold ? ` +${quest.reward.gold}G` : ''}
                                         </span>
                                         {quest.completed && !quest.rewardClaimed ? (
                                             <button

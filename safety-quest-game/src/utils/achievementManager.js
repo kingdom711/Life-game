@@ -140,8 +140,8 @@ export const claimAchievementReward = (achievementId) => {
     }
 
     // 보상 지급
-    if (achievement.reward.gold) {
-        points.add(achievement.reward.gold, '업적 보상', achievement.name);
+    if (achievement.reward.points) {
+        points.add(achievement.reward.points, '업적 보상', achievement.name);
     }
 
     state[achievementId].rewardClaimed = true;

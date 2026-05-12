@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 학습 경로 (Learning Path) 데이터
  * - 직무별 체계적 커리큘럼
  * - 단계별 해금 구조
@@ -13,7 +13,7 @@ export const LEARNING_PATHS = [
         color: '#3b82f6',
         role: 'all',
         totalSteps: 4,
-        reward: { gold: 500, exp: 300, title: '안전 기초 마스터' },
+        reward: { points: 500, exp: 300, title: '안전 기초 마스터' },
         steps: [
             {
                 id: 'basic_step1',
@@ -73,7 +73,7 @@ export const LEARNING_PATHS = [
         role: 'technician',
         totalSteps: 4,
         prerequisite: 'path_basic_safety',
-        reward: { gold: 800, exp: 500, title: '추락방지 전문가' },
+        reward: { points: 800, exp: 500, title: '추락방지 전문가' },
         steps: [
             {
                 id: 'fall_step1',
@@ -134,7 +134,7 @@ export const LEARNING_PATHS = [
         role: 'technician',
         totalSteps: 4,
         prerequisite: 'path_basic_safety',
-        reward: { gold: 800, exp: 500, title: '전기안전 전문가' },
+        reward: { points: 800, exp: 500, title: '전기안전 전문가' },
         steps: [
             {
                 id: 'elec_step1',
@@ -193,7 +193,7 @@ export const LEARNING_PATHS = [
         color: '#8b5cf6',
         role: 'supervisor',
         totalSteps: 3,
-        reward: { gold: 1000, exp: 600, title: '안전 리더' },
+        reward: { points: 1000, exp: 600, title: '안전 리더' },
         steps: [
             {
                 id: 'mgr_step1',

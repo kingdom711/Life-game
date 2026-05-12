@@ -319,7 +319,7 @@ function AchievementPage() {
                                                     animation: 'pulse 2s infinite'
                                                 }}
                                             >
-                                                +{achievement.reward.gold}G 수령
+                                                +{achievement.reward.points}P 수령
                                             </button>
                                         ) : achievement.rewardClaimed ? (
                                             <span style={{
@@ -335,7 +335,7 @@ function AchievementPage() {
                                                 color: rarityColor,
                                                 fontWeight: 600
                                             }}>
-                                                {achievement.reward?.gold}G
+                                                {achievement.reward?.points}P
                                             </span>
                                         )}
                                     </div>

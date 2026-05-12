@@ -12,16 +12,16 @@ const SEASON_KEY = 'safety_quest_season_data';
 const SEASON_HISTORY_KEY = 'safety_quest_season_history';
 const HALL_OF_FAME_KEY = 'safety_quest_hall_of_fame';
 
-// 시즌 보상 테이블
+// 시즌 보상 테이블 (포인트 지급)
 const SEASON_REWARDS = [
-    { minRank: 1, maxRank: 1, gold: 2000, title: '시즌 챔피언', trophy: 'legendary', label: '1위' },
-    { minRank: 2, maxRank: 3, gold: 1000, title: null, trophy: 'epic', label: '2~3위' },
-    { minRank: 4, maxRank: 10, gold: 500, title: null, trophy: 'rare', label: '4~10위' },
-    { minRank: 11, maxRank: Infinity, gold: 200, title: null, trophy: 'common', label: '상위 30%', percentile: 30 },
+    { minRank: 1, maxRank: 1, points: 2000, title: '시즌 챔피언', trophy: 'legendary', label: '1위' },
+    { minRank: 2, maxRank: 3, points: 1000, title: null, trophy: 'epic', label: '2~3위' },
+    { minRank: 4, maxRank: 10, points: 500, title: null, trophy: 'rare', label: '4~10위' },
+    { minRank: 11, maxRank: Infinity, points: 200, title: null, trophy: 'common', label: '상위 30%', percentile: 30 },
 ];
 
 // 참여 보상
-const PARTICIPATION_REWARD = { gold: 100, trophy: 'participation' };
+const PARTICIPATION_REWARD = { points: 100, trophy: 'participation' };
 
 /**
  * 현재 시즌 ID (YYYY-MM)
@@ -161,11 +161,11 @@ export const claimSeasonReward = (rank, totalParticipants) => {
 
     if (!reward) {
         // 참여 보상
-        points.add(PARTICIPATION_REWARD.gold, '시즌 보상', '시즌 참여 보상');
+        points.add(PARTICIPATION_REWARD.points, '시즌 보상', '시즌 참여 보상');
         return { ...PARTICIPATION_REWARD, rank };
     }
 
-    points.add(reward.gold, '시즌 보상', `시즌 ${reward.label} 보상`);
+    points.add(reward.points, '시즌 보상', `시즌 ${reward.label} 보상`);
     return { ...reward, rank };
 };
 

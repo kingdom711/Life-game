@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 업적(Achievement) 데이터 정의
  * 장기 목표 제시를 통한 지속적 참여 동기 부여
  */
@@ -42,7 +42,7 @@ export const achievements = [
         description: '7일 연속 출석을 달성하세요.',
         icon: '🌱',
         condition: { type: 'streak', target: 7 },
-        reward: { gold: 100, badge: true },
+        reward: { points: 100, badge: true },
         rarity: 'common'
     },
     {
@@ -52,7 +52,7 @@ export const achievements = [
         description: '30일 연속 출석을 달성하세요.',
         icon: '🔥',
         condition: { type: 'streak', target: 30 },
-        reward: { gold: 500, badge: true },
+        reward: { points: 500, badge: true },
         rarity: 'rare'
     },
     {
@@ -62,7 +62,7 @@ export const achievements = [
         description: '100일 연속 출석을 달성하세요.',
         icon: '👑',
         condition: { type: 'streak', target: 100 },
-        reward: { gold: 2000, badge: true },
+        reward: { points: 2000, badge: true },
         rarity: 'legendary'
     },
 
@@ -74,7 +74,7 @@ export const achievements = [
         description: '일일 퀘스트 전체 완료를 10일 달성하세요.',
         icon: '⚔️',
         condition: { type: 'daily_perfect', target: 10 },
-        reward: { gold: 300, badge: true },
+        reward: { points: 300, badge: true },
         rarity: 'common'
     },
     {
@@ -84,7 +84,7 @@ export const achievements = [
         description: '일일 퀘스트 전체 완료를 30일 달성하세요.',
         icon: '🏅',
         condition: { type: 'daily_perfect', target: 30 },
-        reward: { gold: 1000, badge: true },
+        reward: { points: 1000, badge: true },
         rarity: 'epic'
     },
     {
@@ -94,7 +94,7 @@ export const achievements = [
         description: '퀘스트를 총 100개 완료하세요.',
         icon: '💯',
         condition: { type: 'quest_total', target: 100 },
-        reward: { gold: 500, badge: true },
+        reward: { points: 500, badge: true },
         rarity: 'rare'
     },
     {
@@ -104,7 +104,7 @@ export const achievements = [
         description: '퀘스트를 총 500개 완료하세요.',
         icon: '🌟',
         condition: { type: 'quest_total', target: 500 },
-        reward: { gold: 3000, badge: true },
+        reward: { points: 3000, badge: true },
         rarity: 'legendary'
     },
 
@@ -116,7 +116,7 @@ export const achievements = [
         description: '위험 신고를 5회 완료하세요.',
         icon: '👁️',
         condition: { type: 'hazard_report', target: 5 },
-        reward: { gold: 150, badge: true },
+        reward: { points: 150, badge: true },
         rarity: 'common'
     },
     {
@@ -126,7 +126,7 @@ export const achievements = [
         description: '위험 신고를 10회 완료하세요.',
         icon: '🛡️',
         condition: { type: 'hazard_report', target: 10 },
-        reward: { gold: 300, badge: true },
+        reward: { points: 300, badge: true },
         rarity: 'common'
     },
     {
@@ -136,7 +136,7 @@ export const achievements = [
         description: '위험 신고를 50회 완료하세요.',
         icon: '🎯',
         condition: { type: 'hazard_report', target: 50 },
-        reward: { gold: 1500, badge: true },
+        reward: { points: 1500, badge: true },
         rarity: 'epic'
     },
 
@@ -148,7 +148,7 @@ export const achievements = [
         description: '교육 영상을 10개 완료하세요.',
         icon: '📖',
         condition: { type: 'education_complete', target: 10 },
-        reward: { gold: 200, badge: true },
+        reward: { points: 200, badge: true },
         rarity: 'common'
     },
     {
@@ -158,7 +158,7 @@ export const achievements = [
         description: '교육 영상을 50개 완료하세요.',
         icon: '🎓',
         condition: { type: 'education_complete', target: 50 },
-        reward: { gold: 500, badge: true },
+        reward: { points: 500, badge: true },
         rarity: 'rare'
     },
     {
@@ -168,7 +168,7 @@ export const achievements = [
         description: '퀴즈 100% 정답을 5회 연속 달성하세요.',
         icon: '🧠',
         condition: { type: 'quiz_perfect_streak', target: 5 },
-        reward: { gold: 400, badge: true },
+        reward: { points: 400, badge: true },
         rarity: 'rare'
     },
     {
@@ -178,7 +178,7 @@ export const achievements = [
         description: '퀴즈 100% 정답을 10회 연속 달성하세요.',
         icon: '💡',
         condition: { type: 'quiz_perfect_streak', target: 10 },
-        reward: { gold: 800, badge: true },
+        reward: { points: 800, badge: true },
         rarity: 'epic'
     },
 
@@ -190,7 +190,7 @@ export const achievements = [
         description: '장비를 처음으로 착용하세요.',
         icon: '🎽',
         condition: { type: 'equip_count', target: 1 },
-        reward: { gold: 50, badge: true },
+        reward: { points: 50, badge: true },
         rarity: 'common'
     },
     {
@@ -200,7 +200,7 @@ export const achievements = [
         description: 'Rare 이상 장비를 5개 보유하세요.',
         icon: '💎',
         condition: { type: 'rare_items', target: 5 },
-        reward: { gold: 500, badge: true },
+        reward: { points: 500, badge: true },
         rarity: 'rare'
     },
     {
@@ -210,7 +210,7 @@ export const achievements = [
         description: 'Epic 이상 장비를 5슬롯 모두 장착하세요.',
         icon: '⚡',
         condition: { type: 'epic_full_set', target: 5 },
-        reward: { gold: 1000, badge: true },
+        reward: { points: 1000, badge: true },
         rarity: 'epic'
     },
     {
@@ -220,7 +220,7 @@ export const achievements = [
         description: 'Legendary 장비를 3개 이상 보유하세요.',
         icon: '🏆',
         condition: { type: 'legendary_items', target: 3 },
-        reward: { gold: 2000, badge: true },
+        reward: { points: 2000, badge: true },
         rarity: 'legendary'
     },
     {
@@ -230,7 +230,7 @@ export const achievements = [
         description: '장비 검교정(강화)을 총 10회 성공하세요.',
         icon: '🔧',
         condition: { type: 'calibration_success', target: 10 },
-        reward: { gold: 300, badge: true },
+        reward: { points: 300, badge: true },
         rarity: 'rare'
     },
 
@@ -242,7 +242,7 @@ export const achievements = [
         description: '동료에게 칭찬을 10회 보내세요.',
         icon: '👏',
         condition: { type: 'praise_sent', target: 10 },
-        reward: { gold: 200, badge: true },
+        reward: { points: 200, badge: true },
         rarity: 'common'
     },
     {
@@ -252,7 +252,7 @@ export const achievements = [
         description: '동료로부터 칭찬을 10회 받으세요.',
         icon: '🌟',
         condition: { type: 'praise_received', target: 10 },
-        reward: { gold: 200, badge: true },
+        reward: { points: 200, badge: true },
         rarity: 'common'
     },
     {
@@ -262,7 +262,7 @@ export const achievements = [
         description: '동료로부터 칭찬을 50회 받으세요.',
         icon: '⭐',
         condition: { type: 'praise_received', target: 50 },
-        reward: { gold: 500, badge: true },
+        reward: { points: 500, badge: true },
         rarity: 'rare'
     },
 
@@ -274,7 +274,7 @@ export const achievements = [
         description: '06:00 이전에 퀘스트를 완료한 적이 5회 있으세요.',
         icon: '🌅',
         condition: { type: 'early_bird', target: 5 },
-        reward: { gold: 300, badge: true },
+        reward: { points: 300, badge: true },
         rarity: 'rare',
         hidden: true
     },
@@ -285,7 +285,7 @@ export const achievements = [
         description: '가입 첫날 위험 신고를 1건 완료하세요.',
         icon: '🔰',
         condition: { type: 'first_day_report', target: 1 },
-        reward: { gold: 100, badge: true },
+        reward: { points: 100, badge: true },
         rarity: 'common',
         hidden: true
     },
@@ -296,7 +296,7 @@ export const achievements = [
         description: '22:00 이후에 퀘스트를 완료한 적이 5회 있으세요.',
         icon: '🦉',
         condition: { type: 'night_owl', target: 5 },
-        reward: { gold: 300, badge: true },
+        reward: { points: 300, badge: true },
         rarity: 'rare',
         hidden: true
     },
@@ -307,7 +307,7 @@ export const achievements = [
         description: '일일 퀘스트를 오전 9시 이전에 모두 완료하세요.',
         icon: '⚡',
         condition: { type: 'speed_run', target: 1 },
-        reward: { gold: 500, badge: true },
+        reward: { points: 500, badge: true },
         rarity: 'epic',
         hidden: true
     }

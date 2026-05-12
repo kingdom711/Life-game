@@ -145,7 +145,7 @@ export const claimPathReward = (pathId) => {
     }
 
     // 보상 지급
-    if (path.reward.gold) addPoints(path.reward.gold, '학습 경로 완료', path.title);
+    if (path.reward.points) addPoints(path.reward.points, '학습 경로 완료', path.title);
     if (path.reward.exp) addExperience(path.reward.exp);
 
     progress.rewardClaimed = true;

@@ -51,7 +51,7 @@ function LearningPathPage() {
         if (result.success) {
             setMessage({
                 type: 'success',
-                text: `🎉 경로 완료 보상: ${result.reward.gold}G +${result.reward.exp}EXP "${result.reward.title}"`
+                text: `🎉 경로 완료 보상: ${result.reward.points}P +${result.reward.exp}EXP "${result.reward.title}"`
             });
         }
         loadData();
@@ -149,7 +149,7 @@ function LearningPathPage() {
                                 <div style={{
                                     marginTop: '0.5rem', fontSize: '0.75rem', color: '#94a3b8'
                                 }}>
-                                    완료 보상: {path.reward.gold}G + {path.reward.exp}EXP
+                                    완료 보상: {path.reward.points}P + {path.reward.exp}EXP
                                     {path.reward.title && <span style={{ color: path.color }}> + "{path.reward.title}"</span>}
                                 </div>
                             </div>
@@ -298,7 +298,7 @@ function LearningPathPage() {
                                             학습 경로 완료!
                                         </div>
                                         <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.75rem' }}>
-                                            {selectedPathData.reward.gold}G + {selectedPathData.reward.exp}EXP
+                                            {selectedPathData.reward.points}P + {selectedPathData.reward.exp}EXP
                                             {selectedPathData.reward.title && ` + "${selectedPathData.reward.title}"`}
                                         </div>
                                         <button

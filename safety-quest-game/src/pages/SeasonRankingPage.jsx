@@ -172,7 +172,7 @@ function SeasonRankingPage() {
                                         </div>
                                         <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
                                             {reward.title && <span style={{ color: '#c084fc' }}>{reward.title} + </span>}
-                                            {reward.gold}G + {reward.trophy} 트로피
+                                            {reward.points}P + {reward.trophy} 트로피
                                         </div>
                                     </div>
                                     <div style={{
