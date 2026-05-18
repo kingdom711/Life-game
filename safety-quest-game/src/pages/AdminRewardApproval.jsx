@@ -33,7 +33,7 @@ const TABS = [
 function AdminRewardApproval() {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const isProjectAdmin = user?.role === 'ROLE_PROJECT_ADMIN';
+    const isProjectAdmin = user?.role === 'ROLE_PROJECT_ADMIN' || user?.role === 'ROLE_ADMIN';
 
     const [exchanges, setExchanges] = useState([]);
     const [loading, setLoading] = useState(true);

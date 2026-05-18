@@ -52,6 +52,9 @@ import ComplianceReportPage from './pages/ComplianceReportPage';
 // Components
 import RoleSelector from './components/RoleSelector';
 import Navigation from './components/Navigation';
+import AdminModeSelector from './components/AdminModeSelector';
+import AdminTestToolbar from './components/AdminTestToolbar';
+import AdminDashboardToolbar from './components/AdminDashboardToolbar';
 import WorkStopButton from './components/WorkStopButton'; // [New] 작업중지 플로팅 버튼
 import WorkStopReportModal from './components/WorkStopReportModal'; // [New] 작업중지 신고 모달
 
@@ -64,6 +67,12 @@ import { LanguageProvider } from './context/LanguageContext';
 
 // ...
 
+const ADMIN_ENTRY_MODE_KEY = 'safety_quest_admin_entry_mode';
+const ADMIN_ENTRY_MODES = {
+    ADMIN: 'admin',
+    TEST: 'test',
+};
+
 function App() {
     // 랜딩페이지 활성화
     const [showLandingPage, setShowLandingPage] = useState(true);
@@ -74,13 +83,23 @@ function App() {
     const [isPlayingBgm, setIsPlayingBgm] = useState(false);
     // const [user, setUser] = useState(null); // AuthContext로 대체
     const [selectedRole, setSelectedRole] = useState(null);
+    const [adminEntryMode, setAdminEntryMode] = useState(() => {
+        try {
+            return sessionStorage.getItem(ADMIN_ENTRY_MODE_KEY);
+        } catch (_) {
+            return null;
+        }
+    });
     const [isWorkStopModalOpen, setIsWorkStopModalOpen] = useState(false); // [New] 작업중지 모달
     // const [loading, setLoading] = useState(true); // AuthContext로 대체
 
     const { user, loading } = useAuth();
-    const isProjectAdmin = user?.role === 'ROLE_PROJECT_ADMIN';
-    const teamGate = useTeamGate({ autoLoad: Boolean(user && selectedRole && !isProjectAdmin) });
-    const shouldForceTeamJoin = Boolean(user && selectedRole && !isProjectAdmin && !teamGate.loading && !teamGate.isActive);
+    const isAdminAccount = user?.role === 'ROLE_PROJECT_ADMIN' || user?.role === 'ROLE_ADMIN';
+    const isAdminDashboardMode = isAdminAccount && adminEntryMode === ADMIN_ENTRY_MODES.ADMIN;
+    const isAdminTestMode = isAdminAccount && adminEntryMode === ADMIN_ENTRY_MODES.TEST;
+    const shouldShowAdminModeSelector = isAdminAccount && !adminEntryMode;
+    const teamGate = useTeamGate({ autoLoad: Boolean(user && selectedRole && !isAdminAccount) });
+    const shouldForceTeamJoin = Boolean(user && selectedRole && !isAdminAccount && !teamGate.loading && !teamGate.isActive);
 
     useEffect(() => {
         const initApp = async () => {
@@ -105,7 +124,7 @@ function App() {
                 if (savedRole) {
                     setSelectedRole(savedRole);
                 } else {
-                    setSelectedRole(null);
+                    setSelectedRole(isAdminAccount ? 'technician' : null);
                 }
 
                 // 기존 사용자는 BGM 자동 재생
@@ -122,7 +141,7 @@ function App() {
         if (!loading) {
             initApp();
         }
-    }, [loading, user]);
+    }, [loading, user, isAdminAccount]);
 
     useEffect(() => {
         // 유저가 로그인되어 있으면 랜딩 페이지 닫기
@@ -198,6 +217,19 @@ function App() {
         userProfile.setRole(roleId); // 저장
     };
 
+    const setAdminMode = (mode) => {
+        setAdminEntryMode(mode);
+        try {
+            sessionStorage.setItem(ADMIN_ENTRY_MODE_KEY, mode);
+        } catch (_) {
+            // sessionStorage may be unavailable in restricted browser modes.
+        }
+
+        if (mode === ADMIN_ENTRY_MODES.TEST && !selectedRole) {
+            handleRoleSelect('technician');
+        }
+    };
+
     if (loading) {
         return (
             <div className="loading-container">
@@ -232,7 +264,12 @@ function App() {
                         <Login onSignup={handleSignup} />
                     ) : !user ? (
                         <Signup onSignupComplete={handleSignupComplete} onLogin={handleLogin} />
-                    ) : !selectedRole && !isProjectAdmin ? (
+                    ) : shouldShowAdminModeSelector ? (
+                        <AdminModeSelector
+                            onSelectAdmin={() => setAdminMode(ADMIN_ENTRY_MODES.ADMIN)}
+                            onSelectTest={() => setAdminMode(ADMIN_ENTRY_MODES.TEST)}
+                        />
+                    ) : !selectedRole && !isAdminAccount ? (
                         <RoleSelector onSelectRole={handleRoleSelect} />
                     ) : (
                         <>
@@ -262,9 +299,21 @@ function App() {
                             </div>
 
                             <Navigation />
+                            {isAdminTestMode && (
+                                <AdminTestToolbar
+                                    selectedRole={selectedRole}
+                                    onRoleChange={handleRoleSelect}
+                                    onAdminMode={() => setAdminMode(ADMIN_ENTRY_MODES.ADMIN)}
+                                />
+                            )}
+                            {isAdminDashboardMode && (
+                                <AdminDashboardToolbar
+                                    onTestMode={() => setAdminMode(ADMIN_ENTRY_MODES.TEST)}
+                                />
+                            )}
                             <div className="relative z-10">
                                 <Routes>
-                                    <Route path="/" element={isProjectAdmin ? <Navigate to="/admin" replace /> : <Dashboard role={selectedRole} />} />
+                                    <Route path="/" element={isAdminDashboardMode ? <Navigate to="/admin" replace /> : <Dashboard role={selectedRole || 'technician'} />} />
                                     <Route path="/daily" element={<DailyQuests role={selectedRole} />} />
                                     <Route path="/weekly" element={<WeeklyQuests role={selectedRole} />} />
                                     <Route path="/monthly" element={<MonthlyQuests role={selectedRole} />} />
@@ -300,7 +349,7 @@ function App() {
                             </div>
 
                             {/* [New] 긴급 작업중지 플로팅 버튼 - 모든 화면에서 표시 */}
-                            {!isProjectAdmin && (
+                            {(!isAdminAccount || isAdminTestMode) && (
                                 <>
                                     <WorkStopButton onActivate={() => setIsWorkStopModalOpen(true)} />
                                     <WorkStopReportModal

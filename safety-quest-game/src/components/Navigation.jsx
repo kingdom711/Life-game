@@ -29,7 +29,7 @@ function Navigation() {
 
     const currentRole = userProfile.getRole();
     const isTechnician = currentRole === 'technician';
-    const isProjectAdmin = user?.role === 'ROLE_PROJECT_ADMIN';
+    const isProjectAdmin = user?.role === 'ROLE_PROJECT_ADMIN' || user?.role === 'ROLE_ADMIN';
 
     const navItems = [
         { path: '/education', label: '교육', Icon: BookOpen, active: location.pathname.startsWith('/education') },

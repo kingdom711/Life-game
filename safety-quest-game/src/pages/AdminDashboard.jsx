@@ -15,10 +15,7 @@ import adminApi from '../api/adminApi';
 import { useAuth } from '../context/AuthContext';
 import { EmptyState, LoadingState, ResultNotice } from '../components/PageState';
 
-const canUseAdminDashboard = (user) => {
-    const role = user?.role;
-    return role === 'ROLE_PROJECT_ADMIN';
-};
+const canUseAdminDashboard = (user) => user?.role === 'ROLE_PROJECT_ADMIN' || user?.role === 'ROLE_ADMIN';
 
 const numberFormat = new Intl.NumberFormat('ko-KR');
 
@@ -38,6 +35,23 @@ const quickLinks = [
     { href: '/compliance-report', label: '월간 리포트', Icon: FileSpreadsheet },
 ];
 
+const hazardLabels = {
+    FALL: '추락',
+    COLLAPSE: '붕괴',
+    ELECTRIC: '감전',
+    FIRE: '화재',
+    CHEMICAL: '화학물질',
+    EQUIPMENT: '장비',
+    CONFINED_SPACE: '밀폐공간',
+    OTHER: '기타',
+};
+
+const chartPanelStyle = {
+    borderRadius: 8,
+    padding: '1rem',
+    border: '1px solid rgba(148, 163, 184, 0.18)',
+};
+
 function formatDateTime(value) {
     if (!value) return '';
     return new Date(value).toLocaleString('ko-KR', {
@@ -46,6 +60,93 @@ function formatDateTime(value) {
         hour: '2-digit',
         minute: '2-digit',
     });
+}
+
+function toChartRows(entries, colors) {
+    const rows = entries
+        .map(([key, value], index) => ({
+            key,
+            label: hazardLabels[key] || key,
+            value: Number(value) || 0,
+            color: colors[index % colors.length],
+        }))
+        .filter((item) => item.value > 0)
+        .sort((a, b) => b.value - a.value);
+
+    const max = Math.max(...rows.map((item) => item.value), 0);
+    const total = rows.reduce((sum, item) => sum + item.value, 0);
+
+    return rows.map((item) => ({
+        ...item,
+        total,
+        percent: total > 0 ? Math.round((item.value / total) * 100) : 0,
+        width: max > 0 ? Math.max(8, Math.round((item.value / max) * 100)) : 0,
+    }));
+}
+
+function BarListChart({ rows, emptyTitle }) {
+    if (rows.length === 0) {
+        return <EmptyState icon="-" title={emptyTitle} description="표시할 데이터가 아직 없습니다." />;
+    }
+
+    return (
+        <div style={{ display: 'grid', gap: 12 }}>
+            {rows.map((row) => (
+                <div key={row.key}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
+                        <span style={{ color: '#e2e8f0', fontSize: '0.9rem', fontWeight: 800 }}>{row.label}</span>
+                        <span style={{ color: '#94a3b8', fontSize: '0.82rem', fontWeight: 700 }}>
+                            {numberFormat.format(row.value)}건
+                            {row.percent ? ` · ${row.percent}%` : ''}
+                        </span>
+                    </div>
+                    <div style={{ height: 10, background: 'rgba(15, 23, 42, 0.72)', borderRadius: 999, overflow: 'hidden' }}>
+                        <div
+                            style={{
+                                width: `${row.width}%`,
+                                height: '100%',
+                                borderRadius: 999,
+                                background: row.color,
+                                boxShadow: `0 0 18px ${row.color}55`,
+                            }}
+                        />
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+function SummaryBars({ rows }) {
+    const max = Math.max(...rows.map((item) => item.value), 1);
+
+    return (
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${rows.length}, minmax(0, 1fr))`, gap: 10, minHeight: 180, alignItems: 'end' }}>
+            {rows.map((row) => {
+                const height = row.value > 0 ? Math.max(14, Math.round((row.value / max) * 128)) : 6;
+                return (
+                    <div key={row.key} style={{ display: 'grid', gap: 8, alignContent: 'end', minWidth: 0 }}>
+                        <div style={{ color: '#f8fafc', textAlign: 'center', fontWeight: 900 }}>
+                            {numberFormat.format(row.value)}
+                        </div>
+                        <div
+                            title={`${row.label}: ${row.value}`}
+                            style={{
+                                height,
+                                borderRadius: 8,
+                                background: row.color,
+                                boxShadow: `0 0 22px ${row.color}44`,
+                                transition: 'height 180ms ease',
+                            }}
+                        />
+                        <div style={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: 800, textAlign: 'center', lineHeight: 1.25 }}>
+                            {row.label}
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
 }
 
 function AdminDashboard() {
@@ -86,6 +187,23 @@ function AdminDashboard() {
     const topActions = summary?.actionItems || [];
     const recentActivities = summary?.recentActivities || [];
 
+    const hazardRows = useMemo(() => toChartRows(
+        Object.entries(summary?.workStopByHazardType || {}),
+        ['#ef4444', '#f59e0b', '#38bdf8', '#22c55e', '#a78bfa', '#60a5fa', '#f472b6']
+    ), [summary]);
+
+    const operationsRows = useMemo(() => [
+        { key: 'openWorkStopReports', label: '작업중지', value: metrics.openWorkStopReports || 0, color: '#ef4444' },
+        { key: 'pendingRewardRequests', label: '보상승인', value: metrics.pendingRewardRequests || 0, color: '#f59e0b' },
+        { key: 'openHazardCycles', label: '위험조치', value: metrics.openHazardCycles || 0, color: '#38bdf8' },
+    ], [metrics]);
+
+    const activityRows = useMemo(() => [
+        { key: 'todayEducationCompletions', label: '교육완료', value: metrics.todayEducationCompletions || 0, color: '#22c55e' },
+        { key: 'todayChecklistSubmissions', label: '체크리스트', value: metrics.todayChecklistSubmissions || 0, color: '#a78bfa' },
+        { key: 'todayHazardReports', label: '위험신고', value: metrics.todayHazardReports || 0, color: '#f97316' },
+    ], [metrics]);
+
     if (!allowed) return null;
 
     return (
@@ -104,7 +222,7 @@ function AdminDashboard() {
                             관리자 운영 콘솔
                         </h1>
                         <p style={{ color: '#cbd5e1', marginTop: 8 }}>
-                            오늘 처리할 안전 이슈와 운영 요청을 한 화면에서 확인합니다.
+                            오늘 처리해야 할 안전 이슈와 운영 요청을 한 화면에서 확인합니다.
                         </p>
                     </div>
                     <button
@@ -143,12 +261,8 @@ function AdminDashboard() {
                             marginBottom: 18,
                         }}>
                             {metricConfig.map(({ key, label, Icon, tone }) => (
-                                <div key={key} className="glass-panel" style={{
-                                    borderRadius: 8,
-                                    padding: '1rem',
-                                    border: '1px solid rgba(148, 163, 184, 0.18)',
-                                }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div key={key} className="glass-panel" style={chartPanelStyle}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
                                         <span style={{ color: '#94a3b8', fontSize: '0.82rem', fontWeight: 700 }}>{label}</span>
                                         <Icon size={18} color={tone} />
                                     </div>
@@ -161,19 +275,78 @@ function AdminDashboard() {
 
                         <section style={{
                             display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))',
+                            gap: 16,
+                            marginBottom: 16,
+                        }}>
+                            <div className="glass-panel" style={chartPanelStyle}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 14 }}>
+                                    <h2 style={{ color: '#f8fafc', fontSize: '1.05rem', margin: 0 }}>최근 30일 작업중지 위험 유형</h2>
+                                    <span style={{ color: '#94a3b8', fontSize: '0.78rem' }}>
+                                        총 {numberFormat.format(hazardRows[0]?.total || 0)}건
+                                    </span>
+                                </div>
+                                <BarListChart rows={hazardRows} emptyTitle="작업중지 위험 유형 데이터가 없습니다." />
+                            </div>
+
+                            <div className="glass-panel" style={chartPanelStyle}>
+                                <h2 style={{ color: '#f8fafc', fontSize: '1.05rem', margin: '0 0 14px' }}>운영 처리 현황</h2>
+                                <SummaryBars rows={operationsRows} />
+                            </div>
+                        </section>
+
+                        <section style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
+                            gap: 16,
+                            marginBottom: 16,
+                        }}>
+                            <div className="glass-panel" style={chartPanelStyle}>
+                                <h2 style={{ color: '#f8fafc', fontSize: '1.05rem', margin: '0 0 14px' }}>오늘 현장 활동</h2>
+                                <SummaryBars rows={activityRows} />
+                            </div>
+
+                            <aside className="glass-panel" style={chartPanelStyle}>
+                                <h2 style={{ color: '#f8fafc', fontSize: '1.05rem', margin: '0 0 12px' }}>빠른 작업</h2>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8 }}>
+                                    {quickLinks.map(({ href, label, Icon }) => (
+                                        <Link
+                                            key={href}
+                                            to={href}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 10,
+                                                color: '#e2e8f0',
+                                                textDecoration: 'none',
+                                                padding: '0.75rem',
+                                                borderRadius: 8,
+                                                background: 'rgba(15, 23, 42, 0.5)',
+                                            }}
+                                        >
+                                            <Icon size={17} />
+                                            <span style={{ fontWeight: 800 }}>{label}</span>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </aside>
+                        </section>
+
+                        <section style={{
+                            display: 'grid',
                             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                             gap: 16,
                         }}>
-                            <div className="glass-panel" style={{ borderRadius: 8, padding: '1rem', border: '1px solid rgba(148, 163, 184, 0.18)' }}>
+                            <div className="glass-panel" style={chartPanelStyle}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                                    <h2 style={{ color: '#f8fafc', fontSize: '1.1rem', margin: 0 }}>처리 대기 큐</h2>
+                                    <h2 style={{ color: '#f8fafc', fontSize: '1.1rem', margin: 0 }}>처리 대기</h2>
                                     <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>
                                         {formatDateTime(summary?.generatedAt)} 기준
                                     </span>
                                 </div>
 
                                 {topActions.length === 0 ? (
-                                    <EmptyState icon="✓" title="처리 대기 항목이 없습니다." description="현재 베타 운영 큐가 비어 있습니다." />
+                                    <EmptyState icon="-" title="처리 대기 항목이 없습니다." description="현재 바로 처리해야 할 운영 항목이 없습니다." />
                                 ) : (
                                     <div style={{ display: 'grid', gap: 10 }}>
                                         {topActions.map((item, index) => (
@@ -207,48 +380,21 @@ function AdminDashboard() {
                                 )}
                             </div>
 
-                            <aside style={{ display: 'grid', gap: 16, alignContent: 'start' }}>
-                                <div className="glass-panel" style={{ borderRadius: 8, padding: '1rem', border: '1px solid rgba(148, 163, 184, 0.18)' }}>
-                                    <h2 style={{ color: '#f8fafc', fontSize: '1.05rem', margin: '0 0 12px' }}>빠른 작업</h2>
-                                    <div style={{ display: 'grid', gap: 8 }}>
-                                        {quickLinks.map(({ href, label, Icon }) => (
-                                            <Link
-                                                key={href}
-                                                to={href}
-                                                style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: 10,
-                                                    color: '#e2e8f0',
-                                                    textDecoration: 'none',
-                                                    padding: '0.75rem',
-                                                    borderRadius: 8,
-                                                    background: 'rgba(15, 23, 42, 0.5)',
-                                                }}
-                                            >
-                                                <Icon size={17} />
-                                                <span style={{ fontWeight: 800 }}>{label}</span>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="glass-panel" style={{ borderRadius: 8, padding: '1rem', border: '1px solid rgba(148, 163, 184, 0.18)' }}>
-                                    <h2 style={{ color: '#f8fafc', fontSize: '1.05rem', margin: '0 0 12px' }}>최근 활동</h2>
-                                    <div style={{ display: 'grid', gap: 10 }}>
-                                        {recentActivities.length === 0 ? (
-                                            <p style={{ color: '#94a3b8', margin: 0 }}>최근 활동이 없습니다.</p>
-                                        ) : recentActivities.map((item, index) => (
-                                            <div key={`${item.type}-${item.occurredAt}-${index}`} style={{ borderBottom: '1px solid rgba(148, 163, 184, 0.14)', paddingBottom: 8 }}>
-                                                <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '0.9rem' }}>{item.title}</div>
-                                                <div style={{ color: '#94a3b8', fontSize: '0.78rem', marginTop: 3 }}>
-                                                    {formatDateTime(item.occurredAt)}
-                                                </div>
+                            <div className="glass-panel" style={chartPanelStyle}>
+                                <h2 style={{ color: '#f8fafc', fontSize: '1.05rem', margin: '0 0 12px' }}>최근 활동</h2>
+                                <div style={{ display: 'grid', gap: 10 }}>
+                                    {recentActivities.length === 0 ? (
+                                        <p style={{ color: '#94a3b8', margin: 0 }}>최근 활동이 없습니다.</p>
+                                    ) : recentActivities.map((item, index) => (
+                                        <div key={`${item.type}-${item.occurredAt}-${index}`} style={{ borderBottom: '1px solid rgba(148, 163, 184, 0.14)', paddingBottom: 8 }}>
+                                            <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '0.9rem' }}>{item.title}</div>
+                                            <div style={{ color: '#94a3b8', fontSize: '0.78rem', marginTop: 3 }}>
+                                                {formatDateTime(item.occurredAt)}
                                             </div>
-                                        ))}
-                                    </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            </aside>
+                            </div>
                         </section>
                     </>
                 )}
