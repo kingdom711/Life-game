@@ -298,7 +298,7 @@ function App() {
                                     }} />
                             </div>
 
-                            <Navigation />
+                            <Navigation showAdminLinks={isAdminDashboardMode} />
                             {isAdminTestMode && (
                                 <AdminTestToolbar
                                     selectedRole={selectedRole}
@@ -331,8 +331,14 @@ function App() {
                                     <Route path="/specialization" element={<SpecializationPage role={selectedRole} />} />
                                     <Route path="/specialization/training/:specId" element={<SpecializationTrainingPage />} />
                                     <Route path="/safety-score" element={<SafetyScoreDashboard role={selectedRole} />} />
-                                    <Route path="/admin" element={<AdminDashboard />} />
-                                    <Route path="/admin/reward-approval" element={<AdminRewardApproval />} />
+                                    <Route
+                                        path="/admin"
+                                        element={isAdminDashboardMode ? <AdminDashboard /> : <Navigate to="/" replace />}
+                                    />
+                                    <Route
+                                        path="/admin/reward-approval"
+                                        element={isAdminDashboardMode ? <AdminRewardApproval /> : <Navigate to="/" replace />}
+                                    />
                                     <Route path="/work-stop-history" element={<WorkStopHistoryPage />} />
                                     <Route path="/achievements" element={<AchievementPage />} />
                                     <Route path="/season-ranking" element={<SeasonRankingPage />} />

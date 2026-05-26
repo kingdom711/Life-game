@@ -2,12 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BookOpen, ShieldCheck, Target, Trophy, ShoppingCart, User } from 'lucide-react';
 import { hasCompletedTodayEducation } from '../utils/educationManager';
-import { userProfile } from '../utils/storage';
-import { useAuth } from '../context/AuthContext';
 
-function Navigation() {
+function Navigation({ showAdminLinks = false }) {
     const location = useLocation();
-    const { user } = useAuth();
     const [educationCompleted, setEducationCompleted] = useState(true);
 
     // 교육 완료 여부 체크
@@ -27,10 +24,6 @@ function Navigation() {
         return () => clearInterval(interval);
     }, [location.pathname]);
 
-    const currentRole = userProfile.getRole();
-    const isTechnician = currentRole === 'technician';
-    const isProjectAdmin = user?.role === 'ROLE_PROJECT_ADMIN' || user?.role === 'ROLE_ADMIN';
-
     const navItems = [
         { path: '/education', label: '교육', Icon: BookOpen, active: location.pathname.startsWith('/education') },
         { path: '/daily', label: '퀘스트', Icon: Target, active: location.pathname === '/daily' },
@@ -39,7 +32,7 @@ function Navigation() {
         { path: '/profile', label: '내프로필', Icon: User, active: location.pathname === '/profile' }
     ];
 
-    if (isProjectAdmin) {
+    if (showAdminLinks) {
         navItems.splice(4, 0, {
             path: '/admin',
             label: '관리',
