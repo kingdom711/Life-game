@@ -4,6 +4,8 @@ import {
     AlertTriangle,
     Bell,
     ClipboardCheck,
+    ChevronRight,
+    ExternalLink,
     FileSpreadsheet,
     Gift,
     HardHat,
@@ -149,12 +151,105 @@ function SummaryBars({ rows }) {
     );
 }
 
+function MetricDetailPanel({ metric, items }) {
+    const Icon = metric.Icon;
+    const count = items.length;
+
+    return (
+        <section className="glass-panel" style={{ ...chartPanelStyle, marginBottom: 18 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                    <Icon size={19} color={metric.tone} />
+                    <div style={{ minWidth: 0 }}>
+                        <h2 style={{ color: '#f8fafc', fontSize: '1.05rem', margin: 0 }}>{metric.label} 상세</h2>
+                        <p style={{ color: '#94a3b8', fontSize: '0.82rem', margin: '4px 0 0' }}>
+                            총 {numberFormat.format(count)}개 항목
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {items.length === 0 ? (
+                <EmptyState icon="-" title={`${metric.label} 상세 항목이 없습니다.`} description="표시할 데이터가 아직 없습니다." />
+            ) : (
+                <div style={{ display: 'grid', gap: 8, maxHeight: 360, overflow: 'auto', paddingRight: 4 }}>
+                    {items.map((item, index) => (
+                        <div
+                            key={`${metric.key}-${item.id || index}`}
+                            style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'minmax(0, 1fr) auto',
+                                gap: 12,
+                                alignItems: 'center',
+                                padding: '0.85rem',
+                                borderRadius: 8,
+                                background: 'rgba(15, 23, 42, 0.48)',
+                                border: '1px solid rgba(148, 163, 184, 0.14)',
+                            }}
+                        >
+                            <div style={{ minWidth: 0 }}>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
+                                    <strong style={{ color: '#f8fafc', fontSize: '0.95rem' }}>{item.title || '제목 없음'}</strong>
+                                    {item.status && (
+                                        <span style={{
+                                            color: metric.tone,
+                                            fontSize: '0.74rem',
+                                            fontWeight: 900,
+                                            padding: '0.18rem 0.45rem',
+                                            borderRadius: 999,
+                                            background: `${metric.tone}1f`,
+                                        }}>
+                                            {item.status}
+                                        </span>
+                                    )}
+                                </div>
+                                <div style={{
+                                    color: '#cbd5e1',
+                                    fontSize: '0.84rem',
+                                    marginTop: 5,
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                }}>
+                                    {item.detail || '상세 정보 없음'}
+                                </div>
+                                <div style={{ color: '#94a3b8', fontSize: '0.76rem', marginTop: 5 }}>
+                                    {[item.meta, formatDateTime(item.occurredAt)].filter(Boolean).join(' · ')}
+                                </div>
+                            </div>
+                            {item.href && (
+                                <Link
+                                    to={item.href}
+                                    title="관련 화면 열기"
+                                    style={{
+                                        width: 34,
+                                        height: 34,
+                                        borderRadius: 8,
+                                        display: 'grid',
+                                        placeItems: 'center',
+                                        color: '#e2e8f0',
+                                        background: 'rgba(30, 41, 59, 0.72)',
+                                        border: '1px solid rgba(148, 163, 184, 0.18)',
+                                    }}
+                                >
+                                    <ExternalLink size={16} />
+                                </Link>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
+        </section>
+    );
+}
+
 function AdminDashboard() {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [summary, setSummary] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [activeMetricKey, setActiveMetricKey] = useState('totalUsers');
 
     const allowed = canUseAdminDashboard(user);
 
@@ -184,6 +279,9 @@ function AdminDashboard() {
     }, [allowed]);
 
     const metrics = useMemo(() => summary?.metrics || {}, [summary]);
+    const metricDetails = useMemo(() => summary?.metricDetails || {}, [summary]);
+    const activeMetric = metricConfig.find((metric) => metric.key === activeMetricKey) || metricConfig[0];
+    const activeMetricItems = metricDetails[activeMetric.key] || [];
     const topActions = summary?.actionItems || [];
     const recentActivities = summary?.recentActivities || [];
 
@@ -261,17 +359,34 @@ function AdminDashboard() {
                             marginBottom: 18,
                         }}>
                             {metricConfig.map(({ key, label, Icon, tone }) => (
-                                <div key={key} className="glass-panel" style={chartPanelStyle}>
+                                <button
+                                    key={key}
+                                    type="button"
+                                    onClick={() => setActiveMetricKey(key)}
+                                    className="glass-panel"
+                                    style={{
+                                        ...chartPanelStyle,
+                                        textAlign: 'left',
+                                        cursor: 'pointer',
+                                        background: activeMetricKey === key ? 'rgba(30, 41, 59, 0.88)' : undefined,
+                                        boxShadow: activeMetricKey === key ? `0 0 0 1px ${tone}66, 0 18px 36px rgba(15, 23, 42, 0.25)` : undefined,
+                                    }}
+                                >
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
                                         <span style={{ color: '#94a3b8', fontSize: '0.82rem', fontWeight: 700 }}>{label}</span>
-                                        <Icon size={18} color={tone} />
+                                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                                            <Icon size={18} color={tone} />
+                                            <ChevronRight size={15} color={activeMetricKey === key ? tone : '#64748b'} />
+                                        </span>
                                     </div>
                                     <div style={{ color: '#f8fafc', fontSize: '1.9rem', fontWeight: 900, marginTop: 10 }}>
                                         {numberFormat.format(metrics[key] || 0)}
                                     </div>
-                                </div>
+                                </button>
                             ))}
                         </section>
+
+                        <MetricDetailPanel metric={activeMetric} items={activeMetricItems} />
 
                         <section style={{
                             display: 'grid',
