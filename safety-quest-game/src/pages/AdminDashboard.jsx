@@ -151,9 +151,10 @@ function SummaryBars({ rows }) {
     );
 }
 
-function MetricDetailPanel({ metric, items }) {
+function MetricDetailPanel({ metric, items, expectedCount = 0 }) {
     const Icon = metric.Icon;
     const count = items.length;
+    const hasMissingDetails = count === 0 && expectedCount > 0;
 
     return (
         <section className="glass-panel" style={{ ...chartPanelStyle, marginBottom: 18 }}>
@@ -164,13 +165,20 @@ function MetricDetailPanel({ metric, items }) {
                         <h2 style={{ color: '#f8fafc', fontSize: '1.05rem', margin: 0 }}>{metric.label} 상세</h2>
                         <p style={{ color: '#94a3b8', fontSize: '0.82rem', margin: '4px 0 0' }}>
                             총 {numberFormat.format(count)}개 항목
+                            {hasMissingDetails ? ` / 지표 ${numberFormat.format(expectedCount)}건` : ''}
                         </p>
                     </div>
                 </div>
             </div>
 
             {items.length === 0 ? (
-                <EmptyState icon="-" title={`${metric.label} 상세 항목이 없습니다.`} description="표시할 데이터가 아직 없습니다." />
+                <EmptyState
+                    icon="!"
+                    title={`${metric.label} 상세 항목이 없습니다.`}
+                    description={hasMissingDetails
+                        ? '지표 숫자는 있지만 상세 목록이 응답에 없습니다. 백엔드가 최신 버전인지 확인한 뒤 다시 새로고침해 주세요.'
+                        : '표시할 데이터가 아직 없습니다.'}
+                />
             ) : (
                 <div style={{ display: 'grid', gap: 8, maxHeight: 360, overflow: 'auto', paddingRight: 4 }}>
                     {items.map((item, index) => (
@@ -386,7 +394,11 @@ function AdminDashboard() {
                             ))}
                         </section>
 
-                        <MetricDetailPanel metric={activeMetric} items={activeMetricItems} />
+                        <MetricDetailPanel
+                            metric={activeMetric}
+                            items={activeMetricItems}
+                            expectedCount={metrics[activeMetric.key] || 0}
+                        />
 
                         <section style={{
                             display: 'grid',
