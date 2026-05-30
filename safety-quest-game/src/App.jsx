@@ -33,6 +33,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminRewardApproval from './pages/AdminRewardApproval';
 import WorkStopHistoryPage from './pages/WorkStopHistoryPage'; // [New] 작업중지 이력
 import AchievementPage from './pages/AchievementPage'; // [Phase1] 업적
+import GrowthReportPage from './pages/GrowthReportPage';
 
 // [Phase1] 팀 상세
 import TeamDetailPage from './pages/TeamDetailPage';
@@ -94,6 +95,7 @@ function App() {
     // const [loading, setLoading] = useState(true); // AuthContext로 대체
 
     const { user, loading } = useAuth();
+    const isProjectAdminAccount = user?.role === 'ROLE_PROJECT_ADMIN';
     const isAdminAccount = user?.role === 'ROLE_PROJECT_ADMIN' || user?.role === 'ROLE_ADMIN';
     const isAdminDashboardMode = isAdminAccount && adminEntryMode === ADMIN_ENTRY_MODES.ADMIN;
     const isAdminTestMode = isAdminAccount && adminEntryMode === ADMIN_ENTRY_MODES.TEST;
@@ -298,7 +300,10 @@ function App() {
                                     }} />
                             </div>
 
-                            <Navigation showAdminLinks={isAdminDashboardMode} />
+                            <Navigation
+                                showAdminLinks={isAdminDashboardMode}
+                                showReportLink={isProjectAdminAccount && isAdminDashboardMode}
+                            />
                             {isAdminTestMode && (
                                 <AdminTestToolbar
                                     selectedRole={selectedRole}
@@ -341,6 +346,10 @@ function App() {
                                     />
                                     <Route path="/work-stop-history" element={<WorkStopHistoryPage />} />
                                     <Route path="/achievements" element={<AchievementPage />} />
+                                    <Route
+                                        path="/reports"
+                                        element={isProjectAdminAccount ? <GrowthReportPage /> : <Navigate to="/" replace />}
+                                    />
                                     <Route path="/season-ranking" element={<SeasonRankingPage />} />
                                     <Route path="/learning-path" element={<LearningPathPage />} />
                                     <Route path="/my-team" element={<TeamDetailPage />} />

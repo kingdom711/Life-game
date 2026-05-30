@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, ShieldCheck, Target, Trophy, ShoppingCart, User } from 'lucide-react';
+import { BookOpen, ShieldCheck, Target, Trophy, ShoppingCart, User, BarChart3 } from 'lucide-react';
 import { hasCompletedTodayEducation } from '../utils/educationManager';
 
-function Navigation({ showAdminLinks = false }) {
+function Navigation({ showAdminLinks = false, showReportLink = false }) {
     const location = useLocation();
     const [educationCompleted, setEducationCompleted] = useState(true);
 
@@ -31,6 +31,15 @@ function Navigation({ showAdminLinks = false }) {
         { path: '/shop', label: '상점', Icon: ShoppingCart, active: location.pathname === '/shop' },
         { path: '/profile', label: '내프로필', Icon: User, active: location.pathname === '/profile' }
     ];
+
+    if (showReportLink) {
+        navItems.splice(2, 0, {
+            path: '/reports',
+            label: '리포트',
+            Icon: BarChart3,
+            active: location.pathname === '/reports'
+        });
+    }
 
     if (showAdminLinks) {
         navItems.splice(4, 0, {
