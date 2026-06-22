@@ -2,6 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import authApi from '../api/authApi';
 import gameProfileApi from '../api/gameProfileApi';
 import { userProfile, storage } from '../utils/storage';
+import {
+    pullAndRestoreSnapshot,
+    bindSnapshotFlushOnUnload,
+} from '../utils/gameStateSnapshot';
 
 const AuthContext = createContext(null);
 const AUTH_BYPASS_ENABLED = import.meta.env.DEV && import.meta.env.VITE_DISABLE_AUTH === 'true';
@@ -127,8 +131,19 @@ const applyUserScope = (userData) => {
 const syncGameData = async () => {
     try {
         const gameData = await gameProfileApi.fetchFullGameData();
+        const hasServerProgress =
+            gameData?.profile &&
+            (
+                gameData.profile.level > 1 ||
+                gameData.profile.exp > 0 ||
+                gameData.profile.expToNext !== 100 ||
+                gameData.profile.gameRole ||
+                gameData.profile.activeSpecialization ||
+                (gameData.points?.balance || 0) > 0 ||
+                (gameData.streak?.currentStreak || 0) > 0
+            );
 
-        if (gameData && gameData.profile && gameData.profile.level > 1) {
+        if (hasServerProgress) {
             // 서버에 진행된 데이터가 있으면 → localStorage에 반영
             hydrateLocalStorage(gameData);
         } else {
@@ -142,6 +157,9 @@ const syncGameData = async () => {
                 }
             }
         }
+
+        // ⭐ 정규화 안 된 durable 데이터(인벤토리/검교정/퀘스트진행/출석/교육 등) 스냅샷 복원
+        await pullAndRestoreSnapshot();
     } catch (err) {
         console.warn('[AuthContext] 게임 데이터 동기화 실패 (오프라인 모드 유지):', err.message);
     }
@@ -167,6 +185,11 @@ export const AuthProvider = ({ children }) => {
         }
         return userData;
     };
+
+    // 페이지 종료 시 스냅샷 백업 보장 (앱 1회 등록)
+    useEffect(() => {
+        bindSnapshotFlushOnUnload();
+    }, []);
 
     // Check for existing session on mount
     useEffect(() => {

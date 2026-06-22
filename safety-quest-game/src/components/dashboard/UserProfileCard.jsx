@@ -13,19 +13,14 @@ const ROLE_LABELS = {
 function UserProfileCard({ playerStats, role, equippedItems, educationCompleted }) {
     const { user } = useAuth();
     const teamGate = useTeamGate({ autoLoad: Boolean(user) });
-    const pointsValue = Number(playerStats?.points || 0);
-    const levelInfo = playerStats?.level || {};
-    const levelProgress = Number.isFinite(levelInfo.progress) ? levelInfo.progress : 0;
-    const levelRank = levelInfo.rank || 1;
+    const experience = playerStats?.experience || {};
+    const numericLevel = Number(experience.current || 1);
+    const currentExp = Number(experience.exp || 0);
+    const expToNext = Number(experience.expToNext || 100);
+    const expProgress = expToNext > 0 ? Math.round((currentExp / expToNext) * 100) : 0;
     const displayName = userProfile.getName() || user?.name || '사용자';
     const teamName = teamGate.team?.name || user?.team?.name || '';
     const siteName = teamGate.team?.siteName || user?.team?.siteName || '';
-
-    const currentXP = pointsValue;
-    const levelMax = levelInfo.max || 3000;
-    const levelMin = levelInfo.min || 0;
-    const xpInLevel = currentXP - levelMin;
-    const xpNeeded = levelMax - levelMin;
 
     return (
         <div className="new-profile-card">
@@ -36,7 +31,7 @@ function UserProfileCard({ playerStats, role, equippedItems, educationCompleted 
                             <Avatar size={48} roleId={role} equippedItems={equippedItems || {}} />
                         </div>
                         <span className="new-profile-level-badge">
-                            {levelRank}
+                            {numericLevel}
                         </span>
                     </Link>
                     <div className="new-profile-identity">
@@ -62,15 +57,15 @@ function UserProfileCard({ playerStats, role, equippedItems, educationCompleted 
             <div className="new-profile-stats-row">
                 <div className="new-profile-level-section">
                     <div className="new-profile-level-label">
-                        Lv.{levelRank}
+                        Lv.{numericLevel}
                         <span className="new-profile-xp-text">
-                            {xpInLevel.toLocaleString()} / {xpNeeded.toLocaleString()} XP
+                            {currentExp.toLocaleString()} / {expToNext.toLocaleString()} EXP
                         </span>
                     </div>
                     <div className="new-profile-xp-bar">
                         <div
                             className="new-profile-xp-fill"
-                            style={{ width: `${Math.max(0, Math.min(100, levelProgress))}%` }}
+                            style={{ width: `${Math.max(0, Math.min(100, expProgress))}%` }}
                         />
                     </div>
                 </div>

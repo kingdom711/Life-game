@@ -110,7 +110,13 @@ function Profile({ role }) {
                     <div className="card-body">
                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', marginBottom: '1rem' }}>
                             <div>
-                                <div className="text-muted">현재 레벨</div>
+                                <div className="text-muted">성장 레벨</div>
+                                <div style={{ fontSize: '1.4rem', fontWeight: 800 }}>
+                                    Lv.{stats.level.current || 1}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-muted">포인트 등급</div>
                                 <div style={{ fontSize: '1.4rem', fontWeight: 800, color: stats.level.color }}>
                                     {stats.level.name}
                                 </div>

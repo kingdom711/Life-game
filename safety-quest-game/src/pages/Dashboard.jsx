@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { points, streak, dailyQuestInstances, userProfile, getKSTDateString, questProgress, dailyQuestSnapshots, monthlyAttendance } from '../utils/storage';
+import { points, level, streak, dailyQuestInstances, userProfile, getKSTDateString, questProgress, dailyQuestSnapshots, monthlyAttendance } from '../utils/storage';
 import { calculateLevel } from '../utils/pointsCalculator';
 import { getQuestsByTypeRoleAndSpec } from '../data/questsData';
 import { getAllEquippedItems } from '../utils/inventoryManager';
@@ -117,6 +117,11 @@ function Dashboard({ role }) {
             rank: 1,
             totalRanks: 15
         },
+        experience: {
+            current: 1,
+            exp: 0,
+            expToNext: 100
+        },
         streak: { current: 0 }
     });
 
@@ -228,6 +233,7 @@ function Dashboard({ role }) {
         // localStorage?먯꽌 利됱떆 濡쒕뱶 (鍮좊Ⅸ UI ?쒖떆)
         const currentPoints = points.get();
         const currentLevel = calculateLevel(currentPoints);
+        const currentExperience = level.get();
         const currentStreak = streak.get();
         const equipped = getAllEquippedItems();
         const activeSpec = getActiveSpecialization();
@@ -236,6 +242,7 @@ function Dashboard({ role }) {
         setPlayerStats({
             points: currentPoints,
             level: currentLevel,
+            experience: currentExperience,
             streak: currentStreak
         });
         setEquippedItems(equipped);
@@ -317,6 +324,7 @@ function Dashboard({ role }) {
                     ...prev,
                     points: syncedPoints,
                     level: calculateLevel(syncedPoints),
+                    experience: level.get(),
                     streak: syncedStreak
                 }));
             } catch (err) {

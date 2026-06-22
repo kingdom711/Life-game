@@ -37,7 +37,7 @@ function getRankValueDisplay(entry, type) {
         case 'points':
             return `${(entry.points || 0).toLocaleString()}P`;
         case 'level':
-            return entry.level?.name || '';
+            return `Lv.${entry.level || 1}`;
         case 'streak':
             return `${entry.streak || 0}일`;
         default:
@@ -109,7 +109,7 @@ function TeamRankingSidebar({ onShowLeaderboard = () => {} }) {
                                 <span className="podium-crown" aria-hidden="true">
                                     {getCrown(entry.rank)}
                                 </span>
-                                <div className="podium-avatar">{entry.level?.tierIcon || entry.name.slice(0, 1)}</div>
+                                <div className="podium-avatar">{entry.levelTier?.tierIcon || entry.name.slice(0, 1)}</div>
                                 <span className="podium-name">{entry.name}</span>
                                 <span className="podium-role">{ROLE_LABELS[entry.role] || '기술자'}</span>
                                 <div className="podium-block" style={{ height: getPodiumHeight(entry.rank) }}>

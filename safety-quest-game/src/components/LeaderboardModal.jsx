@@ -39,7 +39,7 @@ const VIEW_MODES = [
 ];
 
 function getRankValueDisplay(entry, type) {
-    if (type === 'level') return entry.level?.name || '-';
+    if (type === 'level') return `Lv.${entry.level || 1}`;
     if (type === 'streak') return `${entry.streak || 0}일`;
     return `${(entry.points || 0).toLocaleString()}P`;
 }
@@ -319,7 +319,7 @@ function LeaderboardModal({ isOpen, onClose = () => {} }) {
                                                         minWidth: 0
                                                     }}
                                                 >
-                                                    <span>{entry.level?.tierIcon || '👤'}</span>
+                                                    <span>{entry.levelTier?.tierIcon || '👤'}</span>
                                                     <span
                                                         style={{
                                                             color: '#f8fafc',
@@ -429,4 +429,3 @@ function LeaderboardModal({ isOpen, onClose = () => {} }) {
 }
 
 export default LeaderboardModal;
-

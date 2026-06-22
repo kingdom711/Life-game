@@ -15,7 +15,8 @@ function DashboardHeader({ playerStats, role, activeWorkStopCount = 0, unreadNot
     });
 
     const teamLabel = teamGate.team?.name || (teamGate.isPending ? '팀 승인 대기' : '팀 미설정');
-    const levelName = playerStats?.level?.name || 'Lv.1';
+    const levelName = playerStats?.level?.name || 'Bronze III';
+    const numericLevel = Number(playerStats?.experience?.current || 1);
     const streakDays = Number(playerStats?.streak?.current || 0);
     const roleLabel = ROLE_LABELS[role] || '기술인';
 
@@ -109,7 +110,7 @@ function DashboardHeader({ playerStats, role, activeWorkStopCount = 0, unreadNot
                 <span className="dash-hero-meta-sep">·</span>
                 <span className="dash-hero-meta-item">
                     <span className="dash-hero-meta-icon">⚡</span>
-                    {levelName}
+                    Lv.{numericLevel} · {levelName}
                 </span>
                 <span className="dash-hero-meta-sep">·</span>
                 <span className="dash-hero-meta-item dash-hero-meta-role">

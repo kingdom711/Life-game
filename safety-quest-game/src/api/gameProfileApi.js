@@ -82,6 +82,27 @@ const gameProfileApi = {
      */
     syncLocalData: async (data) => {
         return apiClient.post('/game-profile/me/sync', data);
+    },
+
+    /**
+     * ⭐ 게임 상태 스냅샷 조회 (정규화 안 된 durable 데이터 복원용)
+     * @returns {Promise<{payload, clientUpdatedAt, version, applied} | null>}
+     */
+    fetchStateSnapshot: async () => {
+        try {
+            return await apiClient.get('/game-profile/me/state-snapshot');
+        } catch (err) {
+            console.warn('[GameProfile] 스냅샷 조회 실패:', err.message);
+            return null;
+        }
+    },
+
+    /**
+     * ⭐ 게임 상태 스냅샷 저장 (durable 데이터 백업)
+     * @param {{payload: string, clientUpdatedAt: number}} data
+     */
+    pushStateSnapshot: async (data) => {
+        return apiClient.put('/game-profile/me/state-snapshot', data);
     }
 };
 

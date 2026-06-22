@@ -278,6 +278,10 @@ export const storage = {
         try {
             const serialized = JSON.stringify(value);
             localStorage.setItem(buildScopedKey(key), serialized);
+            // durable 데이터 변경 알림 (gameStateSnapshot이 구독하여 디바운스 백업)
+            if (typeof window !== 'undefined' && typeof key === 'string' && key.startsWith('safety_quest_')) {
+                window.dispatchEvent(new CustomEvent('safety_quest_storage_write', { detail: { key } }));
+            }
             return true;
         } catch (error) {
             console.error('Error saving to localStorage:', error);

@@ -348,7 +348,7 @@ function App() {
                                     <Route path="/achievements" element={<AchievementPage />} />
                                     <Route
                                         path="/reports"
-                                        element={isProjectAdminAccount ? <GrowthReportPage /> : <Navigate to="/" replace />}
+                                        element={isProjectAdminAccount && isAdminDashboardMode ? <GrowthReportPage /> : <Navigate to="/" replace />}
                                     />
                                     <Route path="/season-ranking" element={<SeasonRankingPage />} />
                                     <Route path="/learning-path" element={<LearningPathPage />} />

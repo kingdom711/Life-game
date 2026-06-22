@@ -57,6 +57,7 @@ function toDisplayName(apiEntry) {
 
 function normalizeApiRankingEntry(apiEntry, currentUserId) {
     const normalizedPoints = toSafeNumber(apiEntry?.points, 0);
+    const numericLevel = toSafeNumber(apiEntry?.level, 1);
     const resolvedUserId =
         apiEntry?.userId ||
         apiEntry?.id ||
@@ -71,7 +72,8 @@ function normalizeApiRankingEntry(apiEntry, currentUserId) {
         name: toDisplayName(apiEntry),
         role: normalizeRole(apiEntry?.role || apiEntry?.user?.role),
         points: normalizedPoints,
-        level: calculateLevel(normalizedPoints),
+        level: numericLevel,
+        levelTier: calculateLevel(normalizedPoints),
         streak: normalizedStreak,
         isCurrentUser: currentUserId ? String(resolvedUserId) === String(currentUserId) : false,
         rankChange: null

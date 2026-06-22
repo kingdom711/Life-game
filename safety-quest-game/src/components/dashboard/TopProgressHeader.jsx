@@ -22,6 +22,8 @@ function TopProgressHeader({ playerStats, role, onPointsClick, equippedItems, on
     const pointsValue = Number(playerStats?.points || 0);
     const levelInfo = playerStats?.level || {};
     const levelName = levelInfo.name || 'Bronze III';
+    const experience = playerStats?.experience || {};
+    const numericLevel = Number(experience.current || 1);
     const levelColor = levelInfo.color || '#22c55e';
     const levelProgress = Number.isFinite(levelInfo.progress) ? levelInfo.progress : 0;
     const streakDays = Number(playerStats?.streak?.current || 0);
@@ -50,7 +52,7 @@ function TopProgressHeader({ playerStats, role, onPointsClick, equippedItems, on
                                 <div className="top-progress-user-line">{displayName}</div>
                             </Link>
                             <div className="top-progress-profile-content">
-                                <div className="top-progress-level-line">Level: {levelName}</div>
+                                <div className="top-progress-level-line">Lv.{numericLevel} · {levelName}</div>
                                 <div className="top-progress-level-track" aria-label="Level progress">
                                     <span
                                         className="top-progress-level-fill"
