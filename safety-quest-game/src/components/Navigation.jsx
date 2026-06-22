@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, ShieldCheck, Target, Trophy, ShoppingCart, User, BarChart3 } from 'lucide-react';
+import { BookOpen, ShieldCheck, Target, Trophy, ShoppingCart, User, BarChart3, MessageSquare } from 'lucide-react';
 import { hasCompletedTodayEducation } from '../utils/educationManager';
 
 function Navigation({ showAdminLinks = false, showReportLink = false }) {
@@ -28,6 +28,7 @@ function Navigation({ showAdminLinks = false, showReportLink = false }) {
         { path: '/education', label: '교육', Icon: BookOpen, active: location.pathname.startsWith('/education') },
         { path: '/daily', label: '퀘스트', Icon: Target, active: location.pathname === '/daily' },
         { path: '/achievements', label: '업적', Icon: Trophy, active: location.pathname === '/achievements' },
+        { path: '/feedback', label: '게시판', Icon: MessageSquare, active: location.pathname === '/feedback' },
         { path: '/shop', label: '상점', Icon: ShoppingCart, active: location.pathname === '/shop' },
         { path: '/profile', label: '내프로필', Icon: User, active: location.pathname === '/profile' }
     ];
@@ -43,10 +44,16 @@ function Navigation({ showAdminLinks = false, showReportLink = false }) {
 
     if (showAdminLinks) {
         navItems.splice(4, 0, {
+            path: '/admin/feedback',
+            label: '의견관리',
+            Icon: ShieldCheck,
+            active: location.pathname.startsWith('/admin/feedback')
+        });
+        navItems.splice(5, 0, {
             path: '/admin',
             label: '관리',
             Icon: ShieldCheck,
-            active: location.pathname.startsWith('/admin')
+            active: location.pathname === '/admin' || location.pathname === '/admin/reward-approval'
         });
     }
 

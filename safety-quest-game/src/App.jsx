@@ -34,6 +34,7 @@ import AdminRewardApproval from './pages/AdminRewardApproval';
 import WorkStopHistoryPage from './pages/WorkStopHistoryPage'; // [New] 작업중지 이력
 import AchievementPage from './pages/AchievementPage'; // [Phase1] 업적
 import GrowthReportPage from './pages/GrowthReportPage';
+import FeedbackBoard from './pages/FeedbackBoard';
 
 // [Phase1] 팀 상세
 import TeamDetailPage from './pages/TeamDetailPage';
@@ -330,6 +331,7 @@ function App() {
                                     <Route path="/hazard-ack/:cycleId" element={<HazardCycleAckPage />} />
                                     <Route path="/inventory" element={<Inventory />} />
                                     <Route path="/profile" element={<Profile role={selectedRole} />} />
+                                    <Route path="/feedback" element={<FeedbackBoard />} />
                                     <Route path="/risk-solution" element={<RiskSolutionPage />} />
                                     <Route path="/alert-management" element={<AlertManagement role={selectedRole} />} />
                                     <Route path="/education" element={<EducationPage />} />
@@ -343,6 +345,10 @@ function App() {
                                     <Route
                                         path="/admin/reward-approval"
                                         element={isAdminDashboardMode ? <AdminRewardApproval /> : <Navigate to="/" replace />}
+                                    />
+                                    <Route
+                                        path="/admin/feedback"
+                                        element={isAdminDashboardMode ? <FeedbackBoard /> : <Navigate to="/" replace />}
                                     />
                                     <Route path="/work-stop-history" element={<WorkStopHistoryPage />} />
                                     <Route path="/achievements" element={<AchievementPage />} />
