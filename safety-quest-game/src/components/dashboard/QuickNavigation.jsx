@@ -2,12 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import {
   BookOpen, Target, Bot, ShoppingCart, Gift,
   Trophy, Route, Users, Swords, Newspaper,
-  Thermometer, Clapperboard, BarChart2
+  Thermometer, Clapperboard, BarChart2, MessageSquare
 } from 'lucide-react';
 
 const NAV_ITEMS = [
     { path: '/education',        label: '교육',      Icon: BookOpen,     color: '#3b82f6' },
     { path: '/daily',            label: '퀘스트',    Icon: Target,       color: '#22c55e' },
+    { path: '/feedback',         label: '게시판',    Icon: MessageSquare,color: '#0ea5e9' },
     { path: '/safety-score',     label: 'AI 분석',   Icon: Bot,          color: '#8b5cf6' },
     { path: '/shop',             label: '상점',      Icon: ShoppingCart, color: '#f59e0b' },
     { path: '/reward-center',    label: '보상센터',   Icon: Gift,         color: '#ec4899' },

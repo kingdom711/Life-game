@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { FlaskConical } from 'lucide-react';
+import { FlaskConical, MessageSquare } from 'lucide-react';
 
 function AdminDashboardToolbar({ onTestMode }) {
     const navigate = useNavigate();
@@ -23,8 +23,28 @@ function AdminDashboardToolbar({ onTestMode }) {
                 maxWidth: 1180,
                 margin: '0 auto',
                 display: 'flex',
+                gap: 8,
                 justifyContent: 'flex-end',
             }}>
+                <button
+                    type="button"
+                    onClick={() => navigate('/admin/feedback')}
+                    style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        border: '1px solid rgba(14, 165, 233, 0.38)',
+                        background: 'rgba(14, 165, 233, 0.16)',
+                        color: '#e0f2fe',
+                        borderRadius: 8,
+                        padding: '0.5rem 0.75rem',
+                        fontWeight: 900,
+                        cursor: 'pointer',
+                    }}
+                >
+                    <MessageSquare size={16} />
+                    의견관리
+                </button>
                 <button
                     type="button"
                     onClick={handleTestMode}
