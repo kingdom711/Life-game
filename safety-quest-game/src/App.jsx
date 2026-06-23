@@ -15,6 +15,7 @@ import Inventory from './pages/Inventory';
 import Profile from './pages/Profile';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
 import LandingPage from './pages/LandingPage';
 import TeamPage from './pages/TeamPage';
 import PricingPage from './pages/PricingPage';
@@ -76,11 +77,13 @@ const ADMIN_ENTRY_MODES = {
 };
 
 function App() {
+    const initialPasswordResetPath = window.location.pathname === '/forgot-password' || window.location.pathname === '/reset-password';
     // 랜딩페이지 활성화
-    const [showLandingPage, setShowLandingPage] = useState(true);
+    const [showLandingPage, setShowLandingPage] = useState(!initialPasswordResetPath);
     const [showTeamPage, setShowTeamPage] = useState(false);
     const [showPricingPage, setShowPricingPage] = useState(false);
     const [showLoginPage, setShowLoginPage] = useState(false);
+    const [showForgotPasswordPage, setShowForgotPasswordPage] = useState(initialPasswordResetPath);
     const [showLaunchScreen, setShowLaunchScreen] = useState(false);
     const [isPlayingBgm, setIsPlayingBgm] = useState(false);
     // const [user, setUser] = useState(null); // AuthContext로 대체
@@ -177,9 +180,18 @@ function App() {
 
     const handleLogin = () => {
         setShowLandingPage(false);
+        setShowForgotPasswordPage(false);
         setShowLoginPage(true);
+        window.history.replaceState({}, '', '/');
         // setShowLaunchScreen(true); // LaunchScreen 건너뛰기
         // setIsPlayingBgm(true); // 바로 게임 시작
+    };
+
+    const handleForgotPassword = () => {
+        setShowLandingPage(false);
+        setShowLoginPage(false);
+        setShowForgotPasswordPage(true);
+        window.history.replaceState({}, '', '/forgot-password');
     };
 
     const handleSelectPlan = ({ plan, userData }) => {
@@ -199,7 +211,9 @@ function App() {
 
     const handleSignup = () => {
         setShowLandingPage(false); // Ensure Landing is off
+        setShowForgotPasswordPage(false);
         setShowLoginPage(false); // Hide Login, falling through to Signup
+        window.history.replaceState({}, '', '/');
     };
 
     const handleStartGame = () => {
@@ -263,8 +277,13 @@ function App() {
                         <PricingPage onSelectPlan={handleSelectPlan} onBack={handleBackFromPricing} />
                     ) : showLaunchScreen ? (
                         <LaunchScreen onStart={handleStartGame} />
+                    ) : showForgotPasswordPage && !user ? (
+                        <ForgotPassword
+                            initialMode={window.location.pathname === '/reset-password' ? 'reset' : 'request'}
+                            onLogin={handleLogin}
+                        />
                     ) : showLoginPage && !user ? (
-                        <Login onSignup={handleSignup} />
+                        <Login onSignup={handleSignup} onForgotPassword={handleForgotPassword} />
                     ) : !user ? (
                         <Signup onSignupComplete={handleSignupComplete} onLogin={handleLogin} />
                     ) : shouldShowAdminModeSelector ? (

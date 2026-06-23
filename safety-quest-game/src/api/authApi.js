@@ -92,7 +92,7 @@ const authApi = {
     
     /**
      * 비밀번호 재설정
-     * @param {object} data - { token, newPassword }
+     * @param {object} data - { email, code, newPassword }
      */
     resetPassword: async (data) => {
         return apiClient.post('/auth/password-reset/confirm', data);

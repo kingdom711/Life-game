@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import AuthLayout from '../components/auth/AuthLayout';
 import IconInput from '../components/auth/IconInput';
 
-const Login = ({ onSignup }) => {
+const Login = ({ onSignup, onForgotPassword }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -66,6 +66,16 @@ const Login = ({ onSignup }) => {
                         placeholder="비밀번호 입력"
                         required
                     />
+
+                    <div className="auth-form__helper-action">
+                        <button
+                            type="button"
+                            onClick={onForgotPassword}
+                            className="auth-form__link"
+                        >
+                            비밀번호 찾기
+                        </button>
+                    </div>
 
                     <button
                         type="submit"
