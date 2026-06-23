@@ -11,6 +11,7 @@ const ForgotPassword = ({ initialMode = 'request', onLogin }) => {
     const [code, setCode] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [issuedCode, setIssuedCode] = useState('');
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -27,9 +28,16 @@ const ForgotPassword = ({ initialMode = 'request', onLogin }) => {
 
         setIsLoading(true);
         try {
-            await authApi.requestPasswordReset(email.trim());
+            const response = await authApi.requestPasswordReset(email.trim());
             setMode('reset');
-            setMessage('가입된 이메일이면 인증 코드가 발송됩니다. 메일함에서 6자리 코드를 확인해주세요.');
+            if (response?.codeVisible && response?.resetCode) {
+                setIssuedCode(response.resetCode);
+                setCode(response.resetCode);
+                setMessage(response.message || '인증 코드가 발급되었습니다.');
+            } else {
+                setIssuedCode('');
+                setMessage(response?.message || '가입된 이메일이면 인증 코드가 발송됩니다. 메일함에서 6자리 코드를 확인해주세요.');
+            }
         } catch (err) {
             setError(err.message || '인증 코드 요청에 실패했습니다.');
         } finally {
@@ -65,6 +73,7 @@ const ForgotPassword = ({ initialMode = 'request', onLogin }) => {
                 newPassword,
             });
             setMessage('비밀번호가 변경되었습니다. 새 비밀번호로 로그인해주세요.');
+            setIssuedCode('');
             setCode('');
             setNewPassword('');
             setConfirmPassword('');
@@ -113,6 +122,13 @@ const ForgotPassword = ({ initialMode = 'request', onLogin }) => {
 
                     {mode === 'reset' && (
                         <>
+                            {issuedCode && (
+                                <div className="auth-form__issued-code" aria-label="발급된 인증 코드">
+                                    <span className="auth-form__issued-code-label">발급된 인증 코드</span>
+                                    <strong>{issuedCode}</strong>
+                                </div>
+                            )}
+
                             <IconInput
                                 id="reset-code"
                                 label="인증 코드"

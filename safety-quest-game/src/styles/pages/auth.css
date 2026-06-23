@@ -240,6 +240,28 @@
   font-size: var(--font-size-sm);
 }
 
+.auth-form__issued-code {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  background: rgba(251, 191, 36, 0.1);
+  color: var(--color-text);
+}
+
+.auth-form__issued-code-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.auth-form__issued-code strong {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 1.75rem;
+  letter-spacing: 0.16em;
+  color: var(--color-warning-light);
+}
+
 .auth-form__link {
   color: var(--color-primary-light);
   font-weight: 600;
