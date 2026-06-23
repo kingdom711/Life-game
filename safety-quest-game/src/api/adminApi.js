@@ -28,6 +28,18 @@ const adminApi = {
         const query = search.toString();
         return apiClient.get(`/admin/dashboard/points${query ? `?${query}` : ''}`);
     },
+
+    getPasswordResetRequests: async (pendingOnly = true) => {
+        return apiClient.get(`/admin/password-reset-requests?pendingOnly=${pendingOnly}`);
+    },
+
+    approvePasswordResetRequest: async (requestId) => {
+        return apiClient.post(`/admin/password-reset-requests/${requestId}/approve`, {});
+    },
+
+    rejectPasswordResetRequest: async (requestId, reason) => {
+        return apiClient.post(`/admin/password-reset-requests/${requestId}/reject`, { reason });
+    },
 };
 
 export default adminApi;

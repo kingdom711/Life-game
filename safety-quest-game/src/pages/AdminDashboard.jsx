@@ -34,6 +34,7 @@ const metricConfig = [
 const quickLinks = [
     { href: '/alert-management', label: '알림 작성', Icon: Bell },
     { href: '/admin/reward-approval', label: '보상 승인', Icon: Gift },
+    { href: '/admin/password-reset-requests', label: '비밀번호 승인', Icon: ShieldCheck },
     { href: '/work-stop-history', label: '작업중지 관리', Icon: AlertTriangle },
     { href: '/compliance-report', label: '월간 리포트', Icon: FileSpreadsheet },
 ];

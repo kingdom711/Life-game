@@ -32,6 +32,7 @@ import CycleHistoryPage from './pages/CycleHistoryPage';
 import SafetyScoreDashboard from './pages/SafetyScoreDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminRewardApproval from './pages/AdminRewardApproval';
+import AdminPasswordResetApproval from './pages/AdminPasswordResetApproval';
 import WorkStopHistoryPage from './pages/WorkStopHistoryPage'; // [New] 작업중지 이력
 import AchievementPage from './pages/AchievementPage'; // [Phase1] 업적
 import GrowthReportPage from './pages/GrowthReportPage';
@@ -364,6 +365,10 @@ function App() {
                                     <Route
                                         path="/admin/reward-approval"
                                         element={isAdminDashboardMode ? <AdminRewardApproval /> : <Navigate to="/" replace />}
+                                    />
+                                    <Route
+                                        path="/admin/password-reset-requests"
+                                        element={isAdminDashboardMode ? <AdminPasswordResetApproval /> : <Navigate to="/" replace />}
                                     />
                                     <Route
                                         path="/admin/feedback"

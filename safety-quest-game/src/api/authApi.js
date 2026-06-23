@@ -84,10 +84,10 @@ const authApi = {
     
     /**
      * 비밀번호 재설정 요청
-     * @param {string} email
+     * @param {string|object} data - email 또는 { email, newPassword }
      */
-    requestPasswordReset: async (email) => {
-        return apiClient.post('/auth/password-reset/request', { email });
+    requestPasswordReset: async (data) => {
+        return apiClient.post('/auth/password-reset/request', typeof data === 'string' ? { email: data } : data);
     },
     
     /**

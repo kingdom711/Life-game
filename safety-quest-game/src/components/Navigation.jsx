@@ -53,7 +53,9 @@ function Navigation({ showAdminLinks = false, showReportLink = false }) {
             path: '/admin',
             label: '관리',
             Icon: ShieldCheck,
-            active: location.pathname === '/admin' || location.pathname === '/admin/reward-approval'
+            active: location.pathname === '/admin'
+                || location.pathname === '/admin/reward-approval'
+                || location.pathname === '/admin/password-reset-requests'
         });
     }
 
