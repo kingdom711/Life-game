@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview:pwa": "node scripts/preview-pwa-local.mjs"
   },
   "dependencies": {
     "idb": "^8.0.3",
