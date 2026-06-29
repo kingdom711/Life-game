@@ -78,7 +78,7 @@ const ADMIN_ENTRY_MODES = {
 };
 
 function App() {
-    const initialPasswordResetPath = window.location.pathname === '/forgot-password' || window.location.pathname === '/reset-password';
+    const initialPasswordResetPath = window.location.pathname === '/forgot-password';
     // 랜딩페이지 활성화
     const [showLandingPage, setShowLandingPage] = useState(!initialPasswordResetPath);
     const [showTeamPage, setShowTeamPage] = useState(false);
@@ -279,10 +279,7 @@ function App() {
                     ) : showLaunchScreen ? (
                         <LaunchScreen onStart={handleStartGame} />
                     ) : showForgotPasswordPage && !user ? (
-                        <ForgotPassword
-                            initialMode={window.location.pathname === '/reset-password' ? 'reset' : 'request'}
-                            onLogin={handleLogin}
-                        />
+                        <ForgotPassword onLogin={handleLogin} />
                     ) : showLoginPage && !user ? (
                         <Login onSignup={handleSignup} onForgotPassword={handleForgotPassword} />
                     ) : !user ? (
