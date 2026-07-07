@@ -78,7 +78,6 @@ const collectLocalData = () => {
         const levelData = storage.get('safety_quest_level', {});
         const profileData = storage.get('safety_quest_user_profile', {});
         const specData = storage.get('safety_quest_specialization', {});
-        const pointsData = storage.get('safety_quest_points', {});
         const streakData = storage.get('safety_quest_streak', {});
 
         const specializations = (specData.unlockedSpecializations || []).map(specId => ({
@@ -99,7 +98,7 @@ const collectLocalData = () => {
             activeSpecialization: specData.activeSpecialization || null,
             totalQuestsCompleted: 0,
             specializations,
-            pointsBalance: pointsData.balance || 0,
+            pointsBalance: 0,
             currentStreak,
             longestStreak,
             lastCheckInDate
