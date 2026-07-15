@@ -51,6 +51,8 @@ function FeedbackBoard() {
     const [saving, setSaving] = useState(false);
     const [savingNotice, setSavingNotice] = useState(false);
     const [noticeForm, setNoticeForm] = useState({ title: '', content: '' });
+    const [commentDrafts, setCommentDrafts] = useState({});
+    const [savingCommentId, setSavingCommentId] = useState(null);
     const [notice, setNotice] = useState(null);
     const [statusFilter, setStatusFilter] = useState('all');
     const [replyDrafts, setReplyDrafts] = useState({});
@@ -166,6 +168,35 @@ function FeedbackBoard() {
             await loadPosts();
         } catch (err) {
             showNotice('error', err.message || '공지 삭제에 실패했습니다.');
+        }
+    };
+
+    const handleCommentSubmit = async (noticeId) => {
+        const content = commentDrafts[noticeId]?.trim();
+        if (!content) {
+            showNotice('error', '댓글 내용을 입력해주세요.');
+            return;
+        }
+
+        setSavingCommentId(noticeId);
+        try {
+            await feedbackApi.addNoticeComment(noticeId, content);
+            setCommentDrafts((prev) => ({ ...prev, [noticeId]: '' }));
+            await loadPosts();
+        } catch (err) {
+            showNotice('error', err.message || '댓글 등록에 실패했습니다.');
+        } finally {
+            setSavingCommentId(null);
+        }
+    };
+
+    const handleCommentDelete = async (noticeId, commentId) => {
+        if (!window.confirm('이 댓글을 삭제할까요?')) return;
+        try {
+            await feedbackApi.deleteNoticeComment(noticeId, commentId);
+            await loadPosts();
+        } catch (err) {
+            showNotice('error', err.message || '댓글 삭제에 실패했습니다.');
         }
     };
 
@@ -428,6 +459,86 @@ function FeedbackBoard() {
                                 <p style={{ color: 'rgba(226,232,240,0.86)', fontSize: '0.9rem', lineHeight: 1.58, whiteSpace: 'pre-wrap', margin: 0 }}>
                                     {item.content}
                                 </p>
+
+                                {/* 공지 댓글 */}
+                                <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid rgba(251,191,36,0.16)' }}>
+                                    {(item.comments || []).length > 0 && (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 10 }}>
+                                            {item.comments.map((comment) => (
+                                                <div key={comment.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                                        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                                                            <span style={{ color: '#e2e8f0', fontSize: '0.8rem', fontWeight: 750 }}>
+                                                                {comment.authorName || comment.authorUsername}
+                                                            </span>
+                                                            {comment.authorIsAdmin && (
+                                                                <span style={{ ...softBadgeStyle, background: 'rgba(14,165,233,0.14)', color: '#7dd3fc', fontSize: '0.66rem', padding: '0.15rem 0.45rem' }}>
+                                                                    관리자
+                                                                </span>
+                                                            )}
+                                                            <span style={{ color: 'rgba(203,213,225,0.5)', fontSize: '0.7rem' }}>
+                                                                {formatDate(comment.createdAt)}
+                                                            </span>
+                                                        </div>
+                                                        <p style={{ color: 'rgba(226,232,240,0.82)', fontSize: '0.85rem', lineHeight: 1.5, whiteSpace: 'pre-wrap', margin: '2px 0 0' }}>
+                                                            {comment.content}
+                                                        </p>
+                                                    </div>
+                                                    {(isAdmin || comment.authorUsername === user?.username) && (
+                                                        <button
+                                                            onClick={() => handleCommentDelete(item.id, comment.id)}
+                                                            aria-label="댓글 삭제"
+                                                            title="댓글 삭제"
+                                                            style={{
+                                                                border: 'none',
+                                                                background: 'transparent',
+                                                                color: 'rgba(203,213,225,0.45)',
+                                                                cursor: 'pointer',
+                                                                padding: 2,
+                                                                flexShrink: 0,
+                                                            }}
+                                                        >
+                                                            <Trash2 size={13} />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                    <div style={{ display: 'flex', gap: 8 }}>
+                                        <input
+                                            value={commentDrafts[item.id] ?? ''}
+                                            onChange={(event) => setCommentDrafts((prev) => ({ ...prev, [item.id]: event.target.value }))}
+                                            onKeyDown={(event) => {
+                                                if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
+                                                    event.preventDefault();
+                                                    handleCommentSubmit(item.id);
+                                                }
+                                            }}
+                                            placeholder="댓글을 입력하세요."
+                                            maxLength={1000}
+                                            style={{ ...inputStyle, padding: '0.55rem 0.75rem', fontSize: '0.84rem' }}
+                                        />
+                                        <button
+                                            onClick={() => handleCommentSubmit(item.id)}
+                                            disabled={savingCommentId === item.id}
+                                            aria-label="댓글 등록"
+                                            style={{
+                                                flexShrink: 0,
+                                                width: 40,
+                                                borderRadius: 12,
+                                                border: 'none',
+                                                background: savingCommentId === item.id ? 'rgba(148,163,184,0.24)' : 'linear-gradient(135deg, #f59e0b, #d97706)',
+                                                color: '#fff',
+                                                display: 'grid',
+                                                placeItems: 'center',
+                                                cursor: savingCommentId === item.id ? 'not-allowed' : 'pointer',
+                                            }}
+                                        >
+                                            <Send size={15} />
+                                        </button>
+                                    </div>
+                                </div>
                             </article>
                         ))}
                     </section>

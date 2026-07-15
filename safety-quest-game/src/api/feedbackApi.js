@@ -34,6 +34,15 @@ const feedbackApi = {
     deleteNotice: async (postId) => {
         return apiClient.delete(`/admin/feedback/notice/${postId}`);
     },
+
+    // 공지 댓글
+    addNoticeComment: async (postId, content) => {
+        return apiClient.post(`/feedback/notices/${postId}/comments`, { content });
+    },
+
+    deleteNoticeComment: async (postId, commentId) => {
+        return apiClient.delete(`/feedback/notices/${postId}/comments/${commentId}`);
+    },
 };
 
 export default feedbackApi;
