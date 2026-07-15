@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { MessageSquare, RefreshCw, Send } from 'lucide-react';
+import { Megaphone, MessageSquare, RefreshCw, Send, Trash2 } from 'lucide-react';
 import feedbackApi from '../api/feedbackApi';
 import { useAuth } from '../context/AuthContext';
 import { EmptyState, LoadingState, ResultNotice } from '../components/PageState';
@@ -46,8 +46,11 @@ function FeedbackBoard() {
     const hasAdminRole = user?.role === 'ROLE_PROJECT_ADMIN' || user?.role === 'ROLE_ADMIN';
     const isAdmin = hasAdminRole && location.pathname.startsWith('/admin');
     const [posts, setPosts] = useState([]);
+    const [notices, setNotices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [savingNotice, setSavingNotice] = useState(false);
+    const [noticeForm, setNoticeForm] = useState({ title: '', content: '' });
     const [notice, setNotice] = useState(null);
     const [statusFilter, setStatusFilter] = useState('all');
     const [replyDrafts, setReplyDrafts] = useState({});
@@ -71,8 +74,16 @@ function FeedbackBoard() {
     const loadPosts = useCallback(async () => {
         try {
             setLoading(true);
-            const data = isAdmin ? await feedbackApi.getAll(statusFilter) : await feedbackApi.getMine();
-            setPosts(Array.isArray(data) ? data : []);
+            const [noticeResult, postResult] = await Promise.allSettled([
+                feedbackApi.getNotices(),
+                isAdmin ? feedbackApi.getAll(statusFilter) : feedbackApi.getMine(),
+            ]);
+            // 공지 API가 아직 배포 전이거나 실패해도 게시판 자체는 동작하도록 폴백
+            setNotices(noticeResult.status === 'fulfilled' && Array.isArray(noticeResult.value) ? noticeResult.value : []);
+            if (postResult.status === 'rejected') {
+                throw postResult.reason;
+            }
+            setPosts(Array.isArray(postResult.value) ? postResult.value : []);
         } catch (err) {
             showNotice('error', err.message || '게시글을 불러오지 못했습니다.');
         } finally {
@@ -121,6 +132,40 @@ function FeedbackBoard() {
             await loadPosts();
         } catch (err) {
             showNotice('error', err.message || '상태 변경에 실패했습니다.');
+        }
+    };
+
+    const handleNoticeSubmit = async (event) => {
+        event.preventDefault();
+        if (!noticeForm.title.trim() || !noticeForm.content.trim()) {
+            showNotice('error', '공지 제목과 내용을 입력해주세요.');
+            return;
+        }
+
+        setSavingNotice(true);
+        try {
+            await feedbackApi.createNotice({
+                title: noticeForm.title.trim(),
+                content: noticeForm.content.trim(),
+            });
+            setNoticeForm({ title: '', content: '' });
+            showNotice('success', '공지를 등록했습니다.');
+            await loadPosts();
+        } catch (err) {
+            showNotice('error', err.message || '공지 등록에 실패했습니다.');
+        } finally {
+            setSavingNotice(false);
+        }
+    };
+
+    const handleNoticeDelete = async (postId) => {
+        if (!window.confirm('이 공지를 내릴까요?')) return;
+        try {
+            await feedbackApi.deleteNotice(postId);
+            showNotice('success', '공지를 내렸습니다.');
+            await loadPosts();
+        } catch (err) {
+            showNotice('error', err.message || '공지 삭제에 실패했습니다.');
         }
     };
 
@@ -255,6 +300,59 @@ function FeedbackBoard() {
                 )}
 
                 {isAdmin && (
+                    <form
+                        onSubmit={handleNoticeSubmit}
+                        className="glass-panel"
+                        style={{
+                            borderRadius: 16,
+                            padding: '1rem',
+                            marginBottom: 18,
+                            border: '1px solid rgba(251,191,36,0.3)',
+                        }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#fbbf24', fontWeight: 800, fontSize: '0.9rem', marginBottom: 10 }}>
+                            <Megaphone size={16} />
+                            공지 작성
+                        </div>
+                        <input
+                            value={noticeForm.title}
+                            onChange={(event) => setNoticeForm((prev) => ({ ...prev, title: event.target.value }))}
+                            placeholder="공지 제목"
+                            maxLength={120}
+                            style={inputStyle}
+                        />
+                        <textarea
+                            value={noticeForm.content}
+                            onChange={(event) => setNoticeForm((prev) => ({ ...prev, content: event.target.value }))}
+                            placeholder="전체 사용자에게 보여줄 공지 내용을 입력하세요."
+                            maxLength={4000}
+                            style={{ ...inputStyle, minHeight: 96, marginTop: 10, resize: 'vertical', lineHeight: 1.5 }}
+                        />
+                        <button
+                            type="submit"
+                            disabled={savingNotice}
+                            className="ui-btn-core"
+                            style={{
+                                width: '100%',
+                                marginTop: 12,
+                                border: 'none',
+                                background: savingNotice ? 'rgba(148,163,184,0.24)' : 'linear-gradient(135deg, #f59e0b, #d97706)',
+                                color: '#fff',
+                                fontWeight: 800,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 8,
+                                cursor: savingNotice ? 'not-allowed' : 'pointer',
+                            }}
+                        >
+                            <Megaphone size={16} />
+                            {savingNotice ? '등록 중...' : '공지 등록'}
+                        </button>
+                    </form>
+                )}
+
+                {isAdmin && (
                     <div style={{ marginBottom: 14 }}>
                         <div style={{ color: '#f8fafc', fontWeight: 800, marginBottom: 8 }}>
                             처리 필요 {pendingCount}건
@@ -280,6 +378,59 @@ function FeedbackBoard() {
                             ))}
                         </div>
                     </div>
+                )}
+
+                {!loading && notices.length > 0 && (
+                    <section style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+                        {notices.map((item) => (
+                            <article
+                                key={`notice-${item.id}`}
+                                className="glass-panel"
+                                style={{
+                                    borderRadius: 16,
+                                    padding: '1rem',
+                                    border: '1px solid rgba(251,191,36,0.38)',
+                                    background: 'rgba(251,191,36,0.06)',
+                                }}
+                            >
+                                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
+                                    <span style={noticeBadgeStyle}>
+                                        <Megaphone size={12} />
+                                        공지
+                                    </span>
+                                    <span style={{ marginLeft: 'auto', color: 'rgba(203,213,225,0.56)', fontSize: '0.76rem' }}>
+                                        {formatDate(item.createdAt)}
+                                    </span>
+                                    {isAdmin && (
+                                        <button
+                                            onClick={() => handleNoticeDelete(item.id)}
+                                            aria-label="공지 내리기"
+                                            title="공지 내리기"
+                                            style={{
+                                                width: 30,
+                                                height: 30,
+                                                borderRadius: 9,
+                                                border: '1px solid rgba(248,113,113,0.3)',
+                                                background: 'rgba(248,113,113,0.1)',
+                                                color: '#fca5a5',
+                                                display: 'grid',
+                                                placeItems: 'center',
+                                                cursor: 'pointer',
+                                            }}
+                                        >
+                                            <Trash2 size={14} />
+                                        </button>
+                                    )}
+                                </div>
+                                <h2 style={{ color: '#fef3c7', fontSize: '1rem', margin: '0 0 8px', lineHeight: 1.35 }}>
+                                    {item.title}
+                                </h2>
+                                <p style={{ color: 'rgba(226,232,240,0.86)', fontSize: '0.9rem', lineHeight: 1.58, whiteSpace: 'pre-wrap', margin: 0 }}>
+                                    {item.content}
+                                </p>
+                            </article>
+                        ))}
+                    </section>
                 )}
 
                 {loading ? (
@@ -427,5 +578,17 @@ const badgeStyle = (status) => ({
     fontSize: '0.72rem',
     fontWeight: 800,
 });
+
+const noticeBadgeStyle = {
+    borderRadius: 999,
+    padding: '0.25rem 0.55rem',
+    background: 'rgba(251,191,36,0.16)',
+    color: '#fbbf24',
+    fontSize: '0.72rem',
+    fontWeight: 800,
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 4,
+};
 
 export default FeedbackBoard;

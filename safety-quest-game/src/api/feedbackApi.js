@@ -21,6 +21,19 @@ const feedbackApi = {
     reply: async (postId, reply) => {
         return apiClient.post(`/admin/feedback/${postId}/reply`, { reply });
     },
+
+    // 공지 (관리자 작성, 전체 사용자 노출)
+    getNotices: async () => {
+        return apiClient.get('/feedback/notices');
+    },
+
+    createNotice: async (data) => {
+        return apiClient.post('/admin/feedback/notice', data);
+    },
+
+    deleteNotice: async (postId) => {
+        return apiClient.delete(`/admin/feedback/notice/${postId}`);
+    },
 };
 
 export default feedbackApi;
