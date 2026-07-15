@@ -5,12 +5,14 @@ import { calculateLevel, TIERS } from '../utils/pointsCalculator';
 import { getRoleById } from '../data/rolesData';
 import { getInventoryStats } from '../utils/inventoryManager';
 import { useAuth } from '../context/AuthContext';
+import useParticipantLockdown from '../hooks/useParticipantLockdown';
 import useTeamGate from '../hooks/useTeamGate';
 import TeamJoinWizard from '../components/team/TeamJoinWizard';
 import LanguageSelector from '../components/LanguageSelector';
 
 function Profile({ role }) {
     const { user, logout } = useAuth();
+    const participantLockdown = useParticipantLockdown();
     const teamGate = useTeamGate({ autoLoad: Boolean(user) });
     const navigate = useNavigate();
     const [showTeamWizard, setShowTeamWizard] = useState(false);
@@ -46,9 +48,29 @@ function Profile({ role }) {
     return (
         <div className="page">
             <div className="container">
-                <div style={{ marginBottom: '1rem' }}>
-                    <Link to="/" className="btn btn-secondary btn-sm">대시보드로 돌아가기</Link>
-                </div>
+                {!participantLockdown && (
+                    <div style={{ marginBottom: '1rem' }}>
+                        <Link to="/" className="btn btn-secondary btn-sm">대시보드로 돌아가기</Link>
+                    </div>
+                )}
+
+                {/* [베타 종료] 참여자 안내 배너 */}
+                {participantLockdown && (
+                    <div style={{
+                        marginBottom: '1.5rem',
+                        padding: '1rem 1.25rem',
+                        borderRadius: 14,
+                        border: '1px solid rgba(59, 130, 246, 0.35)',
+                        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(99, 102, 241, 0.08))'
+                    }}>
+                        <div style={{ fontWeight: 800, color: '#93c5fd', marginBottom: 4 }}>
+                            베타 테스트가 종료되었습니다
+                        </div>
+                        <div style={{ color: '#cbd5e1', fontSize: '0.9rem' }}>
+                            참여해 주셔서 감사합니다. 획득한 포인트는 교환소에서 골드로 바꾼 뒤 보상센터에서 사용하실 수 있습니다.
+                        </div>
+                    </div>
+                )}
 
                 <div className="mb-8 text-center">
                     <div className="text-7xl mb-4 h-40 flex items-center justify-center relative">
@@ -94,10 +116,16 @@ function Profile({ role }) {
                             </div>
                         ) : (
                             <div>
-                                <p className="text-muted">팀을 설정하면 팀 퀘스트와 랭킹에 참여할 수 있습니다.</p>
-                                <button className="btn btn-primary btn-sm" onClick={() => setShowTeamWizard(true)}>
-                                    팀 설정하기
-                                </button>
+                                {participantLockdown ? (
+                                    <p className="text-muted">소속된 팀이 없습니다.</p>
+                                ) : (
+                                    <>
+                                        <p className="text-muted">팀을 설정하면 팀 퀘스트와 랭킹에 참여할 수 있습니다.</p>
+                                        <button className="btn btn-primary btn-sm" onClick={() => setShowTeamWizard(true)}>
+                                            팀 설정하기
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         )}
                     </div>

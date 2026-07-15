@@ -68,6 +68,7 @@ import LaunchScreen from './pages/LaunchScreen';
 import BackgroundMusic from './components/BackgroundMusic';
 import ErrorBoundary from './components/ErrorBoundary';
 import { LanguageProvider } from './context/LanguageContext';
+import { BETA_CLOSED } from './config/betaConfig';
 
 // ...
 
@@ -78,7 +79,9 @@ const ADMIN_ENTRY_MODES = {
 };
 
 function App() {
-    const initialPasswordResetPath = window.location.pathname === '/forgot-password';
+    const initialPasswordResetPath =
+        window.location.pathname === '/forgot-password' ||
+        window.location.pathname === '/reset-password';
     // 랜딩페이지 활성화
     const [showLandingPage, setShowLandingPage] = useState(!initialPasswordResetPath);
     const [showTeamPage, setShowTeamPage] = useState(false);
@@ -102,11 +105,13 @@ function App() {
     const { user, loading } = useAuth();
     const isProjectAdminAccount = user?.role === 'ROLE_PROJECT_ADMIN';
     const isAdminAccount = user?.role === 'ROLE_PROJECT_ADMIN' || user?.role === 'ROLE_ADMIN';
+    // [베타 종료] 참여자 화면 축소 (점수/보상/교환소/게시판만 노출)
+    const isParticipantLockdown = BETA_CLOSED && !isAdminAccount;
     const isAdminDashboardMode = isAdminAccount && adminEntryMode === ADMIN_ENTRY_MODES.ADMIN;
     const isAdminTestMode = isAdminAccount && adminEntryMode === ADMIN_ENTRY_MODES.TEST;
     const shouldShowAdminModeSelector = isAdminAccount && !adminEntryMode;
-    const teamGate = useTeamGate({ autoLoad: Boolean(user && selectedRole && !isAdminAccount) });
-    const shouldForceTeamJoin = Boolean(user && selectedRole && !isAdminAccount && !teamGate.loading && !teamGate.isActive);
+    const teamGate = useTeamGate({ autoLoad: Boolean(user && selectedRole && !isAdminAccount && !BETA_CLOSED) });
+    const shouldForceTeamJoin = Boolean(user && selectedRole && !isAdminAccount && !BETA_CLOSED && !teamGate.loading && !teamGate.isActive);
 
     useEffect(() => {
         const initApp = async () => {
@@ -289,7 +294,7 @@ function App() {
                             onSelectAdmin={() => setAdminMode(ADMIN_ENTRY_MODES.ADMIN)}
                             onSelectTest={() => setAdminMode(ADMIN_ENTRY_MODES.TEST)}
                         />
-                    ) : !selectedRole && !isAdminAccount ? (
+                    ) : !selectedRole && !isAdminAccount && !BETA_CLOSED ? (
                         <RoleSelector onSelectRole={handleRoleSelect} />
                     ) : (
                         <>
@@ -321,6 +326,7 @@ function App() {
                             <Navigation
                                 showAdminLinks={isAdminDashboardMode}
                                 showReportLink={isProjectAdminAccount && isAdminDashboardMode}
+                                participantLockdown={isParticipantLockdown}
                             />
                             {isAdminTestMode && (
                                 <AdminTestToolbar
@@ -335,6 +341,17 @@ function App() {
                                 />
                             )}
                             <div className="relative z-10">
+                                {isParticipantLockdown ? (
+                                    /* [베타 종료] 참여자는 점수/보상/교환소/게시판만 접근 가능 */
+                                    <Routes>
+                                        <Route path="/" element={<Navigate to="/profile" replace />} />
+                                        <Route path="/profile" element={<Profile role={selectedRole || 'technician'} />} />
+                                        <Route path="/reward-center" element={<RewardCenter />} />
+                                        <Route path="/exchange" element={<Exchange />} />
+                                        <Route path="/feedback" element={<FeedbackBoard />} />
+                                        <Route path="*" element={<Navigate to="/profile" replace />} />
+                                    </Routes>
+                                ) : (
                                 <Routes>
                                     <Route path="/" element={isAdminDashboardMode ? <Navigate to="/admin" replace /> : <Dashboard role={selectedRole || 'technician'} />} />
                                     <Route path="/daily" element={<DailyQuests role={selectedRole} />} />
@@ -388,10 +405,11 @@ function App() {
                                     <Route path="/compliance-report" element={<ComplianceReportPage />} />
                                     <Route path="*" element={<Navigate to="/" replace />} />
                                 </Routes>
+                                )}
                             </div>
 
-                            {/* [New] 긴급 작업중지 플로팅 버튼 - 모든 화면에서 표시 */}
-                            {(!isAdminAccount || isAdminTestMode) && (
+                            {/* [New] 긴급 작업중지 플로팅 버튼 - 베타 종료 후 참여자에게는 숨김 */}
+                            {(!isAdminAccount || isAdminTestMode) && !isParticipantLockdown && (
                                 <>
                                     <WorkStopButton onActivate={() => setIsWorkStopModalOpen(true)} />
                                     <WorkStopReportModal
