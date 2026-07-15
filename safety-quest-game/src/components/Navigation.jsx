@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { BookOpen, ShieldCheck, Target, Trophy, ShoppingCart, User, BarChart3, MessageSquare } from 'lucide-react';
+import { BookOpen, ShieldCheck, Target, Trophy, ShoppingCart, User, BarChart3, MessageSquare, Gift } from 'lucide-react';
 import { hasCompletedTodayEducation } from '../utils/educationManager';
 
-function Navigation({ showAdminLinks = false, showReportLink = false }) {
+function Navigation({ showAdminLinks = false, showReportLink = false, participantLockdown = false }) {
     const location = useLocation();
     const [educationCompleted, setEducationCompleted] = useState(true);
 
-    // 교육 완료 여부 체크
+    // 교육 완료 여부 체크 (베타 종료 축소 모드에서는 불필요)
     useEffect(() => {
+        if (participantLockdown) return;
+
         const checkEducation = () => {
             try {
                 setEducationCompleted(hasCompletedTodayEducation());
@@ -22,9 +24,14 @@ function Navigation({ showAdminLinks = false, showReportLink = false }) {
         // 페이지 변경 시마다 체크
         const interval = setInterval(checkEducation, 5000);
         return () => clearInterval(interval);
-    }, [location.pathname]);
+    }, [location.pathname, participantLockdown]);
 
-    const navItems = [
+    const navItems = participantLockdown ? [
+        // [베타 종료] 참여자 메뉴: 내 점수 / 보상 / 게시판
+        { path: '/profile', label: '내 점수', Icon: User, active: location.pathname === '/profile' },
+        { path: '/reward-center', label: '보상', Icon: Gift, active: location.pathname === '/reward-center' || location.pathname === '/exchange' },
+        { path: '/feedback', label: '게시판', Icon: MessageSquare, active: location.pathname === '/feedback' }
+    ] : [
         { path: '/education', label: '교육', Icon: BookOpen, active: location.pathname.startsWith('/education') },
         { path: '/daily', label: '퀘스트', Icon: Target, active: location.pathname === '/daily' },
         { path: '/achievements', label: '업적', Icon: Trophy, active: location.pathname === '/achievements' },

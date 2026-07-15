@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import goldApi from '../api/goldApi';
 import rewardApi from '../api/rewardApi';
 import { useAuth } from '../context/AuthContext';
+import useParticipantLockdown from '../hooks/useParticipantLockdown';
 import IdentityVerificationModal from '../components/IdentityVerificationModal';
 import { LoadingState, ErrorState, EmptyState, ResultNotice } from '../components/PageState';
 
@@ -64,6 +65,7 @@ const DEFAULT_REWARDS = [
 
 function RewardCenter() {
     const { user } = useAuth();
+    const participantLockdown = useParticipantLockdown();
     const [goldBalance, setGoldBalance] = useState(0);
     const [rewards, setRewards] = useState([]);
     const [myRewards, setMyRewards] = useState([]);
@@ -226,8 +228,10 @@ function RewardCenter() {
             <div className="container" style={{ maxWidth: 600, margin: '0 auto', padding: '0 1rem' }}>
                 {/* 뒤로가기 */}
                 <div style={{ marginBottom: '1rem' }}>
-                    <Link to="/shop" className="btn btn-secondary btn-sm">← 상점으로</Link>
-                    <Link to="/exchange" className="btn btn-secondary btn-sm" style={{ marginLeft: 8 }}>💱 교환소</Link>
+                    {!participantLockdown && (
+                        <Link to="/shop" className="btn btn-secondary btn-sm" style={{ marginRight: 8 }}>← 상점으로</Link>
+                    )}
+                    <Link to="/exchange" className="btn btn-secondary btn-sm">💱 교환소</Link>
                 </div>
 
                 {/* 헤더 */}

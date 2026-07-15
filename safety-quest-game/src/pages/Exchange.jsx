@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import goldApi from '../api/goldApi';
 import exchangeApi from '../api/exchangeApi';
 import { points as pointsStorage } from '../utils/storage';
+import useParticipantLockdown from '../hooks/useParticipantLockdown';
 import { LoadingState, ErrorState, EmptyState, ResultNotice } from '../components/PageState';
 
 const COLOR = {
@@ -21,6 +22,7 @@ const COLOR = {
 };
 
 function Exchange() {
+    const participantLockdown = useParticipantLockdown();
     const [currentPoints, setCurrentPoints] = useState(0);
     const [goldBalance, setGoldBalance] = useState(0);
     const [exchangeRate, setExchangeRate] = useState(null);
@@ -141,8 +143,10 @@ function Exchange() {
             <div className="container" style={{ maxWidth: 600, margin: '0 auto', padding: '0 1rem' }}>
                 {/* 뒤로가기 */}
                 <div style={{ marginBottom: '1rem' }}>
-                    <Link to="/shop" className="btn btn-secondary btn-sm">← 상점으로</Link>
-                    <Link to="/reward-center" className="btn btn-secondary btn-sm" style={{ marginLeft: 8 }}>🎁 보상센터</Link>
+                    {!participantLockdown && (
+                        <Link to="/shop" className="btn btn-secondary btn-sm" style={{ marginRight: 8 }}>← 상점으로</Link>
+                    )}
+                    <Link to="/reward-center" className="btn btn-secondary btn-sm">🎁 보상센터</Link>
                 </div>
 
                 {/* 헤더 */}
