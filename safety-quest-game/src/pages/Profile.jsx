@@ -66,8 +66,9 @@ function Profile({ role }) {
                         <div style={{ fontWeight: 800, color: '#93c5fd', marginBottom: 4 }}>
                             베타 테스트가 종료되었습니다
                         </div>
-                        <div style={{ color: '#cbd5e1', fontSize: '0.9rem' }}>
-                            참여해 주셔서 감사합니다. 획득한 포인트는 교환소에서 골드로 바꾼 뒤 보상센터에서 사용하실 수 있습니다.
+                        <div style={{ color: '#cbd5e1', fontSize: '0.9rem', lineHeight: 1.6 }}>
+                            참여해 주셔서 감사합니다. 보상은 골드 교환 방식이 아니라 관리자 확인 후 직접 지급됩니다.
+                            개인정보는 댓글에 남기지 말고 개별 의견으로 보내주세요.
                         </div>
                     </div>
                 )}

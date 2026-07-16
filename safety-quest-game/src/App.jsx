@@ -24,8 +24,8 @@ import AlertManagement from './pages/AlertManagement';
 import EducationPage from './pages/EducationPage'; // [New] 교육 페이지
 import SpecializationPage from './pages/SpecializationPage'; // [New] 전직 센터
 import SpecializationTrainingPage from './pages/SpecializationTrainingPage'; // [New] 전직 교육
-import Exchange from './pages/Exchange'; // [New] 포인트→골드 교환소
-import RewardCenter from './pages/RewardCenter'; // [New] 보상센터
+import Exchange from './pages/Exchange'; // Disabled: redirects to reward guide
+import RewardCenter from './pages/RewardCenter'; // 보상안내
 import HazardCyclePage from './pages/HazardCyclePage';
 import HazardCycleAckPage from './pages/HazardCycleAckPage';
 import CycleHistoryPage from './pages/CycleHistoryPage';
@@ -105,7 +105,7 @@ function App() {
     const { user, loading } = useAuth();
     const isProjectAdminAccount = user?.role === 'ROLE_PROJECT_ADMIN';
     const isAdminAccount = user?.role === 'ROLE_PROJECT_ADMIN' || user?.role === 'ROLE_ADMIN';
-    // [베타 종료] 참여자 화면 축소 (점수/보상/교환소/게시판만 노출)
+    // [베타 종료] 참여자 화면 축소 (점수/보상안내/게시판만 노출)
     const isParticipantLockdown = BETA_CLOSED && !isAdminAccount;
     const isAdminDashboardMode = isAdminAccount && adminEntryMode === ADMIN_ENTRY_MODES.ADMIN;
     const isAdminTestMode = isAdminAccount && adminEntryMode === ADMIN_ENTRY_MODES.TEST;
@@ -342,7 +342,7 @@ function App() {
                             )}
                             <div className="relative z-10">
                                 {isParticipantLockdown ? (
-                                    /* [베타 종료] 참여자는 점수/보상/교환소/게시판만 접근 가능 */
+                                    /* [베타 종료] 참여자는 점수/보상안내/게시판만 접근 가능 */
                                     <Routes>
                                         <Route path="/" element={<Navigate to="/profile" replace />} />
                                         <Route path="/profile" element={<Profile role={selectedRole || 'technician'} />} />

@@ -117,21 +117,13 @@ function Shop() {
                         <div className="points-badge">
                             💰 보유 포인트: <span className="font-bold">{currentPoints.toLocaleString()}P</span>
                         </div>
-                        <Link to="/exchange" style={{
-                            background: `linear-gradient(135deg, ${COLOR.warningLight}, ${COLOR.warning})`,
-                            color: COLOR.bg, border: 'none', borderRadius: 10,
-                            padding: '0.45rem 1rem', fontSize: '0.85rem', fontWeight: 700,
-                            textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4
-                        }}>
-                            💱 골드 교환
-                        </Link>
                         <Link to="/reward-center" style={{
                             background: `linear-gradient(135deg, ${COLOR.secondaryLight}, ${COLOR.secondary})`,
                             color: COLOR.white, border: 'none', borderRadius: 10,
                             padding: '0.45rem 1rem', fontSize: '0.85rem', fontWeight: 700,
                             textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4
                         }}>
-                            🎁 보상센터
+                            🎁 보상안내
                         </Link>
                     </div>
                 </div>

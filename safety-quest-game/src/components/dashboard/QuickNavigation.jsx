@@ -11,7 +11,7 @@ const NAV_ITEMS = [
     { path: '/feedback',         label: '게시판',    Icon: MessageSquare,color: '#0ea5e9' },
     { path: '/safety-score',     label: 'AI 분석',   Icon: Bot,          color: '#8b5cf6' },
     { path: '/shop',             label: '상점',      Icon: ShoppingCart, color: '#f59e0b' },
-    { path: '/reward-center',    label: '보상센터',   Icon: Gift,         color: '#ec4899' },
+    { path: '/reward-center',    label: '보상안내',   Icon: Gift,         color: '#ec4899' },
     { path: '/season-ranking',   label: '시즌 랭킹',  Icon: Trophy,       color: '#eab308' },
     { path: '/learning-path',    label: '학습 경로',  Icon: Route,        color: '#6366f1' },
     { path: '/team-quest',       label: '팀 퀘스트',  Icon: Users,        color: '#06b6d4' },

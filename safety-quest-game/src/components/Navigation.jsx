@@ -27,9 +27,9 @@ function Navigation({ showAdminLinks = false, showReportLink = false, participan
     }, [location.pathname, participantLockdown]);
 
     const navItems = participantLockdown ? [
-        // [베타 종료] 참여자 메뉴: 내 점수 / 보상 / 게시판
+        // [베타 종료] 참여자 메뉴: 내 점수 / 보상안내 / 게시판
         { path: '/profile', label: '내 점수', Icon: User, active: location.pathname === '/profile' },
-        { path: '/reward-center', label: '보상', Icon: Gift, active: location.pathname === '/reward-center' || location.pathname === '/exchange' },
+        { path: '/reward-center', label: '보상안내', Icon: Gift, active: location.pathname === '/reward-center' },
         { path: '/feedback', label: '게시판', Icon: MessageSquare, active: location.pathname === '/feedback' }
     ] : [
         { path: '/education', label: '교육', Icon: BookOpen, active: location.pathname.startsWith('/education') },
