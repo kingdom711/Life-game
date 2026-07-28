@@ -4,13 +4,14 @@ import ProgressBar from './ProgressBar';
 
 function QuestCard({ quest, onComplete, isLocked = false }) {
     const navigate = useNavigate();
-    const progress = questProgressStorage.getQuestProgress(quest.id);
+    const progress = quest.progress || questProgressStorage.getQuestProgress(quest.id);
     const target = quest.requirement.target || 1;
     const percentage = Math.min(100, Math.round((progress.current / target) * 100));
     const isCompleted = progress.completed;
+    const rewardClaimed = quest.rewardClaimed ?? isCompleted;
 
     const handleComplete = () => {
-        if (!isCompleted && onComplete) {
+        if ((!isCompleted || !rewardClaimed) && onComplete) {
             onComplete(quest);
         }
     };
@@ -33,22 +34,22 @@ function QuestCard({ quest, onComplete, isLocked = false }) {
             quest-card
             backdrop-blur-xl bg-slate-800/70 border border-slate-600/50 rounded-xl p-6
             transition-all duration-300 hover:-translate-y-1 hover:shadow-xl
-            ${isCompleted
+            ${rewardClaimed
                 ? 'border-emerald-500 shadow-emerald-500/30'
                 : 'hover:border-blue-400/50'
             }
-            ${isCompleted ? 'completed' : ''}
+            ${rewardClaimed ? 'completed' : ''}
         `}
             onClick={handleCardClick}
             onKeyDown={handleCardKeyDown}
             role={quest.link && !isCompleted && !isLocked ? 'button' : undefined}
             tabIndex={quest.link && !isCompleted && !isLocked ? 0 : undefined}
         >
-            {isCompleted && (
+            {rewardClaimed && (
                 <div className="completed-overlay absolute inset-0 bg-emerald-500/15 pointer-events-none z-0 rounded-xl"></div>
             )}
 
-            {isLocked && !isCompleted && (
+            {isLocked && !rewardClaimed && (
                 <div style={{
                     position: 'absolute', inset: 0,
                     background: 'rgba(0, 0, 0, 0.6)',
@@ -69,7 +70,7 @@ function QuestCard({ quest, onComplete, isLocked = false }) {
                     <span className="text-3xl">{quest.icon}</span>
                     <h3 className="quest-title text-xl font-bold text-slate-100">{quest.title}</h3>
                 </div>
-                {isCompleted ? (
+                {rewardClaimed ? (
                     <div className="completed-badge-icon bg-emerald-500/20 rounded-full w-10 h-10 flex items-center justify-center shadow-lg shadow-emerald-500/40">
                         <span className="text-emerald-500 text-2xl font-bold">✓</span>
                     </div>
@@ -85,7 +86,7 @@ function QuestCard({ quest, onComplete, isLocked = false }) {
             </p>
 
             <div className="quest-progress-container flex items-center gap-4 mb-6 relative z-10">
-                {isCompleted ? (
+                {rewardClaimed ? (
                     <div className="quest-complete-text text-2xl font-extrabold text-emerald-500 text-center w-full tracking-wider">
                         QUEST COMPLETE
                     </div>
@@ -102,14 +103,14 @@ function QuestCard({ quest, onComplete, isLocked = false }) {
                 )}
             </div>
 
-            {isCompleted ? (
+            {rewardClaimed ? (
                 <button
                     className="btn-action completed w-full py-3 bg-slate-700 text-slate-400 border border-slate-600 rounded-lg font-bold cursor-not-allowed shadow-none relative z-10"
                     disabled
                 >
                     보상 지급 완료
                 </button>
-            ) : quest.link ? (
+            ) : quest.link && !isCompleted ? (
                 <button
                     onClick={() => !isLocked && navigate(quest.link)}
                     disabled={isLocked}
@@ -121,13 +122,13 @@ function QuestCard({ quest, onComplete, isLocked = false }) {
                 <button
                     className={`
                         btn-action w-full py-3 rounded-lg font-bold transition-all duration-300 relative z-10
-                        ${percentage >= 100
+                        ${isCompleted || quest.actionable
                             ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/30'
                             : 'bg-slate-500 text-slate-300 cursor-not-allowed opacity-70'
                         }
                     `}
                     onClick={handleComplete}
-                    disabled={percentage < 100}
+                    disabled={!isCompleted && !quest.actionable}
                 >
                     {percentage >= 100 ? '보상 받기' : '진행 중'}
                 </button>

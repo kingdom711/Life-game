@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import rewardApi from '../api/rewardApi';
 import { LoadingState, EmptyState, ResultNotice } from '../components/PageState';
+import { isAdminRole } from '../utils/authRoles';
 
 const COLOR = {
     text: 'var(--color-text)',
@@ -33,7 +34,7 @@ const TABS = [
 function AdminRewardApproval() {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const isProjectAdmin = user?.role === 'ROLE_PROJECT_ADMIN' || user?.role === 'ROLE_ADMIN';
+    const isProjectAdmin = isAdminRole(user?.role);
 
     const [exchanges, setExchanges] = useState([]);
     const [loading, setLoading] = useState(true);

@@ -3,6 +3,8 @@
  */
 
 import apiClient from './apiClient';
+import authApi from './authApi';
+import { requireSupabase } from '../lib/supabase';
 
 const checklistApi = {
     /**
@@ -11,6 +13,15 @@ const checklistApi = {
      * @param {File[]} files - 업로드할 파일 목록 (선택)
      */
     submitChecklist: async (request, files = []) => {
+        if (authApi.usesSupabase) {
+            if (files.length) throw new Error('체크리스트 첨부파일 이관 후 업로드할 수 있습니다.');
+            const { data, error } = await requireSupabase().rpc('submit_checklist', {
+                p_site_name: request.siteName,
+                p_items: request.items.map((item) => ({ item_key: item.id || item.templateItemId, answer: item.answer, comment: item.comment, risk_flag: item.riskFlag })),
+            });
+            if (error) throw error;
+            return data;
+        }
         const formData = new FormData();
         
         // 요청 데이터를 JSON 문자열로 변환하여 추가

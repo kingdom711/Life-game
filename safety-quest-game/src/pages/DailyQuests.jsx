@@ -10,8 +10,21 @@ import ChecklistFormModal from '../components/ChecklistFormModal';
 import PhotoUploadModal from '../components/PhotoUploadModal';
 import ChecklistReviewModal from '../components/ChecklistReviewModal';
 import ChainQuestCard from '../components/ChainQuestCard';
+import authApi from '../api/authApi';
+import questApi from '../api/questApi';
 
 const NON_GATED_QUESTS = ['daily_education_1', 'daily_login_1'];
+const SERVER_QUEST_LINKS = {
+    daily_login_1: '/',
+    daily_education_1: '/education',
+    daily_hazard_1: '/hazard-cycle',
+};
+
+const decorateServerQuest = (quest) => ({
+    ...quest,
+    link: SERVER_QUEST_LINKS[quest.code],
+    actionable: ['daily_checklist_1', 'daily_review_1'].includes(quest.code),
+});
 
 function DailyQuests({ role }) {
     const [quests, setQuests] = useState([]);
@@ -21,16 +34,39 @@ function DailyQuests({ role }) {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
     useEffect(() => {
+        if (authApi.usesSupabase) {
+            questApi.getPersonalQuests('daily').then((rows) => setQuests(rows.map(decorateServerQuest))).catch(console.error);
+            return;
+        }
         const dailyQuests = getQuestsByTypeRoleAndSpec(QUEST_TYPE.DAILY, role, getActiveSpecialization()?.id || null);
         setQuests(dailyQuests);
     }, [role]);
 
     const refreshQuests = () => {
+        if (authApi.usesSupabase) {
+            questApi.getPersonalQuests('daily').then((rows) => setQuests(rows.map(decorateServerQuest))).catch(console.error);
+            return;
+        }
         const updatedQuests = getQuestsByTypeRoleAndSpec(QUEST_TYPE.DAILY, role, getActiveSpecialization()?.id || null);
         setQuests(updatedQuests);
     };
 
-    const handleCompleteQuest = (quest) => {
+    const handleCompleteQuest = async (quest) => {
+        if (authApi.usesSupabase) {
+            if (quest.progress?.completed) {
+                await questApi.claimPersonalQuestReward(quest.id);
+                refreshQuests();
+                return;
+            }
+            if (quest.code === 'daily_checklist_1') {
+                setIsChecklistModalOpen(true);
+                return;
+            }
+            if (quest.code === 'daily_review_1') {
+                setIsReviewModalOpen(true);
+            }
+            return;
+        }
         if (!NON_GATED_QUESTS.includes(quest.id) && !checkPermission()) {
             return;
         }
@@ -78,7 +114,7 @@ function DailyQuests({ role }) {
                 </div>
 
                 {/* 체인 퀘스트 */}
-                <ChainQuestCard role={role} onComplete={() => refreshQuests()} />
+                {!authApi.usesSupabase && <ChainQuestCard role={role} onComplete={() => refreshQuests()} />}
             </div>
 
             <EducationRequiredModal

@@ -11,6 +11,7 @@
     "preview:pwa": "node scripts/preview-pwa-local.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.110.8",
     "idb": "^8.0.3",
     "lucide-react": "^1.8.0",
     "react": "^18.2.0",

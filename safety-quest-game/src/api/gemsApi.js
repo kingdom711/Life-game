@@ -11,6 +11,10 @@
 
 import apiClient, { ApiError } from './apiClient';
 import config from '../config/environment';
+import aiApi from './aiApi';
+import { requireSupabase } from '../lib/supabase';
+
+const useSupabase = true;
 
 // Mock 응답 데이터 (서버 미가동 시 폴백용)
 // 고용노동부 고시 제2023-19호 위험성평가 양식 + 실제 KOSHA Guide 코드 준수.
@@ -133,6 +137,14 @@ const gemsApi = {
      * @returns {Promise<object>} 분석 결과
      */
     analyzeRisk: async (data) => {
+        if (useSupabase) {
+            const result = await aiApi.generateBusinessPlan({
+                inputType: data.photoId ? 'PHOTO' : 'TEXT',
+                inputText: data.inputText,
+                context: data.context || {},
+            });
+            return { success: true, ...result };
+        }
         // Mock 모드인 경우
         if (config.USE_MOCK) {
             console.log('[GEMS API] Using Mock Response (USE_MOCK=true)');
@@ -259,7 +271,7 @@ const gemsApi = {
             
             if (isConnectionError) {
                 console.warn('[GEMS API] 🔄 백엔드 서버 연결 실패 감지. Mock 응답으로 전환합니다.');
-                console.warn('[GEMS API] 백엔드 서버가 실행 중인지 확인하세요: http://localhost:8080');
+                console.warn('[GEMS API] Supabase Edge Function 연결 상태를 확인하세요.');
             }
             
             // 서버 연결 실패 시 Mock으로 폴백 (status 0 또는 500 이상)
@@ -327,6 +339,21 @@ const gemsApi = {
      * 엔드포인트: GET /api/v1/business-plan/history
      */
     getAnalysisHistory: async () => {
+        if (useSupabase) {
+            const { data, error } = await requireSupabase()
+                .from('ai_analysis_history')
+                .select('analysis_id,result,created_at,action_taken,action_status')
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            const rows = (data || []).map((row) => ({
+                ...(row.result || {}),
+                analysisId: row.analysis_id,
+                analyzedAt: row.created_at,
+                actionTaken: row.action_taken,
+                actionStatus: row.action_status,
+            }));
+            return { success: true, data: rows, total: rows.length };
+        }
         if (config.USE_MOCK) {
             return { success: true, data: [], total: 0 };
         }
@@ -349,6 +376,7 @@ const gemsApi = {
      * 엔드포인트: GET /api/v1/business-plan/health
      */
     checkHealth: async () => {
+        if (useSupabase) return { success: true, status: 'healthy', message: 'Supabase Edge Function configured' };
         if (config.USE_MOCK) {
             return { success: true, status: 'mock', message: 'Mock mode active' };
         }
@@ -374,6 +402,21 @@ const gemsApi = {
      * @param {string} analysisId
      */
     getAnalysisById: async (analysisId) => {
+        if (useSupabase) {
+            const { data, error } = await requireSupabase()
+                .from('ai_analysis_history')
+                .select('analysis_id,result,created_at,action_taken,action_status')
+                .eq('analysis_id', analysisId)
+                .single();
+            if (error) throw error;
+            return {
+                ...(data.result || {}),
+                analysisId: data.analysis_id,
+                analyzedAt: data.created_at,
+                actionTaken: data.action_taken,
+                actionStatus: data.action_status,
+            };
+        }
         if (config.USE_MOCK) {
             return getMockResponse();
         }
@@ -385,6 +428,16 @@ const gemsApi = {
      * @param {object} data - { analysisId, actionTaken, status }
      */
     saveActionRecord: async (data) => {
+        if (useSupabase) {
+            const { data: updated, error } = await requireSupabase()
+                .from('ai_analysis_history')
+                .update({ action_taken: data.actionTaken || null, action_status: data.status || null })
+                .eq('analysis_id', data.analysisId)
+                .select('id,analysis_id,action_taken,action_status')
+                .single();
+            if (error) throw error;
+            return { success: true, ...updated };
+        }
         if (config.USE_MOCK) {
             return { success: true, id: `action-${Date.now()}` };
         }

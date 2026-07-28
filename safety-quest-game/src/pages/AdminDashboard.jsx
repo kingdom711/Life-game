@@ -17,8 +17,9 @@ import {
 import adminApi from '../api/adminApi';
 import { useAuth } from '../context/AuthContext';
 import { EmptyState, LoadingState, ResultNotice } from '../components/PageState';
+import { isAdminRole } from '../utils/authRoles';
 
-const canUseAdminDashboard = (user) => user?.role === 'ROLE_PROJECT_ADMIN' || user?.role === 'ROLE_ADMIN';
+const canUseAdminDashboard = (user) => isAdminRole(user?.role);
 
 const numberFormat = new Intl.NumberFormat('ko-KR');
 

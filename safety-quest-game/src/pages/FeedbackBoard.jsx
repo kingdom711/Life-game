@@ -4,6 +4,7 @@ import { Megaphone, MessageSquare, RefreshCw, Send, Trash2 } from 'lucide-react'
 import feedbackApi from '../api/feedbackApi';
 import { useAuth } from '../context/AuthContext';
 import { EmptyState, LoadingState, ResultNotice } from '../components/PageState';
+import { isAdminRole } from '../utils/authRoles';
 
 const CATEGORY_OPTIONS = [
     { value: 'ERROR', label: '오류' },
@@ -43,7 +44,7 @@ function formatDate(value) {
 function FeedbackBoard() {
     const { user } = useAuth();
     const location = useLocation();
-    const hasAdminRole = user?.role === 'ROLE_PROJECT_ADMIN' || user?.role === 'ROLE_ADMIN';
+    const hasAdminRole = isAdminRole(user?.role);
     const isAdmin = hasAdminRole && location.pathname.startsWith('/admin');
     const [posts, setPosts] = useState([]);
     const [notices, setNotices] = useState([]);

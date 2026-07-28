@@ -4,6 +4,17 @@
  */
 
 import apiClient from './apiClient';
+import authApi from './authApi';
+import { requireSupabase } from '../lib/supabase';
+
+const toGameProfile = (row) => ({
+    level: row.level,
+    exp: row.exp,
+    expToNext: row.exp_to_next,
+    gameRole: row.game_role,
+    activeSpecialization: row.active_specialization,
+    totalQuestsCompleted: row.total_quests_completed,
+});
 
 const gameProfileApi = {
     /**
@@ -12,6 +23,22 @@ const gameProfileApi = {
      * @returns {Promise<{profile, specializations, points, streak} | null>}
      */
     fetchFullGameData: async () => {
+        if (authApi.usesSupabase) {
+            const supabase = requireSupabase();
+            const [profileResult, pointsResult, streakResult] = await Promise.all([
+                supabase.from('user_game_profiles').select('*').single(),
+                supabase.from('user_points').select('*').single(),
+                supabase.from('user_streaks').select('*').single(),
+            ]);
+            const error = profileResult.error || pointsResult.error || streakResult.error;
+            if (error) throw error;
+            return {
+                profile: toGameProfile(profileResult.data),
+                points: pointsResult.data,
+                streak: streakResult.data,
+                specializations: [],
+            };
+        }
         try {
             return await apiClient.get('/game-profile/me/full');
         } catch (err) {
@@ -24,6 +51,14 @@ const gameProfileApi = {
      * 게임 프로필 조회
      */
     getProfile: async () => {
+        if (authApi.usesSupabase) {
+            const { data, error } = await requireSupabase()
+                .from('user_game_profiles')
+                .select('*')
+                .single();
+            if (error) throw error;
+            return toGameProfile(data);
+        }
         return apiClient.get('/game-profile/me');
     },
 
@@ -32,6 +67,18 @@ const gameProfileApi = {
      * @param {object} data - { gameRole, activeSpecialization }
      */
     updateProfile: async (data) => {
+        if (authApi.usesSupabase) {
+            if (Object.prototype.hasOwnProperty.call(data, 'activeSpecialization')) {
+                throw new Error('전직 선택은 전직 데이터 이관 후에 사용할 수 있습니다.');
+            }
+            if (!Object.prototype.hasOwnProperty.call(data, 'gameRole')) {
+                return gameProfileApi.getProfile();
+            }
+            const { data: result, error } = await requireSupabase()
+                .rpc('set_my_game_role', { p_game_role: data.gameRole ?? null });
+            if (error) throw error;
+            return toGameProfile(result);
+        }
         return apiClient.put('/game-profile/me', data);
     },
 
@@ -41,6 +88,9 @@ const gameProfileApi = {
      * @param {string} source - 경험치 획득 출처
      */
     addExp: async (amount, source = '') => {
+        if (authApi.usesSupabase) {
+            throw new Error('경험치 적립은 서버 검증 퀘스트 이관 후에만 가능합니다.');
+        }
         return apiClient.post('/game-profile/me/exp', { amount, source });
     },
 
@@ -49,6 +99,9 @@ const gameProfileApi = {
      * @param {string} role - technician, supervisor, safety_manager
      */
     setGameRole: async (role) => {
+        if (authApi.usesSupabase) {
+            return gameProfileApi.updateProfile({ gameRole: role });
+        }
         return apiClient.put('/game-profile/me/role', { role });
     },
 

@@ -37,6 +37,7 @@ import WorkStopHistoryPage from './pages/WorkStopHistoryPage'; // [New] 작업�
 import AchievementPage from './pages/AchievementPage'; // [Phase1] 업적
 import GrowthReportPage from './pages/GrowthReportPage';
 import FeedbackBoard from './pages/FeedbackBoard';
+import CertificateVerificationPage from './pages/CertificateVerificationPage';
 
 // [Phase1] 팀 상세
 import TeamDetailPage from './pages/TeamDetailPage';
@@ -69,6 +70,7 @@ import BackgroundMusic from './components/BackgroundMusic';
 import ErrorBoundary from './components/ErrorBoundary';
 import { LanguageProvider } from './context/LanguageContext';
 import { BETA_CLOSED } from './config/betaConfig';
+import { isAdminRole } from './utils/authRoles';
 
 // ...
 
@@ -103,8 +105,8 @@ function App() {
     // const [loading, setLoading] = useState(true); // AuthContext로 대체
 
     const { user, loading } = useAuth();
-    const isProjectAdminAccount = user?.role === 'ROLE_PROJECT_ADMIN';
-    const isAdminAccount = user?.role === 'ROLE_PROJECT_ADMIN' || user?.role === 'ROLE_ADMIN';
+    const isProjectAdminAccount = user?.role === 'PROJECT_ADMIN' || user?.role === 'ROLE_PROJECT_ADMIN';
+    const isAdminAccount = isAdminRole(user?.role);
     // [베타 종료] 참여자 화면 축소 (점수/보상안내/게시판만 노출)
     const isParticipantLockdown = BETA_CLOSED && !isAdminAccount;
     const isAdminDashboardMode = isAdminAccount && adminEntryMode === ADMIN_ENTRY_MODES.ADMIN;
@@ -259,6 +261,12 @@ function App() {
                 <div className="spinner"></div>
             </div>
         );
+    }
+
+    // This public page intentionally bypasses the app login flow. QR readers can
+    // verify a certificate through the publishable-key protected Edge Function.
+    if (window.location.pathname === '/verify-certificate') {
+        return <CertificateVerificationPage />;
     }
 
     console.log("App Render State:", { showLandingPage, showPricingPage, showLaunchScreen, user, selectedRole });

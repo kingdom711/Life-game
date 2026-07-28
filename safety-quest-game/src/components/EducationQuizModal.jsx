@@ -117,6 +117,7 @@ const EducationQuizModal = ({
         setIsSubmitting(true);
 
         try {
+            let serverGrade = null;
             // [교육 수료 증거] 퀴즈 답안 서버 저장 (fire-and-forget)
             if (educationId) {
                 const answersPayload = Object.entries(detailedAnswers.current).map(
@@ -127,16 +128,17 @@ const EducationQuizModal = ({
                     })
                 );
 
-                educationApi.submitQuizAnswers({
+                serverGrade = await educationApi.submitQuizAnswers({
                     educationId,
                     attemptNumber: attemptNumberRef.current,
                     answers: answersPayload,
-                }).catch(() => {
+                }).catch((error) => {
+                    throw error;
                     // 네트워크 오류 시 조용히 무시 (퀴즈 UX 방해 안 함)
                 });
             }
 
-            const result = await onSubmit(answers);
+            const result = await onSubmit(answers, educationId ? serverGrade : null);
             setQuizResult(result);
             setShowResult(true);
         } catch (error) {

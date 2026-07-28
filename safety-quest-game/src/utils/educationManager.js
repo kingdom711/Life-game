@@ -33,6 +33,7 @@ import {
 import { addPoints, addExperience } from './pointsCalculator';
 import { applyDailyQuestCompletionToWeekly } from './questManager';
 import educationApi from '../api/educationApi';
+import authApi from '../api/authApi';
 
 /**
  * 오늘의 교육 콘텐츠 가져오기
@@ -153,7 +154,7 @@ export const completeVideo = (watchedTime) => {
  * @param {Object} answers - 답안 { questionId: selectedIndex }
  * @returns {Object} 채점 결과
  */
-export const submitQuiz = (educationId, answers) => {
+export const submitQuiz = (educationId, answers, serverGrade = null) => {
     const education = getEducationById(educationId);
     if (!education) {
         return { success: false, message: '교육 콘텐츠를 찾을 수 없습니다.' };
@@ -196,8 +197,10 @@ export const submitQuiz = (educationId, answers) => {
     });
 
     const totalQuestions = education.quiz.length;
-    const score = Math.round((correctCount / totalQuestions) * 100);
-    const passed = score >= education.requiredScore;
+    const localScore = Math.round((correctCount / totalQuestions) * 100);
+    const hasServerGrade = Number.isInteger(serverGrade?.score) && typeof serverGrade?.passed === 'boolean';
+    const score = hasServerGrade ? serverGrade.score : localScore;
+    const passed = hasServerGrade ? serverGrade.passed : localScore >= education.requiredScore;
 
     // 진행 상태 업데이트
     educationProgress.completeQuiz(score, passed);
@@ -290,10 +293,10 @@ const completeEducation = (educationId, quizScore) => {
     }
 
     // 포인트 지급 (백엔드 동기화 포함)
-    addPoints(pointsReward, '교육 완료', `${education.title} 완료`);
-
-    // 경험치 지급 (백엔드 동기화 포함)
-    addExperience(expReward);
+    if (!authApi.usesSupabase) {
+        addPoints(pointsReward, '?? ??', `${education.title} ??`);
+        addExperience(expReward);
+    }
     // 교육 이력에 추가
     educationHistory.addCompleted({
         educationId: educationId,

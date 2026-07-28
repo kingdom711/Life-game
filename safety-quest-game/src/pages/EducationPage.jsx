@@ -141,10 +141,10 @@ const EducationPage = () => {
     }, []);
 
     // 퀴즈 제출
-    const handleQuizSubmit = async (answers) => {
+    const handleQuizSubmit = async (answers, serverGrade = null) => {
         if (!todayEducation) return;
 
-        const result = submitQuiz(todayEducation.id, answers);
+        const result = submitQuiz(todayEducation.id, answers, serverGrade);
 
         if (result.passed) {
             // 교육 완료 - 데이터 새로고침

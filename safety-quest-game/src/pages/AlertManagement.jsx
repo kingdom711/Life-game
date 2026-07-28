@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAllAlerts, createAlert, updateAlert, deleteAlert } from '../api/alertApi';
 import { LoadingState, EmptyState, ResultNotice } from '../components/PageState';
 import { useAuth } from '../context/AuthContext';
+import { isManagerRole } from '../utils/authRoles';
 
 const COLOR = {
     text: 'var(--color-text)',
@@ -26,10 +27,7 @@ function AlertManagement({ role }) {
     const { user } = useAuth();
     const isAdmin = role === 'supervisor'
         || role === 'safetyManager'
-        || user?.role === 'ROLE_ADMIN'
-        || user?.role === 'ROLE_SAFETY_MANAGER'
-        || user?.role === 'ROLE_SUPERVISOR'
-        || user?.role === 'ROLE_PROJECT_ADMIN';
+        || isManagerRole(user?.role);
 
     const [alerts, setAlerts] = useState([]);
     const [loading, setLoading] = useState(true);

@@ -3,12 +3,23 @@
  */
 
 import apiClient from './apiClient';
+import authApi from './authApi';
+import { requireSupabase } from '../lib/supabase';
 
 const shopApi = {
     /**
      * 상점 아이템 목록 조회
      */
     getItems: async () => {
+        if (authApi.usesSupabase) {
+            const { data, error } = await requireSupabase()
+                .from('shop_items')
+                .select('*')
+                .order('category')
+                .order('price');
+            if (error) throw error;
+            return data;
+        }
         return apiClient.get('/shop/items');
     },
     
@@ -17,6 +28,15 @@ const shopApi = {
      * @param {string} category
      */
     getItemsByCategory: async (category) => {
+        if (authApi.usesSupabase) {
+            const { data, error } = await requireSupabase()
+                .from('shop_items')
+                .select('*')
+                .eq('category', category)
+                .order('price');
+            if (error) throw error;
+            return data;
+        }
         return apiClient.get(`/shop/items?category=${category}`);
     },
     
@@ -25,6 +45,15 @@ const shopApi = {
      * @param {string} itemId
      */
     getItemDetail: async (itemId) => {
+        if (authApi.usesSupabase) {
+            const { data, error } = await requireSupabase()
+                .from('shop_items')
+                .select('*')
+                .eq('id', itemId)
+                .single();
+            if (error) throw error;
+            return data;
+        }
         return apiClient.get(`/shop/items/${itemId}`);
     },
     
@@ -33,6 +62,12 @@ const shopApi = {
      * @param {string} itemId
      */
     purchaseItem: async (itemId) => {
+        if (authApi.usesSupabase) {
+            const { data, error } = await requireSupabase()
+                .rpc('purchase_shop_item', { p_item_id: itemId });
+            if (error) throw error;
+            return Array.isArray(data) ? data[0] : data;
+        }
         return apiClient.post(`/shop/items/${itemId}/purchase`);
     },
     
@@ -41,6 +76,16 @@ const shopApi = {
      * @param {string} itemId
      */
     canPurchase: async (itemId) => {
+        if (authApi.usesSupabase) {
+            const client = requireSupabase();
+            const [{ data: pointData, error: pointError }, { data: inventoryData, error: inventoryError }, { data: itemData, error: itemError }] = await Promise.all([
+                client.from('user_points').select('balance').single(),
+                client.from('user_inventory_items').select('item_id').eq('item_id', itemId).maybeSingle(),
+                client.from('shop_items').select('price').eq('id', itemId).single(),
+            ]);
+            if (pointError || inventoryError || itemError) throw pointError || inventoryError || itemError;
+            return { canPurchase: !inventoryData && pointData.balance >= itemData.price };
+        }
         return apiClient.get(`/shop/items/${itemId}/can-purchase`);
     }
 };

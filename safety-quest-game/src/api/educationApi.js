@@ -10,6 +10,8 @@
  */
 
 import apiClient from './apiClient';
+import authApi from './authApi';
+import { requireSupabase } from '../lib/supabase';
 
 const educationApi = {
     /**
@@ -25,6 +27,17 @@ const educationApi = {
      * @returns {{ logId, serverTime, checkpointSec }}
      */
     saveCheckpoint: async (data) => {
+        if (authApi.usesSupabase) {
+            const { data: result, error } = await requireSupabase().rpc('record_education_checkpoint', {
+                p_education_id: data.educationId,
+                p_checkpoint_sec: data.checkpointSec,
+                p_total_sec: data.totalSec,
+                p_is_playing: data.isPlaying,
+                p_tab_visible: data.tabVisible,
+            });
+            if (error) throw error;
+            return result;
+        }
         return apiClient.post('/education/checkpoint', data);
     },
 
@@ -42,6 +55,19 @@ const educationApi = {
      * @returns {{ savedCount, attemptNumber, savedAt }}
      */
     submitQuizAnswers: async (data) => {
+        if (authApi.usesSupabase) {
+            const { data: result, error } = await requireSupabase().rpc('submit_and_grade_education_quiz', {
+                p_education_id: data.educationId,
+                p_attempt_number: data.attemptNumber,
+                p_answers: data.answers.map(({ questionId, selectedOption, timeSpentSec }) => ({
+                    question_id: questionId,
+                    selected_option: selectedOption,
+                    time_spent_sec: timeSpentSec,
+                })),
+            });
+            if (error) throw error;
+            return result;
+        }
         return apiClient.post('/education/quiz-submit', data);
     },
 
@@ -66,7 +92,32 @@ const educationApi = {
      *             completedAt, quizScore, quizPassed, videoWatchRatio, integrityHash }}
      */
     complete: async (data) => {
+        if (authApi.usesSupabase) {
+            const { data: result, error } = await requireSupabase()
+                .rpc('complete_education', { p_education_id: data.educationId });
+            if (error) throw error;
+            return result;
+        }
         return apiClient.post('/education/complete', data);
+    },
+
+    getMyCompletions: async () => {
+        if (authApi.usesSupabase) {
+            const { data, error } = await requireSupabase()
+                .from('education_completions')
+                .select('id, education_id, quiz_score, watch_seconds, completed_at, certificate_number')
+                .order('completed_at', { ascending: false });
+            if (error) throw error;
+            return data.map((row) => ({
+                id: row.id,
+                educationId: row.education_id,
+                quizScore: row.quiz_score,
+                watchSeconds: row.watch_seconds,
+                completedAt: row.completed_at,
+                certificateNumber: row.certificate_number,
+            }));
+        }
+        return apiClient.get('/education/completions');
     },
 };
 

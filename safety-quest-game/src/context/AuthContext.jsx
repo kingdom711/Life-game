@@ -204,7 +204,7 @@ export const AuthProvider = ({ children }) => {
             }
 
             try {
-                if (authApi.isAuthenticated()) {
+                if (await authApi.isAuthenticated()) {
                     const response = await authApi.getMe();
                     const userData = response.user || response;
 
@@ -217,7 +217,9 @@ export const AuthProvider = ({ children }) => {
                     }
 
                     // ⭐ 세션 복원 시에도 서버 게임 데이터 동기화
-                    await syncGameData();
+                    if (!authApi.usesSupabase) {
+                        await syncGameData();
+                    }
                 } else {
                     storage.clearActiveUser();
                 }
@@ -267,7 +269,9 @@ export const AuthProvider = ({ children }) => {
             }
 
             // ⭐ 로그인 성공 후 서버 게임 데이터 동기화 (크로스 디바이스)
-            await syncGameData();
+            if (!authApi.usesSupabase) {
+                await syncGameData();
+            }
 
             return response;
         } catch (err) {

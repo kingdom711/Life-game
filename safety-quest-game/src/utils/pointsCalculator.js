@@ -2,6 +2,7 @@ import { points, level, equippedItems, userInventoryInstances } from './storage'
 import { getItemEffect, getItemById, getItemBaseStats } from '../data/itemsData';
 import userApi from '../api/userApi';
 import gameProfileApi from '../api/gameProfileApi';
+import authApi from '../api/authApi';
 
 // 백엔드 포인트 동기화 (fire-and-forget, 로그인 시에만)
 const syncPointsToBackend = (amount, type, reason, description = '') => {
@@ -240,6 +241,16 @@ export const getActiveStatsForHUD = () => {
 // 포인트 추가 (아이템 보너스 + 세트 효과 포함) [Updated]
 export const addPoints = (basePoints, questType = 'all', source = '기타', sourceDetail = '') => {
     // 새로운 스탯 시스템 사용
+    if (authApi.usesSupabase) {
+        return {
+            basePoints,
+            bonus: 0,
+            totalPoints: 0,
+            newTotal: points.get(),
+            serverManaged: true
+        };
+    }
+
     const totalStats = getTotalCombinedStats();
     const bonusPercent = totalStats.pointBoost;
     const totalPoints = Math.round(basePoints * (1 + bonusPercent / 100));

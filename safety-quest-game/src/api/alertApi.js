@@ -1,4 +1,6 @@
 import apiClient from './apiClient';
+import authApi from './authApi';
+import { requireSupabase } from '../lib/supabase';
 
 const formatTimeAgo = (dateString) => {
     if (!dateString) return '';
@@ -58,7 +60,7 @@ const transformAlert = (alert) => {
         message: title.message,
         detail: alert.message || '',
         time: formatTimeAgo(alert.createdAt),
-        createdAt: alert.createdAt,
+        createdAt: alert.createdAt || alert.created_at,
         priority: alert.priority,
         active: alert.active
     };
@@ -82,6 +84,11 @@ const transformToBackend = (data) => {
 
 export const getAlerts = async () => {
     try {
+        if (authApi.usesSupabase) {
+            const { data, error } = await requireSupabase().from('alerts').select('*').order('priority', { ascending: false }).order('created_at', { ascending: false });
+            if (error) throw error;
+            return data.map(transformAlert);
+        }
         const alerts = await apiClient.get('/alerts/active');
         const alertList = Array.isArray(alerts) ? alerts : [];
         return alertList.map(transformAlert);
@@ -93,6 +100,11 @@ export const getAlerts = async () => {
 
 export const getAllAlerts = async () => {
     try {
+        if (authApi.usesSupabase) {
+            const { data, error } = await requireSupabase().from('alerts').select('*').order('created_at', { ascending: false });
+            if (error) throw error;
+            return data.map(transformAlert);
+        }
         const alerts = await apiClient.get('/alerts');
         const alertList = Array.isArray(alerts) ? alerts : [];
         return alertList.map(transformAlert);
@@ -105,6 +117,11 @@ export const getAllAlerts = async () => {
 export const createAlert = async (data) => {
     try {
         const backendData = transformToBackend(data);
+        if (authApi.usesSupabase) {
+            const { data: id, error } = await requireSupabase().rpc('admin_save_alert', { p_id: null, p_title: backendData.title, p_message: backendData.message, p_type: backendData.type, p_priority: backendData.priority, p_active: backendData.active, p_start_date: backendData.startDate, p_end_date: backendData.endDate });
+            if (error) throw error;
+            return { ...transformAlert({ ...backendData, id, createdAt: new Date().toISOString() }) };
+        }
         const alert = await apiClient.post('/alerts', backendData);
         return transformAlert(alert);
     } catch (error) {
@@ -116,6 +133,11 @@ export const createAlert = async (data) => {
 export const updateAlert = async (id, data) => {
     try {
         const backendData = transformToBackend(data);
+        if (authApi.usesSupabase) {
+            const { data: savedId, error } = await requireSupabase().rpc('admin_save_alert', { p_id: id, p_title: backendData.title, p_message: backendData.message, p_type: backendData.type, p_priority: backendData.priority, p_active: backendData.active, p_start_date: backendData.startDate, p_end_date: backendData.endDate });
+            if (error) throw error;
+            return transformAlert({ ...backendData, id: savedId, createdAt: new Date().toISOString() });
+        }
         const alert = await apiClient.put(`/alerts/${id}`, backendData);
         return transformAlert(alert);
     } catch (error) {
@@ -126,6 +148,11 @@ export const updateAlert = async (id, data) => {
 
 export const deleteAlert = async (id) => {
     try {
+        if (authApi.usesSupabase) {
+            const { error } = await requireSupabase().rpc('admin_delete_alert', { p_id: id });
+            if (error) throw error;
+            return;
+        }
         await apiClient.delete(`/alerts/${id}`);
         console.log('[AlertApi] Alert deleted:', id);
     } catch (error) {

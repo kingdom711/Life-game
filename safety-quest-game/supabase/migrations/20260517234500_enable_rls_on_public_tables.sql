@@ -1,0 +1,4 @@
+-- Historical baseline restored from the remote migration ledger.
+-- The original initial RLS setup was applied before this repository's
+-- Supabase directory was introduced. Later migrations contain the complete
+-- current policy definitions; this file preserves ledger reproducibility.

@@ -4,6 +4,8 @@
  */
 
 import apiClient from './apiClient';
+import authApi from './authApi';
+import { requireSupabase } from '../lib/supabase';
 import { 
     attemptCalibration, 
     getCalibrationInfo, 
@@ -22,6 +24,14 @@ const inventoryApi = {
      * 인벤토리 전체 조회
      */
     getInventory: async () => {
+        if (authApi.usesSupabase) {
+            const { data, error } = await requireSupabase()
+                .from('user_inventory_items')
+                .select('item_id, calibration_level, is_equipped, purchased_at')
+                .order('purchased_at');
+            if (error) throw error;
+            return { data, success: true };
+        }
         if (USE_API) {
             return apiClient.get('/inventory');
         }
@@ -69,6 +79,12 @@ const inventoryApi = {
      * @param {string} itemId
      */
     equipItem: async (itemId) => {
+        if (authApi.usesSupabase) {
+            const { data, error } = await requireSupabase()
+                .rpc('set_inventory_item_equipped', { p_item_id: itemId, p_equipped: true });
+            if (error) throw error;
+            return { data, success: true };
+        }
         if (USE_API) {
             return apiClient.post(`/inventory/${itemId}/equip`);
         }
@@ -81,6 +97,12 @@ const inventoryApi = {
      * @param {string} itemId
      */
     unequipItem: async (itemId) => {
+        if (authApi.usesSupabase) {
+            const { data, error } = await requireSupabase()
+                .rpc('set_inventory_item_equipped', { p_item_id: itemId, p_equipped: false });
+            if (error) throw error;
+            return { data, success: true };
+        }
         if (USE_API) {
             return apiClient.post(`/inventory/${itemId}/unequip`);
         }
@@ -139,6 +161,18 @@ const inventoryApi = {
      * @returns {Object} 검교정 결과
      */
     calibrateItem: async (instanceId) => {
+        if (authApi.usesSupabase) {
+            const { data, error } = await requireSupabase()
+                .rpc('calibrate_inventory_item', { p_item_id: instanceId });
+            if (error) throw error;
+            return {
+                data,
+                success: Boolean(data?.success),
+                status: data?.status,
+                newLevel: data?.levelAfter,
+                message: data?.success ? 'Calibration complete' : 'Calibration failed',
+            };
+        }
         if (USE_API) {
             return apiClient.post('/inventory/calibrate', { instanceId });
         }
@@ -158,6 +192,33 @@ const inventoryApi = {
      * @returns {Object} 검교정 정보
      */
     getCalibrationInfo: async (itemId) => {
+        if (authApi.usesSupabase) {
+            const { data, error } = await requireSupabase()
+                .from('user_inventory_items')
+                .select('item_id, calibration_level')
+                .eq('item_id', itemId)
+                .single();
+            if (error) throw error;
+            const item = getItemById(itemId);
+            const config = getCalibrationConfig(itemId);
+            if (!item || !config) throw new Error('Inventory item configuration was not found');
+            const currentLevel = data.calibration_level || 0;
+            return {
+                data: {
+                    itemId,
+                    itemName: item.name,
+                    rarity: item.rarity,
+                    currentLevel,
+                    maxLevel: config.maxLevel,
+                    cost: getCalibrationCost(itemId, currentLevel),
+                    successRate: getCalibrationSuccessRate(itemId, currentLevel),
+                    successRatePercent: Math.round(getCalibrationSuccessRate(itemId, currentLevel) * 100),
+                    preview: previewCalibrationStats(itemId, currentLevel),
+                    canCalibrate: currentLevel < config.maxLevel,
+                },
+                success: true,
+            };
+        }
         if (USE_API) {
             return apiClient.get(`/inventory/${itemId}/calibration`);
         }
@@ -253,6 +314,14 @@ const inventoryApi = {
      * 포인트 잔액 확인
      */
     getPointsBalance: async () => {
+        if (authApi.usesSupabase) {
+            const { data, error } = await requireSupabase()
+                .from('user_points')
+                .select('balance')
+                .single();
+            if (error) throw error;
+            return { data: { points: data.balance }, success: true };
+        }
         if (USE_API) {
             return apiClient.get('/user/points');
         }

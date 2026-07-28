@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { items, ITEM_CATEGORY, ITEM_RARITY, CATEGORY_NAMES, RARITY_NAMES, getRarityColor } from '../data/itemsData';
-import { purchaseItem } from '../utils/inventoryManager';
+import shopApi from '../api/shopApi';
+import authApi from '../api/authApi';
+import { requireSupabase } from '../lib/supabase';
 import { points as pointsStorage, inventory as inventoryStorage } from '../utils/storage';
 import { LoadingState, ErrorState, EmptyState } from '../components/PageState';
 import ShareRewardModal from '../components/ShareRewardModal';
@@ -40,7 +42,7 @@ function Shop() {
         setIsLoading(true);
         setLoadError('');
         try {
-            loadData();
+            await loadData();
         } catch (error) {
             console.error('상점 데이터 로드 실패:', error);
             setLoadError('상점 데이터를 불러오지 못했습니다.');
@@ -49,7 +51,18 @@ function Shop() {
         }
     };
 
-    const loadData = () => {
+    const loadData = async () => {
+        if (authApi.usesSupabase) {
+            const client = requireSupabase();
+            const [{ data: pointData, error: pointError }, { data: inventoryData, error: inventoryError }] = await Promise.all([
+                client.from('user_points').select('balance').single(),
+                client.from('user_inventory_items').select('item_id'),
+            ]);
+            if (pointError || inventoryError) throw pointError || inventoryError;
+            setCurrentPoints(pointData.balance);
+            setOwnedItems(inventoryData.map(({ item_id }) => item_id));
+            return;
+        }
         setCurrentPoints(pointsStorage.get());
         setOwnedItems(inventoryStorage.get());
     };
@@ -58,10 +71,22 @@ function Shop() {
         ? items
         : items.filter(item => item.category === filter);
 
-    const handlePurchase = (item) => {
-        const result = purchaseItem(item.id);
+    const handlePurchase = async (item) => {
+        let result;
+        try {
+            if (authApi.usesSupabase) {
+                const purchase = await shopApi.purchaseItem(item.id);
+                result = { success: true, ...purchase };
+            } else {
+                result = (await import('../utils/inventoryManager')).purchaseItem(item.id);
+            }
+        } catch (error) {
+            console.error('Shop purchase failed:', error);
+            setLoadError(error.message || '구매를 완료하지 못했습니다.');
+            return;
+        }
         if (result.success) {
-            loadData();
+            await loadData();
             // epic 이상 아이템 구매 시 공유 모달 표시
             if (item.rarity === 'epic' || item.rarity === 'legendary') {
                 setShareModal({
@@ -70,7 +95,7 @@ function Shop() {
                     data: buildItemShareData(item)
                 });
             }
-        } else {
+        } else if (result?.success === false) {
             console.log(result.message);
         }
     };

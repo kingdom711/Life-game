@@ -4,6 +4,7 @@ import { addPoints, addExperience } from './pointsCalculator';
 import { trackQuestComplete } from './achievementManager';
 import { addSeasonPoints } from './seasonManager';
 import { addNotification, NOTIFICATION_TYPES } from './notificationManager';
+import authApi from '../api/authApi';
 
 const WEEKLY_COMPLETE_DAILY_TRACK_KEY = 'safety_quest_weekly_complete_daily_track';
 
@@ -43,6 +44,7 @@ export const applyDailyQuestCompletionToWeekly = () => {
 };
 
 export const updateQuestProgress = (questId, increment = 1) => {
+    if (authApi.usesSupabase) return { completed: false, serverManaged: true };
     const quest = getQuestById(questId);
     if (!quest) return false;
 
@@ -67,6 +69,7 @@ export const updateQuestProgress = (questId, increment = 1) => {
 
 // 퀘스트 완료 처리
 export const completeQuest = (questId) => {
+    if (authApi.usesSupabase) return false;
     const quest = getQuestById(questId);
     if (!quest) return false;
 
@@ -109,6 +112,7 @@ const grantQuestReward = (quest) => {
 
 // 특정 액션으로 관련 퀘스트 진행도 업데이트
 export const triggerQuestAction = (action, role, amount = 1) => {
+    if (authApi.usesSupabase) return [];
     const completedQuests = [];
 
     // 모든 퀘스트를 순회하며 해당 액션과 관련된 퀘스트 찾기
@@ -145,6 +149,9 @@ export const triggerQuestAction = (action, role, amount = 1) => {
 
 // 출석 체크 로직 (KST 기준, Streak 계산)
 export const checkAttendance = (userId) => {
+    if (authApi.usesSupabase) {
+        return { success: false, serverManaged: true };
+    }
     const todayStr = getKSTDateString();
     const yesterdayStr = getKSTYesterdayString();
 

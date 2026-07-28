@@ -4,6 +4,7 @@ import { CheckCircle2, RefreshCw, XCircle } from 'lucide-react';
 import adminApi from '../api/adminApi';
 import { useAuth } from '../context/AuthContext';
 import { EmptyState, LoadingState, ResultNotice } from '../components/PageState';
+import { isAdminRole } from '../utils/authRoles';
 
 const formatDateTime = (value) => value
     ? new Date(value).toLocaleString('ko-KR', {
@@ -18,7 +19,7 @@ const formatDateTime = (value) => value
 function AdminPasswordResetApproval() {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const isAdmin = user?.role === 'ROLE_PROJECT_ADMIN' || user?.role === 'ROLE_ADMIN';
+    const isAdmin = isAdminRole(user?.role);
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [processingId, setProcessingId] = useState(null);

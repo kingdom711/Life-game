@@ -192,6 +192,9 @@ const attemptTokenRefresh = async () => {
  * 401 에러 시 자동 토큰 갱신 시도
  */
 const request = async (endpoint, options = {}, retryCount = 0) => {
+    if (config.LEGACY_API_DISABLED) {
+        throw new ApiError(`Legacy API endpoint is retired: ${endpoint}. Use the corresponding Supabase API module.`, 501);
+    }
     await config.resolveApiBaseUrl();
     const url = config.getApiUrl(endpoint);
     const isFormDataBody = options.body instanceof FormData;

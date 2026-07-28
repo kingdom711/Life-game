@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getKSTDateString, monthlyAttendance, streak } from '../utils/storage';
 import questApi from '../api/questApi';
 import userApi from '../api/userApi';
+import authApi from '../api/authApi';
 
 const StreakButton = ({ onCheckIn, onShowMonthlyRewards }) => {
     const [isCheckedIn, setIsCheckedIn] = useState(false);
@@ -36,7 +37,7 @@ const StreakButton = ({ onCheckIn, onShowMonthlyRewards }) => {
             refreshLocalStatus();
 
             const token = localStorage.getItem('accessToken');
-            if (!token) return;
+            if (!token && !authApi.usesSupabase) return;
 
             try {
                 await syncStreakFromApi();
@@ -64,7 +65,7 @@ const StreakButton = ({ onCheckIn, onShowMonthlyRewards }) => {
         }
 
         const token = localStorage.getItem('accessToken');
-        if (token) {
+        if (token || authApi.usesSupabase) {
             try {
                 const data = await questApi.checkIn();
 
@@ -97,7 +98,7 @@ const StreakButton = ({ onCheckIn, onShowMonthlyRewards }) => {
             } catch (err) {
                 console.log('[StreakButton] API check-in failed, falling back:', err.message);
 
-                if (err.data?.code === 'AT001') {
+            if (err.data?.code === 'AT001' || err.message?.includes('already checked in today')) {
                     try {
                         await syncStreakFromApi();
                     } catch (syncErr) {

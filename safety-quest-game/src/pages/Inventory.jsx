@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getInventoryItems, equipItem, unequipItem, isItemEquipped, getInventoryStats } from '../utils/inventoryManager';
 import { CATEGORY_NAMES, getRarityColor, RARITY_NAMES } from '../data/itemsData';
+import { getItemById } from '../data/itemsData';
+import inventoryApi from '../api/inventoryApi';
+import authApi from '../api/authApi';
 import { userInventoryInstances } from '../utils/storage';
 import { ensureItemInstance, getCalibrationInfo } from '../utils/calibrationService';
 import CalibrationModal from '../components/CalibrationModal';
@@ -36,7 +39,7 @@ function Inventory() {
         setIsLoading(true);
         setLoadError('');
         try {
-            loadData();
+            await loadData();
         } catch (error) {
             console.error('인벤토리 데이터 로드 실패:', error);
             setLoadError('인벤토리 데이터를 불러오지 못했습니다.');
@@ -45,7 +48,25 @@ function Inventory() {
         }
     };
 
-    const loadData = () => {
+    const loadData = async () => {
+        if (authApi.usesSupabase) {
+            const response = await inventoryApi.getInventory();
+            const records = response.data;
+            const items = records.map(record => ({
+                ...getItemById(record.item_id),
+                serverRecord: record,
+            })).filter(item => item.id);
+            setInventoryItems(items);
+            setStats({
+                totalItems: items.length,
+                equippedCount: records.filter(record => record.is_equipped).length,
+                totalValue: items.reduce((total, item) => total + item.price, 0),
+            });
+            setItemInstances(Object.fromEntries(records.map(record => [record.item_id, {
+                currentCalibrationLevel: record.calibration_level,
+            }])));
+            return;
+        }
         const items = getInventoryItems();
         const inventoryStats = getInventoryStats();
         setInventoryItems(items);
@@ -67,7 +88,12 @@ function Inventory() {
         }
     };
 
-    const handleEquip = (item) => {
+    const handleEquip = async (item) => {
+        if (authApi.usesSupabase) {
+            await inventoryApi.equipItem(item.id);
+            await loadData();
+            return;
+        }
         // 아이템 인스턴스가 없으면 생성
         ensureItemInstance(item.id);
         
@@ -77,7 +103,12 @@ function Inventory() {
         }
     };
 
-    const handleUnequip = (item) => {
+    const handleUnequip = async (item) => {
+        if (authApi.usesSupabase) {
+            await inventoryApi.unequipItem(item.id);
+            await loadData();
+            return;
+        }
         const result = unequipItem(item.category);
         if (result.success) {
             loadData();
@@ -213,7 +244,7 @@ function Inventory() {
                 ) : (
                     <div className="grid grid-3">
                         {inventoryItems.map(item => {
-                            const equipped = isItemEquipped(item.id);
+                            const equipped = authApi.usesSupabase ? item.serverRecord.is_equipped : isItemEquipped(item.id);
                             const calibrationLevel = getItemCalibrationLevel(item.id);
                             const instance = itemInstances[item.id];
 

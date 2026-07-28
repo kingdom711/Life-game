@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { getCalibrationInfo, attemptCalibration, ensureItemInstance } from '../utils/calibrationService';
 import { points } from '../utils/storage';
 import { getRarityColor, RARITY_NAMES, getItemById } from '../data/itemsData';
+import inventoryApi from '../api/inventoryApi';
+import authApi from '../api/authApi';
 
 /**
  * 검교정(강화) 모달 - High-Tech Lab 컨셉
@@ -15,12 +17,21 @@ const CalibrationModal = ({ isOpen, onClose, itemId, onCalibrationComplete }) =>
     useEffect(() => {
         if (isOpen && itemId) {
             loadCalibrationInfo();
-            setCurrentPoints(points.get());
+            if (!authApi.usesSupabase) setCurrentPoints(points.get());
             setResult(null);
         }
     }, [isOpen, itemId]);
 
-    const loadCalibrationInfo = () => {
+    const loadCalibrationInfo = async () => {
+        if (authApi.usesSupabase) {
+            const [infoResponse, pointsResponse] = await Promise.all([
+                inventoryApi.getCalibrationInfo(itemId),
+                inventoryApi.getPointsBalance(),
+            ]);
+            setCalibrationInfo(infoResponse.data);
+            setCurrentPoints(pointsResponse.data.points || 0);
+            return;
+        }
         // 인스턴스가 없으면 생성
         ensureItemInstance(itemId);
         const info = getCalibrationInfo(itemId);
@@ -28,7 +39,7 @@ const CalibrationModal = ({ isOpen, onClose, itemId, onCalibrationComplete }) =>
     };
 
     const handleCalibrate = async () => {
-        if (!calibrationInfo?.instanceId || isCalibrating) return;
+        if ((!calibrationInfo?.instanceId && !authApi.usesSupabase) || isCalibrating) return;
 
         setIsCalibrating(true);
         setResult(null);
@@ -36,9 +47,11 @@ const CalibrationModal = ({ isOpen, onClose, itemId, onCalibrationComplete }) =>
         // 연출을 위한 딜레이
         await new Promise(resolve => setTimeout(resolve, 1500));
 
-        const calibrationResult = attemptCalibration(calibrationInfo.instanceId);
+        const calibrationResult = authApi.usesSupabase
+            ? await inventoryApi.calibrateItem(itemId)
+            : attemptCalibration(calibrationInfo.instanceId);
         setResult(calibrationResult);
-        setCurrentPoints(points.get());
+        if (!authApi.usesSupabase) setCurrentPoints(points.get());
         
         // 정보 새로고침
         loadCalibrationInfo();

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { triggerQuestAction } from '../utils/questManager';
 import { userProfile, storage } from '../utils/storage';
+import checklistApi from '../api/checklistApi';
 
 const CHECKLIST_ITEMS = [
     { id: 'ppe_helmet', label: '안전모 착용 상태 확인', category: '개인보호구(PPE)' },
@@ -89,6 +90,14 @@ const ChecklistFormModal = ({ isOpen, onClose, onComplete, role }) => {
                 id, label, answer: checked, comment, riskFlag
             }))
         };
+
+        try {
+            await checklistApi.submitChecklist({ siteName: checklist.siteName, items: checklist.items });
+        } catch (submitError) {
+            setError(submitError.message || '체크리스트 제출에 실패했습니다.');
+            setIsSubmitting(false);
+            return;
+        }
 
         saveChecklist(checklist);
 

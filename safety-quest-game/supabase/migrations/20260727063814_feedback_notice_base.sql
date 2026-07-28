@@ -1,0 +1,11 @@
+create table public.feedback_posts(id uuid primary key default gen_random_uuid(),user_id uuid not null references public.profiles(id) on delete cascade,category text not null,title text not null check(length(title)<=120),content text not null check(length(content)<=4000),page_path text,status text not null default 'OPEN' check(status in ('OPEN','IN_REVIEW','ANSWERED','CLOSED')),admin_reply text,replied_by uuid references public.profiles(id),replied_at timestamptz,created_at timestamptz not null default now());
+create table public.notices(id uuid primary key default gen_random_uuid(),title text not null check(length(title)<=120),content text not null check(length(content)<=4000),author_id uuid not null references public.profiles(id),created_at timestamptz not null default now());
+create table public.notice_comments(id uuid primary key default gen_random_uuid(),notice_id uuid not null references public.notices(id) on delete cascade,user_id uuid not null references public.profiles(id) on delete cascade,content text not null check(length(content)<=1000),created_at timestamptz not null default now());
+alter table public.feedback_posts enable row level security; alter table public.notices enable row level security; alter table public.notice_comments enable row level security;
+create policy "feedback own or manager select" on public.feedback_posts for select to authenticated using((select auth.uid())=user_id or (select private.is_manager()));
+create policy "feedback own insert" on public.feedback_posts for insert to authenticated with check((select auth.uid())=user_id);
+create policy "notices read" on public.notices for select to authenticated using(true);
+create policy "notice comments read" on public.notice_comments for select to authenticated using(true);
+create policy "notice comments own insert" on public.notice_comments for insert to authenticated with check((select auth.uid())=user_id);
+create policy "notice comments own delete" on public.notice_comments for delete to authenticated using((select auth.uid())=user_id or (select private.is_manager()));
+grant select,insert on public.feedback_posts,public.notices,public.notice_comments to authenticated;

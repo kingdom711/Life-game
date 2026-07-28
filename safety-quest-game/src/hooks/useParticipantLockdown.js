@@ -1,5 +1,6 @@
 import { useAuth } from '../context/AuthContext';
 import { BETA_CLOSED } from '../config/betaConfig';
+import { isAdminRole } from '../utils/authRoles';
 
 /**
  * 베타 종료 후 참여자 화면 축소 여부
@@ -7,6 +8,6 @@ import { BETA_CLOSED } from '../config/betaConfig';
  */
 export default function useParticipantLockdown() {
     const { user } = useAuth();
-    const isAdminAccount = user?.role === 'ROLE_PROJECT_ADMIN' || user?.role === 'ROLE_ADMIN';
+    const isAdminAccount = isAdminRole(user?.role);
     return BETA_CLOSED && !isAdminAccount;
 }

@@ -3,19 +3,31 @@ import { Link } from 'react-router-dom';
 import { getQuestsByTypeAndRole, QUEST_TYPE } from '../data/questsData';
 import QuestCard from '../components/QuestCard';
 import { completeQuest } from '../utils/questManager';
+import authApi from '../api/authApi';
+import questApi from '../api/questApi';
 
 function WeeklyQuests({ role }) {
     const [quests, setQuests] = useState([]);
 
-    useEffect(() => {
+    const refreshQuests = () => {
+        if (authApi.usesSupabase) {
+            questApi.getPersonalQuests('weekly').then((rows) => setQuests(rows.map((quest) => ({ ...quest, link: '/daily' })))).catch(console.error);
+            return;
+        }
         const weeklyQuests = getQuestsByTypeAndRole(QUEST_TYPE.WEEKLY, role);
         setQuests(weeklyQuests);
-    }, [role]);
+    };
 
-    const handleCompleteQuest = (quest) => {
+    useEffect(() => { refreshQuests(); }, [role]);
+
+    const handleCompleteQuest = async (quest) => {
+        if (authApi.usesSupabase) {
+            await questApi.claimPersonalQuestReward(quest.id);
+            refreshQuests();
+            return;
+        }
         completeQuest(quest.id);
-        const updatedQuests = getQuestsByTypeAndRole(QUEST_TYPE.WEEKLY, role);
-        setQuests(updatedQuests);
+        refreshQuests();
     };
 
     return (

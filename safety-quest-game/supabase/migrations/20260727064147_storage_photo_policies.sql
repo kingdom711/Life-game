@@ -1,0 +1,5 @@
+drop policy if exists "photo owner select" on storage.objects; drop policy if exists "photo owner insert" on storage.objects; drop policy if exists "photo owner update" on storage.objects; drop policy if exists "photo owner delete" on storage.objects;
+create policy "photo owner select" on storage.objects for select to authenticated using(bucket_id='safety-road-photos' and ((storage.foldername(name))[1]=(select auth.uid()::text) or (select private.is_manager())));
+create policy "photo owner insert" on storage.objects for insert to authenticated with check(bucket_id='safety-road-photos' and (storage.foldername(name))[1]=(select auth.uid()::text));
+create policy "photo owner update" on storage.objects for update to authenticated using(bucket_id='safety-road-photos' and (storage.foldername(name))[1]=(select auth.uid()::text)) with check(bucket_id='safety-road-photos' and (storage.foldername(name))[1]=(select auth.uid()::text));
+create policy "photo owner delete" on storage.objects for delete to authenticated using(bucket_id='safety-road-photos' and (storage.foldername(name))[1]=(select auth.uid()::text));

@@ -3,12 +3,15 @@
  */
 
 import apiClient from './apiClient';
+import authApi from './authApi';
+import { requireSupabase } from '../lib/supabase';
 
 const riskApi = {
     /**
      * 평가 대상 위험 항목 조회
      */
     getPendingRisks: async () => {
+        if (authApi.usesSupabase) { const { data, error } = await requireSupabase().from('checklist_items').select('*, checklists(*)').eq('risk_flag', true); if (error) throw error; return data; }
         return apiClient.get('/risks/pending');
     },
     
@@ -18,6 +21,7 @@ const riskApi = {
      * @param {object} request - { frequency: number, severity: number, comment?: string }
      */
     assessRisk: async (checklistItemId, request) => {
+        if (authApi.usesSupabase) { const { data, error } = await requireSupabase().rpc('assess_risk', { p_checklist_item_id: checklistItemId, p_frequency: request.frequency, p_severity: request.severity, p_comment: request.comment || null }); if (error) throw error; return { id: data }; }
         return apiClient.post(`/risks/${checklistItemId}/assess`, request);
     },
     
@@ -26,6 +30,7 @@ const riskApi = {
      * @param {number} assessmentId
      */
     getAssessmentDetail: async (assessmentId) => {
+        if (authApi.usesSupabase) { const { data, error } = await requireSupabase().from('risk_assessments').select('*, risk_countermeasures(*)').eq('id', assessmentId).single(); if (error) throw error; return data; }
         return apiClient.get(`/risks/${assessmentId}`);
     },
     
@@ -33,6 +38,7 @@ const riskApi = {
      * 고위험 항목 조회
      */
     getHighRiskItems: async () => {
+        if (authApi.usesSupabase) { const { data, error } = await requireSupabase().from('risk_assessments').select('*, checklist_items(*)').in('level', ['HIGH','CRITICAL']); if (error) throw error; return data; }
         return apiClient.get('/risks/high-risk');
     },
     
@@ -41,6 +47,7 @@ const riskApi = {
      * @param {string} level - LOW, MEDIUM, HIGH, CRITICAL
      */
     getAssessmentsByLevel: async (level) => {
+        if (authApi.usesSupabase) { const { data, error } = await requireSupabase().from('risk_assessments').select('*').eq('level', level); if (error) throw error; return data; }
         return apiClient.get(`/risks/level/${level}`);
     },
     
@@ -63,6 +70,7 @@ const riskApi = {
      * @param {number} countermeasureId
      */
     completeCountermeasure: async (countermeasureId) => {
+        if (authApi.usesSupabase) { const { error } = await requireSupabase().rpc('complete_risk_countermeasure', { p_id: countermeasureId }); if (error) throw error; return { success: true }; }
         return apiClient.patch(`/risks/countermeasures/${countermeasureId}/complete`, {});
     },
 };
