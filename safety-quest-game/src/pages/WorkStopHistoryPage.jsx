@@ -380,8 +380,8 @@ function WorkStopHistoryPage() {
                                                     padding: '0.5rem',
                                                     borderRadius: '8px',
                                                     border: '1px solid rgba(148,163,184,0.2)',
-                                                    background: 'rgba(15, 23, 42, 0.6)',
-                                                    color: '#e2e8f0',
+                                                    background: 'var(--color-surface)',
+                                                    color: 'var(--color-text)',
                                                     fontSize: '0.8rem',
                                                     resize: 'vertical',
                                                     outline: 'none',
@@ -800,8 +800,8 @@ function WorkStopHistoryPage() {
                                             border: actionPlan.trim()
                                                 ? '1px solid rgba(34, 197, 94, 0.3)'
                                                 : '1px solid rgba(239, 68, 68, 0.3)',
-                                            background: 'rgba(15, 23, 42, 0.6)',
-                                            color: '#e2e8f0',
+                                            background: 'var(--color-surface)',
+                                            color: 'var(--color-text)',
                                             fontSize: '0.85rem',
                                             resize: 'vertical',
                                             outline: 'none',
@@ -838,8 +838,8 @@ function WorkStopHistoryPage() {
                                             border: actionMethod.trim()
                                                 ? '1px solid rgba(34, 197, 94, 0.3)'
                                                 : '1px solid rgba(239, 68, 68, 0.3)',
-                                            background: 'rgba(15, 23, 42, 0.6)',
-                                            color: '#e2e8f0',
+                                            background: 'var(--color-surface)',
+                                            color: 'var(--color-text)',
                                             fontSize: '0.85rem',
                                             resize: 'vertical',
                                             outline: 'none',
@@ -881,8 +881,8 @@ function WorkStopHistoryPage() {
                                             border: resumeVerification.trim()
                                                 ? '1px solid rgba(20, 184, 166, 0.3)'
                                                 : '1px solid rgba(239, 68, 68, 0.3)',
-                                            background: 'rgba(15, 23, 42, 0.6)',
-                                            color: '#e2e8f0',
+                                            background: 'var(--color-surface)',
+                                            color: 'var(--color-text)',
                                             fontSize: '0.85rem',
                                             resize: 'vertical',
                                             outline: 'none',
@@ -919,8 +919,8 @@ function WorkStopHistoryPage() {
                                             border: resumeActionNote.trim()
                                                 ? '1px solid rgba(20, 184, 166, 0.3)'
                                                 : '1px solid rgba(239, 68, 68, 0.3)',
-                                            background: 'rgba(15, 23, 42, 0.6)',
-                                            color: '#e2e8f0',
+                                            background: 'var(--color-surface)',
+                                            color: 'var(--color-text)',
                                             fontSize: '0.85rem',
                                             resize: 'vertical',
                                             outline: 'none',

@@ -108,10 +108,10 @@ function TeamQuestPage() {
                 </div>
 
                 <div style={{ marginBottom: '1.25rem' }}>
-                    <h1 className="text-4xl font-bold mb-2" style={{ color: '#e2e8f0' }}>
+                    <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>
                         팀 퀘스트
                     </h1>
-                    <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>
+                    <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
                         {teamGate.team?.name || '우리 팀'}의 안전 활동 진행률
                     </p>
                 </div>
@@ -198,8 +198,8 @@ function TeamQuestPage() {
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                                             <span style={iconStyle}>{questIcons[quest.conditionType] || '?'}</span>
                                             <div>
-                                                <div style={{ fontWeight: 700, color: '#e2e8f0' }}>{quest.title}</div>
-                                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.15rem' }}>
+                                                <div style={{ fontWeight: 700, color: 'var(--color-text)' }}>{quest.title}</div>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.15rem' }}>
                                                     {quest.description}
                                                 </div>
                                             </div>
@@ -214,7 +214,7 @@ function TeamQuestPage() {
                                             display: 'flex',
                                             justifyContent: 'space-between',
                                             fontSize: '0.75rem',
-                                            color: '#94a3b8',
+                                            color: 'var(--color-text-muted)',
                                             marginBottom: '0.3rem'
                                         }}>
                                             <span>진행 상황: {completedCount}/{totalCount}명 완료</span>
@@ -244,7 +244,7 @@ function TeamQuestPage() {
                                         justifyContent: 'space-between',
                                         alignItems: 'center',
                                         gap: '1rem',
-                                        color: '#94a3b8',
+                                        color: 'var(--color-text-muted)',
                                         fontSize: '0.8rem'
                                     }}>
                                         <span>
@@ -288,7 +288,7 @@ const statCardStyle = {
 
 const statLabelStyle = {
     fontSize: '0.72rem',
-    color: '#94a3b8'
+    color: 'var(--color-text-muted)'
 };
 
 const messageStyle = {
@@ -297,7 +297,7 @@ const messageStyle = {
     marginBottom: '1rem',
     background: 'rgba(239,68,68,0.12)',
     border: '1px solid rgba(239,68,68,0.25)',
-    color: '#fca5a5',
+    color: 'var(--color-danger)',
     fontSize: '0.85rem',
     fontWeight: 600
 };
@@ -330,7 +330,7 @@ const badgeStyle = (type) => ({
     fontSize: '0.72rem',
     fontWeight: 700,
     background: type === 'DAILY' ? 'rgba(234,179,8,0.15)' : 'rgba(59,130,246,0.15)',
-    color: type === 'DAILY' ? '#fbbf24' : '#93c5fd'
+    color: type === 'DAILY' ? '#fbbf24' : 'var(--color-primary)'
 });
 
 const barTrackStyle = {
@@ -352,7 +352,7 @@ const memberChipStyle = (member) => ({
     fontSize: '0.75rem',
     fontWeight: 700,
     background: member.completed ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.05)',
-    color: member.completed ? '#4ade80' : '#94a3b8',
+    color: member.completed ? '#4ade80' : 'var(--color-text-muted)',
     border: member.me ? '1px solid rgba(59,130,246,0.45)' : '1px solid transparent'
 });
 

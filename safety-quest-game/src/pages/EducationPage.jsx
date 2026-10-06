@@ -172,7 +172,7 @@ const EducationPage = () => {
     const categoryInfo = todayEducation ? CATEGORY_INFO[todayEducation.category] : null;
 
     return (
-        <div className="min-h-screen pb-24 pt-4 px-4">
+        <div className="page education-adventure-page min-h-screen pb-24 pt-4 px-4">
             {/* 헤더 */}
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-white flex items-center gap-2">
@@ -190,8 +190,8 @@ const EducationPage = () => {
             {/* 법정 교육 시간 진행률 */}
             {legalProgress && (
                 <div
-                    className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-xl p-6 mb-6 border border-blue-500/30"
-                    style={{ width: 'fit-content', minWidth: '400px', margin: '0 auto 1.5rem auto' }}
+                    className="card rounded-xl p-6 mb-6"
+                    style={{ width: '100%', maxWidth: 640, margin: '0 auto 1.5rem auto' }}
                 >
                     <div className="flex justify-center items-center gap-4 mb-3">
                         <span className="text-gray-400 text-sm">법정 교육 시간 진행률</span>
@@ -243,7 +243,7 @@ const EducationPage = () => {
 
             {/* 오늘의 교육 탭 */}
             {selectedTab === 'today' && todayEducation && (
-                <div className="space-y-6" style={{ width: '66.67%', margin: '0 auto' }}>
+                <div className="space-y-6" style={{ width: '100%', maxWidth: 760, margin: '0 auto' }}>
                     {/* 교육 정보 카드 */}
                     <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700">
                         <div className="flex items-start gap-4 mb-4">

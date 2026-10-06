@@ -159,7 +159,7 @@ function AdminRewardApproval() {
                 {/* 탭 */}
                 <div style={{
                     display: 'flex', gap: 4, marginBottom: '1.5rem',
-                    background: 'rgba(30,41,59,0.6)', borderRadius: 12, padding: 4
+                    background: 'var(--color-surface)', borderRadius: 12, padding: 4
                 }}>
                     {TABS.map(tab => (
                         <button

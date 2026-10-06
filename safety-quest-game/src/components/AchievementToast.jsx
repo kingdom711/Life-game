@@ -82,7 +82,7 @@ function AchievementToast({ achievement, onClose }) {
                     <div style={{
                         fontSize: '1rem',
                         fontWeight: 700,
-                        color: '#f1f5f9',
+                        color: 'var(--color-text)',
                         marginBottom: '0.15rem',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -92,7 +92,7 @@ function AchievementToast({ achievement, onClose }) {
                     </div>
                     <div style={{
                         fontSize: '0.75rem',
-                        color: '#94a3b8'
+                        color: 'var(--color-text-muted)'
                     }}>
                         {achievement.description}
                     </div>

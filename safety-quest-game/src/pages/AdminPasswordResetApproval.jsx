@@ -83,16 +83,16 @@ function AdminPasswordResetApproval() {
             <div className="container" style={{ maxWidth: 760, margin: '0 auto' }}>
                 <header style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start', marginBottom: 20 }}>
                     <div>
-                        <p style={{ color: '#94a3b8', margin: '0 0 6px', fontWeight: 800 }}>ACCOUNT RECOVERY</p>
-                        <h1 style={{ color: '#f8fafc', margin: 0, fontSize: '1.75rem', fontWeight: 900 }}>비밀번호 변경 승인</h1>
-                        <p style={{ color: '#cbd5e1', margin: '8px 0 0' }}>사용자가 요청한 새 비밀번호는 승인 후에만 적용됩니다.</p>
+                        <p style={{ color: 'var(--color-text-muted)', margin: '0 0 6px', fontWeight: 800 }}>ACCOUNT RECOVERY</p>
+                        <h1 style={{ color: 'var(--color-text)', margin: 0, fontSize: '1.75rem', fontWeight: 900 }}>비밀번호 변경 승인</h1>
+                        <p style={{ color: 'var(--color-text-secondary)', margin: '8px 0 0' }}>사용자가 요청한 새 비밀번호는 승인 후에만 적용됩니다.</p>
                     </div>
                     <button
                         type="button"
                         onClick={loadRequests}
                         disabled={loading}
                         className="ui-btn-core"
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(15, 23, 42, 0.72)', color: '#e2e8f0' }}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--color-surface)', color: 'var(--color-text)' }}
                     >
                         <RefreshCw size={16} />
                         새로고침
@@ -114,9 +114,9 @@ function AdminPasswordResetApproval() {
                                 style={{ padding: '1rem', borderRadius: 8, border: '1px solid rgba(148, 163, 184, 0.18)' }}
                             >
                                 <div style={{ display: 'grid', gap: 6 }}>
-                                    <strong style={{ color: '#f8fafc', fontSize: '1rem' }}>{request.userName || '이름 없음'}</strong>
-                                    <span style={{ color: '#cbd5e1', fontSize: '0.88rem' }}>{request.email || request.username}</span>
-                                    <span style={{ color: '#94a3b8', fontSize: '0.78rem' }}>요청일: {formatDateTime(request.createdAt)}</span>
+                                    <strong style={{ color: 'var(--color-text)', fontSize: '1rem' }}>{request.userName || '이름 없음'}</strong>
+                                    <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.88rem' }}>{request.email || request.username}</span>
+                                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem' }}>요청일: {formatDateTime(request.createdAt)}</span>
                                 </div>
 
                                 <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
@@ -135,7 +135,7 @@ function AdminPasswordResetApproval() {
                                         onClick={() => reject(request.id)}
                                         disabled={processingId === request.id}
                                         className="ui-btn-core"
-                                        style={{ flex: 1, display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 8, background: 'rgba(239,68,68,0.18)', color: '#fca5a5' }}
+                                        style={{ flex: 1, display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 8, background: 'rgba(239,68,68,0.18)', color: 'var(--color-danger)' }}
                                     >
                                         <XCircle size={16} />
                                         거절

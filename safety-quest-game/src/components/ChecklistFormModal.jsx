@@ -223,7 +223,7 @@ const ChecklistFormModal = ({ isOpen, onClose, onComplete, role }) => {
                                                 <div
                                                     onClick={() => toggleCheck(index)}
                                                     style={{
-                                                        color: item.checked ? '#e2e8f0' : '#94a3b8',
+                                                        color: item.checked ? 'var(--color-text)' : 'var(--color-text-muted)',
                                                         cursor: 'pointer', fontSize: '0.95rem',
                                                         textDecoration: item.checked ? 'none' : 'none',
                                                         marginBottom: '0.4rem'
@@ -239,7 +239,7 @@ const ChecklistFormModal = ({ isOpen, onClose, onComplete, role }) => {
                                                     style={{
                                                         width: '100%', padding: '0.35rem 0.5rem',
                                                         background: '#0f0f23', border: '1px solid #333',
-                                                        borderRadius: '4px', color: '#cbd5e1',
+                                                        borderRadius: '4px', color: 'var(--color-text-secondary)',
                                                         fontSize: '0.8rem'
                                                     }}
                                                 />

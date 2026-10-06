@@ -77,7 +77,7 @@ function DepartmentBattlePage() {
                             }}>
                                 🏆 부서 대항전
                             </h1>
-                            <p style={{ margin: '0.25rem 0 0', color: '#94a3b8', fontSize: '0.8rem' }}>
+                            <p style={{ margin: '0.25rem 0 0', color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>
                                 이번 달 안전 종합 점수 경쟁
                             </p>
                         </div>
@@ -102,7 +102,7 @@ function DepartmentBattlePage() {
                                     <span style={{ color: '#60a5fa', fontWeight: 700 }}>
                                         {myDept.rank}위
                                     </span>
-                                    <span style={{ color: '#e2e8f0', fontWeight: 600, marginLeft: '0.5rem' }}>
+                                    <span style={{ color: 'var(--color-text)', fontWeight: 600, marginLeft: '0.5rem' }}>
                                         {myDept.name}
                                     </span>
                                     <span style={{ color: '#64748b', fontSize: '0.8rem', marginLeft: '0.3rem' }}>
@@ -119,7 +119,7 @@ function DepartmentBattlePage() {
 
                 {/* 로딩/에러/빈 상태 */}
                 {loading && (
-                    <div style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
+                    <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
                         불러오는 중...
                     </div>
                 )}
@@ -127,13 +127,13 @@ function DepartmentBattlePage() {
                     <div style={{
                         padding: '1rem', borderRadius: '12px', marginBottom: '1rem',
                         background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)',
-                        color: '#fca5a5', fontSize: '0.85rem'
+                        color: 'var(--color-danger)', fontSize: '0.85rem'
                     }}>
                         {error}
                     </div>
                 )}
                 {!loading && !error && rankings.length === 0 && (
-                    <div style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
+                    <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
                         아직 등록된 부서가 없습니다.
                     </div>
                 )}
@@ -141,7 +141,7 @@ function DepartmentBattlePage() {
                 {/* 순위 목록 */}
                 {!loading && !error && rankings.length > 0 && (
                 <div style={{ marginBottom: '1.5rem' }}>
-                    <h3 style={{ color: '#e2e8f0', fontWeight: 700, marginBottom: '0.75rem', fontSize: '1rem' }}>
+                    <h3 style={{ color: 'var(--color-text)', fontWeight: 700, marginBottom: '0.75rem', fontSize: '1rem' }}>
                         부서별 순위
                     </h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -169,13 +169,13 @@ function DepartmentBattlePage() {
                                         <div style={{
                                             width: '32px', textAlign: 'center', fontWeight: 800,
                                             fontSize: idx < 3 ? '1.2rem' : '0.9rem',
-                                            color: idx === 0 ? '#fbbf24' : idx === 1 ? '#94a3b8' : idx === 2 ? '#cd7f32' : '#64748b'
+                                            color: idx === 0 ? '#fbbf24' : idx === 1 ? 'var(--color-text-muted)' : idx === 2 ? '#cd7f32' : '#64748b'
                                         }}>
                                             {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : dept.rank}
                                         </div>
                                         <div style={{ flex: 1 }}>
                                             <div style={{
-                                                fontWeight: 700, color: isMyDept ? '#60a5fa' : '#e2e8f0',
+                                                fontWeight: 700, color: isMyDept ? '#60a5fa' : 'var(--color-text)',
                                                 fontSize: '0.9rem'
                                             }}>
                                                 {dept.name} {isMyDept && '(우리)'}
@@ -210,7 +210,7 @@ function DepartmentBattlePage() {
                                                     marginBottom: '0.4rem'
                                                 }}>
                                                     <div style={{
-                                                        flex: 1, fontSize: '0.75rem', color: '#94a3b8'
+                                                        flex: 1, fontSize: '0.75rem', color: 'var(--color-text-muted)'
                                                     }}>
                                                         {cat.label}
                                                     </div>
@@ -225,7 +225,7 @@ function DepartmentBattlePage() {
                                                         }} />
                                                     </div>
                                                     <div style={{
-                                                        fontSize: '0.75rem', color: '#e2e8f0',
+                                                        fontSize: '0.75rem', color: 'var(--color-text)',
                                                         fontWeight: 600, width: '50px', textAlign: 'right'
                                                     }}>
                                                         {score}/{max}
@@ -248,7 +248,7 @@ function DepartmentBattlePage() {
                     background: 'rgba(255,255,255,0.02)', borderRadius: '14px',
                     border: '1px solid rgba(255,255,255,0.06)', padding: '1.25rem'
                 }}>
-                    <h3 style={{ color: '#e2e8f0', fontWeight: 700, marginBottom: '0.75rem', fontSize: '1rem' }}>
+                    <h3 style={{ color: 'var(--color-text)', fontWeight: 700, marginBottom: '0.75rem', fontSize: '1rem' }}>
                         🎁 대항전 보상
                     </h3>
                     {rewards.map((r, idx) => (
@@ -259,10 +259,10 @@ function DepartmentBattlePage() {
                         }}>
                             <span style={{ fontSize: '1.2rem' }}>{r.icon}</span>
                             <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: '0.85rem', color: '#e2e8f0', fontWeight: 600 }}>
+                                <div style={{ fontSize: '0.85rem', color: 'var(--color-text)', fontWeight: 600 }}>
                                     {r.rank ? `${r.rank}위` : '참여 부서'}
                                 </div>
-                                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{r.reward}</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{r.reward}</div>
                             </div>
                         </div>
                     ))}

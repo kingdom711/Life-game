@@ -92,7 +92,7 @@ const ComplianceReportPage = () => {
         return (
             <div style={styles.page}>
                 <div style={styles.container}>
-                    <p style={{ color: '#94a3b8', textAlign: 'center', padding: '40px' }}>
+                    <p style={{ color: 'var(--color-text-muted)', textAlign: 'center', padding: '40px' }}>
                         리포트를 불러오는 중...
                     </p>
                 </div>
@@ -451,7 +451,7 @@ const styles = {
         gap: '10px'
     },
     subtitle: {
-        color: '#94a3b8',
+        color: 'var(--color-text-muted)',
         fontSize: '1rem',
         margin: 0
     },
@@ -464,11 +464,11 @@ const styles = {
         flexWrap: 'wrap'
     },
     monthSelect: {
-        background: 'rgba(30, 41, 59, 0.8)',
+        background: 'var(--color-surface)',
         border: '1px solid rgba(59, 130, 246, 0.3)',
         borderRadius: '10px',
         padding: '10px 16px',
-        color: '#f1f5f9',
+        color: 'var(--color-text)',
         fontSize: '0.95rem',
         cursor: 'pointer',
         outline: 'none',
@@ -499,7 +499,7 @@ const styles = {
     cardTitle: {
         fontSize: '1.15rem',
         fontWeight: '700',
-        color: '#f1f5f9',
+        color: 'var(--color-text)',
         marginTop: 0,
         marginBottom: '18px',
         display: 'flex',
@@ -523,7 +523,7 @@ const styles = {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'rgba(15, 23, 42, 0.6)'
+        background: 'var(--color-surface)'
     },
     scoreNumber: {
         fontSize: '3rem',
@@ -548,7 +548,7 @@ const styles = {
         fontWeight: '700'
     },
     scorePeriod: {
-        color: '#94a3b8',
+        color: 'var(--color-text-muted)',
         fontSize: '0.85rem',
         margin: 0
     },
@@ -560,7 +560,7 @@ const styles = {
     },
     statItem: {
         flex: '1 1 120px',
-        background: 'rgba(15, 23, 42, 0.5)',
+        background: 'var(--color-surface)',
         borderRadius: '12px',
         padding: '14px 16px',
         display: 'flex',
@@ -575,12 +575,12 @@ const styles = {
         letterSpacing: '0.3px'
     },
     statValue: {
-        color: '#f1f5f9',
+        color: 'var(--color-text)',
         fontSize: '1.4rem',
         fontWeight: '700'
     },
     progressBarContainer: {
-        background: 'rgba(15, 23, 42, 0.5)',
+        background: 'var(--color-surface)',
         borderRadius: '6px',
         height: '8px',
         overflow: 'hidden'
@@ -601,7 +601,7 @@ const styles = {
         alignItems: 'center',
         gap: '12px',
         padding: '12px 14px',
-        background: 'rgba(15, 23, 42, 0.4)',
+        background: 'var(--color-surface)',
         borderRadius: '10px',
         border: '1px solid rgba(255, 255, 255, 0.05)'
     },
@@ -617,12 +617,12 @@ const styles = {
         minWidth: 0
     },
     detailTitle: {
-        color: '#f1f5f9',
+        color: 'var(--color-text)',
         fontSize: '0.9rem',
         fontWeight: '600'
     },
     detailDesc: {
-        color: '#94a3b8',
+        color: 'var(--color-text-muted)',
         fontSize: '0.8rem',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
@@ -639,7 +639,7 @@ const styles = {
         marginTop: '18px'
     },
     chartTitle: {
-        color: '#94a3b8',
+        color: 'var(--color-text-muted)',
         fontSize: '0.85rem',
         fontWeight: '600',
         margin: '0 0 12px 0',
@@ -654,14 +654,14 @@ const styles = {
     },
     barLabel: {
         width: '70px',
-        color: '#cbd5e1',
+        color: 'var(--color-text-secondary)',
         fontSize: '0.85rem',
         textAlign: 'right',
         flexShrink: 0
     },
     barContainer: {
         flex: 1,
-        background: 'rgba(15, 23, 42, 0.5)',
+        background: 'var(--color-surface)',
         borderRadius: '4px',
         height: '20px',
         overflow: 'hidden'
@@ -674,7 +674,7 @@ const styles = {
     },
     barCount: {
         width: '40px',
-        color: '#94a3b8',
+        color: 'var(--color-text-muted)',
         fontSize: '0.85rem',
         textAlign: 'right',
         flexShrink: 0
@@ -690,7 +690,7 @@ const styles = {
         alignItems: 'center',
         gap: '8px',
         padding: '12px 14px',
-        background: 'rgba(15, 23, 42, 0.4)',
+        background: 'var(--color-surface)',
         borderRadius: '10px',
         border: '1px solid'
     },
@@ -701,7 +701,7 @@ const styles = {
         flexShrink: 0
     },
     severityLabel: {
-        color: '#cbd5e1',
+        color: 'var(--color-text-secondary)',
         fontSize: '0.85rem',
         flex: 1
     },
@@ -733,7 +733,7 @@ const styles = {
         marginTop: '2px'
     },
     recText: {
-        color: '#cbd5e1',
+        color: 'var(--color-text-secondary)',
         fontSize: '0.9rem',
         lineHeight: 1.6
     },

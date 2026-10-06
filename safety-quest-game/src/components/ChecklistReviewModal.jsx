@@ -253,7 +253,7 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
                                         }}
                                     >
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
-                                            <span style={{ color: '#e2e8f0', fontWeight: 600, fontSize: '0.9rem' }}>
+                                            <span style={{ color: 'var(--color-text)', fontWeight: 600, fontSize: '0.9rem' }}>
                                                 {cl.submittedBy}
                                             </span>
                                             {cl.items.some(i => i.riskFlag) && (
@@ -262,7 +262,7 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
                                                 </span>
                                             )}
                                         </div>
-                                        <div style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
+                                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>
                                             {cl.siteName} · {formatTimeAgo(cl.submittedAt)}
                                         </div>
                                     </div>
@@ -285,7 +285,7 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
                                         marginBottom: '1rem', paddingBottom: '0.75rem', borderBottom: '1px solid #333'
                                     }}>
                                         <div>
-                                            <div style={{ color: '#e2e8f0', fontWeight: 700, fontSize: '1.1rem' }}>
+                                            <div style={{ color: 'var(--color-text)', fontWeight: 700, fontSize: '1.1rem' }}>
                                                 {selected.submittedBy} · {selected.siteName}
                                             </div>
                                             <div style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '0.25rem' }}>
@@ -329,7 +329,7 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
                                                 {item.answer ? '✓' : '✗'}
                                             </span>
                                             <div style={{ flex: 1 }}>
-                                                <span style={{ color: '#cbd5e1' }}>{item.label}</span>
+                                                <span style={{ color: 'var(--color-text-secondary)' }}>{item.label}</span>
                                                 {item.comment && (
                                                     <span style={{ color: '#8b5cf6', marginLeft: '0.5rem', fontSize: '0.8rem' }}>
                                                         — {item.comment}
@@ -342,7 +342,7 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
 
                                     {/* 코멘트 입력 */}
                                     <div style={{ marginTop: '1.5rem' }}>
-                                        <div style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem' }}>
                                             검토 코멘트
                                         </div>
                                         <textarea
@@ -352,7 +352,7 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
                                             style={{
                                                 width: '100%', height: '80px',
                                                 background: '#0f0f23', border: '1px solid #333',
-                                                borderRadius: '6px', color: '#cbd5e1',
+                                                borderRadius: '6px', color: 'var(--color-text-secondary)',
                                                 padding: '0.75rem', fontSize: '0.85rem',
                                                 resize: 'none'
                                             }}
@@ -406,7 +406,7 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
                         <div style={{ color: '#ff4444', fontWeight: 'bold', fontSize: '0.85rem', height: '1.5rem' }}>
                             {error}
                         </div>
-                        <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>
+                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
                             검토 완료: <span style={{ color: reviewedCount >= 2 ? '#00ff88' : '#fbbf24', fontWeight: 700 }}>{reviewedCount}</span> / 2건
                         </div>
                     </div>

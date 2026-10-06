@@ -128,7 +128,7 @@ function ShareRewardModal({ isOpen, onClose, shareType, shareData }) {
                 className={`w-full max-w-sm bg-gradient-to-br ${config.gradient}
                   backdrop-blur-xl rounded-2xl border ${config.borderColor}
                   shadow-2xl shadow-black/30 overflow-hidden`}
-                style={{ background: 'rgba(15, 23, 42, 0.95)' }}
+                style={{ background: 'var(--color-surface)' }}
             >
                 {/* 헤더 */}
                 <div className="p-5 text-center">

@@ -109,7 +109,7 @@ function MicroLearningCard({ onComplete }) {
             {content.type === MICRO_TYPE.QUIZ && (
                 <div>
                     <p style={{
-                        color: '#f1f5f9', fontSize: '0.95rem', fontWeight: 600,
+                        color: 'var(--color-text)', fontSize: '0.95rem', fontWeight: 600,
                         marginBottom: '1rem', lineHeight: 1.5
                     }}>
                         Q. {content.question}
@@ -156,7 +156,7 @@ function MicroLearningCard({ onComplete }) {
                                 {isCorrect ? '정답! 🎉' : '오답!'}
                                 {isCorrect && ` +${content.reward.points}P +${content.reward.exp}EXP`}
                             </div>
-                            <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: 1.5 }}>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
                                 {content.explanation}
                             </div>
                             {!isCorrect && (
@@ -166,7 +166,7 @@ function MicroLearningCard({ onComplete }) {
                                         marginTop: '0.5rem', padding: '0.4rem 0.8rem',
                                         borderRadius: '6px', border: 'none',
                                         background: 'rgba(255,255,255,0.1)',
-                                        color: '#94a3b8', fontSize: '0.75rem',
+                                        color: 'var(--color-text-muted)', fontSize: '0.75rem',
                                         cursor: 'pointer', fontWeight: 600
                                     }}
                                 >다시 도전</button>
@@ -180,13 +180,13 @@ function MicroLearningCard({ onComplete }) {
             {content.type === MICRO_TYPE.CARD && (
                 <div>
                     <h4 style={{
-                        color: '#f1f5f9', fontSize: '1rem', fontWeight: 700,
+                        color: 'var(--color-text)', fontSize: '1rem', fontWeight: 700,
                         marginBottom: '0.5rem'
                     }}>
                         {content.title}
                     </h4>
                     <div style={{
-                        color: '#cbd5e1', fontSize: '0.85rem',
+                        color: 'var(--color-text-secondary)', fontSize: '0.85rem',
                         whiteSpace: 'pre-line', lineHeight: 1.7,
                         marginBottom: '0.75rem'
                     }}>
@@ -218,7 +218,7 @@ function MicroLearningCard({ onComplete }) {
             {content.type === MICRO_TYPE.SCENARIO && (
                 <div>
                     <p style={{
-                        color: '#f1f5f9', fontSize: '0.95rem', fontWeight: 600,
+                        color: 'var(--color-text)', fontSize: '0.95rem', fontWeight: 600,
                         marginBottom: '0.75rem', lineHeight: 1.5
                     }}>
                         [상황] {content.situation}
@@ -235,7 +235,7 @@ function MicroLearningCard({ onComplete }) {
                                         borderRadius: '10px',
                                         border: '1px solid rgba(255,255,255,0.15)',
                                         background: 'rgba(255,255,255,0.05)',
-                                        color: '#cbd5e1',
+                                        color: 'var(--color-text-secondary)',
                                         fontSize: '0.85rem',
                                         cursor: 'pointer',
                                         textAlign: 'left',
@@ -261,7 +261,7 @@ function MicroLearningCard({ onComplete }) {
                                 {isCorrect ? '정답! 🎉' : '오답!'}
                                 {isCorrect && ` +${content.reward.points}P +${content.reward.exp}EXP`}
                             </div>
-                            <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: 1.5 }}>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
                                 {content.correctExplanation}
                             </div>
                             {!isCorrect && (
@@ -271,7 +271,7 @@ function MicroLearningCard({ onComplete }) {
                                         marginTop: '0.5rem', padding: '0.4rem 0.8rem',
                                         borderRadius: '6px', border: 'none',
                                         background: 'rgba(255,255,255,0.1)',
-                                        color: '#94a3b8', fontSize: '0.75rem',
+                                        color: 'var(--color-text-muted)', fontSize: '0.75rem',
                                         cursor: 'pointer', fontWeight: 600
                                     }}
                                 >다시 도전</button>

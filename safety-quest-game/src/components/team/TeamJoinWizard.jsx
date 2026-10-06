@@ -4,7 +4,7 @@ import teamApi from '../../api/teamApi';
 import { useAuth } from '../../context/AuthContext';
 
 const panelStyle = {
-    background: 'rgba(15, 23, 42, 0.96)',
+    background: 'var(--color-surface)',
     border: '1px solid rgba(148, 163, 184, 0.22)',
     borderRadius: '16px',
     width: 'min(720px, calc(100vw - 2rem))',
@@ -150,7 +150,7 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
                             <div style={{ color: '#38bdf8', fontSize: '0.8rem', fontWeight: 800 }}>
                                 TEAM ONBOARDING
                             </div>
-                            <h2 style={{ margin: '0.25rem 0 0', color: '#e2e8f0', fontSize: '1.35rem' }}>
+                            <h2 style={{ margin: '0.25rem 0 0', color: 'var(--color-text)', fontSize: '1.35rem' }}>
                                 소속 팀 설정
                             </h2>
                         </div>
@@ -178,7 +178,7 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
                 <div style={{ padding: '1.25rem' }}>
                     {step === 1 && (
                         <div>
-                            <label style={{ display: 'block', color: '#cbd5e1', fontWeight: 700, marginBottom: '0.5rem' }}>
+                            <label style={{ display: 'block', color: 'var(--color-text-secondary)', fontWeight: 700, marginBottom: '0.5rem' }}>
                                 현장명
                             </label>
                             <input
@@ -192,7 +192,7 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
                                 style={{ width: '100%', padding: '0.8rem' }}
                                 autoFocus
                             />
-                            <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginTop: '0.75rem' }}>
+                            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginTop: '0.75rem' }}>
                                 같은 현장 안에서 팀을 검색하거나 새 팀을 만들 수 있습니다.
                             </p>
                         </div>
@@ -211,7 +211,7 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
 
                             {createMode ? (
                                 <div>
-                                    <label style={{ display: 'block', color: '#cbd5e1', fontWeight: 700, marginBottom: '0.5rem' }}>
+                                    <label style={{ display: 'block', color: 'var(--color-text-secondary)', fontWeight: 700, marginBottom: '0.5rem' }}>
                                         새 팀 이름
                                     </label>
                                     <input
@@ -224,13 +224,13 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
                                         placeholder="예: 철근 A팀"
                                         style={{ width: '100%', padding: '0.8rem' }}
                                     />
-                                    <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginTop: '0.75rem' }}>
+                                    <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginTop: '0.75rem' }}>
                                         생성자는 자동으로 팀 리더가 됩니다.
                                     </p>
                                 </div>
                             ) : (
                                 <div>
-                                    <label style={{ display: 'block', color: '#cbd5e1', fontWeight: 700, marginBottom: '0.5rem' }}>
+                                    <label style={{ display: 'block', color: 'var(--color-text-secondary)', fontWeight: 700, marginBottom: '0.5rem' }}>
                                         팀 검색
                                     </label>
                                     <input
@@ -244,9 +244,9 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
                                         style={{ width: '100%', padding: '0.8rem', marginBottom: '0.75rem' }}
                                     />
                                     <div style={{ display: 'grid', gap: '0.5rem' }}>
-                                        {loading && <div style={{ color: '#94a3b8' }}>팀을 찾는 중입니다.</div>}
+                                        {loading && <div style={{ color: 'var(--color-text-muted)' }}>팀을 찾는 중입니다.</div>}
                                         {!loading && teams.length === 0 && (
-                                            <div style={{ color: '#94a3b8' }}>검색 결과가 없습니다. 새 팀을 만들 수 있습니다.</div>
+                                            <div style={{ color: 'var(--color-text-muted)' }}>검색 결과가 없습니다. 새 팀을 만들 수 있습니다.</div>
                                         )}
                                         {teams.map((team) => (
                                             <button
@@ -262,12 +262,12 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
                                                     borderRadius: 10,
                                                     border: selectedTeam?.id === team.id ? '2px solid #38bdf8' : '1px solid rgba(148,163,184,0.18)',
                                                     background: selectedTeam?.id === team.id ? 'rgba(56,189,248,0.12)' : 'rgba(255,255,255,0.03)',
-                                                    color: '#e2e8f0',
+                                                    color: 'var(--color-text)',
                                                     cursor: 'pointer'
                                                 }}
                                             >
                                                 <div style={{ fontWeight: 800 }}>{team.name}</div>
-                                                <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                                                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
                                                     리더 {team.leaderName || '-'} · 멤버 {team.activeMemberCount || 0}명
                                                 </div>
                                             </button>
@@ -283,10 +283,10 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
                             <div style={{ color: '#22c55e', marginBottom: '0.75rem' }}>
                                 <Check size={40} />
                             </div>
-                            <h3 style={{ color: '#e2e8f0', margin: 0 }}>
+                            <h3 style={{ color: 'var(--color-text)', margin: 0 }}>
                                 {result?.type === 'created' ? '팀 생성이 완료되었습니다.' : '가입 신청을 보냈습니다.'}
                             </h3>
-                            <p style={{ color: '#94a3b8' }}>
+                            <p style={{ color: 'var(--color-text-muted)' }}>
                                 {result?.type === 'created'
                                     ? '이제 팀 기능을 바로 사용할 수 있습니다.'
                                     : '리더가 승인하면 팀 기능이 열립니다.'}

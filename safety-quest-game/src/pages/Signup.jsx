@@ -76,10 +76,10 @@ function Signup({ onSignupComplete, onLogin }) {
     return (
         <AuthLayout>
             <section className="auth-card" aria-labelledby="signup-title">
-                <div className="auth-card__label">NEW AGENT REGISTRATION</div>
+                <div className="auth-card__label">모험의 첫걸음</div>
                 <h1 id="signup-title" className="auth-card__title">회원가입</h1>
                 <p className="auth-card__subtitle">
-                    안전관리 작전에 합류할 신원 정보를 입력하세요
+                    함께 안전을 배우고 실천할 나의 계정을 만드세요
                 </p>
 
                 <form onSubmit={handleSubmit} className="auth-form" noValidate>
@@ -134,7 +134,7 @@ function Signup({ onSignupComplete, onLogin }) {
                             alignItems: 'center',
                             gap: '0.5rem',
                             padding: '0.75rem 0.875rem',
-                            background: 'rgba(15, 23, 42, 0.4)',
+                            background: 'var(--color-surface)',
                             border: '1px solid rgba(71, 85, 105, 0.4)',
                             borderRadius: 'var(--radius-md)',
                             cursor: 'pointer',

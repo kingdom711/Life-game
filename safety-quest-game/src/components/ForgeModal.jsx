@@ -95,7 +95,7 @@ function ForgeModal({ isOpen, onClose, onComplete }) {
                         <h3 style={{ margin: 0, color: '#c084fc', fontWeight: 700, fontSize: '1.2rem' }}>
                             ⚒️ 장비 합성소
                         </h3>
-                        <p style={{ margin: '0.2rem 0 0', color: '#94a3b8', fontSize: '0.8rem' }}>
+                        <p style={{ margin: '0.2rem 0 0', color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>
                             같은 등급 장비 2개 → 상위 등급 장비
                         </p>
                     </div>
@@ -115,7 +115,7 @@ function ForgeModal({ isOpen, onClose, onComplete }) {
                             style={{
                                 background: 'rgba(255,255,255,0.1)', border: 'none',
                                 borderRadius: '50%', width: '32px', height: '32px',
-                                color: '#94a3b8', cursor: 'pointer'
+                                color: 'var(--color-text-muted)', cursor: 'pointer'
                             }}
                         >✕</button>
                     </div>
@@ -264,7 +264,7 @@ function ForgeModal({ isOpen, onClose, onComplete }) {
                             {rate && (
                                 <div style={{
                                     textAlign: 'center', marginBottom: '1rem',
-                                    fontSize: '0.85rem', color: '#94a3b8'
+                                    fontSize: '0.85rem', color: 'var(--color-text-muted)'
                                 }}>
                                     성공 확률: <span style={{ color: '#fbbf24', fontWeight: 700 }}>
                                         {Math.round(rate.successRate * 100)}%
@@ -302,7 +302,7 @@ function ForgeModal({ isOpen, onClose, onComplete }) {
                                                 background: isSelected
                                                     ? `${getRarityColor(item.rarity)}22`
                                                     : 'rgba(255,255,255,0.03)',
-                                                color: '#cbd5e1',
+                                                color: 'var(--color-text-secondary)',
                                                 cursor: 'pointer',
                                                 textAlign: 'center',
                                                 fontSize: '0.75rem',
@@ -352,7 +352,7 @@ function ForgeModal({ isOpen, onClose, onComplete }) {
                                     <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fbbf24' }}>
                                         🎫 보상 토큰 교환
                                     </div>
-                                    <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                                         토큰 5개 → Legendary 장비 확정 획득
                                     </div>
                                 </div>

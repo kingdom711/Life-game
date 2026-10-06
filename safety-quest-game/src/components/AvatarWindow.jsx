@@ -139,7 +139,7 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
                         right: '1rem',
                         background: 'none',
                         border: 'none',
-                        color: '#94a3b8',
+                        color: 'var(--color-text-muted)',
                         fontSize: '1.5rem',
                         cursor: 'pointer',
                         zIndex: 10
@@ -148,7 +148,7 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
                     ×
                 </button>
 
-                <h2 style={{ textAlign: 'center', marginBottom: '1rem', color: '#f8fafc' }}>
+                <h2 style={{ textAlign: 'center', marginBottom: '1rem', color: 'var(--color-text)' }}>
                     장비 관리
                 </h2>
 
@@ -223,7 +223,7 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
 
                             return (
                                 <div key={category} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <span style={{ color: '#94a3b8', fontSize: '0.8rem', width: '60px', textAlign: 'right' }}>
+                                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', width: '60px', textAlign: 'right' }}>
                                         {CATEGORY_NAMES[category]}
                                     </span>
                                     <div style={{ position: 'relative' }}>
@@ -349,7 +349,7 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
                                             </div>
                                         )}
                                     </div>
-                                    <span style={{ color: '#94a3b8', fontSize: '0.8rem', width: '60px' }}>
+                                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', width: '60px' }}>
                                         {CATEGORY_NAMES[category]}
                                     </span>
                                 </div>
@@ -366,19 +366,19 @@ const AvatarWindow = ({ isOpen, onClose, onEquipRequest, roleId }) => {
                         background: 'rgba(0, 0, 0, 0.3)',
                         borderRadius: '12px'
                     }}>
-                        <h4 style={{ color: '#94a3b8', marginBottom: '0.75rem', fontSize: '0.9rem' }}>
+                        <h4 style={{ color: 'var(--color-text-muted)', marginBottom: '0.75rem', fontSize: '0.9rem' }}>
                             ✨ 활성 세트 효과
                         </h4>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
                             {setInfo.map((bonus, index) => {
                                 const setData = ITEM_SETS[bonus.setId];
                                 const rarityColors = {
-                                    common: '#94a3b8',
+                                    common: 'var(--color-text-muted)',
                                     rare: '#3b82f6',
                                     epic: '#a855f7',
                                     legendary: '#eab308'
                                 };
-                                const color = rarityColors[setData?.rarity] || '#94a3b8';
+                                const color = rarityColors[setData?.rarity] || 'var(--color-text-muted)';
 
                                 return (
                                     <div

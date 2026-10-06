@@ -73,7 +73,7 @@ function LearningPathPage() {
                     }}>
                         📚 학습 경로
                     </h1>
-                    <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>
+                    <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
                         체계적인 커리큘럼으로 안전 전문가가 되세요
                     </p>
                 </div>
@@ -110,10 +110,10 @@ function LearningPathPage() {
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                         <div style={{ fontSize: '2rem' }}>{path.icon}</div>
                                         <div>
-                                            <div style={{ fontWeight: 700, color: '#e2e8f0', fontSize: '1rem' }}>
+                                            <div style={{ fontWeight: 700, color: 'var(--color-text)', fontSize: '1rem' }}>
                                                 {path.progress.isLocked && '🔒 '}{path.title}
                                             </div>
-                                            <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
                                                 {path.description}
                                             </div>
                                         </div>
@@ -147,7 +147,7 @@ function LearningPathPage() {
 
                                 {/* 보상 미리보기 */}
                                 <div style={{
-                                    marginTop: '0.5rem', fontSize: '0.75rem', color: '#94a3b8'
+                                    marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--color-text-muted)'
                                 }}>
                                     완료 보상: {path.reward.points}P + {path.reward.exp}EXP
                                     {path.reward.title && <span style={{ color: path.color }}> + "{path.reward.title}"</span>}
@@ -159,7 +159,7 @@ function LearningPathPage() {
                     /* 경로 상세 뷰 */
                     <div>
                         <button onClick={() => setSelectedPath(null)} style={{
-                            background: 'none', border: 'none', color: '#94a3b8',
+                            background: 'none', border: 'none', color: 'var(--color-text-muted)',
                             cursor: 'pointer', fontSize: '0.85rem', marginBottom: '1rem'
                         }}>
                             ← 경로 목록으로
@@ -172,10 +172,10 @@ function LearningPathPage() {
                                 }}>
                                     <div style={{ fontSize: '2.5rem' }}>{selectedPathData.icon}</div>
                                     <div>
-                                        <h2 style={{ margin: 0, color: '#e2e8f0', fontWeight: 800 }}>
+                                        <h2 style={{ margin: 0, color: 'var(--color-text)', fontWeight: 800 }}>
                                             {selectedPathData.title}
                                         </h2>
-                                        <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>
+                                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
                                             {selectedPathData.progress.completedCount}/{selectedPathData.progress.totalSteps} 완료
                                         </div>
                                     </div>
@@ -224,12 +224,12 @@ function LearningPathPage() {
                                                     opacity: step.isUnlocked || step.isCompleted ? 1 : 0.5
                                                 }}>
                                                     <div style={{
-                                                        fontWeight: 700, color: '#e2e8f0', fontSize: '0.9rem',
+                                                        fontWeight: 700, color: 'var(--color-text)', fontSize: '0.9rem',
                                                         marginBottom: '0.25rem'
                                                     }}>
                                                         {step.title}
                                                     </div>
-                                                    <div style={{ fontSize: '0.8rem', color: '#94a3b8', marginBottom: '0.5rem' }}>
+                                                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '0.5rem' }}>
                                                         {step.description}
                                                     </div>
 
@@ -240,7 +240,7 @@ function LearningPathPage() {
                                                                 padding: '0.2rem 0.5rem', borderRadius: '6px',
                                                                 fontSize: '0.7rem', fontWeight: 600,
                                                                 background: 'rgba(255,255,255,0.05)',
-                                                                color: '#94a3b8'
+                                                                color: 'var(--color-text-muted)'
                                                             }}>
                                                                 {c.type === 'video' && '🎬'}
                                                                 {c.type === 'quiz' && '📝'}
@@ -297,7 +297,7 @@ function LearningPathPage() {
                                         <div style={{ fontWeight: 800, color: '#fbbf24', marginBottom: '0.5rem' }}>
                                             학습 경로 완료!
                                         </div>
-                                        <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.75rem' }}>
+                                        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '0.75rem' }}>
                                             {selectedPathData.reward.points}P + {selectedPathData.reward.exp}EXP
                                             {selectedPathData.reward.title && ` + "${selectedPathData.reward.title}"`}
                                         </div>

@@ -11,7 +11,7 @@
 }
 
 .calibration-modal-content {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e1b4b 100%);
+  background: var(--color-surface);
   border-radius: 24px;
   padding: 1.5rem;
   width: 90%;
@@ -41,7 +41,7 @@
   border-radius: 50%;
   border: none;
   background: rgba(71, 85, 105, 0.3);
-  color: #cbd5e1;
+  color: var(--color-text-secondary);
   font-size: 1.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -52,7 +52,7 @@
 
 .calibration-close-btn:hover {
   background: rgba(100, 116, 139, 0.5);
-  color: #f1f5f9;
+  color: var(--color-text);
 }
 
 .calibration-header {
@@ -72,7 +72,7 @@
 }
 
 .calibration-header p {
-  color: #94a3b8;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
 }
 
@@ -243,7 +243,7 @@
   gap: 0.75rem;
   margin-bottom: 1rem;
   padding: 0.75rem;
-  background: rgba(15, 23, 42, 0.5);
+  background: var(--color-surface);
   border-radius: 16px;
   border: 1px solid rgba(71, 85, 105, 0.3);
   overflow: hidden;
@@ -260,7 +260,7 @@
 }
 
 .calibration-stats-current {
-  background: rgba(15, 23, 42, 0.6);
+  background: var(--color-surface);
 }
 
 .calibration-stats-next {
@@ -272,7 +272,7 @@
 .calibration-stats-next h4 {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--color-text-muted);
   margin-bottom: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -301,7 +301,7 @@
 
 .calibration-stats-compare .stat-label {
   font-size: 0.8rem;
-  color: #cbd5e1;
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
@@ -322,7 +322,7 @@
 }
 
 .calibration-stats-compare .stat-value.current {
-  color: #f1f5f9;
+  color: var(--color-text);
 }
 
 .calibration-stats-compare .stat-value.next {
@@ -364,20 +364,20 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem;
-  background: rgba(15, 23, 42, 0.6);
+  background: var(--color-surface);
   border-radius: 8px;
   border: 1px solid rgba(71, 85, 105, 0.3);
 }
 
 .info-label {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--color-text-muted);
 }
 
 .info-value {
   font-weight: 600;
   font-size: 0.875rem;
-  color: #f1f5f9;
+  color: var(--color-text);
 }
 
 .info-value.success-rate {
@@ -467,7 +467,7 @@
 
 .result-text p {
   font-size: 0.875rem;
-  color: #cbd5e1;
+  color: var(--color-text-secondary);
 }
 
 /* Calibration Button */
@@ -569,7 +569,7 @@
 
 .calibration-progress .progress-bar {
   height: 8px;
-  background: rgba(15, 23, 42, 0.8);
+  background: var(--color-surface);
   border-radius: 4px;
   overflow: hidden;
   margin-bottom: 0.75rem;
@@ -681,7 +681,7 @@
 
 /* ==================== Stats HUD - Dark Theme ==================== */
 .stats-hud {
-  background: rgba(30, 41, 59, 0.9);
+  background: var(--color-surface);
   border-radius: 16px;
   border: 1px solid rgba(71, 85, 105, 0.5);
   overflow: hidden;
@@ -706,7 +706,7 @@
 .stats-hud-header h3 {
   font-size: 1rem;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--color-text);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -719,7 +719,7 @@
 .expand-btn {
   background: none;
   border: none;
-  color: #94a3b8;
+  color: var(--color-text-muted);
   cursor: pointer;
   font-size: 0.75rem;
 }
@@ -746,7 +746,7 @@
 .stat-item {
   text-align: center;
   padding: 1rem;
-  background: rgba(15, 23, 42, 0.6);
+  background: var(--color-surface);
   border-radius: 12px;
   border: 1px solid rgba(71, 85, 105, 0.3);
 }
@@ -765,14 +765,14 @@
 
 .stat-name {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 
 .stat-value-large {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--color-text);
 }
 
 .stat-breakdown {
@@ -795,7 +795,7 @@
 
 .stats-set-bonuses h4 {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--color-text-muted);
   margin-bottom: 0.75rem;
 }
 
@@ -807,7 +807,7 @@
 
 .set-bonus-item.rarity-common {
   background: rgba(148, 163, 184, 0.1);
-  border-left: 3px solid #94a3b8;
+  border-left: 3px solid var(--color-text-muted);
 }
 
 .set-bonus-item.rarity-rare {
@@ -835,17 +835,17 @@
 .set-name {
   font-weight: 600;
   font-size: 0.85rem;
-  color: #f1f5f9;
+  color: var(--color-text);
 }
 
 .set-pieces {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--color-text-muted);
 }
 
 .set-bonus-name {
   font-size: 0.8rem;
-  color: #cbd5e1;
+  color: var(--color-text-secondary);
   font-weight: 500;
 }
 
@@ -1158,7 +1158,7 @@
   transform: translateX(-50%);
   width: 4px;
   height: 24px;
-  background: #94a3b8;
+  background: var(--color-text-muted);
   border-radius: 2px;
 }
 
@@ -1195,7 +1195,7 @@
 
 .bonus-tier.locked {
   background: rgba(0, 0, 0, 0.05);
-  color: #94a3b8;
+  color: var(--color-text-muted);
 }
 
 .bonus-tier .tier-number {
@@ -1237,4 +1237,3 @@
     width: 100%;
   }
 }
-

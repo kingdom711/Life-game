@@ -12,8 +12,8 @@ const AuthLayout = ({ children, showSidePanel = true }) => {
                         className="auth-layout__brand-logo"
                     />
                     <div className="auth-layout__brand-text">
-                        <span className="auth-layout__brand-name">Safety Quest</span>
-                        <span className="auth-layout__brand-sub">Mission Control</span>
+                        <span className="auth-layout__brand-name">안전의 길</span>
+                        <span className="auth-layout__brand-sub">안전을 게임으로</span>
                     </div>
                 </a>
             </header>

@@ -199,7 +199,7 @@ function Inventory() {
                         }}
                     >
                         ⚒️ 장비 합성소
-                        <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 400 }}>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 400 }}>
                             같은 등급 장비 2개 → 상위 등급
                         </span>
                     </button>

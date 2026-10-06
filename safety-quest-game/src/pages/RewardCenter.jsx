@@ -28,7 +28,7 @@ function RewardCenter() {
                     style={{
                         padding: '1.5rem',
                         border: '1px solid rgba(59, 130, 246, 0.25)',
-                        background: 'rgba(15, 23, 42, 0.78)',
+                        background: 'var(--color-surface)',
                     }}
                 >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
@@ -39,8 +39,8 @@ function RewardCenter() {
                                 borderRadius: 12,
                                 display: 'grid',
                                 placeItems: 'center',
-                                background: 'linear-gradient(135deg, rgba(59,130,246,0.22), rgba(236,72,153,0.18))',
-                                color: '#93c5fd',
+                                background: 'var(--adventure-soft)',
+                                color: 'var(--color-primary)',
                             }}
                         >
                             <Gift size={24} aria-hidden="true" />
@@ -76,7 +76,7 @@ function RewardCenter() {
                             borderRadius: 12,
                             background: 'rgba(248, 113, 113, 0.1)',
                             border: '1px solid rgba(248, 113, 113, 0.24)',
-                            color: '#fecaca',
+                            color: 'var(--color-danger)',
                             lineHeight: 1.65,
                         }}
                     >
@@ -92,11 +92,11 @@ function RewardCenter() {
                                     minHeight: 156,
                                     padding: '1rem',
                                     borderRadius: 12,
-                                    background: 'rgba(30, 41, 59, 0.72)',
+                                    background: 'var(--color-surface)',
                                     border: '1px solid rgba(148, 163, 184, 0.18)',
                                 }}
                             >
-                                <Icon size={22} color="#93c5fd" aria-hidden="true" />
+                                <Icon size={22} color="var(--color-primary)" aria-hidden="true" />
                                 <h2 style={{ margin: '0.75rem 0 0.45rem', fontSize: '1rem', color: 'var(--color-text)' }}>
                                     {title}
                                 </h2>
@@ -112,7 +112,7 @@ function RewardCenter() {
                             marginTop: '1.25rem',
                             padding: '1rem',
                             borderRadius: 12,
-                            background: 'rgba(71, 85, 105, 0.26)',
+                            background: 'var(--color-surface)',
                             border: '1px dashed rgba(148, 163, 184, 0.32)',
                             color: 'var(--color-text-muted)',
                             lineHeight: 1.6,

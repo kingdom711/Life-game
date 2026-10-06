@@ -205,7 +205,7 @@ function QRScanModal({ isOpen, onClose, onChecklistLoad }) {
                     <button onClick={onClose} style={{
                         background: 'rgba(255,255,255,0.1)', border: 'none',
                         borderRadius: '50%', width: '32px', height: '32px',
-                        color: '#94a3b8', cursor: 'pointer'
+                        color: 'var(--color-text-muted)', cursor: 'pointer'
                     }}>✕</button>
                 </div>
 
@@ -248,7 +248,7 @@ function QRScanModal({ isOpen, onClose, onChecklistLoad }) {
                             {/* 데모 QR 버튼 */}
                             <div style={{ marginBottom: '1rem' }}>
                                 <div style={{
-                                    fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600, marginBottom: '0.5rem'
+                                    fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 600, marginBottom: '0.5rem'
                                 }}>
                                     데모 QR 코드 (장비별 체크리스트)
                                 </div>
@@ -260,7 +260,7 @@ function QRScanModal({ isOpen, onClose, onChecklistLoad }) {
                                             padding: '0.6rem', borderRadius: '10px',
                                             border: '1px solid rgba(6,182,212,0.2)',
                                             background: 'rgba(6,182,212,0.05)',
-                                            color: '#e2e8f0', fontSize: '0.8rem', fontWeight: 600,
+                                            color: 'var(--color-text)', fontSize: '0.8rem', fontWeight: 600,
                                             cursor: 'pointer', textAlign: 'center'
                                         }}>
                                             <div style={{ fontSize: '1.3rem', marginBottom: '0.2rem' }}>
@@ -289,7 +289,7 @@ function QRScanModal({ isOpen, onClose, onChecklistLoad }) {
                                     }}>
                                         {submitResult.message}
                                     </div>
-                                    <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '1rem' }}>
+                                    <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
                                         점검 점수: {submitResult.score}점
                                     </div>
                                     <button onClick={resetToScan} style={{
@@ -308,7 +308,7 @@ function QRScanModal({ isOpen, onClose, onChecklistLoad }) {
                                             padding: '0.6rem 0.75rem', borderRadius: '8px', marginBottom: '1rem',
                                             background: 'rgba(6,182,212,0.1)',
                                             border: '1px solid rgba(6,182,212,0.2)',
-                                            fontSize: '0.8rem', color: '#94a3b8'
+                                            fontSize: '0.8rem', color: 'var(--color-text-muted)'
                                         }}>
                                             장비: <span style={{ color: '#22d3ee', fontWeight: 600 }}>
                                                 {scanResult.name}
@@ -345,7 +345,7 @@ function QRScanModal({ isOpen, onClose, onChecklistLoad }) {
                                                 <div style={{ flex: 1 }}>
                                                     <div style={{
                                                         fontSize: '0.9rem', fontWeight: 600,
-                                                        color: checkStates[item.id] ? '#4ade80' : '#e2e8f0',
+                                                        color: checkStates[item.id] ? '#4ade80' : 'var(--color-text)',
                                                         textDecoration: checkStates[item.id] ? 'line-through' : 'none'
                                                     }}>
                                                         {item.label}
@@ -364,7 +364,7 @@ function QRScanModal({ isOpen, onClose, onChecklistLoad }) {
 
                                     {/* 진행도 */}
                                     <div style={{
-                                        fontSize: '0.8rem', color: '#94a3b8', textAlign: 'center',
+                                        fontSize: '0.8rem', color: 'var(--color-text-muted)', textAlign: 'center',
                                         marginBottom: '0.75rem'
                                     }}>
                                         {Object.values(checkStates).filter(Boolean).length}/{checklist.items.length} 항목 체크 완료
@@ -376,7 +376,7 @@ function QRScanModal({ isOpen, onClose, onChecklistLoad }) {
                                             padding: '0.7rem 1rem', borderRadius: '10px',
                                             border: '1px solid rgba(255,255,255,0.1)',
                                             background: 'rgba(255,255,255,0.05)',
-                                            color: '#94a3b8', fontWeight: 600, cursor: 'pointer'
+                                            color: 'var(--color-text-muted)', fontWeight: 600, cursor: 'pointer'
                                         }}>
                                             ← 다시 스캔
                                         </button>

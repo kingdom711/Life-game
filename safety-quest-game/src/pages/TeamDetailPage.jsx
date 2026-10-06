@@ -5,7 +5,7 @@ import teamApi from '../api/teamApi';
 import useTeamGate from '../hooks/useTeamGate';
 
 const cardStyle = {
-    background: 'rgba(30,41,59,0.82)',
+    background: 'var(--color-surface)',
     borderRadius: '14px',
     border: '1px solid rgba(148,163,184,0.14)',
     padding: '1rem'
@@ -116,7 +116,7 @@ function TeamDetailPage() {
         <div style={{
             minHeight: '100vh',
             background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)',
-            color: '#f1f5f9',
+            color: 'var(--color-text)',
             paddingBottom: '6rem'
         }}>
             <div style={{
@@ -125,7 +125,7 @@ function TeamDetailPage() {
                 alignItems: 'center',
                 gap: '0.75rem',
                 borderBottom: '1px solid rgba(255,255,255,0.08)',
-                background: 'rgba(15,23,42,0.9)',
+                background: 'var(--color-surface)',
                 position: 'sticky',
                 top: 0,
                 zIndex: 100
@@ -147,7 +147,7 @@ function TeamDetailPage() {
                             <h3 style={{ margin: '0.25rem 0 0', fontSize: '1.35rem', fontWeight: 800 }}>
                                 {teamGate.team?.name || teamGate.membership?.teamName}
                             </h3>
-                            <p style={{ margin: '0.35rem 0 0', color: '#94a3b8', fontSize: '0.85rem' }}>
+                            <p style={{ margin: '0.35rem 0 0', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
                                 ACTIVE 멤버 {members.length}명
                             </p>
                         </div>
@@ -172,16 +172,16 @@ function TeamDetailPage() {
                             가입 신청 {pendingMembers.length}건
                         </h3>
                         {loading ? (
-                            <p style={{ color: '#94a3b8' }}>불러오는 중입니다.</p>
+                            <p style={{ color: 'var(--color-text-muted)' }}>불러오는 중입니다.</p>
                         ) : pendingMembers.length === 0 ? (
-                            <p style={{ color: '#94a3b8', margin: 0 }}>대기 중인 신청이 없습니다.</p>
+                            <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>대기 중인 신청이 없습니다.</p>
                         ) : (
                             <div style={{ display: 'grid', gap: '0.5rem' }}>
                                 {pendingMembers.map((member) => (
-                                    <div key={member.membershipId} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.8rem', borderRadius: 10, background: 'rgba(15,23,42,0.56)' }}>
+                                    <div key={member.membershipId} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.8rem', borderRadius: 10, background: 'var(--color-surface)' }}>
                                         <div style={{ flex: 1 }}>
                                             <div style={{ fontWeight: 800 }}>{member.userName}</div>
-                                            <div style={{ color: '#94a3b8', fontSize: '0.8rem' }}>{member.username}</div>
+                                            <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>{member.username}</div>
                                         </div>
                                         <button className="btn btn-primary btn-sm" onClick={() => handleApprove(member.userId)}>
                                             <Check size={16} /> 승인
@@ -201,14 +201,14 @@ function TeamDetailPage() {
                         팀원 목록
                     </h3>
                     {loading ? (
-                        <p style={{ color: '#94a3b8' }}>불러오는 중입니다.</p>
+                        <p style={{ color: 'var(--color-text-muted)' }}>불러오는 중입니다.</p>
                     ) : members.length === 0 ? (
-                        <p style={{ color: '#94a3b8', margin: 0 }}>ACTIVE 멤버가 없습니다.</p>
+                        <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>ACTIVE 멤버가 없습니다.</p>
                     ) : (
                         <div style={{ display: 'grid', gap: '0.5rem' }}>
                             {members.map((member) => (
-                                <div key={member.membershipId} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.8rem', borderRadius: 10, background: 'rgba(15,23,42,0.56)' }}>
-                                    <div style={{ width: 40, height: 40, borderRadius: 12, display: 'grid', placeItems: 'center', background: member.leader ? 'rgba(56,189,248,0.16)' : 'rgba(148,163,184,0.12)', color: member.leader ? '#38bdf8' : '#cbd5e1', fontWeight: 900 }}>
+                                <div key={member.membershipId} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.8rem', borderRadius: 10, background: 'var(--color-surface)' }}>
+                                    <div style={{ width: 40, height: 40, borderRadius: 12, display: 'grid', placeItems: 'center', background: member.leader ? 'rgba(56,189,248,0.16)' : 'rgba(148,163,184,0.12)', color: member.leader ? '#38bdf8' : 'var(--color-text-secondary)', fontWeight: 900 }}>
                                         {member.userName?.slice(0, 1) || 'U'}
                                     </div>
                                     <div style={{ flex: 1 }}>
@@ -216,7 +216,7 @@ function TeamDetailPage() {
                                             {member.userName}
                                             {member.leader && <span style={{ color: '#38bdf8', marginLeft: 8, fontSize: '0.78rem' }}>리더</span>}
                                         </div>
-                                        <div style={{ color: '#94a3b8', fontSize: '0.8rem' }}>{member.username}</div>
+                                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>{member.username}</div>
                                     </div>
                                     {teamGate.isLeader && !member.leader && (
                                         <button className="btn btn-danger btn-sm" onClick={() => handleKick(member)}>

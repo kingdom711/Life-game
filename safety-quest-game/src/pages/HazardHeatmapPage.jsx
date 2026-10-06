@@ -53,7 +53,7 @@ const S = {
     page: {
         minHeight: '100vh',
         background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)',
-        color: '#e2e8f0',
+        color: 'var(--color-text)',
         paddingBottom: '3rem',
     },
     container: {
@@ -69,7 +69,7 @@ const S = {
         borderRadius: '10px',
         background: 'rgba(255,255,255,0.06)',
         border: '1px solid rgba(255,255,255,0.08)',
-        color: '#94a3b8',
+        color: 'var(--color-text-muted)',
         textDecoration: 'none',
         fontSize: '0.85rem',
         fontWeight: 500,
@@ -103,7 +103,7 @@ const S = {
         borderRadius: '10px',
         border: '1px solid rgba(255,255,255,0.1)',
         background: 'rgba(255,255,255,0.05)',
-        color: '#e2e8f0',
+        color: 'var(--color-text)',
         fontSize: '0.82rem',
         fontWeight: 500,
         outline: 'none',
@@ -121,7 +121,7 @@ const S = {
         margin: '0 0 0.75rem',
         fontSize: '0.95rem',
         fontWeight: 700,
-        color: '#e2e8f0',
+        color: 'var(--color-text)',
     },
 };
 
@@ -156,7 +156,7 @@ function ZoneCard({ data, zone, isSelected, onClick }) {
             }}
         >
             {/* 구역명 */}
-            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#e2e8f0', marginBottom: '0.3rem' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--color-text)', marginBottom: '0.3rem' }}>
                 {zone.name}
             </div>
 
@@ -175,7 +175,7 @@ function ZoneCard({ data, zone, isSelected, onClick }) {
                     }}>
                         {data.reportCount}
                     </span>
-                    <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>건</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>건</span>
                 </div>
 
                 {/* 미해결 배지 */}
@@ -244,7 +244,7 @@ function SeverityBar({ breakdown }) {
                             transition: 'width 0.4s ease',
                         }} />
                     </div>
-                    <span style={{ width: '20px', fontSize: '0.7rem', color: '#94a3b8', textAlign: 'right' }}>
+                    <span style={{ width: '20px', fontSize: '0.7rem', color: 'var(--color-text-muted)', textAlign: 'right' }}>
                         {count}
                     </span>
                 </div>
@@ -281,7 +281,7 @@ function TrendChart({ data, period }) {
                         {/* 건수 라벨 */}
                         <span style={{
                             fontSize: '0.65rem',
-                            color: '#94a3b8',
+                            color: 'var(--color-text-muted)',
                             marginBottom: '0.2rem',
                             fontWeight: 600,
                         }}>
@@ -365,7 +365,7 @@ function SummaryStats({ reports, zoneStats }) {
             value: trendSame ? '동일' : trendUp ? '증가' : '감소',
             unit: trendSame ? '-' : `${Math.abs(recentWeek - prevWeek)}건`,
             icon: trendUp ? '📈' : trendSame ? '➡️' : '📉',
-            color: trendUp ? '#f87171' : trendSame ? '#94a3b8' : '#22c55e',
+            color: trendUp ? '#f87171' : trendSame ? 'var(--color-text-muted)' : '#22c55e',
         },
     ];
 
@@ -417,7 +417,7 @@ function ZoneDetail({ zone, stats, reports, hazardTypes }) {
             {/* 구역 헤더 */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <div>
-                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#e2e8f0' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-text)' }}>
                         {zone.name} 상세
                     </h3>
                     <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{zone.description}</span>
@@ -439,7 +439,7 @@ function ZoneDetail({ zone, stats, reports, hazardTypes }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 {/* 심각도 분포 */}
                 <div>
-                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600, marginBottom: '0.5rem' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600, marginBottom: '0.5rem' }}>
                         심각도 분포
                     </div>
                     <SeverityBar breakdown={stats.severityBreakdown} />
@@ -447,7 +447,7 @@ function ZoneDetail({ zone, stats, reports, hazardTypes }) {
 
                 {/* 최근 신고 목록 */}
                 <div>
-                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600, marginBottom: '0.5rem' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 600, marginBottom: '0.5rem' }}>
                         최근 신고 ({recentReports.length}건)
                     </div>
                     {recentReports.length === 0 ? (
@@ -474,7 +474,7 @@ function ZoneDetail({ zone, stats, reports, hazardTypes }) {
                                         <span>{hType?.icon || '⚠️'}</span>
                                         <span style={{
                                             flex: 1,
-                                            color: '#cbd5e1',
+                                            color: 'var(--color-text-secondary)',
                                             overflow: 'hidden',
                                             textOverflow: 'ellipsis',
                                             whiteSpace: 'nowrap',

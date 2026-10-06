@@ -34,7 +34,7 @@ function AdminTestToolbar({ selectedRole, onRoleChange, onAdminMode }) {
                 gap: 12,
                 flexWrap: 'wrap',
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#e2e8f0', fontWeight: 900 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-text)', fontWeight: 900 }}>
                     <RotateCcw size={16} color="#22c55e" />
                     테스트 모드
                 </div>
@@ -50,7 +50,7 @@ function AdminTestToolbar({ selectedRole, onRoleChange, onAdminMode }) {
                                 style={{
                                     border: active ? `1px solid ${role.color}` : '1px solid rgba(148, 163, 184, 0.22)',
                                     background: active ? `${role.color}22` : 'rgba(15, 23, 42, 0.65)',
-                                    color: active ? '#f8fafc' : '#cbd5e1',
+                                    color: active ? 'var(--color-text)' : 'var(--color-text-secondary)',
                                     borderRadius: 8,
                                     padding: '0.5rem 0.75rem',
                                     fontWeight: 800,

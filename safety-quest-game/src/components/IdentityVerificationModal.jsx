@@ -70,7 +70,7 @@ const IdentityVerificationModal = ({ isOpen, onClose, onVerified }) => {
 
                 {step === 'phone' && (
                     <>
-                        <p style={{ color: '#94a3b8', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                        <p style={{ color: 'var(--color-text-muted)', marginBottom: '1rem', fontSize: '0.9rem' }}>
                             상품 교환을 위해 본인 인증이 필요합니다.<br />
                             휴대폰 번호를 입력하면 인증번호가 발송됩니다.
                         </p>
@@ -103,7 +103,7 @@ const IdentityVerificationModal = ({ isOpen, onClose, onVerified }) => {
 
                 {step === 'code' && (
                     <>
-                        <p style={{ color: '#94a3b8', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                        <p style={{ color: 'var(--color-text-muted)', marginBottom: '1rem', fontSize: '0.9rem' }}>
                             발송된 인증번호 6자리를 입력해주세요.
                         </p>
                         <input
@@ -137,7 +137,7 @@ const IdentityVerificationModal = ({ isOpen, onClose, onVerified }) => {
                     <div style={{ textAlign: 'center' }}>
                         <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✅</div>
                         <h3 style={{ color: '#22c55e', marginBottom: '0.5rem' }}>인증 성공!</h3>
-                        <p style={{ color: '#94a3b8' }}>잠시 후 상품 교환이 진행됩니다.</p>
+                        <p style={{ color: 'var(--color-text-muted)' }}>잠시 후 상품 교환이 진행됩니다.</p>
                     </div>
                 )}
 

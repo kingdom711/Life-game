@@ -28,7 +28,7 @@ const STATUS_STYLE = {
     OPEN: { color: '#fbbf24', bg: 'rgba(251,191,36,0.14)', border: 'rgba(251,191,36,0.3)' },
     IN_REVIEW: { color: '#60a5fa', bg: 'rgba(96,165,250,0.14)', border: 'rgba(96,165,250,0.3)' },
     ANSWERED: { color: '#34d399', bg: 'rgba(52,211,153,0.14)', border: 'rgba(52,211,153,0.3)' },
-    CLOSED: { color: '#94a3b8', bg: 'rgba(148,163,184,0.14)', border: 'rgba(148,163,184,0.3)' },
+    CLOSED: { color: 'var(--color-text-muted)', bg: 'rgba(148,163,184,0.14)', border: 'rgba(148,163,184,0.3)' },
 };
 
 function formatDate(value) {
@@ -235,7 +235,7 @@ function FeedbackBoard() {
                         <MessageSquare size={22} />
                     </div>
                     <div style={{ flex: 1 }}>
-                        <h1 style={{ margin: 0, color: '#f8fafc', fontSize: '1.55rem', fontWeight: 850 }}>
+                        <h1 style={{ margin: 0, color: 'var(--color-text)', fontSize: '1.55rem', fontWeight: 850 }}>
                             사용자 게시판
                         </h1>
                         <p style={{ margin: '4px 0 0', color: 'rgba(203,213,225,0.68)', fontSize: '0.86rem' }}>
@@ -250,8 +250,8 @@ function FeedbackBoard() {
                             height: 40,
                             borderRadius: 12,
                             border: '1px solid rgba(148,163,184,0.24)',
-                            background: 'rgba(15,23,42,0.72)',
-                            color: '#cbd5e1',
+                            background: 'var(--color-surface)',
+                            color: 'var(--color-text-secondary)',
                             display: 'grid',
                             placeItems: 'center',
                             cursor: 'pointer',
@@ -386,7 +386,7 @@ function FeedbackBoard() {
 
                 {isAdmin && (
                     <div style={{ marginBottom: 14 }}>
-                        <div style={{ color: '#f8fafc', fontWeight: 800, marginBottom: 8 }}>
+                        <div style={{ color: 'var(--color-text)', fontWeight: 800, marginBottom: 8 }}>
                             처리 필요 {pendingCount}건
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 6 }}>
@@ -398,7 +398,7 @@ function FeedbackBoard() {
                                         borderRadius: 10,
                                         border: '1px solid rgba(148,163,184,0.22)',
                                         background: statusFilter === option.value ? 'rgba(14,165,233,0.22)' : 'rgba(15,23,42,0.62)',
-                                        color: statusFilter === option.value ? '#7dd3fc' : '#cbd5e1',
+                                        color: statusFilter === option.value ? '#7dd3fc' : 'var(--color-text-secondary)',
                                         padding: '0.6rem 0.4rem',
                                         fontSize: '0.78rem',
                                         fontWeight: 750,
@@ -444,7 +444,7 @@ function FeedbackBoard() {
                                                 borderRadius: 9,
                                                 border: '1px solid rgba(248,113,113,0.3)',
                                                 background: 'rgba(248,113,113,0.1)',
-                                                color: '#fca5a5',
+                                                color: 'var(--color-danger)',
                                                 display: 'grid',
                                                 placeItems: 'center',
                                                 cursor: 'pointer',
@@ -469,7 +469,7 @@ function FeedbackBoard() {
                                                 <div key={comment.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                                                     <div style={{ flex: 1, minWidth: 0 }}>
                                                         <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-                                                            <span style={{ color: '#e2e8f0', fontSize: '0.8rem', fontWeight: 750 }}>
+                                                            <span style={{ color: 'var(--color-text)', fontSize: '0.8rem', fontWeight: 750 }}>
                                                                 {comment.authorName || comment.authorUsername}
                                                             </span>
                                                             {comment.authorIsAdmin && (
@@ -575,7 +575,7 @@ function FeedbackBoard() {
                                             {formatDate(post.createdAt)}
                                         </span>
                                     </div>
-                                    <h2 style={{ color: '#f8fafc', fontSize: '1rem', margin: '0 0 8px', lineHeight: 1.35 }}>
+                                    <h2 style={{ color: 'var(--color-text)', fontSize: '1rem', margin: '0 0 8px', lineHeight: 1.35 }}>
                                         {post.title}
                                     </h2>
                                     <p style={{ color: 'rgba(226,232,240,0.86)', fontSize: '0.9rem', lineHeight: 1.58, whiteSpace: 'pre-wrap', margin: 0 }}>
@@ -619,7 +619,7 @@ function FeedbackBoard() {
                                                             borderRadius: 9,
                                                             border: '1px solid rgba(148,163,184,0.18)',
                                                             background: post.status === option.value ? 'rgba(148,163,184,0.18)' : 'rgba(15,23,42,0.54)',
-                                                            color: post.status === option.value ? '#94a3b8' : '#dbeafe',
+                                                            color: post.status === option.value ? 'var(--color-text-muted)' : '#dbeafe',
                                                             padding: '0.48rem 0.3rem',
                                                             fontSize: '0.72rem',
                                                             fontWeight: 750,
@@ -666,8 +666,8 @@ const inputStyle = {
     boxSizing: 'border-box',
     borderRadius: 12,
     border: '1px solid rgba(148,163,184,0.24)',
-    background: 'rgba(15,23,42,0.82)',
-    color: '#f8fafc',
+    background: 'var(--color-surface)',
+    color: 'var(--color-text)',
     padding: '0.78rem 0.85rem',
     outline: 'none',
     fontSize: '0.88rem',
@@ -677,7 +677,7 @@ const softBadgeStyle = {
     borderRadius: 999,
     padding: '0.25rem 0.55rem',
     background: 'rgba(148,163,184,0.12)',
-    color: '#cbd5e1',
+    color: 'var(--color-text-secondary)',
     fontSize: '0.72rem',
     fontWeight: 750,
 };

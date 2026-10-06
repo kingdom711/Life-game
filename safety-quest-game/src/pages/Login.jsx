@@ -29,10 +29,10 @@ const Login = ({ onSignup, onForgotPassword }) => {
     return (
         <AuthLayout>
             <section className="auth-card" aria-labelledby="login-title">
-                <div className="auth-card__label">AGENT LOGIN</div>
+                <div className="auth-card__label">나의 안전 모험</div>
                 <h1 id="login-title" className="auth-card__title">로그인</h1>
                 <p className="auth-card__subtitle">
-                    안전 퀘스트를 계속하려면 신원을 확인해주세요
+                    로그인하고 나의 성장 기록을 이어가세요
                 </p>
 
                 <form onSubmit={handleSubmit} className="auth-form" noValidate>

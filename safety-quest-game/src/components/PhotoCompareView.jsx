@@ -105,14 +105,14 @@ function PhotoCompareView({ isOpen, onClose, onSubmit, location = 'B동 2층 전
                         <h3 style={{ margin: 0, color: '#60a5fa', fontWeight: 700, fontSize: '1.1rem' }}>
                             📸 사진 비교 점검
                         </h3>
-                        <p style={{ margin: '0.2rem 0 0', color: '#94a3b8', fontSize: '0.8rem' }}>
+                        <p style={{ margin: '0.2rem 0 0', color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>
                             {location}
                         </p>
                     </div>
                     <button onClick={onClose} style={{
                         background: 'rgba(255,255,255,0.1)', border: 'none',
                         borderRadius: '50%', width: '32px', height: '32px',
-                        color: '#94a3b8', cursor: 'pointer'
+                        color: 'var(--color-text-muted)', cursor: 'pointer'
                     }}>✕</button>
                 </div>
 
@@ -125,7 +125,7 @@ function PhotoCompareView({ isOpen, onClose, onSubmit, location = 'B동 2층 전
                         {/* 이전 점검 사진 */}
                         <div>
                             <div style={{
-                                fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.3rem',
+                                fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '0.3rem',
                                 fontWeight: 600
                             }}>
                                 이전 점검 ({previousPhoto.date})
@@ -158,7 +158,7 @@ function PhotoCompareView({ isOpen, onClose, onSubmit, location = 'B동 2층 전
                         {/* 현재 점검 사진 */}
                         <div>
                             <div style={{
-                                fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.3rem',
+                                fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '0.3rem',
                                 fontWeight: 600
                             }}>
                                 현재 점검 (오늘)
@@ -220,7 +220,7 @@ function PhotoCompareView({ isOpen, onClose, onSubmit, location = 'B동 2층 전
                             }}>
                                 {aiAnalysis.hasChange ? '⚠️ AI 변화 감지' : '✅ 변화 없음'}
                             </div>
-                            <div style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
+                            <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
                                 {aiAnalysis.message}
                             </div>
                         </div>
@@ -229,7 +229,7 @@ function PhotoCompareView({ isOpen, onClose, onSubmit, location = 'B동 2층 전
                     {/* 변화 상태 선택 */}
                     <div style={{ marginBottom: '1rem' }}>
                         <div style={{
-                            fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600, marginBottom: '0.5rem'
+                            fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 600, marginBottom: '0.5rem'
                         }}>
                             점검 결과
                         </div>
@@ -242,7 +242,7 @@ function PhotoCompareView({ isOpen, onClose, onSubmit, location = 'B동 2층 전
                                         ? '2px solid rgba(34,197,94,0.5)' : '1px solid rgba(255,255,255,0.1)',
                                     background: changeStatus === 'no_change'
                                         ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.03)',
-                                    color: changeStatus === 'no_change' ? '#4ade80' : '#94a3b8',
+                                    color: changeStatus === 'no_change' ? '#4ade80' : 'var(--color-text-muted)',
                                     fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer'
                                 }}
                             >
@@ -256,7 +256,7 @@ function PhotoCompareView({ isOpen, onClose, onSubmit, location = 'B동 2층 전
                                         ? '2px solid rgba(234,179,8,0.5)' : '1px solid rgba(255,255,255,0.1)',
                                     background: changeStatus === 'changed'
                                         ? 'rgba(234,179,8,0.15)' : 'rgba(255,255,255,0.03)',
-                                    color: changeStatus === 'changed' ? '#fbbf24' : '#94a3b8',
+                                    color: changeStatus === 'changed' ? '#fbbf24' : 'var(--color-text-muted)',
                                     fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer'
                                 }}
                             >
@@ -269,7 +269,7 @@ function PhotoCompareView({ isOpen, onClose, onSubmit, location = 'B동 2층 전
                     {changeStatus === 'changed' && (
                         <div style={{ marginBottom: '1rem' }}>
                             <div style={{
-                                fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600, marginBottom: '0.3rem'
+                                fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 600, marginBottom: '0.3rem'
                             }}>
                                 변화 상세 기록
                             </div>
@@ -281,7 +281,7 @@ function PhotoCompareView({ isOpen, onClose, onSubmit, location = 'B동 2층 전
                                 style={{
                                     width: '100%', padding: '0.75rem', borderRadius: '10px',
                                     border: '1px solid rgba(255,255,255,0.1)',
-                                    background: 'rgba(0,0,0,0.2)', color: '#e2e8f0',
+                                    background: 'rgba(0,0,0,0.2)', color: 'var(--color-text)',
                                     fontSize: '0.85rem', resize: 'vertical',
                                     fontFamily: 'inherit', boxSizing: 'border-box'
                                 }}

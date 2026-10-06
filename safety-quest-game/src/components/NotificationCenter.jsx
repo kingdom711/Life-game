@@ -159,10 +159,10 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                             style={styles.closeBtn}
                             onClick={onClose}
                             onMouseOver={(e) => {
-                                e.currentTarget.style.color = '#f1f5f9';
+                                e.currentTarget.style.color = 'var(--color-text)';
                             }}
                             onMouseOut={(e) => {
-                                e.currentTarget.style.color = '#94a3b8';
+                                e.currentTarget.style.color = 'var(--color-text-muted)';
                             }}
                         >
                             &times;
@@ -272,7 +272,7 @@ const styles = {
         alignItems: 'center',
         padding: '18px 20px',
         borderBottom: '1px solid rgba(59, 130, 246, 0.2)',
-        background: 'rgba(15, 23, 42, 0.5)'
+        background: 'var(--color-surface)'
     },
     headerLeft: {
         display: 'flex',
@@ -283,7 +283,7 @@ const styles = {
         margin: 0,
         fontSize: '1.25rem',
         fontWeight: '700',
-        color: '#f1f5f9',
+        color: 'var(--color-text)',
         display: 'flex',
         alignItems: 'center',
         gap: '8px'
@@ -318,7 +318,7 @@ const styles = {
     closeBtn: {
         background: 'none',
         border: 'none',
-        color: '#94a3b8',
+        color: 'var(--color-text-muted)',
         fontSize: '1.8rem',
         cursor: 'pointer',
         padding: 0,
@@ -345,7 +345,7 @@ const styles = {
         marginBottom: '12px'
     },
     emptyText: {
-        color: '#94a3b8',
+        color: 'var(--color-text-muted)',
         fontSize: '1rem',
         margin: 0
     },
@@ -384,7 +384,7 @@ const styles = {
         gap: '8px'
     },
     notifTitle: {
-        color: '#f1f5f9',
+        color: 'var(--color-text)',
         fontSize: '0.95rem',
         lineHeight: 1.3
     },
@@ -397,7 +397,7 @@ const styles = {
         boxShadow: '0 0 6px rgba(59, 130, 246, 0.6)'
     },
     message: {
-        color: '#94a3b8',
+        color: 'var(--color-text-muted)',
         fontSize: '0.85rem',
         lineHeight: 1.4,
         margin: 0,

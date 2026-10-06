@@ -79,7 +79,7 @@ function renderRankChange(rankChange) {
             </span>
         );
     }
-    return <span style={{ color: '#94a3b8', fontSize: '0.72rem' }}>-</span>;
+    return <span style={{ color: 'var(--color-text-muted)', fontSize: '0.72rem' }}>-</span>;
 }
 
 function LeaderboardModal({ isOpen, onClose = () => {} }) {
@@ -167,8 +167,8 @@ function LeaderboardModal({ isOpen, onClose = () => {} }) {
                     }}
                 >
                     <div>
-                        <h2 style={{ margin: 0, color: '#f8fafc', fontSize: '1.25rem' }}>전체 리더보드</h2>
-                        <div style={{ marginTop: '0.2rem', fontSize: '0.72rem', color: '#94a3b8' }}>
+                        <h2 style={{ margin: 0, color: 'var(--color-text)', fontSize: '1.25rem' }}>전체 리더보드</h2>
+                        <div style={{ marginTop: '0.2rem', fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
                             데이터 소스: {SOURCE_LABELS[source] || '오프라인'}
                         </div>
                     </div>
@@ -178,8 +178,8 @@ function LeaderboardModal({ isOpen, onClose = () => {} }) {
                         style={{
                             border: '1px solid rgba(148,163,184,0.35)',
                             borderRadius: '10px',
-                            background: 'rgba(15,23,42,0.55)',
-                            color: '#e2e8f0',
+                            background: 'var(--color-surface)',
+                            color: 'var(--color-text)',
                             width: '36px',
                             height: '36px',
                             cursor: 'pointer',
@@ -283,19 +283,19 @@ function LeaderboardModal({ isOpen, onClose = () => {} }) {
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 gap: '0.3rem',
-                                                color: '#f8fafc',
+                                                color: 'var(--color-text)',
                                                 fontWeight: 700
                                             }}
                                         >
                                             <span style={{ minWidth: '26px' }}>{podiumIcon || `#${entry.rank}`}</span>
-                                            <span style={{ fontSize: '0.82rem', color: '#cbd5e1' }}>{entry.rank}위</span>
+                                            <span style={{ fontSize: '0.82rem', color: 'var(--color-text-secondary)' }}>{entry.rank}위</span>
                                         </div>
 
                                         {viewMode === 'team' ? (
                                             <div style={{ minWidth: 0 }}>
                                                 <div
                                                     style={{
-                                                        color: '#f8fafc',
+                                                        color: 'var(--color-text)',
                                                         fontSize: '0.9rem',
                                                         fontWeight: 700,
                                                         whiteSpace: 'nowrap',
@@ -305,7 +305,7 @@ function LeaderboardModal({ isOpen, onClose = () => {} }) {
                                                 >
                                                     {entry.teamName}
                                                 </div>
-                                                <div style={{ marginTop: '0.2rem', fontSize: '0.72rem', color: '#94a3b8' }}>
+                                                <div style={{ marginTop: '0.2rem', fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
                                                     인원 {entry.memberCount}명 · 최고 기여자 {entry.topMember}
                                                 </div>
                                             </div>
@@ -322,7 +322,7 @@ function LeaderboardModal({ isOpen, onClose = () => {} }) {
                                                     <span>{entry.levelTier?.tierIcon || '👤'}</span>
                                                     <span
                                                         style={{
-                                                            color: '#f8fafc',
+                                                            color: 'var(--color-text)',
                                                             fontSize: '0.9rem',
                                                             fontWeight: 700,
                                                             whiteSpace: 'nowrap',
@@ -338,14 +338,14 @@ function LeaderboardModal({ isOpen, onClose = () => {} }) {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <div style={{ marginTop: '0.2rem', fontSize: '0.72rem', color: '#94a3b8' }}>
+                                                <div style={{ marginTop: '0.2rem', fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
                                                     {ROLE_LABELS[entry.role] || '기술자'}
                                                 </div>
                                             </div>
                                         )}
 
                                         <div style={{ textAlign: 'right' }}>
-                                            <div style={{ color: '#e2e8f0', fontSize: '0.86rem', fontWeight: 700 }}>
+                                            <div style={{ color: 'var(--color-text)', fontSize: '0.86rem', fontWeight: 700 }}>
                                                 {viewMode === 'team'
                                                     ? getTeamValueDisplay(entry, rankingType)
                                                     : getRankValueDisplay(entry, rankingType)}
@@ -362,7 +362,7 @@ function LeaderboardModal({ isOpen, onClose = () => {} }) {
 
                     {!loading && !error && isCurrentUserOutsideList && (
                         <div style={{ marginTop: '1rem', paddingTop: '0.9rem', borderTop: '1px dashed rgba(148,163,184,0.35)' }}>
-                            <div style={{ color: '#94a3b8', fontSize: '0.75rem', marginBottom: '0.45rem' }}>
+                            <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', marginBottom: '0.45rem' }}>
                                 내 현재 순위
                             </div>
                             <div
@@ -377,11 +377,11 @@ function LeaderboardModal({ isOpen, onClose = () => {} }) {
                                     background: 'rgba(56,189,248,0.1)'
                                 }}
                             >
-                                <div style={{ color: '#f8fafc', fontWeight: 700 }}>{currentUserRank.rank}위</div>
-                                <div style={{ color: '#f8fafc', fontSize: '0.88rem', fontWeight: 700 }}>
+                                <div style={{ color: 'var(--color-text)', fontWeight: 700 }}>{currentUserRank.rank}위</div>
+                                <div style={{ color: 'var(--color-text)', fontSize: '0.88rem', fontWeight: 700 }}>
                                     {currentUserRank.name}
                                 </div>
-                                <div style={{ color: '#e2e8f0', fontWeight: 700 }}>
+                                <div style={{ color: 'var(--color-text)', fontWeight: 700 }}>
                                     {getRankValueDisplay(currentUserRank, rankingType)}
                                 </div>
                             </div>
@@ -408,7 +408,7 @@ function LeaderboardModal({ isOpen, onClose = () => {} }) {
                             style={{
                                 minWidth: '230px',
                                 border: '1px solid rgba(251,191,36,0.5)',
-                                background: 'rgba(15,23,42,0.95)',
+                                background: 'var(--color-surface)',
                                 borderRadius: '12px',
                                 padding: '0.6rem 0.75rem',
                                 boxShadow: '0 10px 20px rgba(2,6,23,0.45)'
@@ -417,7 +417,7 @@ function LeaderboardModal({ isOpen, onClose = () => {} }) {
                             <div style={{ fontSize: '0.8rem', color: '#fbbf24', fontWeight: 700 }}>
                                 {achievement.icon} 신규 업적 달성
                             </div>
-                            <div style={{ marginTop: '0.2rem', color: '#f8fafc', fontSize: '0.85rem', fontWeight: 700 }}>
+                            <div style={{ marginTop: '0.2rem', color: 'var(--color-text)', fontSize: '0.85rem', fontWeight: 700 }}>
                                 {achievement.name}
                             </div>
                         </div>

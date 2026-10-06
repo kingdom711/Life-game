@@ -65,7 +65,7 @@ function SeasonRankingPage() {
                             width: `${progress}%`, transition: 'width 0.5s'
                         }} />
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#94a3b8' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                         <span>시즌 시작</span>
                         <span>{progress}% 진행</span>
                         <span>시즌 종료</span>
@@ -80,19 +80,19 @@ function SeasonRankingPage() {
                             <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#fbbf24' }}>
                                 {seasonData.seasonPoints.toLocaleString()}
                             </div>
-                            <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>시즌 포인트</div>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>시즌 포인트</div>
                         </div>
                         <div style={{ textAlign: 'center' }}>
                             <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#60a5fa' }}>
                                 {seasonData.questsCompleted}
                             </div>
-                            <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>퀘스트 완료</div>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>퀘스트 완료</div>
                         </div>
                         <div style={{ textAlign: 'center' }}>
                             <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#34d399' }}>
                                 {seasonData.educationCompleted}
                             </div>
-                            <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>교육 이수</div>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>교육 이수</div>
                         </div>
                     </div>
                 </div>
@@ -107,7 +107,7 @@ function SeasonRankingPage() {
                         <button key={t.id} onClick={() => setTab(t.id)} style={{
                             padding: '0.5rem 1rem', borderRadius: '8px', border: 'none',
                             background: tab === t.id ? 'rgba(234,179,8,0.2)' : 'rgba(255,255,255,0.05)',
-                            color: tab === t.id ? '#fbbf24' : '#94a3b8',
+                            color: tab === t.id ? '#fbbf24' : 'var(--color-text-muted)',
                             fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer'
                         }}>
                             {t.label}
@@ -130,14 +130,14 @@ function SeasonRankingPage() {
                                 <div style={{
                                     width: '32px', textAlign: 'center', fontWeight: 800,
                                     fontSize: idx < 3 ? '1.2rem' : '0.9rem',
-                                    color: idx === 0 ? '#fbbf24' : idx === 1 ? '#94a3b8' : idx === 2 ? '#cd7f32' : '#64748b'
+                                    color: idx === 0 ? '#fbbf24' : idx === 1 ? 'var(--color-text-muted)' : idx === 2 ? '#cd7f32' : '#64748b'
                                 }}>
                                     {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : user.rank}
                                 </div>
                                 <div style={{ flex: 1 }}>
                                     <div style={{
                                         fontWeight: 700, fontSize: '0.9rem',
-                                        color: user.isMe ? '#60a5fa' : '#e2e8f0'
+                                        color: user.isMe ? '#60a5fa' : 'var(--color-text)'
                                     }}>
                                         {user.name} {user.isMe && '(나)'}
                                     </div>
@@ -167,10 +167,10 @@ function SeasonRankingPage() {
                             }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div>
-                                        <div style={{ fontWeight: 700, color: '#e2e8f0', marginBottom: '0.25rem' }}>
+                                        <div style={{ fontWeight: 700, color: 'var(--color-text)', marginBottom: '0.25rem' }}>
                                             {reward.label}
                                         </div>
-                                        <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
                                             {reward.title && <span style={{ color: '#c084fc' }}>{reward.title} + </span>}
                                             {reward.points}P + {reward.trophy} 트로피
                                         </div>
@@ -203,10 +203,10 @@ function SeasonRankingPage() {
                                     background: 'rgba(255,255,255,0.03)',
                                     border: '1px solid rgba(255,255,255,0.06)'
                                 }}>
-                                    <div style={{ fontWeight: 700, color: '#e2e8f0' }}>
+                                    <div style={{ fontWeight: 700, color: 'var(--color-text)' }}>
                                         {season.seasonId} 시즌
                                     </div>
-                                    <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
                                         시즌 포인트: {season.seasonPoints} | 퀘스트: {season.questsCompleted}개
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@ function SeasonRankingPage() {
                                             {entry.seasonId}
                                         </span>
                                         {' — '}
-                                        <span style={{ color: '#e2e8f0' }}>{entry.userName}</span>
+                                        <span style={{ color: 'var(--color-text)' }}>{entry.userName}</span>
                                         <span style={{ color: '#64748b', fontSize: '0.8rem' }}>
                                             {' '}({entry.seasonPoints}SP)
                                         </span>

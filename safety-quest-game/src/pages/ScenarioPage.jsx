@@ -23,7 +23,7 @@ const CATEGORY_CONFIG = {
   electric: { label: '전기', color: '#facc15' },
   fire: { label: '화재', color: '#fb923c' },
   chemical: { label: '화학', color: '#a78bfa' },
-  general: { label: '일반', color: '#94a3b8' }
+  general: { label: '일반', color: 'var(--color-text-muted)' }
 };
 
 function ScenarioPage() {
@@ -141,20 +141,20 @@ function ScenarioPage() {
                 border: `4px solid ${gradeColor}`
               }}>
                 <div style={{ fontSize: '2rem', fontWeight: 800, color: gradeColor }}>{scorePercent}%</div>
-                <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{gradeLabel}</div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>{gradeLabel}</div>
               </div>
             </div>
 
             {/* 획득 포인트 */}
             <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '1.5rem' }}>
               <div style={styles.rewardItem}>
-                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>획득 포인트</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>획득 포인트</div>
                 <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#60a5fa' }}>
                   +{completionResult.earnedPoints}P
                 </div>
               </div>
               <div style={styles.rewardItem}>
-                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>획득 경험치</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>획득 경험치</div>
                 <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#a78bfa' }}>
                   +{completionResult.earnedExp}EXP
                 </div>
@@ -163,7 +163,7 @@ function ScenarioPage() {
 
             {/* 단계별 결과 */}
             <div style={{ marginBottom: '1.5rem' }}>
-              <h3 style={{ fontSize: '0.9rem', color: '#e2e8f0', marginBottom: '0.75rem', fontWeight: 700 }}>
+              <h3 style={{ fontSize: '0.9rem', color: 'var(--color-text)', marginBottom: '0.75rem', fontWeight: 700 }}>
                 단계별 결과
               </h3>
               {stepResults.map((result, idx) => (
@@ -172,7 +172,7 @@ function ScenarioPage() {
                   borderLeft: `3px solid ${result.correct ? '#4ade80' : result.points > 0 ? '#fbbf24' : '#f87171'}`
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.85rem', color: '#e2e8f0' }}>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--color-text)' }}>
                       {result.correct ? '✅' : result.points > 0 ? '⚠️' : '❌'} 단계 {idx + 1}
                     </span>
                     <span style={{ fontSize: '0.8rem', fontWeight: 600, color: result.correct ? '#4ade80' : result.points > 0 ? '#fbbf24' : '#f87171' }}>
@@ -226,7 +226,7 @@ function ScenarioPage() {
 
           {/* 시나리오 제목 */}
           <div style={{ marginBottom: '1rem' }}>
-            <h2 style={{ fontSize: '1.1rem', color: '#e2e8f0', fontWeight: 700, margin: 0 }}>
+            <h2 style={{ fontSize: '1.1rem', color: 'var(--color-text)', fontWeight: 700, margin: 0 }}>
               {activeScenario.icon} {activeScenario.title}
             </h2>
           </div>
@@ -285,7 +285,7 @@ function ScenarioPage() {
           {/* 피드백 */}
           {showFeedback && selectedChoice && (
             <div style={styles.feedbackCard}>
-              <p style={{ fontSize: '0.9rem', lineHeight: 1.7, color: '#e2e8f0', margin: 0 }}>
+              <p style={{ fontSize: '0.9rem', lineHeight: 1.7, color: 'var(--color-text)', margin: 0 }}>
                 {step.choices.find(c => c.id === selectedChoice)?.feedback}
               </p>
             </div>
@@ -376,8 +376,8 @@ function ScenarioPage() {
                       {/* 카테고리 뱃지 */}
                       <span style={{
                         ...styles.badge,
-                        background: `${cat.color}20`,
-                        border: `1px solid ${cat.color}40`,
+                        background: `color-mix(in srgb, ${cat.color} 13%, transparent)`,
+                        border: `1px solid color-mix(in srgb, ${cat.color} 25%, transparent)`,
                         color: cat.color
                       }}>
                         {cat.label}
@@ -402,7 +402,7 @@ function ScenarioPage() {
                     </span>
                     {/* 최고 점수 */}
                     {scenario.progress.completed && (
-                      <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                         최고: {scenario.progress.scorePercent}%
                       </span>
                     )}
@@ -441,7 +441,7 @@ const styles = {
     borderRadius: '10px',
     background: 'rgba(255, 255, 255, 0.05)',
     border: '1px solid rgba(255, 255, 255, 0.1)',
-    color: '#94a3b8',
+    color: 'var(--color-text-muted)',
     fontSize: '0.85rem',
     textDecoration: 'none',
     cursor: 'pointer',
@@ -451,13 +451,13 @@ const styles = {
     fontSize: 'clamp(1.5rem, 5vw, 2.2rem)',
     fontWeight: 800,
     margin: '0 0 0.5rem 0',
-    background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%)',
+    background: 'var(--color-text)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     backgroundClip: 'text'
   },
   pageSubtitle: {
-    color: '#94a3b8',
+    color: 'var(--color-text-muted)',
     fontSize: '0.9rem',
     margin: 0,
     lineHeight: 1.5
@@ -479,7 +479,7 @@ const styles = {
   statValue: {
     fontSize: '1.2rem',
     fontWeight: 800,
-    color: '#e2e8f0'
+    color: 'var(--color-text)'
   },
   statLabel: {
     fontSize: '0.7rem',
@@ -513,12 +513,12 @@ const styles = {
   scenarioTitle: {
     fontSize: '1rem',
     fontWeight: 700,
-    color: '#e2e8f0',
+    color: 'var(--color-text)',
     margin: 0
   },
   scenarioDesc: {
     fontSize: '0.8rem',
-    color: '#94a3b8',
+    color: 'var(--color-text-muted)',
     margin: '0.25rem 0 0 0',
     lineHeight: 1.5,
     display: '-webkit-box',
@@ -565,7 +565,7 @@ const styles = {
   backButtonSmall: {
     background: 'none',
     border: 'none',
-    color: '#94a3b8',
+    color: 'var(--color-text-muted)',
     fontSize: '0.85rem',
     cursor: 'pointer',
     padding: '0.4rem 0'
@@ -573,7 +573,7 @@ const styles = {
   progressText: {
     fontSize: '0.85rem',
     fontWeight: 700,
-    color: '#94a3b8'
+    color: 'var(--color-text-muted)'
   },
   progressBarTrack: {
     width: '100%',
@@ -599,7 +599,7 @@ const styles = {
   situationText: {
     fontSize: '0.95rem',
     lineHeight: 1.8,
-    color: '#e2e8f0',
+    color: 'var(--color-text)',
     margin: 0,
     wordBreak: 'keep-all'
   },
@@ -612,7 +612,7 @@ const styles = {
     borderRadius: '14px',
     background: 'rgba(255, 255, 255, 0.04)',
     border: '2px solid rgba(255, 255, 255, 0.08)',
-    color: '#e2e8f0',
+    color: 'var(--color-text)',
     cursor: 'pointer',
     textAlign: 'left',
     transition: 'all 0.2s',
@@ -669,7 +669,7 @@ const styles = {
   },
   completionSubtitle: {
     fontSize: '0.9rem',
-    color: '#94a3b8',
+    color: 'var(--color-text-muted)',
     margin: '0 0 1.5rem 0'
   },
   scoreCircleWrap: {

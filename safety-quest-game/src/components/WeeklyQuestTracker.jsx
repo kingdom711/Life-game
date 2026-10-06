@@ -36,7 +36,7 @@ const WeeklyQuestTracker = ({ role }) => {
 
     const styles = {
         widget: {
-            background: 'rgba(30, 41, 59, 0.8)',
+            background: 'var(--color-surface)',
             borderRadius: '15px',
             padding: '20px',
             border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -53,11 +53,11 @@ const WeeklyQuestTracker = ({ role }) => {
         title: {
             margin: 0,
             fontSize: '1.1rem',
-            color: '#e2e8f0'
+            color: 'var(--color-text)'
         },
         resetNotice: {
             fontSize: '0.75rem',
-            color: '#94a3b8',
+            color: 'var(--color-text-muted)',
             background: 'rgba(100, 116, 139, 0.3)',
             padding: '4px 10px',
             borderRadius: '12px'
@@ -93,7 +93,7 @@ const WeeklyQuestTracker = ({ role }) => {
         },
         label: {
             fontSize: '0.9rem',
-            color: '#e2e8f0',
+            color: 'var(--color-text)',
             fontWeight: '500'
         },
         questMeta: {
@@ -103,7 +103,7 @@ const WeeklyQuestTracker = ({ role }) => {
         },
         count: {
             fontSize: '0.85rem',
-            color: '#94a3b8',
+            color: 'var(--color-text-muted)',
             fontWeight: '600'
         },
         countCompleted: {
@@ -149,7 +149,7 @@ const WeeklyQuestTracker = ({ role }) => {
         },
         emptyState: {
             textAlign: 'center',
-            color: '#94a3b8',
+            color: 'var(--color-text-muted)',
             padding: '20px',
             fontSize: '0.9rem'
         }

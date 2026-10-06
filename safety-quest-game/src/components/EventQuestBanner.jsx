@@ -87,7 +87,7 @@ function EventQuestBanner({ onComplete }) {
                             <div style={{ flex: 1 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                     <span style={{
-                                        fontWeight: 700, color: '#e2e8f0', fontSize: '0.9rem'
+                                        fontWeight: 700, color: 'var(--color-text)', fontSize: '0.9rem'
                                     }}>
                                         {quest.title}
                                     </span>
@@ -101,7 +101,7 @@ function EventQuestBanner({ onComplete }) {
                                         {quest.trigger}
                                     </span>
                                 </div>
-                                <div style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '0.2rem' }}>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '0.2rem' }}>
                                     {quest.description}
                                 </div>
                             </div>
@@ -114,7 +114,7 @@ function EventQuestBanner({ onComplete }) {
                             {quest.actions.map((action, idx) => (
                                 <div key={idx} style={{
                                     display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                    padding: '0.4rem 0', fontSize: '0.8rem', color: '#cbd5e1'
+                                    padding: '0.4rem 0', fontSize: '0.8rem', color: 'var(--color-text-secondary)'
                                 }}>
                                     <span style={{
                                         width: '18px', height: '18px', borderRadius: '4px',
@@ -145,7 +145,7 @@ function EventQuestBanner({ onComplete }) {
                                     padding: '0.35rem 0.6rem', borderRadius: '6px',
                                     border: '1px solid rgba(255,255,255,0.1)',
                                     background: 'rgba(255,255,255,0.05)',
-                                    color: '#94a3b8', fontSize: '0.75rem', cursor: 'pointer'
+                                    color: 'var(--color-text-muted)', fontSize: '0.75rem', cursor: 'pointer'
                                 }}
                             >
                                 {expandedId === quest.id ? '접기' : '상세'}

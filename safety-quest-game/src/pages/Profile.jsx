@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { points, level, streak, userProfile, storage } from '../utils/storage';
 import { calculateLevel, TIERS } from '../utils/pointsCalculator';
 import { getRoleById } from '../data/rolesData';
-import { getInventoryStats } from '../utils/inventoryManager';
+import { getInventoryStats, getAllEquippedItems } from '../utils/inventoryManager';
+import PlayerCard from '../components/dashboard/PlayerCard';
 import { useAuth } from '../context/AuthContext';
 import useParticipantLockdown from '../hooks/useParticipantLockdown';
 import useTeamGate from '../hooks/useTeamGate';
@@ -21,7 +22,9 @@ function Profile({ role }) {
         level: calculateLevel(0),
         streak: { current: 0, longest: 0 },
         inventory: {},
-        profile: {}
+        profile: {},
+        experience: {},
+        equipped: {}
     });
 
     useEffect(() => {
@@ -32,7 +35,9 @@ function Profile({ role }) {
             level: { ...calculateLevel(currentPoints), current: levelData.current },
             streak: streak.get(),
             inventory: getInventoryStats(),
-            profile: userProfile.get()
+            profile: userProfile.get(),
+            experience: levelData,
+            equipped: getAllEquippedItems()
         });
     }, []);
 
@@ -46,11 +51,11 @@ function Profile({ role }) {
     const team = teamGate.team || user?.team;
 
     return (
-        <div className="page">
+        <div className="page profile-adventure-page">
             <div className="container">
                 {!participantLockdown && (
                     <div style={{ marginBottom: '1rem' }}>
-                        <Link to="/" className="btn btn-secondary btn-sm">대시보드로 돌아가기</Link>
+                        <Link to="/" className="btn btn-secondary btn-sm">안전 모험으로 돌아가기</Link>
                     </div>
                 )}
 
@@ -63,29 +68,19 @@ function Profile({ role }) {
                         border: '1px solid rgba(59, 130, 246, 0.35)',
                         background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(99, 102, 241, 0.08))'
                     }}>
-                        <div style={{ fontWeight: 800, color: '#93c5fd', marginBottom: 4 }}>
+                        <div style={{ fontWeight: 800, color: 'var(--color-primary)', marginBottom: 4 }}>
                             베타 테스트가 종료되었습니다
                         </div>
-                        <div style={{ color: '#cbd5e1', fontSize: '0.9rem', lineHeight: 1.6 }}>
+                        <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', lineHeight: 1.6 }}>
                             참여해 주셔서 감사합니다. 보상은 골드 교환 방식이 아니라 관리자 확인 후 직접 지급됩니다.
                             개인정보는 댓글에 남기지 말고 개별 의견으로 보내주세요.
                         </div>
                     </div>
                 )}
 
-                <div className="mb-8 text-center">
-                    <div className="text-7xl mb-4 h-40 flex items-center justify-center relative">
-                        {roleInfo?.image ? (
-                            <img src={roleInfo.image} alt={roleInfo.name} className="h-full w-auto object-contain drop-shadow-2xl relative z-10" />
-                        ) : (
-                            <span className="relative z-10">{roleInfo?.icon || 'User'}</span>
-                        )}
-                    </div>
-                    <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                        {stats.profile.name || user?.name || '사용자'}
-                    </h1>
-                    <p className="text-slate-600 text-lg">{roleInfo?.name}</p>
-                </div>
+                <header className="profile-adventure-heading"><p className="adventure-eyebrow">안전을 게임으로</p><h1>나의 캐릭터</h1><p>매일의 실천으로 쌓아온 안전 모험 기록.</p></header>
+                <PlayerCard name={stats.profile.name || user?.name || '안전 탐험가'} role={role} experience={stats.experience} equippedItems={stats.equipped} siteName={team?.siteName} teamName={team?.name} />
+                <div className="profile-adventure-stats" aria-label="나의 활동 기록"><div><span>참여 포인트</span><strong>{stats.points.toLocaleString()} P</strong></div><div><span>연속 출석</span><strong>{stats.streak.current || 0}일</strong></div><div><span>보유 장비</span><strong>{stats.inventory.totalItems || 0}개</strong></div></div>
 
                 <div className="card" style={{ marginBottom: '1.5rem' }}>
                     <div className="card-header">
@@ -97,20 +92,20 @@ function Profile({ role }) {
                         ) : teamGate.isActive || team ? (
                             <div style={{ display: 'grid', gap: '0.75rem' }}>
                                 <div>
-                                    <div style={{ color: '#94a3b8', fontSize: '0.8rem' }}>현장</div>
-                                    <div style={{ color: '#e2e8f0', fontWeight: 800 }}>{team?.siteName || '-'}</div>
+                                    <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>현장</div>
+                                    <div style={{ color: 'var(--color-text)', fontWeight: 800 }}>{team?.siteName || '-'}</div>
                                 </div>
                                 <div>
-                                    <div style={{ color: '#94a3b8', fontSize: '0.8rem' }}>팀</div>
-                                    <div style={{ color: '#e2e8f0', fontWeight: 800 }}>
+                                    <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>팀</div>
+                                    <div style={{ color: 'var(--color-text)', fontWeight: 800 }}>
                                         {team?.name || teamGate.membership?.teamName}
-                                        {teamGate.isLeader && <span style={{ marginLeft: 8, color: '#38bdf8' }}>리더</span>}
+                                        {teamGate.isLeader && <span style={{ marginLeft: 8, color: 'var(--color-primary)' }}>리더</span>}
                                     </div>
                                 </div>
                             </div>
                         ) : teamGate.isPending ? (
                             <div>
-                                <div style={{ color: '#fbbf24', fontWeight: 800 }}>가입 승인 대기 중</div>
+                                <div style={{ color: 'var(--color-warning)', fontWeight: 800 }}>가입 승인 대기 중</div>
                                 <p className="text-muted" style={{ marginTop: '0.35rem' }}>
                                     {teamGate.membership?.teamName} 리더의 승인을 기다리고 있습니다.
                                 </p>
@@ -134,7 +129,7 @@ function Profile({ role }) {
 
                 <div className="card mb-xl">
                     <div className="card-header">
-                        <h3 className="card-title">레벨 정보</h3>
+                        <h3 className="card-title">포인트로 쌓은 성장</h3>
                     </div>
                     <div className="card-body">
                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', marginBottom: '1rem' }}>

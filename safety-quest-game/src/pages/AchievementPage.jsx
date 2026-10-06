@@ -245,7 +245,7 @@ function AchievementPage() {
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
                                             <span style={{
                                                 fontWeight: 700,
-                                                color: achievement.unlocked ? '#f1f5f9' : 'var(--color-text-muted)',
+                                                color: achievement.unlocked ? 'var(--color-text)' : 'var(--color-text-muted)',
                                                 fontSize: '0.95rem'
                                             }}>
                                                 {isHidden ? '??? 히든 업적' : achievement.name}

@@ -191,7 +191,7 @@ const TeamPage = ({ onBack }) => {
                         안전의 길을 만드는 사람들
                     </h1>
                     <p style={{
-                        color: '#94a3b8',
+                        color: 'var(--color-text-muted)',
                         fontSize: '1.1rem',
                         maxWidth: '600px',
                         margin: '0 auto',
@@ -296,7 +296,7 @@ const TeamPage = ({ onBack }) => {
                                                     {member.role}
                                                 </p>
                                                 <p style={{
-                                                    color: '#94a3b8',
+                                                    color: 'var(--color-text-muted)',
                                                     fontSize: '0.8rem',
                                                     margin: 0
                                                 }}>
@@ -307,7 +307,7 @@ const TeamPage = ({ onBack }) => {
 
                                         {/* 설명 */}
                                         <p style={{
-                                            color: '#cbd5e1',
+                                            color: 'var(--color-text-secondary)',
                                             fontSize: '0.9rem',
                                             lineHeight: 1.6,
                                             marginBottom: '1.25rem'
@@ -335,7 +335,7 @@ const TeamPage = ({ onBack }) => {
                                                 <div
                                                     key={i}
                                                     style={{
-                                                        color: '#94a3b8',
+                                                        color: 'var(--color-text-muted)',
                                                         fontSize: '0.8rem',
                                                         marginBottom: i < member.career.length - 1 ? '0.35rem' : 0,
                                                         display: 'flex',
@@ -372,7 +372,7 @@ const TeamPage = ({ onBack }) => {
                         함께 안전한 현장을 만들어가요
                     </h3>
                     <p style={{
-                        color: '#94a3b8',
+                        color: 'var(--color-text-muted)',
                         marginBottom: '2rem'
                     }}>
                         안전의 길 팀과 함께 게이미피케이션 안전관리를 시작하세요
@@ -416,7 +416,7 @@ const TeamPage = ({ onBack }) => {
                 <div style={{ marginBottom: '0.5rem' }}>
                     <img src="/assets/safety_road_logo-removebg-preview.png" alt="안전의 길" style={{ width: '28px', height: '28px', objectFit: 'contain', marginRight: '0.5rem' }} />
                     <strong style={{ color: '#fbbf24' }}>안전의 길</strong>
-                    <span style={{ color: '#94a3b8' }}> | 게이미피케이션 안전관리 플랫폼</span>
+                    <span style={{ color: 'var(--color-text-muted)' }}> | 게이미피케이션 안전관리 플랫폼</span>
                 </div>
                 <p style={{ margin: 0 }}>© 2024 Safety Quest. All rights reserved.</p>
             </footer>

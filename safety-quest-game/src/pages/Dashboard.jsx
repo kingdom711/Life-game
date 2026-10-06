@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Camera, Clapperboard } from 'lucide-react';
 import { points, level, streak, dailyQuestInstances, userProfile, getKSTDateString, questProgress, dailyQuestSnapshots, monthlyAttendance } from '../utils/storage';
 import { calculateLevel } from '../utils/pointsCalculator';
 import { getQuestsByTypeRoleAndSpec } from '../data/questsData';
@@ -30,7 +31,6 @@ import RecentRewards from '../components/dashboard/RecentRewards';
 import OurTeamSection from '../components/dashboard/OurTeamSection';
 import QuickNavigation from '../components/dashboard/QuickNavigation';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
-import SafetyTipBar from '../components/dashboard/SafetyTipBar';
 import { getActiveWorkStopCount } from '../utils/workStopManager';
 
 // [New] 援먯쑁 ?쒖뒪??
@@ -334,43 +334,16 @@ function Dashboard({ role }) {
     };
 
     const loadAlerts = async () => {
-        const fallbackAlerts = [
-            {
-                id: 1,
-                type: 'danger',
-                zone: '2구역',
-                message: '낙하물 주의',
-                time: '10분 전',
-                detail: '2구역 상부 작업 중 낙하물 위험이 감지되었습니다. 해당 구역 진입 전 안전모 착용과 작업 반경 확인이 필요합니다.'
-            },
-            {
-                id: 2,
-                type: 'warning',
-                zone: '5구역',
-                message: '고소작업 진행 중',
-                time: '25분 전',
-                detail: '5구역 고소작업이 진행 중입니다. 추락 방지 안전대와 출입 통제 상태를 확인해 주세요.'
-            },
-            {
-                id: 3,
-                type: 'info',
-                zone: '전체',
-                message: '정기 안전점검 예정',
-                time: '1시간 전',
-                detail: '오후 2시부터 전 구역 정기 안전점검이 예정되어 있습니다. 작업 중단 및 관리자 지시에 협조해 주세요.'
-            }
-        ];
-
         try {
             const alerts = await getAlerts();
             if (alerts && alerts.length > 0) {
                 setLatestAlerts(alerts);
                 return;
             }
-            setLatestAlerts(fallbackAlerts);
+            setLatestAlerts([]);
         } catch (error) {
             console.error('알림 로드 실패:', error);
-            setLatestAlerts(fallbackAlerts);
+            setLatestAlerts([]);
         }
     };
     const enrichedQuests = dailyQuests.map((quest, index) => {
@@ -582,7 +555,6 @@ function Dashboard({ role }) {
                     unreadNotifCount={unreadNotifCount}
                     onNotificationClick={() => setIsNotificationOpen(true)}
                 />
-                <SafetyTipBar />
                 <div className="new-dashboard-layout">
                     {/* Left main column */}
                     <main className="new-dashboard-left">
@@ -592,16 +564,12 @@ function Dashboard({ role }) {
                             equippedItems={equippedItems}
                             educationCompleted={educationCompleted}
                         />
-                        {/* [Phase2] 이벤트 퀘스트 배너 */}
-                        <EventQuestBanner onComplete={() => loadData()} />
-
-                        {/* [Phase1] 마이크로 러닝 카드 */}
-                        <MicroLearningCard onComplete={() => loadData()} />
-
                         <TodayMissions
                             quests={enrichedQuests}
                             onQuestAction={handleCompleteQuest}
                         />
+                        <div className="adventure-explore"><Link to="/hazard-cycle"><Camera size={23} aria-hidden="true" /><strong>현장 위험 탐색</strong><span>발견부터 개선 확인까지</span></Link><Link to="/scenario"><Clapperboard size={23} aria-hidden="true" /><strong>현장 시나리오</strong><span>선택하며 배우는 안전</span></Link></div>
+                        <details className="adventure-quest-list"><summary>더 도전해 보기</summary><div className="adventure-secondary-content"><EventQuestBanner onComplete={() => loadData()} /><MicroLearningCard onComplete={() => loadData()} /></div></details>
                         <SiteInfoSection alerts={latestAlerts} alertCount={latestAlerts.length} workStopCount={activeWorkStopCount} />
                     </main>
 
@@ -609,13 +577,14 @@ function Dashboard({ role }) {
                     <aside className="new-dashboard-right">
                         <MyGrowthStats
                             points={Number(playerStats?.points || 0)}
-                            safetyScore={92}
-                            ranking={3}
+                            completedQuests={enrichedQuests.filter(quest => quest.isCompleted).length}
+                            totalQuests={enrichedQuests.length}
+                            equippedCount={Object.keys(equippedItems).length}
                         />
                         <EquippedGearDisplay equippedItems={equippedItems} />
                         <RecentRewards />
-                        <OurTeamSection weeklyProgress={78} />
-                        <QuickNavigation />
+                        <OurTeamSection />
+                        <details className="adventure-quest-list"><summary>다른 모험 둘러보기</summary><QuickNavigation /></details>
                     </aside>
                 </div>
             </div>

@@ -81,8 +81,8 @@ const inputStyle = {
     minHeight: 42,
     borderRadius: 8,
     border: '1px solid rgba(148, 163, 184, 0.28)',
-    background: 'rgba(15, 23, 42, 0.72)',
-    color: '#e2e8f0',
+    background: 'var(--color-surface)',
+    color: 'var(--color-text)',
     padding: '0 0.75rem',
 };
 
@@ -134,12 +134,12 @@ function BarListChart({ rows, emptyTitle }) {
             {rows.map((row) => (
                 <div key={row.key}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
-                        <span style={{ color: '#e2e8f0', fontSize: '0.9rem', fontWeight: 800 }}>{row.label}</span>
-                        <span style={{ color: '#94a3b8', fontSize: '0.82rem', fontWeight: 700 }}>
+                        <span style={{ color: 'var(--color-text)', fontSize: '0.9rem', fontWeight: 800 }}>{row.label}</span>
+                        <span style={{ color: 'var(--color-text-muted)', fontSize: '0.82rem', fontWeight: 700 }}>
                             {numberFormat.format(row.value)}건 {row.percent ? `· ${row.percent}%` : ''}
                         </span>
                     </div>
-                    <div style={{ height: 10, background: 'rgba(15, 23, 42, 0.72)', borderRadius: 999, overflow: 'hidden' }}>
+                    <div style={{ height: 10, background: 'var(--color-surface)', borderRadius: 999, overflow: 'hidden' }}>
                         <div style={{ width: `${row.width}%`, height: '100%', borderRadius: 999, background: row.color }} />
                     </div>
                 </div>
@@ -157,11 +157,11 @@ function SummaryBars({ rows }) {
                 const height = row.value > 0 ? Math.max(14, Math.round((row.value / max) * 128)) : 6;
                 return (
                     <div key={row.key} style={{ display: 'grid', gap: 8, alignContent: 'end', minWidth: 0 }}>
-                        <div style={{ color: '#f8fafc', textAlign: 'center', fontWeight: 900 }}>
+                        <div style={{ color: 'var(--color-text)', textAlign: 'center', fontWeight: 900 }}>
                             {numberFormat.format(row.value)}
                         </div>
                         <div style={{ height, borderRadius: 8, background: row.color, transition: 'height 180ms ease' }} />
-                        <div style={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: 800, textAlign: 'center', lineHeight: 1.25 }}>
+                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 800, textAlign: 'center', lineHeight: 1.25 }}>
                             {row.label}
                         </div>
                     </div>
@@ -182,8 +182,8 @@ function MetricDetailPanel({ metric, items, expectedCount = 0 }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                     <Icon size={19} color={metric.tone} />
                     <div style={{ minWidth: 0 }}>
-                        <h2 style={{ color: '#f8fafc', fontSize: '1.05rem', margin: 0 }}>{metric.label} 상세</h2>
-                        <p style={{ color: '#94a3b8', fontSize: '0.82rem', margin: '4px 0 0' }}>
+                        <h2 style={{ color: 'var(--color-text)', fontSize: '1.05rem', margin: 0 }}>{metric.label} 상세</h2>
+                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.82rem', margin: '4px 0 0' }}>
                             총 {numberFormat.format(count)}개 항목
                             {hasMissingDetails ? ` / 지표 ${numberFormat.format(expectedCount)}건` : ''}
                         </p>
@@ -209,23 +209,23 @@ function MetricDetailPanel({ metric, items, expectedCount = 0 }) {
                                 alignItems: 'center',
                                 padding: '0.85rem',
                                 borderRadius: 8,
-                                background: 'rgba(15, 23, 42, 0.48)',
+                                background: 'var(--color-surface)',
                                 border: '1px solid rgba(148, 163, 184, 0.14)',
                             }}
                         >
                             <div style={{ minWidth: 0 }}>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
-                                    <strong style={{ color: '#f8fafc', fontSize: '0.95rem' }}>{item.title || '제목 없음'}</strong>
+                                    <strong style={{ color: 'var(--color-text)', fontSize: '0.95rem' }}>{item.title || '제목 없음'}</strong>
                                     {item.status && (
                                         <span style={{ color: metric.tone, fontSize: '0.74rem', fontWeight: 900, padding: '0.18rem 0.45rem', borderRadius: 999, background: `${metric.tone}1f` }}>
                                             {item.status}
                                         </span>
                                     )}
                                 </div>
-                                <div style={{ color: '#cbd5e1', fontSize: '0.84rem', marginTop: 5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.84rem', marginTop: 5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     {item.detail || '상세 정보 없음'}
                                 </div>
-                                <div style={{ color: '#94a3b8', fontSize: '0.76rem', marginTop: 5 }}>
+                                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.76rem', marginTop: 5 }}>
                                     {[item.meta, formatDateTime(item.occurredAt)].filter(Boolean).join(' · ')}
                                 </div>
                             </div>
@@ -239,8 +239,8 @@ function MetricDetailPanel({ metric, items, expectedCount = 0 }) {
                                         borderRadius: 8,
                                         display: 'grid',
                                         placeItems: 'center',
-                                        color: '#e2e8f0',
-                                        background: 'rgba(30, 41, 59, 0.72)',
+                                        color: 'var(--color-text)',
+                                        background: 'var(--color-surface)',
                                         border: '1px solid rgba(148, 163, 184, 0.18)',
                                     }}
                                 >
@@ -276,9 +276,9 @@ function ParticipantEngagementSection({ engagement, filters, onFilterChange, onR
         <section className="glass-panel" style={{ ...chartPanelStyle, marginTop: 18 }}>
             <header style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap' }}>
                 <div>
-                    <p style={{ color: '#94a3b8', margin: '0 0 5px', fontWeight: 800 }}>PARTICIPANT ENGAGEMENT</p>
-                    <h2 style={{ color: '#f8fafc', fontSize: '1.25rem', margin: 0 }}>개인별 참여 현황</h2>
-                    <p style={{ color: '#cbd5e1', margin: '6px 0 0' }}>
+                    <p style={{ color: 'var(--color-text-muted)', margin: '0 0 5px', fontWeight: 800 }}>PARTICIPANT ENGAGEMENT</p>
+                    <h2 style={{ color: 'var(--color-text)', fontSize: '1.25rem', margin: 0 }}>개인별 참여 현황</h2>
+                    <p style={{ color: 'var(--color-text-secondary)', margin: '6px 0 0' }}>
                         {engagement?.from}부터 {engagement?.to}까지의 참여 데이터를 집계합니다.
                     </p>
                 </div>
@@ -287,7 +287,7 @@ function ParticipantEngagementSection({ engagement, filters, onFilterChange, onR
                     onClick={onRefresh}
                     disabled={loading}
                     className="ui-btn-core"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(15, 23, 42, 0.72)', color: '#e2e8f0' }}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--color-surface)', color: 'var(--color-text)' }}
                 >
                     <RefreshCw size={16} />
                     새로고침
@@ -303,9 +303,9 @@ function ParticipantEngagementSection({ engagement, filters, onFilterChange, onR
                     ['교육 수료', summary.totalEducationCompletions || 0],
                     ['위험제보', summary.totalHazardReports || 0],
                 ].map(([label, value]) => (
-                    <div key={label} style={{ padding: '0.9rem', borderRadius: 8, background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(148, 163, 184, 0.14)' }}>
-                        <div style={{ color: '#94a3b8', fontSize: '0.78rem', fontWeight: 800 }}>{label}</div>
-                        <div style={{ color: '#f8fafc', fontSize: '1.45rem', fontWeight: 900, marginTop: 6 }}>{numberFormat.format(value)}</div>
+                    <div key={label} style={{ padding: '0.9rem', borderRadius: 8, background: 'var(--color-surface)', border: '1px solid rgba(148, 163, 184, 0.14)' }}>
+                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', fontWeight: 800 }}>{label}</div>
+                        <div style={{ color: 'var(--color-text)', fontSize: '1.45rem', fontWeight: 900, marginTop: 6 }}>{numberFormat.format(value)}</div>
                     </div>
                 ))}
             </div>
@@ -330,7 +330,7 @@ function ParticipantEngagementSection({ engagement, filters, onFilterChange, onR
                         value={filters.keyword}
                         onChange={(event) => updateFilter('keyword', event.target.value)}
                         placeholder="이름, 계정, 팀 검색"
-                        style={{ flex: 1, minWidth: 0, border: 0, outline: 0, background: 'transparent', color: '#e2e8f0' }}
+                        style={{ flex: 1, minWidth: 0, border: 0, outline: 0, background: 'transparent', color: 'var(--color-text)' }}
                     />
                 </label>
             </div>
@@ -342,7 +342,7 @@ function ParticipantEngagementSection({ engagement, filters, onFilterChange, onR
                     <div style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 920 }}>
                             <thead>
-                                <tr style={{ color: '#94a3b8', fontSize: '0.76rem', textAlign: 'left' }}>
+                                <tr style={{ color: 'var(--color-text-muted)', fontSize: '0.76rem', textAlign: 'left' }}>
                                     {['이름', '팀', '출석', '교육', '퀘스트', '위험제보', '확인', '작업중지', '포인트', '최근 활동', '점수'].map((header) => (
                                         <th key={header} style={{ padding: '0.65rem 0.55rem', borderBottom: '1px solid rgba(148, 163, 184, 0.18)' }}>{header}</th>
                                     ))}
@@ -358,16 +358,16 @@ function ParticipantEngagementSection({ engagement, filters, onFilterChange, onR
                                             background: selected?.userId === row.userId ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
                                         }}
                                     >
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#f8fafc', fontWeight: 900 }}>{row.name}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#cbd5e1' }}>{row.teamName}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#e2e8f0' }}>{row.attendanceCount}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#e2e8f0' }}>{row.educationCompletions}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#e2e8f0' }}>{row.questCompletions}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#e2e8f0' }}>{row.hazardReports}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#e2e8f0' }}>{row.hazardAcks}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#e2e8f0' }}>{row.workStopReports}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#e2e8f0' }}>{numberFormat.format(row.pointsEarned || 0)}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#94a3b8' }}>{formatDateTime(row.lastActivityAt)}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)', fontWeight: 900 }}>{row.name}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text-secondary)' }}>{row.teamName}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{row.attendanceCount}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{row.educationCompletions}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{row.questCompletions}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{row.hazardReports}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{row.hazardAcks}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{row.workStopReports}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{numberFormat.format(row.pointsEarned || 0)}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text-muted)' }}>{formatDateTime(row.lastActivityAt)}</td>
                                         <td style={{ padding: '0.75rem 0.55rem' }}>
                                             <span style={{ color: '#22c55e', fontWeight: 900 }}>{row.engagementScore}</span>
                                         </td>
@@ -377,13 +377,13 @@ function ParticipantEngagementSection({ engagement, filters, onFilterChange, onR
                         </table>
                     </div>
 
-                    <aside style={{ borderRadius: 8, background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(148, 163, 184, 0.14)', padding: '1rem', alignSelf: 'start' }}>
+                    <aside style={{ borderRadius: 8, background: 'var(--color-surface)', border: '1px solid rgba(148, 163, 184, 0.14)', padding: '1rem', alignSelf: 'start' }}>
                         {selected && (
                             <>
-                                <div style={{ color: '#94a3b8', fontSize: '0.78rem', fontWeight: 800 }}>{selected.role}</div>
-                                <h3 style={{ color: '#f8fafc', margin: '4px 0 2px', fontSize: '1.15rem' }}>{selected.name}</h3>
-                                <div style={{ color: '#cbd5e1', fontSize: '0.86rem' }}>{selected.username} · {selected.teamName}</div>
-                                <div style={{ marginTop: 14, height: 10, borderRadius: 999, background: 'rgba(30, 41, 59, 0.9)', overflow: 'hidden' }}>
+                                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', fontWeight: 800 }}>{selected.role}</div>
+                                <h3 style={{ color: 'var(--color-text)', margin: '4px 0 2px', fontSize: '1.15rem' }}>{selected.name}</h3>
+                                <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.86rem' }}>{selected.username} · {selected.teamName}</div>
+                                <div style={{ marginTop: 14, height: 10, borderRadius: 999, background: 'var(--color-surface)', overflow: 'hidden' }}>
                                     <div style={{ width: `${Math.min(100, selected.engagementScore || 0)}%`, height: '100%', background: '#22c55e' }} />
                                 </div>
                                 <dl style={{ display: 'grid', gap: 10, margin: '1rem 0 0' }}>
@@ -394,8 +394,8 @@ function ParticipantEngagementSection({ engagement, filters, onFilterChange, onR
                                         ['최근 활동', formatDateTime(selected.lastActivityAt)],
                                     ].map(([label, value]) => (
                                         <div key={label} style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-                                            <dt style={{ color: '#94a3b8' }}>{label}</dt>
-                                            <dd style={{ color: '#f8fafc', margin: 0, fontWeight: 800, textAlign: 'right' }}>{value}</dd>
+                                            <dt style={{ color: 'var(--color-text-muted)' }}>{label}</dt>
+                                            <dd style={{ color: 'var(--color-text)', margin: 0, fontWeight: 800, textAlign: 'right' }}>{value}</dd>
                                         </div>
                                     ))}
                                 </dl>
@@ -419,9 +419,9 @@ function PointRewardDashboardSection({ pointReward, filters, sort, onSortChange,
         <section className="glass-panel" style={{ ...chartPanelStyle, marginTop: 18 }}>
             <header style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap' }}>
                 <div>
-                    <p style={{ color: '#94a3b8', margin: '0 0 5px', fontWeight: 800 }}>POINTS AND REWARDS</p>
-                    <h2 style={{ color: '#f8fafc', fontSize: '1.25rem', margin: 0 }}>포인트/보상 준비 현황</h2>
-                    <p style={{ color: '#cbd5e1', margin: '6px 0 0' }}>
+                    <p style={{ color: 'var(--color-text-muted)', margin: '0 0 5px', fontWeight: 800 }}>POINTS AND REWARDS</p>
+                    <h2 style={{ color: 'var(--color-text)', fontSize: '1.25rem', margin: 0 }}>포인트/보상 준비 현황</h2>
+                    <p style={{ color: 'var(--color-text-secondary)', margin: '6px 0 0' }}>
                         {pointReward?.from || filters.from}부터 {pointReward?.to || filters.to}까지의 포인트 흐름과 보상 대기 물량입니다.
                     </p>
                 </div>
@@ -436,7 +436,7 @@ function PointRewardDashboardSection({ pointReward, filters, sort, onSortChange,
                         onClick={onRefresh}
                         disabled={loading}
                         className="ui-btn-core"
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(15, 23, 42, 0.72)', color: '#e2e8f0' }}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--color-surface)', color: 'var(--color-text)' }}
                     >
                         <RefreshCw size={16} />
                         새로고침
@@ -454,9 +454,9 @@ function PointRewardDashboardSection({ pointReward, filters, sort, onSortChange,
                     ['대기 보상 골드', summary.pendingRewardGold || 0],
                     ['예상 현금가치', summary.pendingRewardCashValue || 0],
                 ].map(([label, value]) => (
-                    <div key={label} style={{ padding: '0.9rem', borderRadius: 8, background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(148, 163, 184, 0.14)' }}>
-                        <div style={{ color: '#94a3b8', fontSize: '0.78rem', fontWeight: 800 }}>{label}</div>
-                        <div style={{ color: '#f8fafc', fontSize: '1.35rem', fontWeight: 900, marginTop: 6 }}>{numberFormat.format(value)}</div>
+                    <div key={label} style={{ padding: '0.9rem', borderRadius: 8, background: 'var(--color-surface)', border: '1px solid rgba(148, 163, 184, 0.14)' }}>
+                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', fontWeight: 800 }}>{label}</div>
+                        <div style={{ color: 'var(--color-text)', fontSize: '1.35rem', fontWeight: 900, marginTop: 6 }}>{numberFormat.format(value)}</div>
                     </div>
                 ))}
             </div>
@@ -468,7 +468,7 @@ function PointRewardDashboardSection({ pointReward, filters, sort, onSortChange,
                     ) : (
                         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 1040 }}>
                             <thead>
-                                <tr style={{ color: '#94a3b8', fontSize: '0.76rem', textAlign: 'left' }}>
+                                <tr style={{ color: 'var(--color-text-muted)', fontSize: '0.76rem', textAlign: 'left' }}>
                                     {['이름', '팀', '포인트 잔액', '기간 획득', '기간 사용', '골드 잔액', '골드 획득', '골드 사용', '보상 대기', '대기 골드', '최근 활동'].map((header) => (
                                         <th key={header} style={{ padding: '0.65rem 0.55rem', borderBottom: '1px solid rgba(148, 163, 184, 0.18)' }}>{header}</th>
                                     ))}
@@ -484,17 +484,17 @@ function PointRewardDashboardSection({ pointReward, filters, sort, onSortChange,
                                             background: selected?.userId === row.userId ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
                                         }}
                                     >
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#f8fafc', fontWeight: 900 }}>{row.name}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#cbd5e1' }}>{row.teamName}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#f8fafc', fontWeight: 900 }}>{numberFormat.format(row.pointBalance || 0)}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)', fontWeight: 900 }}>{row.name}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text-secondary)' }}>{row.teamName}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)', fontWeight: 900 }}>{numberFormat.format(row.pointBalance || 0)}</td>
                                         <td style={{ padding: '0.75rem 0.55rem', color: '#22c55e' }}>{numberFormat.format(row.periodPointsEarned || 0)}</td>
                                         <td style={{ padding: '0.75rem 0.55rem', color: '#f97316' }}>{numberFormat.format(row.periodPointsSpent || 0)}</td>
                                         <td style={{ padding: '0.75rem 0.55rem', color: '#fbbf24', fontWeight: 900 }}>{numberFormat.format(row.goldBalance || 0)}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#e2e8f0' }}>{numberFormat.format(row.periodGoldEarned || 0)}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#e2e8f0' }}>{numberFormat.format(row.periodGoldSpent || 0)}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#e2e8f0' }}>{numberFormat.format(row.pendingRewardRequests || 0)}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#e2e8f0' }}>{numberFormat.format(row.pendingRewardGold || 0)}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#94a3b8' }}>{formatDateTime(row.lastPointActivityAt)}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{numberFormat.format(row.periodGoldEarned || 0)}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{numberFormat.format(row.periodGoldSpent || 0)}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{numberFormat.format(row.pendingRewardRequests || 0)}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{numberFormat.format(row.pendingRewardGold || 0)}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text-muted)' }}>{formatDateTime(row.lastPointActivityAt)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -503,8 +503,8 @@ function PointRewardDashboardSection({ pointReward, filters, sort, onSortChange,
                 </div>
 
                 <aside style={{ display: 'grid', gap: 12, alignSelf: 'start' }}>
-                    <div style={{ borderRadius: 8, background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(148, 163, 184, 0.14)', padding: '1rem' }}>
-                        <h3 style={{ color: '#f8fafc', margin: '0 0 10px', fontSize: '1rem' }}>선택 사용자</h3>
+                    <div style={{ borderRadius: 8, background: 'var(--color-surface)', border: '1px solid rgba(148, 163, 184, 0.14)', padding: '1rem' }}>
+                        <h3 style={{ color: 'var(--color-text)', margin: '0 0 10px', fontSize: '1rem' }}>선택 사용자</h3>
                         {selected ? (
                             <dl style={{ display: 'grid', gap: 10, margin: 0 }}>
                                 {[
@@ -515,29 +515,29 @@ function PointRewardDashboardSection({ pointReward, filters, sort, onSortChange,
                                     ['보상 대기', `${numberFormat.format(selected.pendingRewardRequests || 0)}건`],
                                 ].map(([label, value]) => (
                                     <div key={label} style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-                                        <dt style={{ color: '#94a3b8' }}>{label}</dt>
-                                        <dd style={{ color: '#f8fafc', margin: 0, fontWeight: 800, textAlign: 'right' }}>{value}</dd>
+                                        <dt style={{ color: 'var(--color-text-muted)' }}>{label}</dt>
+                                        <dd style={{ color: 'var(--color-text)', margin: 0, fontWeight: 800, textAlign: 'right' }}>{value}</dd>
                                     </div>
                                 ))}
                             </dl>
                         ) : (
-                            <p style={{ color: '#94a3b8', margin: 0 }}>선택된 사용자가 없습니다.</p>
+                            <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>선택된 사용자가 없습니다.</p>
                         )}
                     </div>
 
-                    <div style={{ borderRadius: 8, background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(148, 163, 184, 0.14)', padding: '1rem' }}>
-                        <h3 style={{ color: '#f8fafc', margin: '0 0 10px', fontSize: '1rem' }}>보상 준비 물량</h3>
+                    <div style={{ borderRadius: 8, background: 'var(--color-surface)', border: '1px solid rgba(148, 163, 184, 0.14)', padding: '1rem' }}>
+                        <h3 style={{ color: 'var(--color-text)', margin: '0 0 10px', fontSize: '1rem' }}>보상 준비 물량</h3>
                         {pendingRewards.length === 0 ? (
-                            <p style={{ color: '#94a3b8', margin: 0 }}>대기 중인 보상 신청이 없습니다.</p>
+                            <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>대기 중인 보상 신청이 없습니다.</p>
                         ) : (
                             <div style={{ display: 'grid', gap: 10 }}>
                                 {pendingRewards.map((item) => (
                                     <div key={item.rewardId} style={{ paddingBottom: 10, borderBottom: '1px solid rgba(148, 163, 184, 0.14)' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                                            <strong style={{ color: '#f8fafc' }}>{item.rewardName}</strong>
+                                            <strong style={{ color: 'var(--color-text)' }}>{item.rewardName}</strong>
                                             <span style={{ color: '#fbbf24', fontWeight: 900 }}>{numberFormat.format(item.pendingCount)}개</span>
                                         </div>
-                                        <div style={{ color: '#94a3b8', fontSize: '0.78rem', marginTop: 4 }}>
+                                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', marginTop: 4 }}>
                                             필요 {numberFormat.format(item.requiredGold || 0)}G · 현금가치 {numberFormat.format(item.cashValue || 0)}원 · 재고 {numberFormat.format(item.remainingQuantity || 0)}
                                         </div>
                                     </div>
@@ -670,15 +670,15 @@ function AdminDashboard() {
             <div className="container" style={{ maxWidth: 1180, margin: '0 auto' }}>
                 <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.5rem' }}>
                     <div>
-                        <p style={{ color: '#94a3b8', marginBottom: 6, fontWeight: 700 }}>BETA OPERATIONS</p>
-                        <h1 style={{ color: '#f8fafc', fontSize: '2rem', fontWeight: 900, margin: 0 }}>관리자 운영 콘솔</h1>
-                        <p style={{ color: '#cbd5e1', marginTop: 8 }}>오늘 처리할 안전 이슈와 개인별 참여 현황을 한 화면에서 확인합니다.</p>
+                        <p style={{ color: 'var(--color-text-muted)', marginBottom: 6, fontWeight: 700 }}>BETA OPERATIONS</p>
+                        <h1 style={{ color: 'var(--color-text)', fontSize: '2rem', fontWeight: 900, margin: 0 }}>관리자 운영 콘솔</h1>
+                        <p style={{ color: 'var(--color-text-secondary)', marginTop: 8 }}>오늘 처리할 안전 이슈와 개인별 참여 현황을 한 화면에서 확인합니다.</p>
                     </div>
                     <button
                         onClick={loadDashboard}
                         disabled={loading}
                         className="ui-btn-core"
-                        style={{ border: '1px solid rgba(148, 163, 184, 0.35)', background: 'rgba(15, 23, 42, 0.72)', color: '#e2e8f0', display: 'inline-flex', alignItems: 'center', gap: 8, cursor: loading ? 'wait' : 'pointer' }}
+                        style={{ border: '1px solid rgba(148, 163, 184, 0.35)', background: 'var(--color-surface)', color: 'var(--color-text)', display: 'inline-flex', alignItems: 'center', gap: 8, cursor: loading ? 'wait' : 'pointer' }}
                     >
                         <RefreshCw size={16} />
                         새로고침
@@ -703,13 +703,13 @@ function AdminDashboard() {
                                     style={{ ...chartPanelStyle, textAlign: 'left', cursor: 'pointer', background: activeMetricKey === key ? 'rgba(30, 41, 59, 0.88)' : undefined, boxShadow: activeMetricKey === key ? `0 0 0 1px ${tone}66, 0 18px 36px rgba(15, 23, 42, 0.25)` : undefined }}
                                 >
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
-                                        <span style={{ color: '#94a3b8', fontSize: '0.82rem', fontWeight: 700 }}>{label}</span>
+                                        <span style={{ color: 'var(--color-text-muted)', fontSize: '0.82rem', fontWeight: 700 }}>{label}</span>
                                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                                             <Icon size={18} color={tone} />
                                             <ChevronRight size={15} color={activeMetricKey === key ? tone : '#64748b'} />
                                         </span>
                                     </div>
-                                    <div style={{ color: '#f8fafc', fontSize: '1.9rem', fontWeight: 900, marginTop: 10 }}>{numberFormat.format(metrics[key] || 0)}</div>
+                                    <div style={{ color: 'var(--color-text)', fontSize: '1.9rem', fontWeight: 900, marginTop: 10 }}>{numberFormat.format(metrics[key] || 0)}</div>
                                 </button>
                             ))}
                         </section>
@@ -719,29 +719,29 @@ function AdminDashboard() {
                         <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: 16, marginBottom: 16 }}>
                             <div className="glass-panel" style={chartPanelStyle}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 14 }}>
-                                    <h2 style={{ color: '#f8fafc', fontSize: '1.05rem', margin: 0 }}>최근 30일 작업중지 위험 유형</h2>
-                                    <span style={{ color: '#94a3b8', fontSize: '0.78rem' }}>총 {numberFormat.format(hazardRows[0]?.total || 0)}건</span>
+                                    <h2 style={{ color: 'var(--color-text)', fontSize: '1.05rem', margin: 0 }}>최근 30일 작업중지 위험 유형</h2>
+                                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem' }}>총 {numberFormat.format(hazardRows[0]?.total || 0)}건</span>
                                 </div>
                                 <BarListChart rows={hazardRows} emptyTitle="작업중지 위험 유형 데이터가 없습니다." />
                             </div>
 
                             <div className="glass-panel" style={chartPanelStyle}>
-                                <h2 style={{ color: '#f8fafc', fontSize: '1.05rem', margin: '0 0 14px' }}>운영 처리 현황</h2>
+                                <h2 style={{ color: 'var(--color-text)', fontSize: '1.05rem', margin: '0 0 14px' }}>운영 처리 현황</h2>
                                 <SummaryBars rows={operationsRows} />
                             </div>
                         </section>
 
                         <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 16, marginBottom: 16 }}>
                             <div className="glass-panel" style={chartPanelStyle}>
-                                <h2 style={{ color: '#f8fafc', fontSize: '1.05rem', margin: '0 0 14px' }}>오늘 현장 활동</h2>
+                                <h2 style={{ color: 'var(--color-text)', fontSize: '1.05rem', margin: '0 0 14px' }}>오늘 현장 활동</h2>
                                 <SummaryBars rows={activityRows} />
                             </div>
 
                             <aside className="glass-panel" style={chartPanelStyle}>
-                                <h2 style={{ color: '#f8fafc', fontSize: '1.05rem', margin: '0 0 12px' }}>빠른 작업</h2>
+                                <h2 style={{ color: 'var(--color-text)', fontSize: '1.05rem', margin: '0 0 12px' }}>빠른 작업</h2>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8 }}>
                                     {quickLinks.map(({ href, label, Icon }) => (
-                                        <Link key={href} to={href} style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#e2e8f0', textDecoration: 'none', padding: '0.75rem', borderRadius: 8, background: 'rgba(15, 23, 42, 0.5)' }}>
+                                        <Link key={href} to={href} style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--color-text)', textDecoration: 'none', padding: '0.75rem', borderRadius: 8, background: 'var(--color-surface)' }}>
                                             <Icon size={17} />
                                             <span style={{ fontWeight: 800 }}>{label}</span>
                                         </Link>
@@ -753,8 +753,8 @@ function AdminDashboard() {
                         <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
                             <div className="glass-panel" style={chartPanelStyle}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                                    <h2 style={{ color: '#f8fafc', fontSize: '1.1rem', margin: 0 }}>처리 대기</h2>
-                                    <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>{formatDateTime(summary?.generatedAt)} 기준</span>
+                                    <h2 style={{ color: 'var(--color-text)', fontSize: '1.1rem', margin: 0 }}>처리 대기</h2>
+                                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>{formatDateTime(summary?.generatedAt)} 기준</span>
                                 </div>
 
                                 {topActions.length === 0 ? (
@@ -762,12 +762,12 @@ function AdminDashboard() {
                                 ) : (
                                     <div style={{ display: 'grid', gap: 10 }}>
                                         {topActions.map((item, index) => (
-                                            <Link key={`${item.type}-${item.createdAt}-${index}`} to={item.href} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: 12, textDecoration: 'none', padding: '0.9rem', borderRadius: 8, background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(148, 163, 184, 0.16)' }}>
+                                            <Link key={`${item.type}-${item.createdAt}-${index}`} to={item.href} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: 12, textDecoration: 'none', padding: '0.9rem', borderRadius: 8, background: 'var(--color-surface)', border: '1px solid rgba(148, 163, 184, 0.16)' }}>
                                                 <div style={{ minWidth: 0 }}>
-                                                    <div style={{ color: '#f8fafc', fontWeight: 800 }}>{item.title}</div>
-                                                    <div style={{ color: '#cbd5e1', fontSize: '0.86rem', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.detail || '상세 정보 없음'}</div>
+                                                    <div style={{ color: 'var(--color-text)', fontWeight: 800 }}>{item.title}</div>
+                                                    <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.86rem', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.detail || '상세 정보 없음'}</div>
                                                 </div>
-                                                <div style={{ color: '#94a3b8', fontSize: '0.78rem', textAlign: 'right' }}>
+                                                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', textAlign: 'right' }}>
                                                     <div>{item.status}</div>
                                                     <div style={{ marginTop: 4 }}>{formatDateTime(item.createdAt)}</div>
                                                 </div>
@@ -778,14 +778,14 @@ function AdminDashboard() {
                             </div>
 
                             <div className="glass-panel" style={chartPanelStyle}>
-                                <h2 style={{ color: '#f8fafc', fontSize: '1.05rem', margin: '0 0 12px' }}>최근 활동</h2>
+                                <h2 style={{ color: 'var(--color-text)', fontSize: '1.05rem', margin: '0 0 12px' }}>최근 활동</h2>
                                 <div style={{ display: 'grid', gap: 10 }}>
                                     {recentActivities.length === 0 ? (
-                                        <p style={{ color: '#94a3b8', margin: 0 }}>최근 활동이 없습니다.</p>
+                                        <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>최근 활동이 없습니다.</p>
                                     ) : recentActivities.map((item, index) => (
                                         <div key={`${item.type}-${item.occurredAt}-${index}`} style={{ borderBottom: '1px solid rgba(148, 163, 184, 0.14)', paddingBottom: 8 }}>
-                                            <div style={{ color: '#f8fafc', fontWeight: 800, fontSize: '0.9rem' }}>{item.title}</div>
-                                            <div style={{ color: '#94a3b8', fontSize: '0.78rem', marginTop: 3 }}>{formatDateTime(item.occurredAt)}</div>
+                                            <div style={{ color: 'var(--color-text)', fontWeight: 800, fontSize: '0.9rem' }}>{item.title}</div>
+                                            <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', marginTop: 3 }}>{formatDateTime(item.occurredAt)}</div>
                                         </div>
                                     ))}
                                 </div>

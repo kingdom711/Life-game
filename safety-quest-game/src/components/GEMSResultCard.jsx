@@ -130,7 +130,7 @@ const GEMSResultCard = ({ result, isLoading }) => {
                             <div className="cell-value">{sev}</div>
                         </div>
                         <div className="cell cell-score">
-                            <div className="cell-label" style={{ color: '#93c5fd' }}>위험성 R</div>
+                            <div className="cell-label" style={{ color: 'var(--color-primary)' }}>위험성 R</div>
                             <div className="cell-value" style={{ color: '#dbeafe' }}>{rScore}</div>
                         </div>
                     </div>

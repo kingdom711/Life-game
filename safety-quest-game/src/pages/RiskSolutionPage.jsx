@@ -179,7 +179,7 @@ const RiskSolutionPage = () => {
 
                 {/* 메인 카드 */}
                 <div style={{
-                    background: 'rgba(15, 23, 42, 0.8)',
+                    background: 'var(--color-surface)',
                     border: `1px solid ${COLOR.primary}`,
                     borderRadius: '24px',
                     overflow: 'hidden',

@@ -269,7 +269,7 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
                             fontWeight: '800',
                             marginBottom: '1rem'
                         }}>
-                            <span style={{ color: '#94a3b8' }}>기업 규모에 맞는</span><br />
+                            <span style={{ color: 'var(--color-text-muted)' }}>기업 규모에 맞는</span><br />
                             <span style={{
                                 background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
                                 WebkitBackgroundClip: 'text',
@@ -277,7 +277,7 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
                             }}>최적의 요금제</span>를 선택하세요
                         </h1>
                         <p style={{
-                            color: '#94a3b8',
+                            color: 'var(--color-text-muted)',
                             fontSize: '1.1rem',
                             maxWidth: '600px',
                             margin: '0 auto'
@@ -401,7 +401,7 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
 
                                     {/* 설명 */}
                                     <p style={{
-                                        color: '#94a3b8',
+                                        color: 'var(--color-text-muted)',
                                         fontSize: '0.9rem',
                                         marginBottom: '1.5rem',
                                         lineHeight: 1.5
@@ -420,7 +420,7 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
                                                 fontSize: '0.9rem'
                                             }}>
                                                 <span style={{ color: '#34d399' }}>✓</span>
-                                                <span style={{ color: '#e2e8f0' }}>{feature}</span>
+                                                <span style={{ color: 'var(--color-text)' }}>{feature}</span>
                                             </div>
                                         ))}
                                         {plan.limitations.map((limitation, idx) => (
@@ -510,7 +510,7 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
                                     <h4 style={{ color: '#fbbf24', marginBottom: '0.5rem', fontWeight: '600' }}>
                                         Q. {faq.q}
                                     </h4>
-                                    <p style={{ color: '#94a3b8', margin: 0, lineHeight: 1.6 }}>
+                                    <p style={{ color: 'var(--color-text-muted)', margin: 0, lineHeight: 1.6 }}>
                                         A. {faq.a}
                                     </p>
                                 </div>
@@ -533,7 +533,7 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
                             gap: '0.5rem',
                             background: 'transparent',
                             border: 'none',
-                            color: '#94a3b8',
+                            color: 'var(--color-text-muted)',
                             cursor: 'pointer',
                             fontSize: '0.9rem',
                             marginBottom: '2rem',
@@ -590,7 +590,7 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
                                 <label style={{
                                     display: 'block',
                                     marginBottom: '0.5rem',
-                                    color: '#e2e8f0',
+                                    color: 'var(--color-text)',
                                     fontWeight: '600'
                                 }}>
                                     회사명 <span style={{ color: '#f87171' }}>*</span>
@@ -618,7 +618,7 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
                             <label style={{
                                 display: 'block',
                                 marginBottom: '0.5rem',
-                                color: '#e2e8f0',
+                                color: 'var(--color-text)',
                                 fontWeight: '600'
                             }}>
                                 {selectedPlan.id === 'free' ? '닉네임' : '담당자명'} <span style={{ color: '#f87171' }}>*</span>
@@ -645,7 +645,7 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
                             <label style={{
                                 display: 'block',
                                 marginBottom: '0.5rem',
-                                color: '#e2e8f0',
+                                color: 'var(--color-text)',
                                 fontWeight: '600'
                             }}>
                                 이메일 <span style={{ color: '#f87171' }}>*</span>
@@ -672,7 +672,7 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
                             <label style={{
                                 display: 'block',
                                 marginBottom: '0.5rem',
-                                color: '#e2e8f0',
+                                color: 'var(--color-text)',
                                 fontWeight: '600'
                             }}>
                                 비밀번호 <span style={{ color: '#f87171' }}>*</span>
@@ -701,7 +701,7 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
                                     <label style={{
                                         display: 'block',
                                         marginBottom: '0.5rem',
-                                        color: '#e2e8f0',
+                                        color: 'var(--color-text)',
                                         fontWeight: '600'
                                     }}>
                                         연락처
@@ -728,7 +728,7 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
                                     <label style={{
                                         display: 'block',
                                         marginBottom: '0.5rem',
-                                        color: '#e2e8f0',
+                                        color: 'var(--color-text)',
                                         fontWeight: '600'
                                     }}>
                                         예상 사용 인원 <span style={{ color: '#f87171' }}>*</span>
@@ -781,7 +781,7 @@ const PricingPage = ({ onSelectPlan, onBack }) => {
                                         marginTop: '2px'
                                     }}
                                 />
-                                <span style={{ color: '#e2e8f0', fontSize: '0.9rem', lineHeight: 1.5 }}>
+                                <span style={{ color: 'var(--color-text)', fontSize: '0.9rem', lineHeight: 1.5 }}>
                                     <strong>[필수]</strong> 서비스 이용약관 및 개인정보 처리방침에 동의합니다.
                                     {selectedPlan.id !== 'free' && ' 14일 무료 체험 후 자동 결제됩니다.'}
                                 </span>

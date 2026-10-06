@@ -246,7 +246,7 @@ const PhotoUploadModal = ({ isOpen, onClose, onComplete, role }) => {
                                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                                 marginBottom: '0.5rem'
                             }}>
-                                <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 600 }}>업로드 진행</span>
+                                <span style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>업로드 진행</span>
                                 <span style={{
                                     color: photos.length >= REQUIRED_PHOTOS ? '#00ff88' : '#fbbf24',
                                     fontSize: '0.85rem', fontWeight: 700
@@ -304,7 +304,7 @@ const PhotoUploadModal = ({ isOpen, onClose, onComplete, role }) => {
                                                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                                                 marginBottom: '0.4rem'
                                             }}>
-                                                <span style={{ color: '#e2e8f0', fontSize: '0.9rem', fontWeight: 600 }}>
+                                                <span style={{ color: 'var(--color-text)', fontSize: '0.9rem', fontWeight: 600 }}>
                                                     사진 #{index + 1}
                                                 </span>
                                                 <button
@@ -328,7 +328,7 @@ const PhotoUploadModal = ({ isOpen, onClose, onComplete, role }) => {
                                                 style={{
                                                     width: '100%', padding: '0.4rem 0.5rem',
                                                     background: '#0f0f23', border: '1px solid #333',
-                                                    borderRadius: '4px', color: '#cbd5e1',
+                                                    borderRadius: '4px', color: 'var(--color-text-secondary)',
                                                     fontSize: '0.8rem'
                                                 }}
                                             />

@@ -243,7 +243,7 @@ function AlertManagement({ role }) {
                                             padding: '0.75rem',
                                             borderRadius: '8px',
                                             border: '1px solid rgba(139, 92, 246, 0.3)',
-                                            background: 'rgba(15, 23, 42, 0.8)',
+                                            background: 'var(--color-surface)',
                                             color: COLOR.text,
                                             fontSize: '1rem'
                                         }}
@@ -276,7 +276,7 @@ function AlertManagement({ role }) {
                                             padding: '0.75rem',
                                             borderRadius: '8px',
                                             border: '1px solid rgba(139, 92, 246, 0.3)',
-                                            background: 'rgba(15, 23, 42, 0.8)',
+                                            background: 'var(--color-surface)',
                                             color: COLOR.text,
                                             fontSize: '1rem'
                                         }}
@@ -304,7 +304,7 @@ function AlertManagement({ role }) {
                                             padding: '0.75rem',
                                             borderRadius: '8px',
                                             border: '1px solid rgba(139, 92, 246, 0.3)',
-                                            background: 'rgba(15, 23, 42, 0.8)',
+                                            background: 'var(--color-surface)',
                                             color: COLOR.text,
                                             fontSize: '1rem'
                                         }}
@@ -333,7 +333,7 @@ function AlertManagement({ role }) {
                                             padding: '0.75rem',
                                             borderRadius: '8px',
                                             border: '1px solid rgba(139, 92, 246, 0.3)',
-                                            background: 'rgba(15, 23, 42, 0.8)',
+                                            background: 'var(--color-surface)',
                                             color: COLOR.text,
                                             fontSize: '1rem',
                                             resize: 'vertical'
@@ -381,7 +381,7 @@ function AlertManagement({ role }) {
 
                 {/* 알림 목록 */}
                 <div style={{
-                    background: 'rgba(30, 41, 59, 0.6)',
+                    background: 'var(--color-surface)',
                     backdropFilter: 'blur(20px)',
                     border: '1px solid rgba(71, 85, 105, 0.3)',
                     borderRadius: '16px',

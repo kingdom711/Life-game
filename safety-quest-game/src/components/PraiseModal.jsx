@@ -65,10 +65,10 @@ function PraiseModal({ isOpen, onClose, targetUser }) {
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center'
                 }}>
                     <div>
-                        <h3 style={{ margin: 0, color: '#f1f5f9', fontWeight: 700, fontSize: '1.1rem' }}>
+                        <h3 style={{ margin: 0, color: 'var(--color-text)', fontWeight: 700, fontSize: '1.1rem' }}>
                             👏 칭찬하기
                         </h3>
-                        <p style={{ margin: '0.25rem 0 0', color: '#94a3b8', fontSize: '0.8rem' }}>
+                        <p style={{ margin: '0.25rem 0 0', color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>
                             {targetUser.name}님에게 칭찬을 보내세요
                         </p>
                     </div>
@@ -77,7 +77,7 @@ function PraiseModal({ isOpen, onClose, targetUser }) {
                         style={{
                             background: 'rgba(255,255,255,0.1)', border: 'none',
                             borderRadius: '50%', width: '32px', height: '32px',
-                            color: '#94a3b8', fontSize: '1rem', cursor: 'pointer'
+                            color: 'var(--color-text-muted)', fontSize: '1rem', cursor: 'pointer'
                         }}
                     >✕</button>
                 </div>
@@ -104,7 +104,7 @@ function PraiseModal({ isOpen, onClose, targetUser }) {
                 {/* 칭찬 유형 선택 */}
                 <div style={{ padding: '1.25rem 1.5rem' }}>
                     <div style={{
-                        fontSize: '0.8rem', color: '#94a3b8', marginBottom: '0.75rem',
+                        fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '0.75rem',
                         display: 'flex', justifyContent: 'space-between'
                     }}>
                         <span>칭찬 유형을 선택하세요</span>
@@ -125,7 +125,7 @@ function PraiseModal({ isOpen, onClose, targetUser }) {
                                     background: selectedType === type.id
                                         ? 'rgba(251, 191, 36, 0.15)'
                                         : 'rgba(255,255,255,0.05)',
-                                    color: selectedType === type.id ? '#fbbf24' : '#cbd5e1',
+                                    color: selectedType === type.id ? '#fbbf24' : 'var(--color-text-secondary)',
                                     cursor: 'pointer',
                                     textAlign: 'center',
                                     transition: 'all 0.2s'
@@ -151,7 +151,7 @@ function PraiseModal({ isOpen, onClose, targetUser }) {
                                 borderRadius: '10px',
                                 border: '1px solid rgba(255,255,255,0.15)',
                                 background: 'rgba(255,255,255,0.05)',
-                                color: '#f1f5f9',
+                                color: 'var(--color-text)',
                                 fontSize: '0.85rem',
                                 outline: 'none',
                                 boxSizing: 'border-box'
@@ -171,7 +171,7 @@ function PraiseModal({ isOpen, onClose, targetUser }) {
                             flex: 1, padding: '0.75rem',
                             borderRadius: '10px', border: '1px solid rgba(255,255,255,0.15)',
                             background: 'rgba(255,255,255,0.05)',
-                            color: '#94a3b8', fontWeight: 600, fontSize: '0.9rem',
+                            color: 'var(--color-text-muted)', fontWeight: 600, fontSize: '0.9rem',
                             cursor: 'pointer'
                         }}
                     >취소</button>

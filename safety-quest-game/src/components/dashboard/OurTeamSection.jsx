@@ -1,14 +1,13 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import useTeamGate from '../../hooks/useTeamGate';
 import userApi from '../../api/userApi';
 import questApi from '../../api/questApi';
 import { useEffect, useState } from 'react';
 
-function OurTeamSection({ weeklyProgress = 0 }) {
-    const navigate = useNavigate();
+function OurTeamSection() {
     const teamGate = useTeamGate();
     const [rankings, setRankings] = useState([]);
-    const [summary, setSummary] = useState({ weeklyProgress });
+    const [summary, setSummary] = useState(null);
 
     useEffect(() => {
         let active = true;
@@ -25,10 +24,10 @@ function OurTeamSection({ weeklyProgress = 0 }) {
 
         questApi.getTeamQuestSummary()
             .then((data) => {
-                if (active) setSummary(data || { weeklyProgress: 0 });
+                if (active) setSummary(data || null);
             })
             .catch(() => {
-                if (active) setSummary({ weeklyProgress: 0 });
+                if (active) setSummary(null);
             });
 
         return () => {
@@ -38,7 +37,7 @@ function OurTeamSection({ weeklyProgress = 0 }) {
 
     if (!teamGate.isActive) {
         return (
-            <div className="new-team-section" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
+            <Link className="new-team-section adventure-team-link" to="/profile">
                 <h3 className="new-team-title">우리 팀</h3>
                 <div className="new-team-progress-card">
                     <div className="new-team-progress-header">
@@ -50,24 +49,25 @@ function OurTeamSection({ weeklyProgress = 0 }) {
                         팀이 활성화되면 팀 퀘스트와 랭킹을 확인할 수 있습니다.
                     </div>
                 </div>
-            </div>
+            </Link>
         );
     }
 
+    const weeklyProgress = summary?.weeklyProgress != null && Number.isFinite(Number(summary.weeklyProgress)) ? Math.max(0, Math.min(100, Number(summary.weeklyProgress))) : null;
     return (
-        <div className="new-team-section" onClick={() => navigate('/my-team')} style={{ cursor: 'pointer' }}>
+        <Link className="new-team-section adventure-team-link" to="/my-team">
             <h3 className="new-team-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 우리 팀
-                <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 400 }}>더보기</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 400 }}>더보기</span>
             </h3>
 
             <div className="new-team-progress-card">
                 <div className="new-team-progress-header">
                     <span className="new-team-progress-label">이번 주 팀 퀘스트 수행률</span>
-                    <span className="new-team-progress-value">{summary.weeklyProgress || 0}%</span>
+                    <span className="new-team-progress-value">{weeklyProgress === null ? '미집계' : `${weeklyProgress}%`}</span>
                 </div>
                 <div className="new-team-progress-bar">
-                    <div className="new-team-progress-fill" style={{ width: `${summary.weeklyProgress || 0}%` }} />
+                    <div className="new-team-progress-fill" style={{ width: `${weeklyProgress || 0}%` }} />
                 </div>
                 <div className="new-team-progress-hint">
                     {teamGate.team?.name} 구성원과 함께 진행 중입니다.
@@ -92,16 +92,13 @@ function OurTeamSection({ weeklyProgress = 0 }) {
                                     {team.teamName || team.name}
                                     {isMine && <span className="new-team-mine-badge">(우리 팀)</span>}
                                 </span>
-                                <div className="new-team-rank-bar-wrap">
-                                    <div className="new-team-rank-bar" style={{ width: `${Math.min(100, Number(score) || 0)}%` }} />
-                                </div>
                                 <span className="new-team-rank-score">{score}</span>
                             </div>
                         );
                     })}
                 </div>
             </div>
-        </div>
+        </Link>
     );
 }
 

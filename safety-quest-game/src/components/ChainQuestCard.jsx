@@ -47,7 +47,7 @@ function ChainQuestCard({ role, onComplete }) {
                 opacity: 0.6
             }}>
                 <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>🔒</div>
-                <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#94a3b8', marginBottom: '0.25rem' }}>
+                <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>
                     체인 퀘스트 잠김
                 </div>
                 <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
@@ -119,10 +119,10 @@ function ChainQuestCard({ role, onComplete }) {
                             CHAIN QUEST
                         </span>
                     </div>
-                    <h4 style={{ margin: '0 0 0.2rem', color: '#f1f5f9', fontSize: '1rem', fontWeight: 700 }}>
+                    <h4 style={{ margin: '0 0 0.2rem', color: 'var(--color-text)', fontSize: '1rem', fontWeight: 700 }}>
                         {chain.name}
                     </h4>
-                    <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.8rem' }}>
+                    <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>
                         {chain.description}
                     </p>
 
@@ -141,7 +141,7 @@ function ChainQuestCard({ role, onComplete }) {
                                     borderRadius: '8px',
                                     border: '1px solid rgba(59, 130, 246, 0.3)',
                                     background: 'rgba(0,0,0,0.2)',
-                                    color: '#f1f5f9',
+                                    color: 'var(--color-text)',
                                     fontSize: '0.85rem',
                                     outline: 'none',
                                     boxSizing: 'border-box'

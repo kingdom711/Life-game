@@ -22,7 +22,7 @@ const GearSlot = ({
                 width: `${size}px`,
                 height: `${size}px`,
                 position: 'relative',
-                backgroundColor: 'rgba(15, 23, 42, 0.6)',
+                backgroundColor: 'var(--color-surface)',
                 border: `2px solid ${item ? rarityColor : 'rgba(71, 85, 105, 0.5)'}`,
                 borderRadius: '8px',
                 display: 'flex',
