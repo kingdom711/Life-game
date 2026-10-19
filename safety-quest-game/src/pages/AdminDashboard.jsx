@@ -18,18 +18,19 @@ import adminApi from '../api/adminApi';
 import { useAuth } from '../context/AuthContext';
 import { EmptyState, LoadingState, ResultNotice } from '../components/PageState';
 import { isAdminRole } from '../utils/authRoles';
+import '../styles/pages/admin-dashboard.css';
 
 const canUseAdminDashboard = (user) => isAdminRole(user?.role);
 
 const numberFormat = new Intl.NumberFormat('ko-KR');
 
 const metricConfig = [
-    { key: 'openWorkStopReports', label: '미해결 작업중지', Icon: AlertTriangle, tone: '#ef4444' },
-    { key: 'pendingRewardRequests', label: '보상 승인 대기', Icon: Gift, tone: '#f59e0b' },
-    { key: 'openHazardCycles', label: '조치 필요 위험', Icon: HardHat, tone: '#38bdf8' },
-    { key: 'todayEducationCompletions', label: '오늘 교육 완료', Icon: ShieldCheck, tone: '#22c55e' },
-    { key: 'todayChecklistSubmissions', label: '오늘 체크리스트', Icon: ClipboardCheck, tone: '#a78bfa' },
-    { key: 'totalUsers', label: '전체 참여자', Icon: Users, tone: '#60a5fa' },
+    { key: 'openWorkStopReports', label: '미해결 작업중지', Icon: AlertTriangle, tone: '#b91c1c' },
+    { key: 'pendingRewardRequests', label: '보상 승인 대기', Icon: Gift, tone: '#92400e' },
+    { key: 'openHazardCycles', label: '조치 필요 위험', Icon: HardHat, tone: '#0369a1' },
+    { key: 'todayEducationCompletions', label: '오늘 교육 완료', Icon: ShieldCheck, tone: '#15803d' },
+    { key: 'todayChecklistSubmissions', label: '오늘 체크리스트', Icon: ClipboardCheck, tone: '#6d28d9' },
+    { key: 'totalUsers', label: '전체 참여자', Icon: Users, tone: '#1d4ed8' },
 ];
 
 const quickLinks = [
@@ -72,15 +73,16 @@ const pointSortOptions = [
 ];
 
 const chartPanelStyle = {
-    borderRadius: 8,
-    padding: '1rem',
-    border: '1px solid rgba(148, 163, 184, 0.18)',
+    borderRadius: 14,
+    padding: '1.25rem',
+    border: '1px solid var(--admin-border)',
 };
 
 const inputStyle = {
-    minHeight: 42,
+    minHeight: 44,
+    minWidth: 0,
     borderRadius: 8,
-    border: '1px solid rgba(148, 163, 184, 0.28)',
+    border: '1px solid var(--admin-border)',
     background: 'var(--color-surface)',
     color: 'var(--color-text)',
     padding: '0 0.75rem',
@@ -135,7 +137,7 @@ function BarListChart({ rows, emptyTitle }) {
                 <div key={row.key}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
                         <span style={{ color: 'var(--color-text)', fontSize: '0.9rem', fontWeight: 800 }}>{row.label}</span>
-                        <span style={{ color: 'var(--color-text-muted)', fontSize: '0.82rem', fontWeight: 700 }}>
+                        <span style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', fontWeight: 700 }}>
                             {numberFormat.format(row.value)}건 {row.percent ? `· ${row.percent}%` : ''}
                         </span>
                     </div>
@@ -161,7 +163,7 @@ function SummaryBars({ rows }) {
                             {numberFormat.format(row.value)}
                         </div>
                         <div style={{ height, borderRadius: 8, background: row.color, transition: 'height 180ms ease' }} />
-                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontWeight: 800, textAlign: 'center', lineHeight: 1.25 }}>
+                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', fontWeight: 800, textAlign: 'center', lineHeight: 1.25 }}>
                             {row.label}
                         </div>
                     </div>
@@ -177,13 +179,13 @@ function MetricDetailPanel({ metric, items, expectedCount = 0 }) {
     const hasMissingDetails = count === 0 && expectedCount > 0;
 
     return (
-        <section className="glass-panel" style={{ ...chartPanelStyle, marginBottom: 18 }}>
+        <section className="admin-panel" style={{ ...chartPanelStyle, marginBottom: 18 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 14 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                     <Icon size={19} color={metric.tone} />
                     <div style={{ minWidth: 0 }}>
                         <h2 style={{ color: 'var(--color-text)', fontSize: '1.05rem', margin: 0 }}>{metric.label} 상세</h2>
-                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.82rem', margin: '4px 0 0' }}>
+                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', margin: '4px 0 0' }}>
                             총 {numberFormat.format(count)}개 항목
                             {hasMissingDetails ? ` / 지표 ${numberFormat.format(expectedCount)}건` : ''}
                         </p>
@@ -210,7 +212,7 @@ function MetricDetailPanel({ metric, items, expectedCount = 0 }) {
                                 padding: '0.85rem',
                                 borderRadius: 8,
                                 background: 'var(--color-surface)',
-                                border: '1px solid rgba(148, 163, 184, 0.14)',
+                                border: '1px solid var(--admin-border)',
                             }}
                         >
                             <div style={{ minWidth: 0 }}>
@@ -225,7 +227,7 @@ function MetricDetailPanel({ metric, items, expectedCount = 0 }) {
                                 <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.84rem', marginTop: 5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     {item.detail || '상세 정보 없음'}
                                 </div>
-                                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.76rem', marginTop: 5 }}>
+                                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', marginTop: 5 }}>
                                     {[item.meta, formatDateTime(item.occurredAt)].filter(Boolean).join(' · ')}
                                 </div>
                             </div>
@@ -241,7 +243,7 @@ function MetricDetailPanel({ metric, items, expectedCount = 0 }) {
                                         placeItems: 'center',
                                         color: 'var(--color-text)',
                                         background: 'var(--color-surface)',
-                                        border: '1px solid rgba(148, 163, 184, 0.18)',
+                                        border: '1px solid var(--admin-border)',
                                     }}
                                 >
                                     <ExternalLink size={16} />
@@ -273,7 +275,7 @@ function ParticipantEngagementSection({ engagement, filters, onFilterChange, onR
     const updateFilter = (key, value) => onFilterChange({ ...filters, [key]: value });
 
     return (
-        <section className="glass-panel" style={{ ...chartPanelStyle, marginTop: 18 }}>
+        <section className="admin-panel" style={{ ...chartPanelStyle, marginTop: 18 }}>
             <header style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap' }}>
                 <div>
                     <p style={{ color: 'var(--color-text-muted)', margin: '0 0 5px', fontWeight: 800 }}>PARTICIPANT ENGAGEMENT</p>
@@ -294,7 +296,7 @@ function ParticipantEngagementSection({ engagement, filters, onFilterChange, onR
                 </button>
             </header>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginBottom: 16 }}>
+            <div className="admin-summary-grid">
                 {[
                     ['총 참여자', summary.totalParticipants || 0],
                     ['활동 참여자', summary.activeParticipants || 0],
@@ -303,48 +305,64 @@ function ParticipantEngagementSection({ engagement, filters, onFilterChange, onR
                     ['교육 수료', summary.totalEducationCompletions || 0],
                     ['위험제보', summary.totalHazardReports || 0],
                 ].map(([label, value]) => (
-                    <div key={label} style={{ padding: '0.9rem', borderRadius: 8, background: 'var(--color-surface)', border: '1px solid rgba(148, 163, 184, 0.14)' }}>
-                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', fontWeight: 800 }}>{label}</div>
+                    <div key={label} style={{ padding: '0.9rem', borderRadius: 8, background: 'var(--color-surface)', border: '1px solid var(--admin-border)' }}>
+                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', fontWeight: 800 }}>{label}</div>
                         <div style={{ color: 'var(--color-text)', fontSize: '1.45rem', fontWeight: 900, marginTop: 6 }}>{numberFormat.format(value)}</div>
                     </div>
                 ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginBottom: 16 }}>
-                <input type="date" value={filters.from} onChange={(event) => updateFilter('from', event.target.value)} style={inputStyle} />
-                <input type="date" value={filters.to} onChange={(event) => updateFilter('to', event.target.value)} style={inputStyle} />
-                <select value={filters.teamId} onChange={(event) => updateFilter('teamId', event.target.value)} style={inputStyle}>
-                    <option value="">전체 팀</option>
-                    {teamOptions.map((team) => (
-                        <option key={team.id} value={team.id}>{team.name}</option>
-                    ))}
-                </select>
-                <select value={filters.sort} onChange={(event) => updateFilter('sort', event.target.value)} style={inputStyle}>
-                    {sortOptions.map((option) => (
-                        <option key={option.value} value={option.value}>{option.label}</option>
-                    ))}
-                </select>
-                <label style={{ ...inputStyle, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Search size={16} color="#94a3b8" />
-                    <input
-                        value={filters.keyword}
-                        onChange={(event) => updateFilter('keyword', event.target.value)}
-                        placeholder="이름, 계정, 팀 검색"
-                        style={{ flex: 1, minWidth: 0, border: 0, outline: 0, background: 'transparent', color: 'var(--color-text)' }}
-                    />
+            <div className="admin-filter-grid">
+                <label className="admin-filter-label">
+                    시작일
+                    <input type="date" value={filters.from} onChange={(event) => updateFilter('from', event.target.value)} style={inputStyle} />
+                </label>
+                <label className="admin-filter-label">
+                    종료일
+                    <input type="date" value={filters.to} onChange={(event) => updateFilter('to', event.target.value)} style={inputStyle} />
+                </label>
+                <label className="admin-filter-label">
+                    소속 팀
+                    <select value={filters.teamId} onChange={(event) => updateFilter('teamId', event.target.value)} style={inputStyle}>
+                        <option value="">전체 팀</option>
+                        {teamOptions.map((team) => (
+                            <option key={team.id} value={team.id}>{team.name}</option>
+                        ))}
+                    </select>
+                </label>
+                <label className="admin-filter-label">
+                    정렬 기준
+                    <select value={filters.sort} onChange={(event) => updateFilter('sort', event.target.value)} style={inputStyle}>
+                        {sortOptions.map((option) => (
+                            <option key={option.value} value={option.value}>{option.label}</option>
+                        ))}
+                    </select>
+                </label>
+                <label className="admin-filter-label admin-search">참여자 검색
+                    <span style={{ ...inputStyle, display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <Search size={16} color="var(--color-text-muted)" />
+                        <input
+                            value={filters.keyword}
+                            onChange={(event) => updateFilter('keyword', event.target.value)}
+                            placeholder="이름, 계정, 팀 검색"
+                            style={{ flex: 1, minWidth: 0, border: 0, background: 'transparent', color: 'var(--color-text)' }}
+                        />
+                    </span>
                 </label>
             </div>
 
             {participants.length === 0 ? (
                 <EmptyState icon="-" title="개인별 참여 데이터가 없습니다." description="기간 또는 검색 조건을 조정해 주세요." />
             ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.8fr) minmax(260px, 0.8fr)', gap: 16 }}>
-                    <div style={{ overflowX: 'auto' }}>
+                <div className="admin-data-layout">
+                    <div className="admin-table-region">
+                        <p className="admin-table-hint">이름을 선택하면 상세 현황이 표시됩니다. 표를 좌우로 밀어 전체 항목을 확인하세요.</p>
+                        <div className="admin-table-scroll" tabIndex={0} role="region" aria-label="개인별 참여 현황 표">
                         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 920 }}>
                             <thead>
-                                <tr style={{ color: 'var(--color-text-muted)', fontSize: '0.76rem', textAlign: 'left' }}>
+                                <tr style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', textAlign: 'left' }}>
                                     {['이름', '팀', '출석', '교육', '퀘스트', '위험제보', '확인', '작업중지', '포인트', '최근 활동', '점수'].map((header) => (
-                                        <th key={header} style={{ padding: '0.65rem 0.55rem', borderBottom: '1px solid rgba(148, 163, 184, 0.18)' }}>{header}</th>
+                                        <th key={header} style={{ padding: '0.65rem 0.55rem', borderBottom: '1px solid var(--admin-border)' }}>{header}</th>
                                     ))}
                                 </tr>
                             </thead>
@@ -358,7 +376,7 @@ function ParticipantEngagementSection({ engagement, filters, onFilterChange, onR
                                             background: selected?.userId === row.userId ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
                                         }}
                                     >
-                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)', fontWeight: 900 }}>{row.name}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)', fontWeight: 900 }}><button type="button" className="admin-user-select" aria-pressed={selected?.userId === row.userId} onClick={(event) => { event.stopPropagation(); setSelectedUserId(row.userId); }}>{row.name}</button></td>
                                         <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text-secondary)' }}>{row.teamName}</td>
                                         <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{row.attendanceCount}</td>
                                         <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{row.educationCompletions}</td>
@@ -369,18 +387,19 @@ function ParticipantEngagementSection({ engagement, filters, onFilterChange, onR
                                         <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{numberFormat.format(row.pointsEarned || 0)}</td>
                                         <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text-muted)' }}>{formatDateTime(row.lastActivityAt)}</td>
                                         <td style={{ padding: '0.75rem 0.55rem' }}>
-                                            <span style={{ color: '#22c55e', fontWeight: 900 }}>{row.engagementScore}</span>
+                                            <span style={{ color: '#15803d', fontWeight: 900 }}>{row.engagementScore}</span>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
+                        </div>
                     </div>
 
-                    <aside style={{ borderRadius: 8, background: 'var(--color-surface)', border: '1px solid rgba(148, 163, 184, 0.14)', padding: '1rem', alignSelf: 'start' }}>
+                    <aside style={{ borderRadius: 8, background: 'var(--color-surface)', border: '1px solid var(--admin-border)', padding: '1rem', alignSelf: 'start' }}>
                         {selected && (
                             <>
-                                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', fontWeight: 800 }}>{selected.role}</div>
+                                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', fontWeight: 800 }}>{selected.role}</div>
                                 <h3 style={{ color: 'var(--color-text)', margin: '4px 0 2px', fontSize: '1.15rem' }}>{selected.name}</h3>
                                 <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.86rem' }}>{selected.username} · {selected.teamName}</div>
                                 <div style={{ marginTop: 14, height: 10, borderRadius: 999, background: 'var(--color-surface)', overflow: 'hidden' }}>
@@ -416,7 +435,7 @@ function PointRewardDashboardSection({ pointReward, filters, sort, onSortChange,
     const selected = users.find((item) => item.userId === selectedUserId) || users[0] || null;
 
     return (
-        <section className="glass-panel" style={{ ...chartPanelStyle, marginTop: 18 }}>
+        <section className="admin-panel" style={{ ...chartPanelStyle, marginTop: 18 }}>
             <header style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap' }}>
                 <div>
                     <p style={{ color: 'var(--color-text-muted)', margin: '0 0 5px', fontWeight: 800 }}>POINTS AND REWARDS</p>
@@ -426,7 +445,7 @@ function PointRewardDashboardSection({ pointReward, filters, sort, onSortChange,
                     </p>
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    <select value={sort} onChange={(event) => onSortChange(event.target.value)} style={inputStyle}>
+                    <select aria-label="포인트 현황 정렬 기준" value={sort} onChange={(event) => onSortChange(event.target.value)} style={inputStyle}>
                         {pointSortOptions.map((option) => (
                             <option key={option.value} value={option.value}>{option.label}</option>
                         ))}
@@ -444,7 +463,7 @@ function PointRewardDashboardSection({ pointReward, filters, sort, onSortChange,
                 </div>
             </header>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10, marginBottom: 16 }}>
+            <div className="admin-summary-grid">
                 {[
                     ['총 잔여 포인트', summary.totalPointBalance || 0],
                     ['기간 획득 포인트', summary.periodPointsEarned || 0],
@@ -454,23 +473,26 @@ function PointRewardDashboardSection({ pointReward, filters, sort, onSortChange,
                     ['대기 보상 골드', summary.pendingRewardGold || 0],
                     ['예상 현금가치', summary.pendingRewardCashValue || 0],
                 ].map(([label, value]) => (
-                    <div key={label} style={{ padding: '0.9rem', borderRadius: 8, background: 'var(--color-surface)', border: '1px solid rgba(148, 163, 184, 0.14)' }}>
-                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', fontWeight: 800 }}>{label}</div>
+                    <div key={label} style={{ padding: '0.9rem', borderRadius: 8, background: 'var(--color-surface)', border: '1px solid var(--admin-border)' }}>
+                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', fontWeight: 800 }}>{label}</div>
                         <div style={{ color: 'var(--color-text)', fontSize: '1.35rem', fontWeight: 900, marginTop: 6 }}>{numberFormat.format(value)}</div>
                     </div>
                 ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.7fr) minmax(280px, 0.9fr)', gap: 16 }}>
-                <div style={{ overflowX: 'auto' }}>
+            <div className="admin-data-layout">
+                <div className="admin-table-region">
                     {users.length === 0 ? (
                         <EmptyState icon="-" title="포인트 현황 데이터가 없습니다." description="기간 또는 검색 조건을 조정해 주세요." />
                     ) : (
+                        <>
+                        <p className="admin-table-hint">이름을 선택하면 잔액 상세가 표시됩니다. 표를 좌우로 밀어 전체 항목을 확인하세요.</p>
+                        <div className="admin-table-scroll" tabIndex={0} role="region" aria-label="포인트와 보상 현황 표">
                         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 1040 }}>
                             <thead>
-                                <tr style={{ color: 'var(--color-text-muted)', fontSize: '0.76rem', textAlign: 'left' }}>
+                                <tr style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', textAlign: 'left' }}>
                                     {['이름', '팀', '포인트 잔액', '기간 획득', '기간 사용', '골드 잔액', '골드 획득', '골드 사용', '보상 대기', '대기 골드', '최근 활동'].map((header) => (
-                                        <th key={header} style={{ padding: '0.65rem 0.55rem', borderBottom: '1px solid rgba(148, 163, 184, 0.18)' }}>{header}</th>
+                                        <th key={header} style={{ padding: '0.65rem 0.55rem', borderBottom: '1px solid var(--admin-border)' }}>{header}</th>
                                     ))}
                                 </tr>
                             </thead>
@@ -484,12 +506,12 @@ function PointRewardDashboardSection({ pointReward, filters, sort, onSortChange,
                                             background: selected?.userId === row.userId ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
                                         }}
                                     >
-                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)', fontWeight: 900 }}>{row.name}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)', fontWeight: 900 }}><button type="button" className="admin-user-select" aria-pressed={selected?.userId === row.userId} onClick={(event) => { event.stopPropagation(); setSelectedUserId(row.userId); }}>{row.name}</button></td>
                                         <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text-secondary)' }}>{row.teamName}</td>
                                         <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)', fontWeight: 900 }}>{numberFormat.format(row.pointBalance || 0)}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#22c55e' }}>{numberFormat.format(row.periodPointsEarned || 0)}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#f97316' }}>{numberFormat.format(row.periodPointsSpent || 0)}</td>
-                                        <td style={{ padding: '0.75rem 0.55rem', color: '#fbbf24', fontWeight: 900 }}>{numberFormat.format(row.goldBalance || 0)}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: '#15803d' }}>{numberFormat.format(row.periodPointsEarned || 0)}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: '#9a3412' }}>{numberFormat.format(row.periodPointsSpent || 0)}</td>
+                                        <td style={{ padding: '0.75rem 0.55rem', color: '#92400e', fontWeight: 900 }}>{numberFormat.format(row.goldBalance || 0)}</td>
                                         <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{numberFormat.format(row.periodGoldEarned || 0)}</td>
                                         <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{numberFormat.format(row.periodGoldSpent || 0)}</td>
                                         <td style={{ padding: '0.75rem 0.55rem', color: 'var(--color-text)' }}>{numberFormat.format(row.pendingRewardRequests || 0)}</td>
@@ -499,11 +521,13 @@ function PointRewardDashboardSection({ pointReward, filters, sort, onSortChange,
                                 ))}
                             </tbody>
                         </table>
+                        </div>
+                        </>
                     )}
                 </div>
 
                 <aside style={{ display: 'grid', gap: 12, alignSelf: 'start' }}>
-                    <div style={{ borderRadius: 8, background: 'var(--color-surface)', border: '1px solid rgba(148, 163, 184, 0.14)', padding: '1rem' }}>
+                    <div style={{ borderRadius: 8, background: 'var(--color-surface)', border: '1px solid var(--admin-border)', padding: '1rem' }}>
                         <h3 style={{ color: 'var(--color-text)', margin: '0 0 10px', fontSize: '1rem' }}>선택 사용자</h3>
                         {selected ? (
                             <dl style={{ display: 'grid', gap: 10, margin: 0 }}>
@@ -525,19 +549,19 @@ function PointRewardDashboardSection({ pointReward, filters, sort, onSortChange,
                         )}
                     </div>
 
-                    <div style={{ borderRadius: 8, background: 'var(--color-surface)', border: '1px solid rgba(148, 163, 184, 0.14)', padding: '1rem' }}>
+                    <div style={{ borderRadius: 8, background: 'var(--color-surface)', border: '1px solid var(--admin-border)', padding: '1rem' }}>
                         <h3 style={{ color: 'var(--color-text)', margin: '0 0 10px', fontSize: '1rem' }}>보상 준비 물량</h3>
                         {pendingRewards.length === 0 ? (
                             <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>대기 중인 보상 신청이 없습니다.</p>
                         ) : (
                             <div style={{ display: 'grid', gap: 10 }}>
                                 {pendingRewards.map((item) => (
-                                    <div key={item.rewardId} style={{ paddingBottom: 10, borderBottom: '1px solid rgba(148, 163, 184, 0.14)' }}>
+                                    <div key={item.rewardId} style={{ paddingBottom: 10, borderBottom: '1px solid var(--admin-border)' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
                                             <strong style={{ color: 'var(--color-text)' }}>{item.rewardName}</strong>
-                                            <span style={{ color: '#fbbf24', fontWeight: 900 }}>{numberFormat.format(item.pendingCount)}개</span>
+                                            <span style={{ color: '#92400e', fontWeight: 900 }}>{numberFormat.format(item.pendingCount)}개</span>
                                         </div>
-                                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', marginTop: 4 }}>
+                                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', marginTop: 4 }}>
                                             필요 {numberFormat.format(item.requiredGold || 0)}G · 현금가치 {numberFormat.format(item.cashValue || 0)}원 · 재고 {numberFormat.format(item.remainingQuantity || 0)}
                                         </div>
                                     </div>
@@ -658,17 +682,17 @@ function AdminDashboard() {
     ], [metrics]);
 
     const activityRows = useMemo(() => [
-        { key: 'todayEducationCompletions', label: '교육완료', value: metrics.todayEducationCompletions || 0, color: '#22c55e' },
+        { key: 'todayEducationCompletions', label: '교육완료', value: metrics.todayEducationCompletions || 0, color: '#15803d' },
         { key: 'todayChecklistSubmissions', label: '체크리스트', value: metrics.todayChecklistSubmissions || 0, color: '#a78bfa' },
-        { key: 'todayHazardReports', label: '위험제보', value: metrics.todayHazardReports || 0, color: '#f97316' },
+        { key: 'todayHazardReports', label: '위험제보', value: metrics.todayHazardReports || 0, color: '#9a3412' },
     ], [metrics]);
 
     if (!allowed) return null;
 
     return (
-        <div className="page" style={{ padding: '2rem 1rem 6rem' }}>
+        <div className="page admin-dashboard" style={{ padding: '2rem 1rem 6rem' }}>
             <div className="container" style={{ maxWidth: 1180, margin: '0 auto' }}>
-                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.5rem' }}>
+                <header className="admin-dashboard-header">
                     <div>
                         <p style={{ color: 'var(--color-text-muted)', marginBottom: 6, fontWeight: 700 }}>BETA OPERATIONS</p>
                         <h1 style={{ color: 'var(--color-text)', fontSize: '2rem', fontWeight: 900, margin: 0 }}>관리자 운영 콘솔</h1>
@@ -693,17 +717,18 @@ function AdminDashboard() {
                     </div>
                 ) : (
                     <>
-                        <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 18 }}>
+                        <section className="admin-metric-grid" aria-label="주요 운영 지표">
                             {metricConfig.map(({ key, label, Icon, tone }) => (
                                 <button
                                     key={key}
                                     type="button"
                                     onClick={() => setActiveMetricKey(key)}
-                                    className="glass-panel"
-                                    style={{ ...chartPanelStyle, textAlign: 'left', cursor: 'pointer', background: activeMetricKey === key ? 'rgba(30, 41, 59, 0.88)' : undefined, boxShadow: activeMetricKey === key ? `0 0 0 1px ${tone}66, 0 18px 36px rgba(15, 23, 42, 0.25)` : undefined }}
+                                    className="admin-panel admin-metric"
+                                    aria-pressed={activeMetricKey === key}
+                                    style={{ ...chartPanelStyle, '--metric-tone': tone, borderLeft: `4px solid ${tone}` }}
                                 >
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
-                                        <span style={{ color: 'var(--color-text-muted)', fontSize: '0.82rem', fontWeight: 700 }}>{label}</span>
+                                        <span className="admin-metric-label">{label}</span>
                                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                                             <Icon size={18} color={tone} />
                                             <ChevronRight size={15} color={activeMetricKey === key ? tone : '#64748b'} />
@@ -717,27 +742,27 @@ function AdminDashboard() {
                         <MetricDetailPanel metric={activeMetric} items={activeMetricItems} expectedCount={metrics[activeMetric.key] || 0} />
 
                         <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: 16, marginBottom: 16 }}>
-                            <div className="glass-panel" style={chartPanelStyle}>
+                            <div className="admin-panel" style={chartPanelStyle}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 14 }}>
                                     <h2 style={{ color: 'var(--color-text)', fontSize: '1.05rem', margin: 0 }}>최근 30일 작업중지 위험 유형</h2>
-                                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem' }}>총 {numberFormat.format(hazardRows[0]?.total || 0)}건</span>
+                                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>총 {numberFormat.format(hazardRows[0]?.total || 0)}건</span>
                                 </div>
                                 <BarListChart rows={hazardRows} emptyTitle="작업중지 위험 유형 데이터가 없습니다." />
                             </div>
 
-                            <div className="glass-panel" style={chartPanelStyle}>
+                            <div className="admin-panel" style={chartPanelStyle}>
                                 <h2 style={{ color: 'var(--color-text)', fontSize: '1.05rem', margin: '0 0 14px' }}>운영 처리 현황</h2>
                                 <SummaryBars rows={operationsRows} />
                             </div>
                         </section>
 
                         <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 16, marginBottom: 16 }}>
-                            <div className="glass-panel" style={chartPanelStyle}>
+                            <div className="admin-panel" style={chartPanelStyle}>
                                 <h2 style={{ color: 'var(--color-text)', fontSize: '1.05rem', margin: '0 0 14px' }}>오늘 현장 활동</h2>
                                 <SummaryBars rows={activityRows} />
                             </div>
 
-                            <aside className="glass-panel" style={chartPanelStyle}>
+                            <aside className="admin-panel" style={chartPanelStyle}>
                                 <h2 style={{ color: 'var(--color-text)', fontSize: '1.05rem', margin: '0 0 12px' }}>빠른 작업</h2>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 8 }}>
                                     {quickLinks.map(({ href, label, Icon }) => (
@@ -750,11 +775,11 @@ function AdminDashboard() {
                             </aside>
                         </section>
 
-                        <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-                            <div className="glass-panel" style={chartPanelStyle}>
+                        <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 16 }}>
+                            <div className="admin-panel" style={chartPanelStyle}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                                     <h2 style={{ color: 'var(--color-text)', fontSize: '1.1rem', margin: 0 }}>처리 대기</h2>
-                                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>{formatDateTime(summary?.generatedAt)} 기준</span>
+                                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>{formatDateTime(summary?.generatedAt)} 기준</span>
                                 </div>
 
                                 {topActions.length === 0 ? (
@@ -767,7 +792,7 @@ function AdminDashboard() {
                                                     <div style={{ color: 'var(--color-text)', fontWeight: 800 }}>{item.title}</div>
                                                     <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.86rem', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.detail || '상세 정보 없음'}</div>
                                                 </div>
-                                                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', textAlign: 'right' }}>
+                                                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', textAlign: 'right' }}>
                                                     <div>{item.status}</div>
                                                     <div style={{ marginTop: 4 }}>{formatDateTime(item.createdAt)}</div>
                                                 </div>
@@ -777,15 +802,15 @@ function AdminDashboard() {
                                 )}
                             </div>
 
-                            <div className="glass-panel" style={chartPanelStyle}>
+                            <div className="admin-panel" style={chartPanelStyle}>
                                 <h2 style={{ color: 'var(--color-text)', fontSize: '1.05rem', margin: '0 0 12px' }}>최근 활동</h2>
                                 <div style={{ display: 'grid', gap: 10 }}>
                                     {recentActivities.length === 0 ? (
                                         <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>최근 활동이 없습니다.</p>
                                     ) : recentActivities.map((item, index) => (
-                                        <div key={`${item.type}-${item.occurredAt}-${index}`} style={{ borderBottom: '1px solid rgba(148, 163, 184, 0.14)', paddingBottom: 8 }}>
+                                        <div key={`${item.type}-${item.occurredAt}-${index}`} style={{ borderBottom: '1px solid var(--admin-border)', paddingBottom: 8 }}>
                                             <div style={{ color: 'var(--color-text)', fontWeight: 800, fontSize: '0.9rem' }}>{item.title}</div>
-                                            <div style={{ color: 'var(--color-text-muted)', fontSize: '0.78rem', marginTop: 3 }}>{formatDateTime(item.occurredAt)}</div>
+                                            <div style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', marginTop: 3 }}>{formatDateTime(item.occurredAt)}</div>
                                         </div>
                                     ))}
                                 </div>
