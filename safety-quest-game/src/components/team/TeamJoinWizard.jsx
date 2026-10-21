@@ -69,20 +69,26 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
 
     const finish = async (nextResult) => {
         setResult(nextResult);
+        try {
+            await refreshUser?.();
+        } catch (_) {
+            // Membership refresh is best-effort; the gate hook will retry.
+        }
+        // Refresh the profile first: it may not include a team in Supabase mode.
+        // A successful create_team RPC already created an approved leader membership.
         if (nextResult?.type === 'created' && nextResult.team) {
             setUser?.((currentUser) => currentUser
                 ? { ...currentUser, team: { ...nextResult.team, leader: true } }
                 : currentUser);
         }
         try {
-            await refreshUser?.();
-        } catch (_) {
-            // Membership refresh is best-effort; the gate hook will retry.
-        }
-        try {
             await onComplete?.(nextResult);
         } catch (_) {
             // Follow-up gate refresh should not turn a successful team action into a failure.
+        }
+        if (nextResult?.type === 'created') {
+            onClose?.();
+            return;
         }
         moveToStep(3);
     };
@@ -118,7 +124,7 @@ function TeamJoinWizard({ isOpen = true, onClose, force = false, onComplete }) {
             await finish({
                 type: createMode ? 'created' : 'requested',
                 team: createMode ? response : selectedTeam,
-                membership: createMode ? { status: 'ACTIVE' } : response
+                membership: createMode ? { status: 'APPROVED', is_leader: true } : response
             });
         } catch (err) {
             setError(err.message || '팀 처리 중 오류가 발생했습니다.');

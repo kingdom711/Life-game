@@ -15,14 +15,30 @@ const teamApi = {
         return apiClient.get(`/teams?${params}`);
     },
 
-    createTeam: ({ name, siteName }) => {
-        if (authApi.usesSupabase) return requireSupabase().rpc('create_team', { p_name: name, p_site_name: siteName }).then(({ data, error }) => { if (error) throw error; return { id: data }; });
-        return apiClient.post('/teams', { name, siteName });
+    createTeam: async ({ name, siteName }) => {
+        if (!authApi.usesSupabase) return apiClient.post('/teams', { name, siteName });
+        const { data, error } = await requireSupabase().rpc('create_team', {
+            p_name: name.trim(), p_site_name: siteName.trim()
+        });
+        if (error) throw error;
+        return { id: data, name: name.trim(), siteName: siteName.trim(), leader: true };
     },
 
-    getMyMembership: () => {
-        if (authApi.usesSupabase) return requireSupabase().from('team_memberships').select('*, teams(*)').maybeSingle().then(({ data, error }) => { if (error) throw error; return data; });
-        return apiClient.get('/teams/me/membership');
+    getMyMembership: async () => {
+        if (!authApi.usesSupabase) return apiClient.get('/teams/me/membership');
+        const client = requireSupabase();
+        const { data: { user }, error: authError } = await client.auth.getUser();
+        if (authError) throw authError;
+        if (!user) return null;
+        const { data, error } = await client
+            .from('team_memberships')
+            .select('*, teams(*)')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+        if (error) throw error;
+        return data;
     },
 
     joinTeam: (teamId) => {

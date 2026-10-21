@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import teamApi from '../api/teamApi';
-
-const normalizeStatus = (status) => String(status || '').toUpperCase();
+import { resolveTeamMembership } from '../utils/teamMembership';
 
 export default function useTeamGate({ autoLoad = true } = {}) {
     const { user } = useAuth();
@@ -39,22 +38,8 @@ export default function useTeamGate({ autoLoad = true } = {}) {
     }, [autoLoad, loadMembership]);
 
     return useMemo(() => {
-        const userTeam = user?.team || null;
-        const membershipStatus = normalizeStatus(membership?.status);
-        const activeTeam = membershipStatus === 'ACTIVE'
-            ? {
-                id: membership.teamId,
-                name: membership.teamName,
-                siteName: userTeam?.siteName,
-                leader: userTeam?.leader || userTeam?.isLeader || false
-            }
-            : userTeam;
-
-        const status = activeTeam
-            ? 'ACTIVE'
-            : membershipStatus === 'PENDING'
-                ? 'PENDING'
-                : 'NONE';
+        const resolved = resolveTeamMembership(membership, user?.team);
+        const { team: activeTeam, status } = resolved;
 
         return {
             loading,
@@ -65,7 +50,7 @@ export default function useTeamGate({ autoLoad = true } = {}) {
             isActive: status === 'ACTIVE',
             isPending: status === 'PENDING',
             isMissing: status === 'NONE',
-            isLeader: Boolean(activeTeam?.leader || activeTeam?.isLeader),
+            isLeader: resolved.isLeader,
             refresh: loadMembership
         };
     }, [error, loadMembership, loading, membership, user]);
