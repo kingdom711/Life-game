@@ -6,12 +6,10 @@
  * VITE_AUTH_PROVIDER=supabase를 별도 선택지로 제공합니다.
  */
 
-import apiClient from './apiClient';
-import { requireSupabase } from '../lib/supabase';
+import { invokeEdgeFunction, requireSupabase } from '../lib/supabase';
 
 // The retired authentication adapter is retained only for import compatibility. Keep the public API surface
 // stable while always routing identities through Supabase Auth.
-const useSupabaseAuth = true;
 
 const toAuthEmail = (identity) => {
     const normalized = identity?.trim().toLowerCase();
@@ -134,12 +132,18 @@ const supabaseAuthApi = {
         return Boolean(data.session);
     },
 
+    // 비밀번호 변경은 관리자 승인제다. 요청한 새 비밀번호는 password-reset-approval
+    // Edge Function이 암호화해 보관하고, 관리자가 승인할 때 비로소 적용된다.
+    // Supabase Auth의 복구 메일 흐름은 승인 없이 비밀번호를 바꿀 수 있어 쓰지 않는다.
     requestPasswordReset: async (data) => {
         const email = typeof data === 'string' ? data : data.email;
-        const { error } = await requireSupabase().auth.resetPasswordForEmail(email, {
-            redirectTo: `${window.location.origin}/forgot-password`,
+        const newPassword = typeof data === 'string' ? '' : data.newPassword;
+
+        return invokeEdgeFunction('password-reset-approval', {
+            action: 'request',
+            email,
+            newPassword,
         });
-        throwIfError(error);
     },
 
     resetPassword: async ({ newPassword }) => {
@@ -149,45 +153,12 @@ const supabaseAuthApi = {
     },
 };
 
-const legacyAuthApi = {
-    signup: async (data) => {
-        const response = await apiClient.post('/auth/signup', data);
-        if (response.accessToken) apiClient.token.setTokens(response.accessToken, response.refreshToken);
-        return response;
-    },
 
-    login: async (credentials) => {
-        const response = await apiClient.post('/auth/login', credentials);
-        if (response.accessToken) apiClient.token.setTokens(response.accessToken, response.refreshToken);
-        return response;
-    },
-
-    logout: async () => {
-        try {
-            await apiClient.post('/auth/logout');
-        } finally {
-            apiClient.token.clearTokens();
-        }
-    },
-
-    refreshToken: async () => {
-        const refreshToken = apiClient.token.getRefreshToken();
-        if (!refreshToken) throw new Error('Refresh token not found');
-        const response = await apiClient.post('/auth/refresh', { refreshToken });
-        if (response.accessToken) apiClient.token.setTokens(response.accessToken, response.refreshToken);
-        return response;
-    },
-
-    getMe: async () => apiClient.get('/auth/me'),
-    isAuthenticated: () => Boolean(apiClient.token.getAccessToken()),
-    requestPasswordReset: async (data) =>
-        apiClient.post('/auth/password-reset/request', typeof data === 'string' ? { email: data } : data),
-    resetPassword: async (data) => apiClient.post('/auth/password-reset/confirm', data),
-};
-
+// Supabase Auth가 유일한 인증 제공자다. usesSupabase는 컴포넌트가 서버 경로와
+// 로컬 게임 로직 경로를 고르는 데 여전히 쓰이므로 남겨 둔다.
 const authApi = {
-    ...(useSupabaseAuth ? supabaseAuthApi : legacyAuthApi),
-    usesSupabase: useSupabaseAuth,
+    ...supabaseAuthApi,
+    usesSupabase: true,
 };
 
 export default authApi;

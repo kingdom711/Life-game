@@ -1,6 +1,5 @@
-import apiClient from './apiClient';
 import authApi from './authApi';
-import { requireSupabase } from '../lib/supabase';
+import { invokeEdgeFunction, requireSupabase } from '../lib/supabase';
 
 const throwIfError = (error) => {
     if (error) throw error;
@@ -105,6 +104,13 @@ const supabaseAdminApi = {
         return { totalParticipants: data.profiles.length, activeParticipants: data.profiles.length, inactiveParticipants: 0, averageEngagementScore: 0, totalEducationCompletions: data.education.length, totalHazardReports: data.hazards.length, totalPointBalance: data.points.reduce((sum, row) => sum + row.balance, 0), periodPointsEarned: data.pointTransactions.filter((row) => row.transaction_type === 'EARN').reduce((sum, row) => sum + row.amount, 0), periodPointsSpent: data.pointTransactions.filter((row) => row.transaction_type === 'SPEND').reduce((sum, row) => sum + row.amount, 0), totalGoldBalance: data.gold.reduce((sum, row) => sum + row.balance, 0), pendingRewardRequests: pending.length, pendingRewardGold: pending.reduce((sum, row) => sum + row.gold_paid, 0), pendingRewardCashValue: 0, metrics: { totalUsers: data.profiles.length, openWorkStopReports: active(['reported', 'confirmed', 'investigating']).length, pendingRewardRequests: pending.length, openHazardCycles: data.hazards.filter((row) => !['ACTION_COMPLETED', 'EXPIRED', 'REJECTED'].includes(row.status)).length, todayEducationCompletions: data.education.length, todayChecklistSubmissions: data.checklists.length, todayHazardReports: data.hazards.length }, metricDetails: {}, actionItems: [], recentActivities: [], workStopByHazardType: byHazard };
     },
     getParticipantEngagement: async (params = {}) => createEngagement(await getAdminData(params), params),
+    getLegacyActivityReport: async (params = {}) => {
+        const client = requireSupabase();
+        const { data, error } = await client.functions.invoke('legacy-activity-report', { body: { from: params.from || null, to: params.to || null } });
+        if (error) throw error;
+        if (data?.error?.message) throw new Error(data.error.message);
+        return data;
+    },
     getPointRewardDashboard: async (params = {}) => {
         const data = await getAdminData(params); const points = toMap(data.points); const gold = toMap(data.gold); const membership = new Map(data.memberships.map((row) => [row.user_id, row])); const rewards = toMap(data.rewards, 'id');
         const sum = (rows, id, type) => rows.filter((row) => row.user_id === id && row.transaction_type === type).reduce((total, row) => total + row.amount, 0);
@@ -112,18 +118,25 @@ const supabaseAdminApi = {
         const sort = params.sort || 'balance'; const key = { balance: 'pointBalance', earned: 'periodPointsEarned', spent: 'periodPointsSpent', gold: 'goldBalance', pending: 'pendingRewardRequests', last: 'lastPointActivityAt' }[sort]; users.sort((a, b) => sort === 'name' ? a.name.localeCompare(b.name, 'ko-KR') : (typeof a[key] === 'string' ? String(b[key] || '').localeCompare(String(a[key] || '')) : b[key] - a[key]));
         const pendingRows = data.redemptions.filter((row) => row.status === 'PENDING'); return { from: params.from || null, to: params.to || null, users, summary: { totalPointBalance: users.reduce((total, row) => total + row.pointBalance, 0), periodPointsEarned: users.reduce((total, row) => total + row.periodPointsEarned, 0), periodPointsSpent: users.reduce((total, row) => total + row.periodPointsSpent, 0), totalGoldBalance: users.reduce((total, row) => total + row.goldBalance, 0), pendingRewardRequests: pendingRows.length, pendingRewardGold: pendingRows.reduce((total, row) => total + row.gold_paid, 0), pendingRewardCashValue: pendingRows.reduce((total, row) => total + (rewards.get(row.reward_id)?.cash_value || 0), 0) }, pendingRewards: data.rewards.map((reward) => ({ rewardId: reward.id, rewardName: reward.name, requiredGold: reward.gold_price, cashValue: reward.cash_value, remainingQuantity: reward.remaining_quantity, pendingCount: pendingRows.filter((row) => row.reward_id === reward.id).length })).filter((row) => row.pendingCount > 0) };
     },
-    getPasswordResetRequests: async () => [],
-    approvePasswordResetRequest: async () => { throw new Error('Supabase Auth 비밀번호 재설정은 사용자의 이메일 재설정 흐름으로 처리됩니다.'); },
-    rejectPasswordResetRequest: async () => { throw new Error('Supabase Auth 비밀번호 재설정 요청은 별도 승인하지 않습니다.'); },
+    // 승인 대기 큐는 관리자 전용 RPC로 읽는다. 요청 테이블은 Data API에 노출되지
+    // 않으며(암호화된 새 비밀번호 컬럼 때문), 승인/거절은 Edge Function이 처리한다.
+    getPasswordResetRequests: async (pendingOnly = true) => {
+        const { data, error } = await requireSupabase().rpc('list_password_reset_requests', {
+            p_pending_only: pendingOnly !== false,
+        });
+        throwIfError(error);
+        return Array.isArray(data) ? data : [];
+    },
+    approvePasswordResetRequest: async (id) => invokeEdgeFunction('password-reset-approval', {
+        action: 'approve',
+        id,
+    }),
+    rejectPasswordResetRequest: async (id, reason) => invokeEdgeFunction('password-reset-approval', {
+        action: 'reject',
+        id,
+        reason: reason || '관리자 확인 결과 반려되었습니다.',
+    }),
 };
 
-const legacyAdminApi = {
-    getDashboardSummary: async () => apiClient.get('/admin/dashboard/summary'),
-    getParticipantEngagement: async (params = {}) => apiClient.get(`/admin/dashboard/participants?${new URLSearchParams(params)}`),
-    getPointRewardDashboard: async (params = {}) => apiClient.get(`/admin/dashboard/points?${new URLSearchParams(params)}`),
-    getPasswordResetRequests: async (pendingOnly = true) => apiClient.get(`/admin/password-reset-requests?pendingOnly=${pendingOnly}`),
-    approvePasswordResetRequest: async (requestId) => apiClient.post(`/admin/password-reset-requests/${requestId}/approve`, {}),
-    rejectPasswordResetRequest: async (requestId, reason) => apiClient.post(`/admin/password-reset-requests/${requestId}/reject`, { reason }),
-};
 
-export default authApi.usesSupabase ? supabaseAdminApi : legacyAdminApi;
+export default supabaseAdminApi;

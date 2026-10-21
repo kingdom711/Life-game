@@ -437,10 +437,13 @@ entrypoint = "./functions/hazard-cycle/index.ts"
 
 [functions.generate-risk-pdf]
 enabled = true
-# The function uses @supabase/server with auth: "user" to validate modern
-# publishable-key sessions itself. Gateway JWT verification rejects those
-# asymmetric tokens before the function can perform that validation.
-verify_jwt = false
+# Gateway JWT verification does accept the asymmetric (ES256) access tokens
+# issued for publishable-key sessions — verified against the live project.
+# The earlier assumption that it rejected them was wrong; the real problem was
+# that @supabase/server leaves ctx.userClaims unset for those sessions, which
+# functions/_shared/auth.ts now works around. Keep gateway verification on so
+# unauthenticated calls never reach the function body.
+verify_jwt = true
 import_map = "./functions/generate-risk-pdf/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -451,6 +454,9 @@ static_files = [ "./functions/generate-risk-pdf/NotoSansKR-Regular.ttf" ]
 
 [functions.verify-certificate]
 enabled = true
+# Deliberately public: a certificate QR code is scanned by inspectors who are
+# not signed in, so the request carries only the publishable key, which is not
+# a JWT. The function itself gates access with auth: ["publishable", "secret"].
 verify_jwt = false
 import_map = "./functions/verify-certificate/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
@@ -462,7 +468,9 @@ entrypoint = "./functions/verify-certificate/index.ts"
 
 [functions.export-hazard-excel]
 enabled = true
-verify_jwt = false
+# Manager-only export; callers are always signed in. This matches the deployed
+# setting, which had drifted from the previous `false` recorded here.
+verify_jwt = true
 import_map = "./functions/export-hazard-excel/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -470,3 +478,21 @@ entrypoint = "./functions/export-hazard-excel/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/export-hazard-excel/*.html" ]
+
+[functions.legacy-activity-report]
+enabled = true
+# Admin-only report; callers are always signed in.
+verify_jwt = true
+import_map = "./functions/legacy-activity-report/deno.json"
+entrypoint = "./functions/legacy-activity-report/index.ts"
+
+[functions.password-reset-approval]
+enabled = true
+# Deliberately public: the `request` action is submitted from the sign-in
+# screen by a visitor who cannot log in, so the call carries only the
+# publishable key, which is not a JWT. The function gates itself with
+# auth: ["publishable", "secret"], and the `approve` / `reject` actions
+# validate the caller's own access token and require an administrator role.
+verify_jwt = false
+import_map = "./functions/password-reset-approval/deno.json"
+entrypoint = "./functions/password-reset-approval/index.ts"
