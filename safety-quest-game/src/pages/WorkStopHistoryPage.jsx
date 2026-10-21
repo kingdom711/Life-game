@@ -233,7 +233,7 @@ function WorkStopHistoryPage() {
                         {[
                             { label: '총 신고', value: stats.totalReports, icon: '🚨', color: 'var(--color-danger)' },
                             { label: '해결률', value: `${stats.resolutionRate}%`, icon: '✅', color: 'var(--color-safe)' },
-                            { label: '평균 대응', value: `${stats.avgResponseTime}분`, icon: '⏱️', color: 'var(--color-info)' }
+                            { label: '평균 대응', value: Number.isFinite(stats.avgResponseTime) ? `${stats.avgResponseTime}분` : '미집계', icon: '⏱️', color: 'var(--color-info)' }
                         ].map((stat, i) => (
                             <div key={i} style={{
                                 background: 'var(--color-surface)',

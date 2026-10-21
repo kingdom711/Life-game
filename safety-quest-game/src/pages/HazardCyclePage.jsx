@@ -9,6 +9,7 @@ import OfflineIndicator from '../components/offline/OfflineIndicator';
 import OfflineBanner from '../components/offline/OfflineBanner';
 import { offlineDb } from '../utils/offlineDb';
 import { syncManager } from '../utils/syncManager';
+import '../styles/pages/hazard-cycle.css';
 
 const createTempId = () => {
     if (window.crypto && window.crypto.randomUUID) {
@@ -128,51 +129,55 @@ function HazardCyclePage() {
     };
 
     return (
-        <div className="mx-auto w-full max-w-4xl space-y-4 px-4 pb-24 pt-6">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-                <h1 className="text-2xl font-bold text-slate-100">Hazard Cycle</h1>
+        <div className="hazard-cycle-page">
+            <div className="hazard-cycle-header">
+                <h1>위험 제보와 개선</h1>
                 <OfflineIndicator />
             </div>
 
             <OfflineBanner />
 
             {notice && (
-                <div className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-100">
+                <div role="status" className="hazard-cycle-notice">
                     {notice}
                 </div>
             )}
 
             {error && (
-                <div className="rounded-lg border border-red-400/30 bg-red-500/10 px-4 py-2 text-sm text-red-100">
+                <div role="alert" className="hazard-cycle-error">
                     {error}
                 </div>
             )}
 
             {step === 'input' && (
-                <div className="space-y-4 rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5">
+                <div className="hazard-cycle-form">
                     <CameraCapture onCapture={setPhoto} initialFile={photo} />
 
-                    <textarea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        rows={3}
-                        maxLength={2000}
-                        className="w-full rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500"
-                        placeholder="위험 상황 설명 (선택)"
-                    />
+                    <label className="hazard-cycle-field">
+                        <span>위험 상황 설명 (선택)</span>
+                        <textarea
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            rows={3}
+                            maxLength={2000}
+                            placeholder="발견한 위험 상황을 설명해 주세요."
+                        />
+                    </label>
 
-                    <input
-                        value={location}
-                        onChange={(e) => setLocation(e.target.value)}
-                        maxLength={500}
-                        className="w-full rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500"
-                        placeholder="위치 설명 (선택)"
-                    />
+                    <label className="hazard-cycle-field">
+                        <span>위치 설명 (선택)</span>
+                        <input
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
+                            maxLength={500}
+                            placeholder="예: A동 1층 자재 보관 구역"
+                        />
+                    </label>
 
                     <button
                         onClick={handleCreate}
                         disabled={loading || !photo}
-                        className="w-full rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-700"
+                        className="btn btn-primary hazard-cycle-submit"
                     >
                         {loading ? '분석 준비 중...' : 'AI 분석 시작'}
                     </button>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import '../../styles/pages/hazard-cycle.css';
 
 function CameraCapture({ onCapture, initialFile = null, title = '위험 사진 촬영/업로드' }) {
     const [file, setFile] = useState(initialFile);
@@ -26,14 +27,14 @@ function CameraCapture({ onCapture, initialFile = null, title = '위험 사진 �
     };
 
     return (
-        <div className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-4">
-            <h3 className="mb-3 text-sm font-semibold text-slate-200">{title}</h3>
+        <div className="hazard-camera">
+            <h3>{title}</h3>
 
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500">
+            <label className="btn btn-primary hazard-photo-picker">
                 사진 선택
                 <input
-                    className="hidden"
                     type="file"
+                    aria-label={title}
                     accept="image/*"
                     capture="environment"
                     onChange={handleFileChange}
@@ -41,8 +42,8 @@ function CameraCapture({ onCapture, initialFile = null, title = '위험 사진 �
             </label>
 
             {previewUrl && (
-                <div className="mt-4 overflow-hidden rounded-xl border border-slate-700">
-                    <img src={previewUrl} alt="preview" className="h-52 w-full object-cover" />
+                <div className="hazard-photo-preview">
+                    <img src={previewUrl} alt="선택한 현장 사진" />
                 </div>
             )}
         </div>

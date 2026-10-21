@@ -19,7 +19,7 @@ function OfflineBanner() {
     if (isOnline) return null;
 
     return (
-        <div className="mb-4 rounded-lg border border-red-400/30 bg-red-500/15 px-4 py-2 text-sm text-red-100">
+        <div className="hazard-cycle-error" role="status">
             오프라인 상태입니다. 업로드 요청은 복구 후 자동 동기화됩니다.
         </div>
     );

@@ -29,11 +29,11 @@ function OfflineIndicator() {
     }, []);
 
     return (
-        <div className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1 text-xs text-slate-200">
-            <span className={isOnline ? 'text-emerald-300' : 'text-red-300'}>
+        <div className="hazard-connection-status" role="status">
+            <span style={{ color: isOnline ? 'var(--color-safe)' : 'var(--color-danger)' }}>
                 {isOnline ? '온라인' : '오프라인'}
             </span>
-            <span className="text-slate-400">대기 {pendingCount}건</span>
+            <span>대기 {pendingCount}건</span>
         </div>
     );
 }
