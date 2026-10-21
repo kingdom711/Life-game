@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { roles } from '../data/rolesData';
+import { getAccentInk } from '../utils/uiColors';
 
 function RoleSelector({ onSelectRole }) {
     const navigate = useNavigate();
@@ -60,7 +61,7 @@ function RoleSelector({ onSelectRole }) {
                                 <ul style={{ listStyle: 'none', padding: 0 }}>
                                     {role.features.map((feature, index) => (
                                         <li key={index} style={{ marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            <span style={{ color: role.color }}>✓</span>
+                                            <span style={{ color: getAccentInk(role.color) }}>✓</span>
                                             <span style={{ fontSize: '0.875rem' }}>{feature}</span>
                                         </li>
                                     ))}
@@ -76,7 +77,8 @@ function RoleSelector({ onSelectRole }) {
                                     className="btn btn-primary"
                                     style={{
                                         width: '100%',
-                                        background: `linear-gradient(135deg, ${role.color}, ${role.color}dd)`,
+                                        background: getAccentInk(role.color),
+                                        color: 'var(--color-on-primary)',
                                     }}
                                 >
                                     선택하기
