@@ -160,16 +160,16 @@ const RiskSolutionPage = () => {
                         <div style={{
                             display: 'flex', alignItems: 'center', gap: '0.75rem',
                             padding: '0.75rem 1rem', marginBottom: '1.5rem',
-                            background: completed ? 'rgba(0, 255, 136, 0.08)' : 'rgba(251, 191, 36, 0.08)',
-                            border: `1px solid ${completed ? 'rgba(0, 255, 136, 0.3)' : 'rgba(251, 191, 36, 0.3)'}`,
+                            background: completed ? 'var(--color-safe-bg)' : 'var(--color-warning-bg)',
+                            border: `1px solid ${completed ? 'var(--color-safe-border)' : 'var(--color-warning-border)'}`,
                             borderRadius: '10px'
                         }}>
                             <span style={{ fontSize: '1.2rem' }}>{completed ? '✅' : '📋'}</span>
                             <div style={{ flex: 1 }}>
-                                <div style={{ color: completed ? '#00ff88' : '#fbbf24', fontWeight: 700, fontSize: '0.85rem' }}>
+                                <div style={{ color: completed ? COLOR.success : COLOR.warningLight, fontWeight: 700, fontSize: '0.85rem' }}>
                                     {completed ? '일일 퀘스트 완료!' : '일일 위험 요소 제거'}
                                 </div>
-                                <div style={{ color: 'rgba(203, 213, 225, 0.6)', fontSize: '0.75rem' }}>
+                                <div style={{ color: COLOR.textSecondary, fontSize: '0.75rem' }}>
                                     {completed ? '오늘의 위험 해결 퀘스트를 완료했습니다 (+250P)' : '위험 요인을 분석하고 조치를 기록하면 퀘스트가 완료됩니다'}
                                 </div>
                             </div>
