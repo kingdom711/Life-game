@@ -1,6 +1,7 @@
 import apiClient from './apiClient';
 import authApi from './authApi';
 import { requireSupabase } from '../lib/supabase';
+import { normalizeTeamMember } from '../utils/teamMembership';
 
 const encode = (value) => encodeURIComponent(value ?? '');
 
@@ -47,12 +48,12 @@ const teamApi = {
     },
 
     listPendingMembers: (teamId) => {
-        if (authApi.usesSupabase) return requireSupabase().from('team_memberships').select('*').eq('team_id', teamId).eq('status', 'PENDING').then(({ data, error }) => { if (error) throw error; return data; });
+        if (authApi.usesSupabase) return requireSupabase().from('team_memberships').select('*, profiles(name, username)').eq('team_id', teamId).eq('status', 'PENDING').then(({ data, error }) => { if (error) throw error; return (data || []).map(normalizeTeamMember); });
         return apiClient.get(`/teams/${teamId}/pending`);
     },
 
     listTeamMembers: (teamId) => {
-        if (authApi.usesSupabase) return requireSupabase().from('team_memberships').select('*').eq('team_id', teamId).eq('status', 'APPROVED').then(({ data, error }) => { if (error) throw error; return data; });
+        if (authApi.usesSupabase) return requireSupabase().from('team_memberships').select('*, profiles(name, username)').eq('team_id', teamId).eq('status', 'APPROVED').then(({ data, error }) => { if (error) throw error; return (data || []).map(normalizeTeamMember); });
         return apiClient.get(`/teams/${teamId}/members`);
     },
 

@@ -1,4 +1,16 @@
 // Normalize server membership records without treating pending users as active.
+export function normalizeTeamMember(record) {
+    const userId = record.user_id ?? record.userId;
+    return {
+        ...record,
+        membershipId: record.membershipId ?? `${record.team_id ?? record.teamId}:${userId}`,
+        userId,
+        userName: record.profiles?.name ?? record.userName ?? '팀원',
+        username: record.profiles?.username ?? record.username ?? '프로필 정보 비공개',
+        leader: Boolean(record.is_leader ?? record.leader ?? record.isLeader ?? false)
+    };
+}
+
 export function resolveTeamMembership(membership, userTeam = null) {
     const status = String(membership?.status || '').toUpperCase();
     const approved = status === 'APPROVED' || status === 'ACTIVE';

@@ -7,7 +7,7 @@ import useTeamGate from '../hooks/useTeamGate';
 const cardStyle = {
     background: 'var(--color-surface)',
     borderRadius: '14px',
-    border: '1px solid rgba(148,163,184,0.14)',
+    border: '1px solid var(--color-border)',
     padding: '1rem'
 };
 
@@ -115,7 +115,7 @@ function TeamDetailPage() {
     return (
         <div style={{
             minHeight: '100vh',
-            background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)',
+            background: 'var(--color-bg)',
             color: 'var(--color-text)',
             paddingBottom: '6rem'
         }}>
@@ -124,7 +124,7 @@ function TeamDetailPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.75rem',
-                borderBottom: '1px solid rgba(255,255,255,0.08)',
+                borderBottom: '1px solid var(--color-border)',
                 background: 'var(--color-surface)',
                 position: 'sticky',
                 top: 0,
@@ -137,22 +137,23 @@ function TeamDetailPage() {
             <div style={{ padding: '1rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: 900, margin: '0 auto' }}>
                 <div style={{
                     ...cardStyle,
-                    background: 'linear-gradient(135deg, rgba(14,165,233,0.16), rgba(30,41,59,0.84))'
+                    background: 'var(--color-primary-soft)',
+                    borderColor: 'var(--color-primary-border)'
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
                         <div>
-                            <div style={{ color: '#38bdf8', fontSize: '0.8rem', fontWeight: 800 }}>
+                            <div style={{ color: 'var(--color-primary)', fontSize: '0.8rem', fontWeight: 800 }}>
                                 {teamGate.team?.siteName || '현장'}
                             </div>
                             <h3 style={{ margin: '0.25rem 0 0', fontSize: '1.35rem', fontWeight: 800 }}>
                                 {teamGate.team?.name || teamGate.membership?.teamName}
                             </h3>
                             <p style={{ margin: '0.35rem 0 0', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                                ACTIVE 멤버 {members.length}명
+                                승인된 팀원 {members.length}명
                             </p>
                         </div>
                         {teamGate.isLeader ? (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: '#38bdf8', fontWeight: 800 }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: 'var(--color-primary)', fontWeight: 800 }}>
                                 <Shield size={18} /> 리더 관리 모드
                             </span>
                         ) : (
@@ -163,8 +164,8 @@ function TeamDetailPage() {
                     </div>
                 </div>
 
-                {message && <div style={{ ...cardStyle, color: '#4ade80', fontWeight: 800 }}>{message}</div>}
-                {error && <div style={{ ...cardStyle, color: '#f87171', fontWeight: 800 }}>{error}</div>}
+                {message && <div role="status" style={{ ...cardStyle, color: 'var(--color-safe)', fontWeight: 800 }}>{message}</div>}
+                {error && <div role="alert" style={{ ...cardStyle, color: 'var(--color-danger)', fontWeight: 800 }}>{error}</div>}
 
                 {teamGate.isLeader && (
                     <section style={cardStyle}>
@@ -203,18 +204,18 @@ function TeamDetailPage() {
                     {loading ? (
                         <p style={{ color: 'var(--color-text-muted)' }}>불러오는 중입니다.</p>
                     ) : members.length === 0 ? (
-                        <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>ACTIVE 멤버가 없습니다.</p>
+                        <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>승인된 팀원이 없습니다.</p>
                     ) : (
                         <div style={{ display: 'grid', gap: '0.5rem' }}>
                             {members.map((member) => (
                                 <div key={member.membershipId} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.8rem', borderRadius: 10, background: 'var(--color-surface)' }}>
-                                    <div style={{ width: 40, height: 40, borderRadius: 12, display: 'grid', placeItems: 'center', background: member.leader ? 'rgba(56,189,248,0.16)' : 'rgba(148,163,184,0.12)', color: member.leader ? '#38bdf8' : 'var(--color-text-secondary)', fontWeight: 900 }}>
+                                    <div style={{ width: 40, height: 40, borderRadius: 12, display: 'grid', placeItems: 'center', background: member.leader ? 'var(--color-primary-soft)' : 'var(--color-surface-subtle)', color: member.leader ? 'var(--color-primary)' : 'var(--color-text-secondary)', fontWeight: 900 }}>
                                         {member.userName?.slice(0, 1) || 'U'}
                                     </div>
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontWeight: 800 }}>
                                             {member.userName}
-                                            {member.leader && <span style={{ color: '#38bdf8', marginLeft: 8, fontSize: '0.78rem' }}>리더</span>}
+                                            {member.leader && <span style={{ color: 'var(--color-primary)', marginLeft: 8, fontSize: '0.78rem' }}>리더</span>}
                                         </div>
                                         <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>{member.username}</div>
                                     </div>

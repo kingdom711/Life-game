@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import test from 'node:test';
-import { resolveTeamMembership } from '../src/utils/teamMembership.js';
+import { normalizeTeamMember, resolveTeamMembership } from '../src/utils/teamMembership.js';
 
 test('approved creator is an active leader after profile refresh', () => {
     const state = resolveTeamMembership({ status: 'APPROVED', team_id: 'owned-team', is_leader: true, teams: { name: 'Leader team', site_name: 'Site A' } });
@@ -40,6 +40,7 @@ async function loadApi(client) {
         if (specifier === './authApi') return new vm.SyntheticModule(['default'], function(){this.setExport('default', { usesSupabase: true });}, { context });
         if (specifier === './apiClient') return new vm.SyntheticModule(['default'], function(){this.setExport('default', {});}, { context });
         if (specifier === '../lib/supabase') return new vm.SyntheticModule(['requireSupabase'], function(){this.setExport('requireSupabase', () => client);}, { context });
+        if (specifier === '../utils/teamMembership') return new vm.SyntheticModule(['normalizeTeamMember'], function(){this.setExport('normalizeTeamMember', normalizeTeamMember);}, { context });
         throw new Error('Unexpected import: ' + specifier);
     });
     await module.evaluate();
@@ -58,6 +59,36 @@ test('create returns the new leader team details and propagates RPC errors', asy
     const failure = new Error('Create rejected');
     const failingApi = await loadApi({ rpc: async () => ({ data: null, error: failure }) });
     await assert.rejects(failingApi.createTeam({ name: 'Crew', siteName: 'Site' }), /Create rejected/);
+});
+
+test('team member fields preserve the creator identity and leader protection', () => {
+    const member = normalizeTeamMember({ team_id: 'team', user_id: 'creator', is_leader: true, profiles: { name: 'Creator', username: 'creator-name' } });
+    assert.equal(member.membershipId, 'team:creator');
+    assert.equal(member.userId, 'creator');
+    assert.equal(member.userName, 'Creator');
+    assert.equal(member.username, 'creator-name');
+    assert.equal(member.leader, true);
+    const hiddenProfile = normalizeTeamMember({ team_id: 'team', user_id: 'member', is_leader: false, profiles: null });
+    assert.equal(hiddenProfile.userName, '팀원');
+    assert.equal(hiddenProfile.username, '프로필 정보 비공개');
+    assert.equal(hiddenProfile.leader, false);
+});
+
+test('approved and pending lists both map server records without widening profile access', async () => {
+    const calls = [];
+    const query = {};
+    for (const method of ['select', 'eq']) query[method] = (...args) => { calls.push([method, ...args]); return query; };
+    query.then = callback => Promise.resolve(callback({ data: [{ team_id: 'team', user_id: 'creator', is_leader: true, profiles: { name: 'Creator' } }], error: null }));
+    const api = await loadApi({ from: () => query });
+    for (const list of [api.listTeamMembers, api.listPendingMembers]) {
+        const [member] = await list('team');
+        assert.equal(member.userId, 'creator');
+        assert.equal(member.userName, 'Creator');
+        assert.equal(member.leader, true);
+    }
+    assert.ok(calls.some(call => call[0] === 'select' && call[1] === '*, profiles(name, username)'));
+    assert.ok(calls.some(call => call[0] === 'eq' && call[1] === 'status' && call[2] === 'APPROVED'));
+    assert.ok(calls.some(call => call[0] === 'eq' && call[1] === 'status' && call[2] === 'PENDING'));
 });
 test('membership reads only the signed-in user and bounds multiple memberships', async () => {
     const calls = [];
