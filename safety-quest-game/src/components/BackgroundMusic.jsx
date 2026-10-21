@@ -16,7 +16,7 @@ const BackgroundMusic = ({ src, isPlaying, volume = 0.5 }) => {
 
     useEffect(() => {
         const updateControlTarget = () => {
-            setControlTarget(document.getElementById('dashboard-bgm-control-slot'));
+            setControlTarget(document.getElementById('dashboard-bgm-control-slot') || document.getElementById('admin-test-bgm-control-slot'));
         };
 
         updateControlTarget();

@@ -37,6 +37,7 @@ function AdminTestToolbar({ selectedRole, onRoleChange, onAdminMode }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-text)', fontWeight: 900 }}>
                     <RotateCcw size={16} color="var(--color-safe)" />
                     테스트 모드
+                    <div id="admin-test-bgm-control-slot" aria-label="배경음악 제어" />
                 </div>
 
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
