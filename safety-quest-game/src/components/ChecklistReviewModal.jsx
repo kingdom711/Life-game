@@ -164,78 +164,78 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
     return (
         <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            backgroundColor: 'rgb(36 38 54 / 48%)',
             zIndex: 2000,
             display: 'flex', justifyContent: 'center', alignItems: 'center',
-            backdropFilter: 'blur(5px)'
+            backdropFilter: 'none'
         }}>
             {showSuccess ? (
-                <div style={{ textAlign: 'center', color: '#fff' }}>
+                <div style={{ textAlign: 'center', color: 'var(--color-text)', background: 'var(--color-surface)', borderRadius: 16, padding: '2rem', margin: '1rem' }}>
                     <div style={{
                         width: '150px', height: '150px',
-                        border: '4px solid #00ff88', borderRadius: '50%',
+                        border: '4px solid var(--color-safe)', borderRadius: '50%',
                         margin: '0 auto 2rem',
-                        boxShadow: '0 0 30px #00ff88',
+                        boxShadow: 'none',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: '4rem',
                         animation: 'pulse 1.5s infinite'
                     }}>✓</div>
-                    <h1 style={{ fontSize: '2.5rem', textShadow: '0 0 20px #00ff88', marginBottom: '1rem' }}>
+                    <h1 style={{ fontSize: '2.5rem', textShadow: 'none', marginBottom: '1rem' }}>
                         검토 완료!
                     </h1>
-                    <div style={{ fontSize: '1.2rem', color: '#00ff88' }}>
+                    <div style={{ fontSize: '1.2rem', color: 'var(--color-safe)' }}>
                         체크리스트 {reviewedCount}건 검토 완료 (+200P)
                     </div>
                 </div>
             ) : (
-                <div style={{
+                <div className="checklist-modal-panel" role="dialog" aria-modal="true" aria-label="체크리스트 검토" style={{
                     position: 'relative',
                     width: '95%', maxWidth: '900px', maxHeight: '90vh',
-                    backgroundColor: '#1a1a2e',
-                    border: '1px solid #4a4e69',
+                    backgroundColor: 'var(--color-surface)', color: 'var(--color-text)',
+                    border: '1px solid var(--color-border)',
                     borderRadius: '10px',
                     display: 'flex', flexDirection: 'column',
                     overflow: 'hidden',
-                    boxShadow: '0 0 50px rgba(0,0,0,0.5)'
+                    boxShadow: 'var(--shadow-lg)'
                 }}>
                     {/* Header */}
-                    <div style={{
+                    <div className="checklist-modal-header" style={{
                         padding: '1rem 1.5rem',
-                        borderBottom: '1px solid #4a4e69',
+                        borderBottom: '1px solid var(--color-border)',
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        background: 'rgba(255,255,255,0.05)',
+                        background: 'var(--color-surface-subtle)',
                         flexShrink: 0
                     }}>
                         <div>
-                            <h2 style={{ color: '#fff', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <h2 style={{ color: 'var(--color-text)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 🔍 체크리스트 검토
-                                <span style={{ fontSize: '0.8rem', background: '#333', padding: '0.2rem 0.5rem', borderRadius: '4px', color: '#aaa' }}>
+                                <span style={{ fontSize: '0.8rem', background: 'var(--color-surface-subtle)', padding: '0.2rem 0.5rem', borderRadius: '4px', color: 'var(--color-text-muted)' }}>
                                     Daily Quest · {reviewedCount}/2건
                                 </span>
                             </h2>
-                            <p style={{ color: '#aaa', margin: '0.5rem 0 0', fontSize: '0.85rem' }}>
+                            <p style={{ color: 'var(--color-text-muted)', margin: '0.5rem 0 0', fontSize: '0.85rem' }}>
                                 작업자가 제출한 체크리스트를 검토하고 피드백을 제공하세요.
                             </p>
                         </div>
-                        <button onClick={onClose} style={{
-                            background: 'none', border: 'none', color: '#fff', fontSize: '2rem', cursor: 'pointer'
+                        <button type="button" aria-label="체크리스트 닫기" onClick={onClose} style={{
+                            background: 'none', border: 'none', color: 'var(--color-text)', fontSize: '2rem', cursor: 'pointer'
                         }}>×</button>
                     </div>
 
                     {/* Body */}
-                    <div style={{ flex: 1, overflow: 'hidden', display: 'flex' }}>
+                    <div className="checklist-review-body">
                         {/* 좌측: 목록 */}
-                        <div style={{
-                            width: '280px', flexShrink: 0,
-                            borderRight: '1px solid #333',
+                        <div className="checklist-review-list" style={{
+                            flexShrink: 0,
+                            borderRight: '1px solid var(--color-border)',
                             overflowY: 'auto',
-                            background: 'rgba(0,0,0,0.2)'
+                            background: 'var(--color-surface-subtle)'
                         }}>
-                            <div style={{ padding: '0.75rem', fontSize: '0.8rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
+                            <div style={{ padding: '0.75rem', fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>
                                 검토 대기 ({checklists.length}건)
                             </div>
                             {checklists.length === 0 ? (
-                                <div style={{ padding: '2rem 1rem', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }}>
+                                <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
                                     검토 대기 중인 체크리스트가 없습니다.
                                 </div>
                             ) : (
@@ -246,8 +246,8 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
                                         style={{
                                             padding: '0.75rem 1rem',
                                             cursor: 'pointer',
-                                            borderBottom: '1px solid #222',
-                                            background: selected?.id === cl.id ? 'rgba(139, 92, 246, 0.15)' : 'transparent',
+                                            borderBottom: '1px solid var(--color-border-light)',
+                                            background: selected?.id === cl.id ? 'var(--color-primary-soft)' : 'transparent',
                                             borderLeft: selected?.id === cl.id ? '3px solid #8b5cf6' : '3px solid transparent',
                                             transition: 'all 0.15s ease'
                                         }}
@@ -257,7 +257,7 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
                                                 {cl.submittedBy}
                                             </span>
                                             {cl.items.some(i => i.riskFlag) && (
-                                                <span style={{ fontSize: '0.7rem', background: 'rgba(255,68,68,0.2)', color: '#ff6b6b', padding: '0.1rem 0.4rem', borderRadius: '3px' }}>
+                                                <span style={{ fontSize: '0.7rem', background: 'var(--color-danger-bg)', color: 'var(--color-danger)', padding: '0.1rem 0.4rem', borderRadius: '3px' }}>
                                                     위험
                                                 </span>
                                             )}
@@ -271,38 +271,38 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
                         </div>
 
                         {/* 우측: 상세 */}
-                        <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
+                        <div className="checklist-review-detail" style={{ flex: 1, minWidth: 0, overflowY: 'auto', padding: '1.5rem' }}>
                             {!selected ? (
-                                <div style={{ textAlign: 'center', padding: '4rem 2rem', color: '#64748b' }}>
+                                <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--color-text-muted)' }}>
                                     <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📋</div>
-                                    <div>좌측에서 체크리스트를 선택하세요</div>
+                                    <div>목록에서 체크리스트를 선택하세요</div>
                                 </div>
                             ) : (
                                 <>
                                     {/* 체크리스트 정보 */}
                                     <div style={{
                                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                        marginBottom: '1rem', paddingBottom: '0.75rem', borderBottom: '1px solid #333'
+                                        marginBottom: '1rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--color-border)'
                                     }}>
                                         <div>
                                             <div style={{ color: 'var(--color-text)', fontWeight: 700, fontSize: '1.1rem' }}>
                                                 {selected.submittedBy} · {selected.siteName}
                                             </div>
-                                            <div style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '0.25rem' }}>
+                                            <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', marginTop: '0.25rem' }}>
                                                 제출: {new Date(selected.submittedAt).toLocaleString('ko-KR')}
                                             </div>
                                         </div>
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                                             <span style={{
                                                 fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '4px',
-                                                background: 'rgba(0, 255, 136, 0.1)', color: '#00ff88'
+                                                background: 'var(--color-safe-bg)', color: 'var(--color-safe)'
                                             }}>
                                                 체크 {checkedCount}/{selected.items.length}
                                             </span>
                                             {riskCount > 0 && (
                                                 <span style={{
                                                     fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '4px',
-                                                    background: 'rgba(255, 68, 68, 0.15)', color: '#ff6b6b'
+                                                    background: 'var(--color-danger-bg)', color: 'var(--color-danger)'
                                                 }}>
                                                     위험 {riskCount}건
                                                 </span>
@@ -315,23 +315,23 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
                                         <div key={item.id || idx} style={{
                                             display: 'flex', alignItems: 'center', gap: '0.75rem',
                                             padding: '0.6rem 0.75rem', marginBottom: '0.4rem',
-                                            background: item.riskFlag ? 'rgba(255, 68, 68, 0.08)' : 'rgba(255,255,255,0.02)',
-                                            border: `1px solid ${item.riskFlag ? 'rgba(255,68,68,0.3)' : '#2a2a3e'}`,
+                                            background: item.riskFlag ? 'var(--color-danger-bg)' : 'var(--color-surface)',
+                                            border: `1px solid ${item.riskFlag ? 'var(--color-danger-border)' : 'var(--color-border)'}`,
                                             borderRadius: '6px', fontSize: '0.85rem'
                                         }}>
                                             <span style={{
                                                 width: '22px', height: '22px', flexShrink: 0,
                                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                 borderRadius: '4px', fontSize: '0.85rem',
-                                                background: item.answer ? 'rgba(0,255,136,0.15)' : 'rgba(255,68,68,0.15)',
-                                                color: item.answer ? '#00ff88' : '#ff6b6b'
+                                                background: item.answer ? 'var(--color-safe-bg)' : 'var(--color-danger-bg)',
+                                                color: item.answer ? 'var(--color-safe)' : 'var(--color-danger)'
                                             }}>
                                                 {item.answer ? '✓' : '✗'}
                                             </span>
                                             <div style={{ flex: 1 }}>
                                                 <span style={{ color: 'var(--color-text-secondary)' }}>{item.label}</span>
                                                 {item.comment && (
-                                                    <span style={{ color: '#8b5cf6', marginLeft: '0.5rem', fontSize: '0.8rem' }}>
+                                                    <span style={{ color: 'var(--color-primary)', marginLeft: '0.5rem', fontSize: '0.8rem' }}>
                                                         — {item.comment}
                                                     </span>
                                                 )}
@@ -351,7 +351,7 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
                                             placeholder="검토 의견을 작성하세요 (반려 시 필수)"
                                             style={{
                                                 width: '100%', height: '80px',
-                                                background: '#0f0f23', border: '1px solid #333',
+                                                background: 'var(--color-surface)', border: '1px solid var(--color-border)',
                                                 borderRadius: '6px', color: 'var(--color-text-secondary)',
                                                 padding: '0.75rem', fontSize: '0.85rem',
                                                 resize: 'none'
@@ -365,9 +365,9 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
                                             onClick={() => handleReview('REJECT')}
                                             style={{
                                                 flex: 1, padding: '0.75rem',
-                                                background: 'rgba(255, 68, 68, 0.15)',
+                                                background: 'var(--color-danger-bg)',
                                                 border: '1px solid rgba(255, 68, 68, 0.4)',
-                                                color: '#ff6b6b', borderRadius: '8px',
+                                                color: 'var(--color-danger)', borderRadius: '8px',
                                                 fontWeight: 700, cursor: 'pointer',
                                                 fontSize: '0.95rem',
                                                 transition: 'all 0.2s ease'
@@ -379,11 +379,11 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
                                             onClick={() => handleReview('APPROVE')}
                                             style={{
                                                 flex: 1, padding: '0.75rem',
-                                                background: 'linear-gradient(45deg, #00ff88, #00cc6a)',
-                                                border: 'none', color: '#000',
+                                                background: 'var(--color-safe)',
+                                                border: 'none', color: 'var(--color-on-primary)',
                                                 borderRadius: '8px', fontWeight: 700,
                                                 cursor: 'pointer', fontSize: '0.95rem',
-                                                boxShadow: '0 0 15px rgba(0, 255, 136, 0.3)',
+                                                boxShadow: 'none',
                                                 transition: 'all 0.2s ease'
                                             }}
                                         >
@@ -396,18 +396,18 @@ const ChecklistReviewModal = ({ isOpen, onClose, onComplete }) => {
                     </div>
 
                     {/* Footer */}
-                    <div style={{
+                    <div className="checklist-modal-footer" style={{
                         padding: '0.75rem 1.5rem',
-                        borderTop: '1px solid #4a4e69',
+                        borderTop: '1px solid var(--color-border)',
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        background: 'rgba(255,255,255,0.05)',
+                        background: 'var(--color-surface-subtle)',
                         flexShrink: 0
                     }}>
-                        <div style={{ color: '#ff4444', fontWeight: 'bold', fontSize: '0.85rem', height: '1.5rem' }}>
+                        <div style={{ color: 'var(--color-danger)', fontWeight: 'bold', fontSize: '0.85rem', height: '1.5rem' }}>
                             {error}
                         </div>
                         <div style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                            검토 완료: <span style={{ color: reviewedCount >= 2 ? '#00ff88' : '#fbbf24', fontWeight: 700 }}>{reviewedCount}</span> / 2건
+                            검토 완료: <span style={{ color: reviewedCount >= 2 ? 'var(--color-safe)' : 'var(--color-warning)', fontWeight: 700 }}>{reviewedCount}</span> / 2건
                         </div>
                     </div>
                 </div>

@@ -2818,7 +2818,7 @@
 
 .new-team-mine-badge {
   font-size: 0.68rem;
-  color: #38bdf8;
+  color: var(--color-info);
   font-weight: 700;
   margin-left: 0.2rem;
 }
@@ -2873,7 +2873,7 @@
   margin: 0 0 0.8rem;
   font-size: 1rem;
   font-weight: 800;
-  color: #f8fafc;
+  color: var(--color-text);
 }
 
 .new-quicknav-grid {
@@ -2897,9 +2897,9 @@
 }
 
 .new-quicknav-btn:hover {
-  background: rgba(var(--qn-color-rgb, 59, 130, 246), 0.15);
-  border-color: var(--qn-color, #3b82f6);
-  color: var(--qn-color, #3b82f6);
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
   transform: translateY(-2px);
 }
 

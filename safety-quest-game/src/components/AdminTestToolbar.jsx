@@ -21,9 +21,9 @@ function AdminTestToolbar({ selectedRole, onRoleChange, onAdminMode }) {
             top: 0,
             zIndex: 40,
             padding: '0.6rem 1rem',
-            background: 'rgba(2, 6, 23, 0.92)',
-            borderBottom: '1px solid rgba(148, 163, 184, 0.18)',
-            backdropFilter: 'blur(18px)',
+            background: 'var(--color-surface)',
+            borderBottom: '1px solid var(--color-border)',
+            boxShadow: 'var(--shadow-sm)',
         }}>
             <div style={{
                 maxWidth: 1180,
@@ -35,7 +35,7 @@ function AdminTestToolbar({ selectedRole, onRoleChange, onAdminMode }) {
                 flexWrap: 'wrap',
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-text)', fontWeight: 900 }}>
-                    <RotateCcw size={16} color="#22c55e" />
+                    <RotateCcw size={16} color="var(--color-safe)" />
                     테스트 모드
                 </div>
 
@@ -47,11 +47,12 @@ function AdminTestToolbar({ selectedRole, onRoleChange, onAdminMode }) {
                                 key={role.id}
                                 type="button"
                                 onClick={() => handleRoleClick(role.id)}
+                                aria-pressed={active}
                                 style={{
                                     border: active ? `1px solid ${role.color}` : '1px solid rgba(148, 163, 184, 0.22)',
-                                    background: active ? `${role.color}22` : 'rgba(15, 23, 42, 0.65)',
-                                    color: active ? 'var(--color-text)' : 'var(--color-text-secondary)',
-                                    borderRadius: 8,
+                                    background: active ? 'var(--color-primary-soft)' : 'var(--color-surface-subtle)',
+                                    color: active ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+                                    minHeight: 44, borderRadius: 8,
                                     padding: '0.5rem 0.75rem',
                                     fontWeight: 800,
                                     cursor: 'pointer',
@@ -71,9 +72,9 @@ function AdminTestToolbar({ selectedRole, onRoleChange, onAdminMode }) {
                         alignItems: 'center',
                         gap: 8,
                         border: '1px solid rgba(96, 165, 250, 0.4)',
-                        background: 'rgba(37, 99, 235, 0.16)',
-                        color: '#dbeafe',
-                        borderRadius: 8,
+                        background: 'var(--color-primary-soft)',
+                        color: 'var(--color-primary)',
+                        minHeight: 44, borderRadius: 8,
                         padding: '0.5rem 0.75rem',
                         fontWeight: 900,
                         cursor: 'pointer',

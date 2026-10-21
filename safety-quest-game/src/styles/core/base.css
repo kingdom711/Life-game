@@ -1,63 +1,70 @@
 
 /* ==================== CSS Variables ==================== */
 :root {
-  /* Colors - Safety Theme (Bright & Vibrant) */
-  --color-safe: #059669;
+  /* Safety colors with readable text on light surfaces */
+  --color-safe: #237354;
   /* Darker green for contrast on light */
-  --color-safe-light: #34d399;
-  --color-safe-dark: #047857;
+  --color-safe-light: #237354;
+  --color-safe-dark: #19543d;
 
-  --color-warning: #d97706;
+  --color-warning: #885900;
   /* Darker orange */
-  --color-warning-light: #fbbf24;
-  --color-warning-dark: #b45309;
+  --color-warning-light: #885900;
+  --color-warning-dark: #694400;
 
-  --color-danger: #dc2626;
+  --color-danger: #b93e35;
   /* Darker red */
-  --color-danger-light: #f87171;
-  --color-danger-dark: #b91c1c;
+  --color-danger-light: #b93e35;
+  --color-danger-dark: #963229;
 
-  --color-primary: #2563eb;
-  /* Vibrant Blue */
-  --color-primary-light: #60a5fa;
-  --color-primary-dark: #1d4ed8;
+  --color-primary: #5456b8;
+  /* Primary accent */
+  --color-primary-light: #5456b8;
+  --color-primary-dark: #3e4091;
 
-  --color-secondary: #7c3aed;
-  /* Vibrant Purple */
-  --color-secondary-light: #a78bfa;
-  --color-secondary-dark: #6d28d9;
-  --color-bronze: #cd7f32;
-  --color-alert-modal-start: #1e1b4b;
-  --color-alert-modal-end: #312e81;
+  --color-secondary: #6454a4;
+  /* Secondary accent */
+  --color-secondary-light: #6454a4;
+  --color-secondary-dark: #4d3e87;
+  --color-bronze: #85521e;
+  --color-alert-modal-start: #ffffff;
+  --color-alert-modal-end: #ffffff;
 
-  /* Neutrals - Dark Mode */
-  --color-bg: #0f172a;
-  /* Slate 900 */
-  --color-bg-light: #1e293b;
-  /* Slate 800 */
-  --color-bg-lighter: #334155;
-  /* Slate 700 */
-  --color-surface: rgba(30, 41, 59, 0.85);
-  /* Dark Glass */
-  --color-surface-hover: rgba(30, 41, 59, 0.95);
+  /* Neutrals - shared light surfaces */
+  --color-bg: #f7f5ee;
+  --color-bg-light: #ffffff;
+  --color-bg-lighter: #eeedf4;
+  --color-surface: #ffffff;
+  /* Content surface */
+  --color-surface-hover: #f5f4fa;
 
-  --color-text: #f1f5f9;
-  /* Slate 100 */
-  --color-text-secondary: #cbd5e1;
-  /* Slate 300 */
-  --color-text-muted: #94a3b8;
-  /* Slate 400 */
+  --color-text: #242636;
+  --color-text-secondary: #4f5367;
+  --color-text-muted: #626477;
 
-  --color-border: #475569;
-  /* Slate 600 */
-  --color-border-light: #334155;
-  /* Slate 700 */
+  --color-border: #dedee8;
+  --color-border-light: #ebebf1;
 
   /* Item Rarity Colors (Adjusted for Light Mode) */
-  --color-common: #64748b;
-  --color-rare: #2563eb;
-  --color-epic: #9333ea;
-  --color-legendary: #d97706;
+  --color-common: #526176;
+  --color-rare: #1d4ed8;
+  --color-epic: #6d28d9;
+  --color-legendary: #885900;
+
+  --color-on-primary: #ffffff;
+  --color-text-tertiary: var(--color-text-muted);
+  --color-surface-subtle: #f3f6fa;
+  --color-primary-soft: #ededfb;
+  --color-primary-border: #bfc0e7;
+  --color-info: #1d4ed8;
+  --color-info-bg: #eff6ff;
+  --color-info-border: #93b4f5;
+  --color-safe-bg: #eaf6ef;
+  --color-safe-border: #a4ceb5;
+  --color-warning-bg: #fff5da;
+  --color-warning-border: #dfc78b;
+  --color-danger-bg: #fff0ed;
+  --color-danger-border: #e6b4ad;
 
   /* Spacing - Mobile First */
   --spacing-xs: 0.25rem;
@@ -96,14 +103,14 @@
   --transition-slow: 350ms ease-in-out;
 
   /* Glass Effect — 3-level intensity scale */
-  --glass-bg: rgba(30, 41, 59, 0.7);           /* legacy alias */
-  --glass-border: rgba(71, 85, 105, 0.5);       /* legacy alias */
-  --glass-primary-bg: rgba(30, 41, 59, 0.92);   /* 모달, 중요 카드 */
-  --glass-primary-blur: blur(20px);
-  --glass-secondary-bg: rgba(30, 41, 59, 0.72); /* 일반 카드 */
-  --glass-secondary-blur: blur(10px);
-  --glass-subtle-bg: rgba(30, 41, 59, 0.48);    /* 배경 보조 요소 */
-  --glass-subtle-blur: blur(4px);
+  --glass-bg: var(--color-surface);           /* legacy alias */
+  --glass-border: var(--color-border);       /* legacy alias */
+  --glass-primary-bg: var(--color-surface);   /* 모달, 중요 카드 */
+  --glass-primary-blur: none;
+  --glass-secondary-bg: var(--color-surface); /* 일반 카드 */
+  --glass-secondary-blur: none;
+  --glass-subtle-bg: var(--color-surface-subtle);    /* 배경 보조 요소 */
+  --glass-subtle-blur: none;
 
   /* Page Theme Colors */
   --theme-dashboard-blue: #3b82f6;
@@ -123,10 +130,10 @@
   --theme-quest-orange: #f59e0b;
   --theme-quest-amber: #fbbf24;
 
-  /* Background Gradient Colors - Dark Theme */
-  --bg-gradient-start: #0f172a;
-  --bg-gradient-mid: #1e293b;
-  --bg-gradient-end: #1e1b4b;
+  /* Background colors */
+  --bg-gradient-start: var(--color-bg);
+  --bg-gradient-mid: var(--color-bg);
+  --bg-gradient-end: var(--color-bg);
   --gradient-highlight: #ec4899;
   --z-bg-effects: 0;
   --z-page-content: 10;
@@ -438,11 +445,12 @@ a:hover {
 }
 
 .glass-panel {
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(71, 85, 105, 0.5);
+  background: var(--color-surface);
+  color: var(--color-text);
+  backdrop-filter: none;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-sm);
 }
 
 .gradient-text-secondary {
@@ -1205,3 +1213,10 @@ textarea {
   }
 }
 
+
+/* Keep form hints readable on the shared light surfaces. */
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 1;
+}

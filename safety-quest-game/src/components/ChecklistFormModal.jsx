@@ -121,61 +121,61 @@ const ChecklistFormModal = ({ isOpen, onClose, onComplete, role }) => {
     return (
         <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            backgroundColor: 'rgb(36 38 54 / 48%)',
             zIndex: 2000,
             display: 'flex', justifyContent: 'center', alignItems: 'center',
-            backdropFilter: 'blur(5px)'
+            backdropFilter: 'none'
         }}>
             {showSuccess ? (
-                <div style={{ textAlign: 'center', color: '#fff' }}>
+                <div style={{ textAlign: 'center', color: 'var(--color-text)', background: 'var(--color-surface)', borderRadius: 16, padding: '2rem', margin: '1rem' }}>
                     <div style={{
                         width: '150px', height: '150px',
-                        border: '4px solid #00ff88', borderRadius: '50%',
+                        border: '4px solid var(--color-safe)', borderRadius: '50%',
                         margin: '0 auto 2rem',
-                        boxShadow: '0 0 30px #00ff88',
+                        boxShadow: 'none',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: '4rem',
                         animation: 'pulse 1.5s infinite'
                     }}>✓</div>
-                    <h1 style={{ fontSize: '2.5rem', textShadow: '0 0 20px #00ff88', marginBottom: '1rem' }}>
+                    <h1 style={{ fontSize: '2.5rem', textShadow: 'none', marginBottom: '1rem' }}>
                         체크리스트 제출 완료!
                     </h1>
-                    <div style={{ fontSize: '1.2rem', color: '#00ff88' }}>
+                    <div style={{ fontSize: '1.2rem', color: 'var(--color-safe)' }}>
                         안전 점검을 완료했습니다 (+100P)
                     </div>
                 </div>
             ) : (
-                <div style={{
+                <div className="checklist-modal-panel" role="dialog" aria-modal="true" aria-label="안전 체크리스트" style={{
                     position: 'relative',
                     width: '95%', maxWidth: '700px', maxHeight: '90vh',
-                    backgroundColor: '#1a1a2e',
-                    border: '1px solid #4a4e69',
+                    backgroundColor: 'var(--color-surface)', color: 'var(--color-text)',
+                    border: '1px solid var(--color-border)',
                     borderRadius: '10px',
                     display: 'flex', flexDirection: 'column',
                     overflow: 'hidden',
-                    boxShadow: '0 0 50px rgba(0,0,0,0.5)'
+                    boxShadow: 'var(--shadow-lg)'
                 }}>
                     {/* Header */}
-                    <div style={{
+                    <div className="checklist-modal-header" style={{
                         padding: '1rem 1.5rem',
-                        borderBottom: '1px solid #4a4e69',
+                        borderBottom: '1px solid var(--color-border)',
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        background: 'rgba(255,255,255,0.05)',
+                        background: 'var(--color-surface-subtle)',
                         flexShrink: 0
                     }}>
                         <div>
-                            <h2 style={{ color: '#fff', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <h2 style={{ color: 'var(--color-text)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 📋 안전 체크리스트
-                                <span style={{ fontSize: '0.8rem', background: '#333', padding: '0.2rem 0.5rem', borderRadius: '4px', color: '#aaa' }}>
+                                <span style={{ fontSize: '0.8rem', background: 'var(--color-surface-subtle)', padding: '0.2rem 0.5rem', borderRadius: '4px', color: 'var(--color-text-muted)' }}>
                                     Daily Quest
                                 </span>
                             </h2>
-                            <p style={{ color: '#aaa', margin: '0.5rem 0 0', fontSize: '0.85rem' }}>
+                            <p style={{ color: 'var(--color-text-muted)', margin: '0.5rem 0 0', fontSize: '0.85rem' }}>
                                 작업 전 안전 점검 항목을 확인하세요. (체크: {checkedCount}/{CHECKLIST_ITEMS.length}, 최소 {MIN_CHECKED}개)
                             </p>
                         </div>
-                        <button onClick={onClose} style={{
-                            background: 'none', border: 'none', color: '#fff', fontSize: '2rem', cursor: 'pointer'
+                        <button type="button" aria-label="체크리스트 닫기" onClick={onClose} style={{
+                            background: 'none', border: 'none', color: 'var(--color-text)', fontSize: '2rem', cursor: 'pointer'
                         }}>×</button>
                     </div>
 
@@ -184,7 +184,7 @@ const ChecklistFormModal = ({ isOpen, onClose, onComplete, role }) => {
                         {categories.map(category => (
                             <div key={category} style={{ marginBottom: '1.5rem' }}>
                                 <div style={{
-                                    color: '#8b5cf6', fontWeight: 700, fontSize: '0.85rem',
+                                    color: 'var(--color-primary)', fontWeight: 700, fontSize: '0.85rem',
                                     textTransform: 'uppercase', letterSpacing: '0.05em',
                                     marginBottom: '0.75rem', paddingBottom: '0.5rem',
                                     borderBottom: '1px solid rgba(139, 92, 246, 0.3)'
@@ -198,28 +198,32 @@ const ChecklistFormModal = ({ isOpen, onClose, onComplete, role }) => {
                                             display: 'flex', alignItems: 'flex-start', gap: '0.75rem',
                                             padding: '0.75rem',
                                             marginBottom: '0.5rem',
-                                            background: item.checked ? 'rgba(0, 255, 136, 0.05)' : 'rgba(255,255,255,0.02)',
-                                            border: `1px solid ${item.riskFlag ? '#ff4444' : item.checked ? 'rgba(0, 255, 136, 0.2)' : '#333'}`,
+                                            background: item.checked ? 'var(--color-safe-bg)' : 'var(--color-surface)',
+                                            border: `1px solid ${item.riskFlag ? 'var(--color-danger-border)' : item.checked ? 'var(--color-safe-border)' : 'var(--color-border)'}`,
                                             borderRadius: '8px',
                                             transition: 'all 0.2s ease'
                                         }}>
                                             {/* 체크박스 */}
-                                            <div
+                                            <button
+                                                type="button"
+                                                role="checkbox"
+                                                aria-checked={item.checked}
+                                                aria-label={item.label}
                                                 onClick={() => toggleCheck(index)}
                                                 style={{
                                                     width: '28px', height: '28px', flexShrink: 0,
-                                                    border: `2px solid ${item.checked ? '#00ff88' : '#555'}`,
+                                                    border: `2px solid ${item.checked ? 'var(--color-safe)' : 'var(--color-text-muted)'}`,
                                                     borderRadius: '6px', cursor: 'pointer',
                                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    background: item.checked ? 'rgba(0, 255, 136, 0.15)' : 'transparent',
+                                                    background: item.checked ? 'var(--color-safe-bg)' : 'transparent',
                                                     transition: 'all 0.2s ease',
                                                     marginTop: '2px'
                                                 }}
                                             >
-                                                {item.checked && <span style={{ color: '#00ff88', fontWeight: 'bold', fontSize: '1.1rem' }}>✓</span>}
-                                            </div>
+                                                {item.checked && <span style={{ color: 'var(--color-safe)', fontWeight: 'bold', fontSize: '1.1rem' }}>✓</span>}
+                                            </button>
 
-                                            <div style={{ flex: 1 }}>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
                                                 <div
                                                     onClick={() => toggleCheck(index)}
                                                     style={{
@@ -238,7 +242,7 @@ const ChecklistFormModal = ({ isOpen, onClose, onComplete, role }) => {
                                                     placeholder="비고 (선택사항)"
                                                     style={{
                                                         width: '100%', padding: '0.35rem 0.5rem',
-                                                        background: '#0f0f23', border: '1px solid #333',
+                                                        background: 'var(--color-surface)', border: '1px solid var(--color-border)',
                                                         borderRadius: '4px', color: 'var(--color-text-secondary)',
                                                         fontSize: '0.8rem'
                                                     }}
@@ -246,21 +250,24 @@ const ChecklistFormModal = ({ isOpen, onClose, onComplete, role }) => {
                                             </div>
 
                                             {/* 위험 플래그 */}
-                                            <div
+                                            <button
+                                                type="button"
+                                                aria-pressed={item.riskFlag}
+                                                aria-label={`${item.label} 위험 요인 표시`}
                                                 onClick={() => toggleRisk(index)}
                                                 title="위험 요인 플래그"
                                                 style={{
                                                     width: '32px', height: '32px', flexShrink: 0,
                                                     borderRadius: '6px', cursor: 'pointer',
                                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    background: item.riskFlag ? 'rgba(255, 68, 68, 0.2)' : 'transparent',
-                                                    border: `1px solid ${item.riskFlag ? '#ff4444' : '#444'}`,
+                                                    background: item.riskFlag ? 'var(--color-danger-bg)' : 'transparent',
+                                                    border: `1px solid ${item.riskFlag ? 'var(--color-danger)' : 'var(--color-text-muted)'}`,
                                                     transition: 'all 0.2s ease',
                                                     marginTop: '2px'
                                                 }}
                                             >
                                                 <span style={{ fontSize: '1rem' }}>{item.riskFlag ? '🚨' : '⚑'}</span>
-                                            </div>
+                                            </button>
                                         </div>
                                     );
                                 })}
@@ -269,17 +276,17 @@ const ChecklistFormModal = ({ isOpen, onClose, onComplete, role }) => {
                     </div>
 
                     {/* Footer */}
-                    <div style={{
+                    <div className="checklist-modal-footer" style={{
                         padding: '1rem 1.5rem',
-                        borderTop: '1px solid #4a4e69',
+                        borderTop: '1px solid var(--color-border)',
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        background: 'rgba(255,255,255,0.05)',
+                        background: 'var(--color-surface-subtle)',
                         flexShrink: 0
                     }}>
-                        <div style={{ color: '#ff4444', fontWeight: 'bold', fontSize: '0.85rem', height: '1.5rem' }}>
+                        <div style={{ color: 'var(--color-danger)', fontWeight: 'bold', fontSize: '0.85rem', height: '1.5rem' }}>
                             {error}
                             {!error && checkedCount < MIN_CHECKED && (
-                                <span style={{ color: '#aaa' }}>
+                                <span style={{ color: 'var(--color-text-muted)' }}>
                                     {MIN_CHECKED - checkedCount}개 항목을 더 체크해주세요
                                 </span>
                             )}
@@ -289,12 +296,12 @@ const ChecklistFormModal = ({ isOpen, onClose, onComplete, role }) => {
                             disabled={!canSubmit}
                             style={{
                                 padding: '0.8rem 2rem',
-                                background: canSubmit ? 'linear-gradient(45deg, #00ff88, #00cc6a)' : '#333',
-                                color: canSubmit ? '#000' : '#666',
+                                background: canSubmit ? 'var(--color-safe)' : 'var(--color-surface-subtle)',
+                                color: canSubmit ? 'var(--color-on-primary)' : 'var(--color-text-muted)',
                                 border: 'none', borderRadius: '30px',
                                 fontWeight: 'bold', fontSize: '1rem',
                                 cursor: canSubmit ? 'pointer' : 'not-allowed',
-                                boxShadow: canSubmit ? '0 0 20px rgba(0, 255, 136, 0.4)' : 'none',
+                                boxShadow: canSubmit ? 'none' : 'none',
                                 transition: 'all 0.3s ease'
                             }}
                         >

@@ -89,7 +89,7 @@ function ChainQuestCard({ role, onComplete }) {
                     borderRadius: '8px',
                     marginBottom: '0.75rem',
                     background: result.success ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
-                    color: result.success ? '#4ade80' : '#f87171',
+                    color: result.success ? 'var(--color-safe)' : 'var(--color-danger)',
                     fontSize: '0.8rem', fontWeight: 600, textAlign: 'center'
                 }}>
                     {result.message}
@@ -112,7 +112,7 @@ function ChainQuestCard({ role, onComplete }) {
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
                         <span style={{
-                            fontSize: '0.65rem', fontWeight: 700, color: '#60a5fa',
+                            fontSize: '0.65rem', fontWeight: 700, color: 'var(--color-info)',
                             background: 'rgba(59, 130, 246, 0.2)',
                             padding: '0.1rem 0.4rem', borderRadius: '4px'
                         }}>
@@ -140,10 +140,10 @@ function ChainQuestCard({ role, onComplete }) {
                                     padding: '0.6rem 0.8rem',
                                     borderRadius: '8px',
                                     border: '1px solid rgba(59, 130, 246, 0.3)',
-                                    background: 'rgba(0,0,0,0.2)',
+                                    background: 'var(--color-surface)',
                                     color: 'var(--color-text)',
                                     fontSize: '0.85rem',
-                                    outline: 'none',
+
                                     boxSizing: 'border-box'
                                 }}
                             />
@@ -185,7 +185,7 @@ function ChainQuestCard({ role, onComplete }) {
                             display: 'flex', alignItems: 'center', justifyContent: 'space-between'
                         }}>
                             <div>
-                                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#fbbf24' }}>
+                                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-warning)' }}>
                                     {perfectBonus.icon} {perfectBonus.name}
                                 </div>
                                 <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
@@ -210,7 +210,7 @@ function ChainQuestCard({ role, onComplete }) {
                     {status.perfectClaimed && (
                         <div style={{
                             marginTop: '0.5rem', fontSize: '0.8rem',
-                            color: '#4ade80', fontWeight: 600
+                            color: 'var(--color-safe)', fontWeight: 600
                         }}>
                             ✅ 완벽한 하루 달성! 모든 보상을 수령했습니다.
                         </div>

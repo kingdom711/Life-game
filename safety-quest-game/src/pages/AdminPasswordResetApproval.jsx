@@ -125,7 +125,7 @@ function AdminPasswordResetApproval() {
                                         onClick={() => approve(request.id)}
                                         disabled={processingId === request.id}
                                         className="ui-btn-core"
-                                        style={{ flex: 1, display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 8, background: '#16a34a', color: '#fff' }}
+                                        style={{ flex: 1, display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 8, background: 'var(--color-safe)', color: '#fff' }}
                                     >
                                         <CheckCircle2 size={16} />
                                         승인
@@ -135,7 +135,7 @@ function AdminPasswordResetApproval() {
                                         onClick={() => reject(request.id)}
                                         disabled={processingId === request.id}
                                         className="ui-btn-core"
-                                        style={{ flex: 1, display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 8, background: 'rgba(239,68,68,0.18)', color: 'var(--color-danger)' }}
+                                        style={{ flex: 1, display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 8, background: 'var(--color-danger-bg)', color: 'var(--color-danger)' }}
                                     >
                                         <XCircle size={16} />
                                         거절

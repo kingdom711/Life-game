@@ -15,9 +15,9 @@ function AdminDashboardToolbar({ onTestMode }) {
             top: 0,
             zIndex: 40,
             padding: '0.55rem 1rem',
-            background: 'rgba(2, 6, 23, 0.9)',
-            borderBottom: '1px solid rgba(148, 163, 184, 0.18)',
-            backdropFilter: 'blur(18px)',
+            background: 'var(--color-surface)',
+            borderBottom: '1px solid var(--color-border)',
+            boxShadow: 'var(--shadow-sm)',
         }}>
             <div style={{
                 maxWidth: 1180,
@@ -25,6 +25,7 @@ function AdminDashboardToolbar({ onTestMode }) {
                 display: 'flex',
                 gap: 8,
                 justifyContent: 'flex-end',
+                flexWrap: 'wrap',
             }}>
                 <button
                     type="button"
@@ -34,9 +35,9 @@ function AdminDashboardToolbar({ onTestMode }) {
                         alignItems: 'center',
                         gap: 8,
                         border: '1px solid rgba(14, 165, 233, 0.38)',
-                        background: 'rgba(14, 165, 233, 0.16)',
-                        color: '#e0f2fe',
-                        borderRadius: 8,
+                        background: 'var(--color-info-bg)',
+                        color: 'var(--color-info)',
+                        minHeight: 44, borderRadius: 8,
                         padding: '0.5rem 0.75rem',
                         fontWeight: 900,
                         cursor: 'pointer',
@@ -53,9 +54,9 @@ function AdminDashboardToolbar({ onTestMode }) {
                         alignItems: 'center',
                         gap: 8,
                         border: '1px solid rgba(34, 197, 94, 0.38)',
-                        background: 'rgba(22, 163, 74, 0.16)',
-                        color: '#dcfce7',
-                        borderRadius: 8,
+                        background: 'var(--color-safe-bg)',
+                        color: 'var(--color-safe)',
+                        minHeight: 44, borderRadius: 8,
                         padding: '0.5rem 0.75rem',
                         fontWeight: 900,
                         cursor: 'pointer',

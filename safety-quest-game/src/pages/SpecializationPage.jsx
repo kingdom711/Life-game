@@ -1,3 +1,4 @@
+import { getAccentInk } from '../utils/uiColors';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { SPECIALIZATIONS, SPECIALIZATION_STATUS } from '../data/specializationData';
@@ -118,7 +119,7 @@ const SpecializationPage = ({ role }) => {
                                 <span style={{ fontSize: '2rem' }}>{activeSpec.icon}</span>
                                 <div>
                                     <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>현재 전직</div>
-                                    <div style={{ fontWeight: 700, color: activeSpec.color }}>{activeSpec.name}</div>
+                                    <div style={{ fontWeight: 700, color: getAccentInk(activeSpec.color) }}>{activeSpec.name}</div>
                                     <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
                                         포인트 ×{activeSpec.bonuses.pointMultiplier} 보너스 적용 중
                                     </div>
@@ -150,7 +151,7 @@ const SpecializationPage = ({ role }) => {
                                     <div style={{ fontSize: '0.8rem', color: 'var(--color-text-tertiary)' }}>
                                         {legalProgress.currentYearHours}h / {legalProgress.requiredHours}h
                                     </div>
-                                    <div style={{ fontWeight: 700, color: '#3b82f6' }}>
+                                    <div style={{ fontWeight: 700, color: 'var(--color-info)' }}>
                                         {legalProgress.completionRate}%
                                     </div>
                                 </div>
@@ -159,7 +160,7 @@ const SpecializationPage = ({ role }) => {
                                 marginTop: '0.75rem',
                                 height: '8px',
                                 borderRadius: '999px',
-                                background: 'rgba(255,255,255,0.08)',
+                                background: 'var(--color-surface)',
                                 overflow: 'hidden'
                             }}>
                                 <div style={{
@@ -174,7 +175,7 @@ const SpecializationPage = ({ role }) => {
                             <div style={{
                                 marginTop: '0.4rem',
                                 fontSize: '0.75rem',
-                                color: legalProgress.hasMetRequirement ? '#22c55e' : 'var(--color-text-secondary)'
+                                color: legalProgress.hasMetRequirement ? 'var(--color-safe)' : 'var(--color-text-secondary)'
                             }}>
                                 {legalProgress.hasMetRequirement
                                     ? '연간 법정 교육시간을 모두 충족했습니다.'
@@ -201,7 +202,6 @@ const SpecializationPage = ({ role }) => {
                                 key={spec.id}
                                 className="card"
                                 style={{
-                                    opacity: isLocked ? 0.6 : 1,
                                     border: isActive ? `2px solid ${spec.color}` : undefined,
                                     position: 'relative',
                                     overflow: 'hidden'
@@ -216,7 +216,7 @@ const SpecializationPage = ({ role }) => {
                                     borderRadius: '999px',
                                     fontSize: '0.7rem',
                                     fontWeight: 600,
-                                    background: getStatusColor(progress.status),
+                                    background: getAccentInk(getStatusColor(progress.status)),
                                     color: '#fff'
                                 }}>
                                     {getStatusLabel(progress.status)}
@@ -232,7 +232,7 @@ const SpecializationPage = ({ role }) => {
                                         {isLocked ? '🔒' : spec.icon}
                                     </div>
                                     <h3 className="card-title" style={{
-                                        color: isLocked ? 'var(--color-text-tertiary)' : spec.color
+                                        color: isLocked ? 'var(--color-text-tertiary)' : getAccentInk(spec.color)
                                     }}>
                                         {spec.name}
                                     </h3>
@@ -260,7 +260,7 @@ const SpecializationPage = ({ role }) => {
                                             fontSize: '0.8rem'
                                         }}>
                                             <span style={{
-                                                color: progress.isFullyCompleted ? '#22c55e' : '#ef4444'
+                                                color: progress.isFullyCompleted ? 'var(--color-safe)' : 'var(--color-danger)'
                                             }}>
                                                 {progress.isFullyCompleted ? '✓' : '✗'}
                                             </span>
@@ -285,7 +285,7 @@ const SpecializationPage = ({ role }) => {
                                                 marginBottom: '0.25rem'
                                             }}>
                                                 <span>교육 진행률</span>
-                                                <span style={{ color: spec.color }}>{progress.completionRate}%</span>
+                                                <span style={{ color: getAccentInk(spec.color) }}>{progress.completionRate}%</span>
                                             </div>
                                             <div style={{
                                                 height: '6px',
@@ -319,7 +319,7 @@ const SpecializationPage = ({ role }) => {
                                             alignItems: 'center',
                                             gap: '0.5rem',
                                             fontSize: '0.8rem',
-                                            color: spec.color
+                                            color: getAccentInk(spec.color)
                                         }}>
                                             <span>⚡</span>
                                             <span>포인트 ×{spec.bonuses.pointMultiplier} 획득</span>
@@ -336,7 +336,7 @@ const SpecializationPage = ({ role }) => {
                                                 gap: '0.5rem',
                                                 fontSize: '0.8rem'
                                             }}>
-                                                <span style={{ color: isLocked ? '#64748b' : spec.color }}>✦</span>
+                                                <span style={{ color: isLocked ? '#64748b' : getAccentInk(spec.color) }}>✦</span>
                                                 <span style={{
                                                     color: isLocked ? 'var(--color-text-tertiary)' : 'var(--color-text-secondary)'
                                                 }}>
@@ -359,7 +359,7 @@ const SpecializationPage = ({ role }) => {
                                         <Link
                                             to={`/specialization/training/${spec.id}`}
                                             className="btn btn-primary"
-                                            style={{ width: '100%', background: spec.bgGradient, whiteSpace: 'nowrap' }}
+                                            style={{ width: '100%', background: getAccentInk(spec.color), whiteSpace: 'nowrap' }}
                                         >
                                             📚 교육 시작하기
                                         </Link>
@@ -368,7 +368,7 @@ const SpecializationPage = ({ role }) => {
                                         <Link
                                             to={`/specialization/training/${spec.id}`}
                                             className="btn btn-primary"
-                                            style={{ width: '100%', background: spec.bgGradient, whiteSpace: 'nowrap' }}
+                                            style={{ width: '100%', background: getAccentInk(spec.color), whiteSpace: 'nowrap' }}
                                         >
                                             📚 교육 이어하기 ({progress.completionRate}%)
                                         </Link>
@@ -376,7 +376,7 @@ const SpecializationPage = ({ role }) => {
                                     {isUnlocked && (
                                         <button
                                             className="btn btn-primary"
-                                            style={{ width: '100%', background: spec.bgGradient, whiteSpace: 'nowrap' }}
+                                            style={{ width: '100%', background: getAccentInk(spec.color), whiteSpace: 'nowrap' }}
                                             onClick={() => handleSwitch(spec.id)}
                                         >
                                             ⚔️ 전직 장착하기

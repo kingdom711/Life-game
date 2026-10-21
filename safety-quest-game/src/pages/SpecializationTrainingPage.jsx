@@ -1,3 +1,4 @@
+import { getAccentInk } from '../utils/uiColors';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getSpecializationById } from '../data/specializationData';
@@ -216,7 +217,7 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
 
                 <div style={{ textAlign: 'center', marginBottom: isCompactLayout ? '1rem' : '2rem' }}>
                     <span style={{ fontSize: '2.5rem' }}>{spec.icon}</span>
-                    <h1 style={{ fontSize: '1.75rem', color: spec.color, marginTop: '0.5rem' }}>
+                    <h1 style={{ fontSize: '1.75rem', color: getAccentInk(spec.color), marginTop: '0.5rem' }}>
                         {spec.name} 전직 교육
                     </h1>
                     <p className="text-muted" style={{ fontSize: '0.875rem' }}>
@@ -230,7 +231,7 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                             marginTop: '0.75rem',
                             padding: '0.5rem 1rem',
                             borderRadius: '0.5rem',
-                            background: 'rgba(255,255,255,0.05)',
+                            background: 'var(--color-surface)',
                             border: '1px solid rgba(255,255,255,0.1)'
                         }}>
                             <span style={{ fontSize: '0.875rem' }}>
@@ -251,7 +252,7 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                     transition: 'width 0.5s ease'
                                 }} />
                             </div>
-                            <span style={{ color: spec.color, fontWeight: 700, fontSize: '0.875rem' }}>
+                            <span style={{ color: getAccentInk(spec.color), fontWeight: 700, fontSize: '0.875rem' }}>
                                 {progress.completionRate}%
                             </span>
                         </div>
@@ -307,8 +308,8 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                             fontSize: '0.75rem',
                                             fontWeight: 700,
                                             flexShrink: 0,
-                                            background: completed ? '#22c55e' : `${spec.color}30`,
-                                            color: completed ? '#fff' : spec.color
+                                            background: completed ? 'var(--color-safe)' : `${spec.color}30`,
+                                            color: completed ? '#fff' : getAccentInk(spec.color)
                                         }}>
                                             {completed ? '✓' : edu.order}
                                         </div>
@@ -365,7 +366,7 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                             textAlign: 'center',
                                             padding: '0.75rem',
                                             borderRadius: '0.5rem',
-                                            background: 'rgba(255,255,255,0.05)'
+                                            background: 'var(--color-surface)'
                                         }}>
                                             <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>영상 시간</div>
                                             <div style={{ fontWeight: 700 }}>{Math.floor(selectedEdu.duration / 60)}분</div>
@@ -374,7 +375,7 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                             textAlign: 'center',
                                             padding: '0.75rem',
                                             borderRadius: '0.5rem',
-                                            background: 'rgba(255,255,255,0.05)'
+                                            background: 'var(--color-surface)'
                                         }}>
                                             <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)' }}>퀴즈 문항</div>
                                             <div style={{ fontWeight: 700 }}>7문제</div>
@@ -386,8 +387,8 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                             background: 'rgba(59, 130, 246, 0.1)',
                                             border: '1px solid rgba(59, 130, 246, 0.2)'
                                         }}>
-                                            <div style={{ fontSize: '0.7rem', color: '#3b82f6' }}>법정 시간 반영</div>
-                                            <div style={{ fontWeight: 700, color: '#3b82f6' }}>
+                                            <div style={{ fontSize: '0.7rem', color: 'var(--color-info)' }}>법정 시간 반영</div>
+                                            <div style={{ fontWeight: 700, color: 'var(--color-info)' }}>
                                                 +{(selectedEdu.legalHours || 0).toFixed(2)}h
                                             </div>
                                         </div>
@@ -398,8 +399,8 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                             background: 'rgba(239, 68, 68, 0.1)',
                                             border: '1px solid rgba(239, 68, 68, 0.2)'
                                         }}>
-                                            <div style={{ fontSize: '0.7rem', color: '#ef4444' }}>합격 기준</div>
-                                            <div style={{ fontWeight: 700, color: '#ef4444' }}>
+                                            <div style={{ fontSize: '0.7rem', color: 'var(--color-danger)' }}>합격 기준</div>
+                                            <div style={{ fontWeight: 700, color: 'var(--color-danger)' }}>
                                                 {SPECIALIZATION_EDUCATION_CONFIG.REQUIRED_SCORE}%
                                             </div>
                                         </div>
@@ -413,7 +414,7 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                         marginBottom: '1.5rem',
                                         fontSize: '0.8rem'
                                     }}>
-                                        <strong style={{ color: spec.color }}>⚠️ 전직 교육 안내</strong>
+                                        <strong style={{ color: getAccentInk(spec.color) }}>⚠️ 전직 교육 안내</strong>
                                         <ul style={{ margin: '0.5rem 0 0 1rem', lineHeight: 1.6, color: 'var(--color-text-secondary)' }}>
                                             <li>일반 교육보다 높은 합격 기준({SPECIALIZATION_EDUCATION_CONFIG.REQUIRED_SCORE}%)이 적용됩니다</li>
                                             <li>영상의 90% 이상을 시청해야 퀴즈에 응시할 수 있습니다</li>
@@ -430,14 +431,14 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                             border: '1px solid rgba(34, 197, 94, 0.3)'
                                         }}>
                                             <span style={{ fontSize: '2rem' }}>✅</span>
-                                            <div style={{ marginTop: '0.5rem', fontWeight: 700, color: '#22c55e' }}>
+                                            <div style={{ marginTop: '0.5rem', fontWeight: 700, color: 'var(--color-safe)' }}>
                                                 이수 완료
                                             </div>
                                         </div>
                                     ) : (
                                         <button
                                             className="btn btn-primary"
-                                            style={{ width: '100%', background: spec.bgGradient }}
+                                            style={{ width: '100%', background: getAccentInk(spec.color) }}
                                             onClick={handleStartVideo}
                                         >
                                             ▶️ 교육 영상 시청 시작
@@ -521,7 +522,7 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                     <div style={{
                                         padding: '1rem',
                                         borderRadius: '0.5rem',
-                                        background: 'rgba(255,255,255,0.03)',
+                                        background: 'var(--color-surface)',
                                         marginBottom: '1rem'
                                     }}>
                                         <div style={{
@@ -531,7 +532,7 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                             marginBottom: '0.5rem'
                                         }}>
                                             <span>영상 시청 (90% 이상 시청 필요)</span>
-                                            <span style={{ color: spec.color }}>
+                                            <span style={{ color: getAccentInk(spec.color) }}>
                                                 {formatTime(Math.min(watchedTime, selectedEdu.duration))} / {formatTime(selectedEdu.duration)}
                                             </span>
                                         </div>
@@ -564,7 +565,7 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                         </p>
                                         <button
                                             className="btn btn-primary"
-                                            style={{ background: spec.bgGradient }}
+                                            style={{ background: getAccentInk(spec.color) }}
                                             onClick={handleStartQuiz}
                                         >
                                             📝 퀴즈 응시하기
@@ -637,7 +638,7 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                                 </button>
                                 <button
                                     className="btn btn-primary"
-                                    style={{ flex: 1, background: spec.bgGradient }}
+                                    style={{ flex: 1, background: getAccentInk(spec.color) }}
                                     onClick={handleClassChange}
                                 >
                                     ⚔️ 전직하기
@@ -672,14 +673,14 @@ const SpecializationTrainingPage = ({ embeddedSpecId = null, embedded = false, o
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div style={{ fontSize: '4rem', marginBottom: '0.5rem' }}>🎉</div>
-                            <h2 style={{ color: spec.color }}>{spec.name} 전직 완료!</h2>
+                            <h2 style={{ color: getAccentInk(spec.color) }}>{spec.name} 전직 완료!</h2>
                             <p style={{ color: 'var(--color-text-secondary)', margin: '0.75rem 0 1.5rem' }}>
                                 {classChangeResult.message}
                             </p>
                             <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
                                 <button
                                     className="btn btn-primary"
-                                    style={{ width: '100%', background: spec.bgGradient }}
+                                    style={{ width: '100%', background: getAccentInk(spec.color) }}
                                     onClick={() => {
                                         setClassChangeResult(null);
                                         setShareModal({

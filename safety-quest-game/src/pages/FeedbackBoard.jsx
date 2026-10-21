@@ -25,9 +25,9 @@ const CATEGORY_LABEL = Object.fromEntries(CATEGORY_OPTIONS.map((item) => [item.v
 const STATUS_LABEL = Object.fromEntries(STATUS_OPTIONS.map((item) => [item.value, item.label]));
 
 const STATUS_STYLE = {
-    OPEN: { color: '#fbbf24', bg: 'rgba(251,191,36,0.14)', border: 'rgba(251,191,36,0.3)' },
-    IN_REVIEW: { color: '#60a5fa', bg: 'rgba(96,165,250,0.14)', border: 'rgba(96,165,250,0.3)' },
-    ANSWERED: { color: '#34d399', bg: 'rgba(52,211,153,0.14)', border: 'rgba(52,211,153,0.3)' },
+    OPEN: { color: 'var(--color-warning)', bg: 'var(--color-warning-bg)', border: 'var(--color-warning-border)' },
+    IN_REVIEW: { color: 'var(--color-info)', bg: 'var(--color-info-bg)', border: 'var(--color-info-border)' },
+    ANSWERED: { color: 'var(--color-safe)', bg: 'var(--color-safe-bg)', border: 'var(--color-safe-border)' },
     CLOSED: { color: 'var(--color-text-muted)', bg: 'rgba(148,163,184,0.14)', border: 'rgba(148,163,184,0.3)' },
 };
 
@@ -230,7 +230,7 @@ function FeedbackBoard() {
                         placeItems: 'center',
                         background: 'rgba(14,165,233,0.14)',
                         border: '1px solid rgba(14,165,233,0.28)',
-                        color: '#7dd3fc',
+                        color: 'var(--color-info)',
                     }}>
                         <MessageSquare size={22} />
                     </div>
@@ -238,7 +238,7 @@ function FeedbackBoard() {
                         <h1 style={{ margin: 0, color: 'var(--color-text)', fontSize: '1.55rem', fontWeight: 850 }}>
                             사용자 게시판
                         </h1>
-                        <p style={{ margin: '4px 0 0', color: 'rgba(203,213,225,0.68)', fontSize: '0.86rem' }}>
+                        <p style={{ margin: '4px 0 0', color: 'var(--color-text-secondary)', fontSize: '0.86rem' }}>
                             오류, 사용 의견, 질문을 남기고 답변을 확인합니다.
                         </p>
                     </div>
@@ -249,7 +249,7 @@ function FeedbackBoard() {
                             width: 40,
                             height: 40,
                             borderRadius: 12,
-                            border: '1px solid rgba(148,163,184,0.24)',
+                            border: '1px solid var(--color-border)',
                             background: 'var(--color-surface)',
                             color: 'var(--color-text-secondary)',
                             display: 'grid',
@@ -315,7 +315,7 @@ function FeedbackBoard() {
                                 width: '100%',
                                 marginTop: 12,
                                 border: 'none',
-                                background: saving ? 'rgba(148,163,184,0.24)' : 'linear-gradient(135deg, #0ea5e9, #2563eb)',
+                                background: saving ? 'rgba(148,163,184,0.24)' : 'var(--color-primary)',
                                 color: '#fff',
                                 fontWeight: 800,
                                 display: 'flex',
@@ -342,7 +342,7 @@ function FeedbackBoard() {
                             border: '1px solid rgba(251,191,36,0.3)',
                         }}
                     >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#fbbf24', fontWeight: 800, fontSize: '0.9rem', marginBottom: 10 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-warning)', fontWeight: 800, fontSize: '0.9rem', marginBottom: 10 }}>
                             <Megaphone size={16} />
                             공지 작성
                         </div>
@@ -368,7 +368,7 @@ function FeedbackBoard() {
                                 width: '100%',
                                 marginTop: 12,
                                 border: 'none',
-                                background: savingNotice ? 'rgba(148,163,184,0.24)' : 'linear-gradient(135deg, #f59e0b, #d97706)',
+                                background: savingNotice ? 'rgba(148,163,184,0.24)' : 'var(--color-warning)',
                                 color: '#fff',
                                 fontWeight: 800,
                                 display: 'flex',
@@ -394,11 +394,12 @@ function FeedbackBoard() {
                                 <button
                                     key={option.value}
                                     onClick={() => setStatusFilter(option.value)}
+                                    aria-pressed={statusFilter === option.value}
                                     style={{
                                         borderRadius: 10,
                                         border: '1px solid rgba(148,163,184,0.22)',
-                                        background: statusFilter === option.value ? 'rgba(14,165,233,0.22)' : 'rgba(15,23,42,0.62)',
-                                        color: statusFilter === option.value ? '#7dd3fc' : 'var(--color-text-secondary)',
+                                        background: statusFilter === option.value ? 'var(--color-primary-soft)' : 'var(--color-surface-subtle)',
+                                        color: statusFilter === option.value ? 'var(--color-primary)' : 'var(--color-text-secondary)',
                                         padding: '0.6rem 0.4rem',
                                         fontSize: '0.78rem',
                                         fontWeight: 750,
@@ -422,7 +423,7 @@ function FeedbackBoard() {
                                     borderRadius: 16,
                                     padding: '1rem',
                                     border: '1px solid rgba(251,191,36,0.38)',
-                                    background: 'rgba(251,191,36,0.06)',
+                                    background: 'var(--color-warning-bg)',
                                 }}
                             >
                                 <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
@@ -430,7 +431,7 @@ function FeedbackBoard() {
                                         <Megaphone size={12} />
                                         공지
                                     </span>
-                                    <span style={{ marginLeft: 'auto', color: 'rgba(203,213,225,0.56)', fontSize: '0.76rem' }}>
+                                    <span style={{ marginLeft: 'auto', color: 'var(--color-text-muted)', fontSize: '0.76rem' }}>
                                         {formatDate(item.createdAt)}
                                     </span>
                                     {isAdmin && (
@@ -454,10 +455,10 @@ function FeedbackBoard() {
                                         </button>
                                     )}
                                 </div>
-                                <h2 style={{ color: '#fef3c7', fontSize: '1rem', margin: '0 0 8px', lineHeight: 1.35 }}>
+                                <h2 style={{ color: 'var(--color-warning)', fontSize: '1rem', margin: '0 0 8px', lineHeight: 1.35 }}>
                                     {item.title}
                                 </h2>
-                                <p style={{ color: 'rgba(226,232,240,0.86)', fontSize: '0.9rem', lineHeight: 1.58, whiteSpace: 'pre-wrap', margin: 0 }}>
+                                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', lineHeight: 1.58, whiteSpace: 'pre-wrap', margin: 0 }}>
                                     {item.content}
                                 </p>
 
@@ -473,15 +474,15 @@ function FeedbackBoard() {
                                                                 {comment.authorName || comment.authorUsername}
                                                             </span>
                                                             {comment.authorIsAdmin && (
-                                                                <span style={{ ...softBadgeStyle, background: 'rgba(14,165,233,0.14)', color: '#7dd3fc', fontSize: '0.66rem', padding: '0.15rem 0.45rem' }}>
+                                                                <span style={{ ...softBadgeStyle, background: 'rgba(14,165,233,0.14)', color: 'var(--color-info)', fontSize: '0.66rem', padding: '0.15rem 0.45rem' }}>
                                                                     관리자
                                                                 </span>
                                                             )}
-                                                            <span style={{ color: 'rgba(203,213,225,0.5)', fontSize: '0.7rem' }}>
+                                                            <span style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem' }}>
                                                                 {formatDate(comment.createdAt)}
                                                             </span>
                                                         </div>
-                                                        <p style={{ color: 'rgba(226,232,240,0.82)', fontSize: '0.85rem', lineHeight: 1.5, whiteSpace: 'pre-wrap', margin: '2px 0 0' }}>
+                                                        <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem', lineHeight: 1.5, whiteSpace: 'pre-wrap', margin: '2px 0 0' }}>
                                                             {comment.content}
                                                         </p>
                                                     </div>
@@ -493,7 +494,7 @@ function FeedbackBoard() {
                                                             style={{
                                                                 border: 'none',
                                                                 background: 'transparent',
-                                                                color: 'rgba(203,213,225,0.45)',
+                                                                color: 'var(--color-text-muted)',
                                                                 cursor: 'pointer',
                                                                 padding: 2,
                                                                 flexShrink: 0,
@@ -529,7 +530,7 @@ function FeedbackBoard() {
                                                 width: 40,
                                                 borderRadius: 12,
                                                 border: 'none',
-                                                background: savingCommentId === item.id ? 'rgba(148,163,184,0.24)' : 'linear-gradient(135deg, #f59e0b, #d97706)',
+                                                background: savingCommentId === item.id ? 'rgba(148,163,184,0.24)' : 'var(--color-warning)',
                                                 color: '#fff',
                                                 display: 'grid',
                                                 placeItems: 'center',
@@ -571,18 +572,18 @@ function FeedbackBoard() {
                                         <span style={badgeStyle(status)}>{STATUS_LABEL[post.status] || post.status}</span>
                                         <span style={softBadgeStyle}>{CATEGORY_LABEL[post.category] || post.category}</span>
                                         {isAdmin && <span style={softBadgeStyle}>{post.authorName || post.authorUsername}</span>}
-                                        <span style={{ marginLeft: 'auto', color: 'rgba(203,213,225,0.56)', fontSize: '0.76rem' }}>
+                                        <span style={{ marginLeft: 'auto', color: 'var(--color-text-muted)', fontSize: '0.76rem' }}>
                                             {formatDate(post.createdAt)}
                                         </span>
                                     </div>
                                     <h2 style={{ color: 'var(--color-text)', fontSize: '1rem', margin: '0 0 8px', lineHeight: 1.35 }}>
                                         {post.title}
                                     </h2>
-                                    <p style={{ color: 'rgba(226,232,240,0.86)', fontSize: '0.9rem', lineHeight: 1.58, whiteSpace: 'pre-wrap', margin: 0 }}>
+                                    <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', lineHeight: 1.58, whiteSpace: 'pre-wrap', margin: 0 }}>
                                         {post.content}
                                     </p>
                                     {post.pagePath && (
-                                        <div style={{ color: 'rgba(125,211,252,0.78)', fontSize: '0.76rem', marginTop: 8 }}>
+                                        <div style={{ color: 'var(--color-info)', fontSize: '0.76rem', marginTop: 8 }}>
                                             관련 화면: {post.pagePath}
                                         </div>
                                     )}
@@ -592,16 +593,16 @@ function FeedbackBoard() {
                                             marginTop: 12,
                                             padding: '0.85rem',
                                             borderRadius: 12,
-                                            background: 'rgba(34,197,94,0.08)',
+                                            background: 'var(--color-safe-bg)',
                                             border: '1px solid rgba(34,197,94,0.18)',
                                         }}>
-                                            <div style={{ color: '#86efac', fontWeight: 800, fontSize: '0.82rem', marginBottom: 4 }}>
+                                            <div style={{ color: 'var(--color-safe)', fontWeight: 800, fontSize: '0.82rem', marginBottom: 4 }}>
                                                 관리자 답변
                                             </div>
-                                            <p style={{ color: '#d1fae5', whiteSpace: 'pre-wrap', lineHeight: 1.55, margin: 0, fontSize: '0.86rem' }}>
+                                            <p style={{ color: 'var(--color-safe)', whiteSpace: 'pre-wrap', lineHeight: 1.55, margin: 0, fontSize: '0.86rem' }}>
                                                 {post.adminReply}
                                             </p>
-                                            <div style={{ color: 'rgba(187,247,208,0.62)', fontSize: '0.72rem', marginTop: 6 }}>
+                                            <div style={{ color: 'var(--color-safe)', fontSize: '0.72rem', marginTop: 6 }}>
                                                 {post.repliedByName || '관리자'} · {formatDate(post.repliedAt)}
                                             </div>
                                         </div>
@@ -618,8 +619,8 @@ function FeedbackBoard() {
                                                         style={{
                                                             borderRadius: 9,
                                                             border: '1px solid rgba(148,163,184,0.18)',
-                                                            background: post.status === option.value ? 'rgba(148,163,184,0.18)' : 'rgba(15,23,42,0.54)',
-                                                            color: post.status === option.value ? 'var(--color-text-muted)' : '#dbeafe',
+                                                            background: post.status === option.value ? 'rgba(148,163,184,0.18)' : 'var(--color-surface-subtle)',
+                                                            color: post.status === option.value ? 'var(--color-text-muted)' : 'var(--color-info)',
                                                             padding: '0.48rem 0.3rem',
                                                             fontSize: '0.72rem',
                                                             fontWeight: 750,
@@ -641,7 +642,7 @@ function FeedbackBoard() {
                                                 className="ui-btn-core"
                                                 style={{
                                                     border: 'none',
-                                                    background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                                                    background: 'var(--color-safe)',
                                                     color: '#fff',
                                                     fontWeight: 800,
                                                     cursor: 'pointer',
@@ -665,7 +666,7 @@ const inputStyle = {
     width: '100%',
     boxSizing: 'border-box',
     borderRadius: 12,
-    border: '1px solid rgba(148,163,184,0.24)',
+    border: '1px solid var(--color-border)',
     background: 'var(--color-surface)',
     color: 'var(--color-text)',
     padding: '0.78rem 0.85rem',
@@ -695,7 +696,7 @@ const noticeBadgeStyle = {
     borderRadius: 999,
     padding: '0.25rem 0.55rem',
     background: 'rgba(251,191,36,0.16)',
-    color: '#fbbf24',
+    color: 'var(--color-warning)',
     fontSize: '0.72rem',
     fontWeight: 800,
     display: 'inline-flex',

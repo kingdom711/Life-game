@@ -1,3 +1,4 @@
+import { getAccentInk } from '../utils/uiColors';
 /**
  * 작업중지 이력 페이지
  *
@@ -186,10 +187,10 @@ function WorkStopHistoryPage() {
                     <button
                         onClick={() => navigate(-1)}
                         style={{
-                            background: 'rgba(255,255,255,0.1)',
+                            background: 'var(--color-border-light)',
                             border: 'none',
                             borderRadius: '10px',
-                            color: 'rgba(203,213,225,0.8)',
+                            color: 'var(--color-text-secondary)',
                             padding: '0.5rem 0.75rem',
                             cursor: 'pointer',
                             fontSize: '1rem'
@@ -201,7 +202,7 @@ function WorkStopHistoryPage() {
                         margin: 0,
                         fontSize: '1.5rem',
                         fontWeight: 800,
-                        color: '#f87171',
+                        color: 'var(--color-danger)',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '0.5rem'
@@ -213,7 +214,7 @@ function WorkStopHistoryPage() {
                         padding: '0.25rem 0.625rem',
                         borderRadius: '12px',
                         background: 'rgba(99, 102, 241, 0.15)',
-                        color: '#818cf8',
+                        color: 'var(--color-primary)',
                         fontSize: '0.75rem',
                         fontWeight: 600
                     }}>
@@ -230,13 +231,13 @@ function WorkStopHistoryPage() {
                         marginBottom: '1.5rem'
                     }}>
                         {[
-                            { label: '총 신고', value: stats.totalReports, icon: '🚨', color: '#ef4444' },
-                            { label: '해결률', value: `${stats.resolutionRate}%`, icon: '✅', color: '#22c55e' },
-                            { label: '평균 대응', value: `${stats.avgResponseTime}분`, icon: '⏱️', color: '#3b82f6' }
+                            { label: '총 신고', value: stats.totalReports, icon: '🚨', color: 'var(--color-danger)' },
+                            { label: '해결률', value: `${stats.resolutionRate}%`, icon: '✅', color: 'var(--color-safe)' },
+                            { label: '평균 대응', value: `${stats.avgResponseTime}분`, icon: '⏱️', color: 'var(--color-info)' }
                         ].map((stat, i) => (
                             <div key={i} style={{
-                                background: 'rgba(30, 27, 46, 0.8)',
-                                border: `1px solid ${stat.color}33`,
+                                background: 'var(--color-surface)',
+                                border: '1px solid var(--color-border)',
                                 borderRadius: '12px',
                                 padding: '1rem',
                                 textAlign: 'center'
@@ -245,7 +246,7 @@ function WorkStopHistoryPage() {
                                 <div style={{ color: stat.color, fontSize: '1.25rem', fontWeight: 800 }}>
                                     {stat.value}
                                 </div>
-                                <div style={{ color: 'rgba(203,213,225,0.6)', fontSize: '0.7rem' }}>
+                                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem' }}>
                                     {stat.label}
                                 </div>
                             </div>
@@ -256,14 +257,14 @@ function WorkStopHistoryPage() {
                 {/* 보호 기간 안내 + 보복 신고 */}
                 {protections.length > 0 && (
                     <div style={{
-                        background: 'rgba(99, 102, 241, 0.1)',
-                        border: '1px solid rgba(99, 102, 241, 0.3)',
+                        background: 'var(--color-primary-soft)',
+                        border: '1px solid var(--color-primary-border)',
                         borderRadius: '12px',
                         padding: '1rem',
                         marginBottom: '1.5rem'
                     }}>
                         <div style={{
-                            color: '#818cf8',
+                            color: 'var(--color-primary)',
                             fontSize: '0.85rem',
                             fontWeight: 700,
                             marginBottom: '0.5rem',
@@ -273,7 +274,7 @@ function WorkStopHistoryPage() {
                         }}>
                             🛡️ 보호 기간 활성 ({protections.length}건)
                         </div>
-                        <div style={{ color: 'rgba(203,213,225,0.7)', fontSize: '0.8rem', lineHeight: 1.6, marginBottom: '0.75rem' }}>
+                        <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem', lineHeight: 1.6, marginBottom: '0.75rem' }}>
                             작업중지 행사 후 30일간 보복 방지 모니터링이 진행 중입니다.
                         </div>
 
@@ -282,7 +283,7 @@ function WorkStopHistoryPage() {
                             const daysLeft = Math.max(0, Math.ceil((new Date(p.endDate) - new Date()) / (1000 * 60 * 60 * 24)));
                             return (
                                 <div key={p.reportId || idx} style={{
-                                    background: 'rgba(99, 102, 241, 0.08)',
+                                    background: 'var(--color-surface)',
                                     borderRadius: '8px',
                                     padding: '0.75rem',
                                     marginBottom: idx < protections.length - 1 ? '0.5rem' : 0
@@ -293,10 +294,10 @@ function WorkStopHistoryPage() {
                                         alignItems: 'center'
                                     }}>
                                         <div>
-                                            <span style={{ color: '#a5b4fc', fontSize: '0.8rem', fontWeight: 600 }}>
+                                            <span style={{ color: 'var(--color-primary)', fontSize: '0.8rem', fontWeight: 600 }}>
                                                 {p.workerName || userName}
                                             </span>
-                                            <span style={{ color: 'rgba(203,213,225,0.5)', fontSize: '0.7rem', marginLeft: '0.5rem' }}>
+                                            <span style={{ color: 'var(--color-text-muted)', fontSize: '0.7rem', marginLeft: '0.5rem' }}>
                                                 잔여 {daysLeft}일
                                             </span>
                                         </div>
@@ -309,9 +310,9 @@ function WorkStopHistoryPage() {
                                                 borderRadius: '8px',
                                                 border: '1px solid rgba(239, 68, 68, 0.4)',
                                                 background: showRetaliationForm === p.reportId
-                                                    ? 'rgba(239, 68, 68, 0.2)'
-                                                    : 'rgba(239, 68, 68, 0.08)',
-                                                color: '#f87171',
+                                                    ? 'var(--color-danger-bg)'
+                                                    : 'var(--color-danger-bg)',
+                                                color: 'var(--color-danger)',
                                                 fontSize: '0.7rem',
                                                 fontWeight: 700,
                                                 cursor: 'pointer',
@@ -332,7 +333,7 @@ function WorkStopHistoryPage() {
                                             border: '1px solid rgba(239, 68, 68, 0.2)'
                                         }}>
                                             <div style={{
-                                                color: '#f87171',
+                                                color: 'var(--color-danger)',
                                                 fontSize: '0.8rem',
                                                 fontWeight: 700,
                                                 marginBottom: '0.625rem'
@@ -356,11 +357,11 @@ function WorkStopHistoryPage() {
                                                                 ? '1px solid rgba(239, 68, 68, 0.6)'
                                                                 : '1px solid rgba(148,163,184,0.2)',
                                                             background: retaliationType === rt.id
-                                                                ? 'rgba(239, 68, 68, 0.15)'
-                                                                : 'rgba(30,27,46,0.5)',
+                                                                ? 'var(--color-danger-bg)'
+                                                                : 'var(--color-surface-subtle)',
                                                             color: retaliationType === rt.id
-                                                                ? '#f87171'
-                                                                : 'rgba(203,213,225,0.7)',
+                                                                ? 'var(--color-danger)'
+                                                                : 'var(--color-text-secondary)',
                                                             fontSize: '0.7rem',
                                                             fontWeight: 600,
                                                             cursor: 'pointer'
@@ -401,7 +402,7 @@ function WorkStopHistoryPage() {
                                                         borderRadius: '8px',
                                                         border: '1px solid rgba(148,163,184,0.2)',
                                                         background: 'transparent',
-                                                        color: 'rgba(203,213,225,0.7)',
+                                                        color: 'var(--color-text-secondary)',
                                                         fontSize: '0.75rem',
                                                         cursor: 'pointer'
                                                     }}
@@ -417,10 +418,10 @@ function WorkStopHistoryPage() {
                                                         border: 'none',
                                                         background: (!retaliationType || !retaliationDesc.trim())
                                                             ? 'rgba(148,163,184,0.15)'
-                                                            : 'rgba(239, 68, 68, 0.2)',
+                                                            : 'var(--color-danger-bg)',
                                                         color: (!retaliationType || !retaliationDesc.trim())
                                                             ? 'rgba(148,163,184,0.4)'
-                                                            : '#f87171',
+                                                            : 'var(--color-danger)',
                                                         fontSize: '0.75rem',
                                                         fontWeight: 700,
                                                         cursor: (!retaliationType || !retaliationDesc.trim())
@@ -460,8 +461,8 @@ function WorkStopHistoryPage() {
                                 padding: '0.5rem 0.875rem',
                                 borderRadius: '20px',
                                 border: filter === f.key ? '1px solid rgba(220,38,38,0.5)' : '1px solid rgba(148,163,184,0.2)',
-                                background: filter === f.key ? 'rgba(220,38,38,0.15)' : 'rgba(30,27,46,0.5)',
-                                color: filter === f.key ? '#f87171' : 'rgba(203,213,225,0.7)',
+                                background: filter === f.key ? 'var(--color-danger-bg)' : 'var(--color-surface-subtle)',
+                                color: filter === f.key ? 'var(--color-danger)' : 'var(--color-text-secondary)',
                                 fontSize: '0.8rem',
                                 fontWeight: 600,
                                 cursor: 'pointer',
@@ -479,7 +480,7 @@ function WorkStopHistoryPage() {
                         <div style={{
                             textAlign: 'center',
                             padding: '3rem 1rem',
-                            color: 'rgba(203,213,225,0.5)',
+                            color: 'var(--color-text-muted)',
                             fontSize: '0.9rem'
                         }}>
                             {filter === 'all' ? '작업중지 신고 이력이 없습니다.' : '해당 상태의 신고가 없습니다.'}
@@ -494,7 +495,7 @@ function WorkStopHistoryPage() {
                                 <div
                                     key={report.id}
                                     style={{
-                                        background: 'rgba(30, 27, 46, 0.8)',
+                                        background: 'var(--color-surface)',
                                         border: `1px solid ${statusInfo.color}33`,
                                         borderRadius: '14px',
                                         padding: '1.25rem',
@@ -517,7 +518,7 @@ function WorkStopHistoryPage() {
                                                 {hazardInfo?.icon || '🔶'}
                                             </span>
                                             <span style={{
-                                                color: 'rgba(203,213,225,0.9)',
+                                                color: 'var(--color-text-secondary)',
                                                 fontWeight: 700,
                                                 fontSize: '1rem'
                                             }}>
@@ -525,7 +526,7 @@ function WorkStopHistoryPage() {
                                             </span>
                                             {report.zone && (
                                                 <span style={{
-                                                    color: 'rgba(203,213,225,0.5)',
+                                                    color: 'var(--color-text-muted)',
                                                     fontSize: '0.8rem'
                                                 }}>
                                                     · {report.zone}
@@ -536,7 +537,7 @@ function WorkStopHistoryPage() {
                                             padding: '0.25rem 0.75rem',
                                             borderRadius: '20px',
                                             background: `${statusInfo.color}22`,
-                                            color: statusInfo.color,
+                                            color: getAccentInk(statusInfo.color),
                                             fontSize: '0.75rem',
                                             fontWeight: 700
                                         }}>
@@ -548,7 +549,7 @@ function WorkStopHistoryPage() {
                                     {report.description && (
                                         <p style={{
                                             margin: '0 0 0.75rem 0',
-                                            color: 'rgba(203,213,225,0.7)',
+                                            color: 'var(--color-text-secondary)',
                                             fontSize: '0.85rem',
                                             lineHeight: 1.5
                                         }}>
@@ -563,7 +564,7 @@ function WorkStopHistoryPage() {
                                         alignItems: 'center'
                                     }}>
                                         <span style={{
-                                            color: 'rgba(203,213,225,0.4)',
+                                            color: 'var(--color-text-muted)',
                                             fontSize: '0.75rem'
                                         }}>
                                             {formatDate(report.createdAt)} · {report.reporterName}
@@ -579,7 +580,7 @@ function WorkStopHistoryPage() {
                                                     borderRadius: '8px',
                                                     border: 'none',
                                                     background: `${REPORT_STATUS_INFO[nextStatus].color}22`,
-                                                    color: REPORT_STATUS_INFO[nextStatus].color,
+                                                    color: getAccentInk(REPORT_STATUS_INFO[nextStatus].color),
                                                     fontSize: '0.75rem',
                                                     fontWeight: 700,
                                                     cursor: isUpdating === report.id ? 'wait' : 'pointer',
@@ -603,27 +604,27 @@ function WorkStopHistoryPage() {
                                             background: 'rgba(34, 197, 94, 0.08)',
                                             border: '1px solid rgba(34, 197, 94, 0.2)'
                                         }}>
-                                            <div style={{ color: '#4ade80', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                                            <div style={{ color: 'var(--color-safe)', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
                                                 ✅ 해결: {report.resolverName}
                                             </div>
                                             {report.actionPlan && (
                                                 <div style={{ marginBottom: '0.375rem' }}>
-                                                    <span style={{ color: '#86efac', fontSize: '0.7rem', fontWeight: 700 }}>조치 내용</span>
-                                                    <div style={{ color: 'rgba(203,213,225,0.7)', fontSize: '0.8rem', marginTop: '0.125rem', lineHeight: 1.5 }}>
+                                                    <span style={{ color: 'var(--color-safe)', fontSize: '0.7rem', fontWeight: 700 }}>조치 내용</span>
+                                                    <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem', marginTop: '0.125rem', lineHeight: 1.5 }}>
                                                         {report.actionPlan}
                                                     </div>
                                                 </div>
                                             )}
                                             {report.actionMethod && (
                                                 <div style={{ marginBottom: '0.375rem' }}>
-                                                    <span style={{ color: '#86efac', fontSize: '0.7rem', fontWeight: 700 }}>조치 방법</span>
-                                                    <div style={{ color: 'rgba(203,213,225,0.7)', fontSize: '0.8rem', marginTop: '0.125rem', lineHeight: 1.5 }}>
+                                                    <span style={{ color: 'var(--color-safe)', fontSize: '0.7rem', fontWeight: 700 }}>조치 방법</span>
+                                                    <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem', marginTop: '0.125rem', lineHeight: 1.5 }}>
                                                         {report.actionMethod}
                                                     </div>
                                                 </div>
                                             )}
                                             {report.resolutionNote && !report.actionPlan && (
-                                                <div style={{ color: 'rgba(203,213,225,0.6)', fontSize: '0.8rem' }}>
+                                                <div style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>
                                                     {report.resolutionNote}
                                                 </div>
                                             )}
@@ -639,19 +640,19 @@ function WorkStopHistoryPage() {
                                             background: 'rgba(20, 184, 166, 0.08)',
                                             border: '1px solid rgba(20, 184, 166, 0.2)'
                                         }}>
-                                            <div style={{ color: '#2dd4bf', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                                            <div style={{ color: 'var(--color-safe)', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
                                                 🔄 작업 재개 확인
                                             </div>
                                             <div style={{ marginBottom: '0.375rem' }}>
-                                                <span style={{ color: '#5eead4', fontSize: '0.7rem', fontWeight: 700 }}>확인 사항</span>
-                                                <div style={{ color: 'rgba(203,213,225,0.7)', fontSize: '0.8rem', marginTop: '0.125rem', lineHeight: 1.5 }}>
+                                                <span style={{ color: 'var(--color-safe)', fontSize: '0.7rem', fontWeight: 700 }}>확인 사항</span>
+                                                <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem', marginTop: '0.125rem', lineHeight: 1.5 }}>
                                                     {report.resumeVerification}
                                                 </div>
                                             </div>
                                             {report.resumeActionNote && (
                                                 <div>
-                                                    <span style={{ color: '#5eead4', fontSize: '0.7rem', fontWeight: 700 }}>조치 완료 확인</span>
-                                                    <div style={{ color: 'rgba(203,213,225,0.7)', fontSize: '0.8rem', marginTop: '0.125rem', lineHeight: 1.5 }}>
+                                                    <span style={{ color: 'var(--color-safe)', fontSize: '0.7rem', fontWeight: 700 }}>조치 완료 확인</span>
+                                                    <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem', marginTop: '0.125rem', lineHeight: 1.5 }}>
                                                         {report.resumeActionNote}
                                                     </div>
                                                 </div>
@@ -667,7 +668,7 @@ function WorkStopHistoryPage() {
                                             borderTop: '1px solid rgba(148,163,184,0.1)'
                                         }}>
                                             <div style={{
-                                                color: 'rgba(203,213,225,0.35)',
+                                                color: 'var(--color-text-muted)',
                                                 fontSize: '0.7rem'
                                             }}>
                                                 최근 조치: {report.statusHistory[report.statusHistory.length - 1].by || '시스템'}
@@ -705,7 +706,7 @@ function WorkStopHistoryPage() {
                     <div
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                            background: 'linear-gradient(135deg, #1e1b2e 0%, #0f172a 100%)',
+                            background: 'var(--color-surface)',
                             borderRadius: '20px',
                             padding: '1.5rem',
                             width: '100%',
@@ -728,7 +729,7 @@ function WorkStopHistoryPage() {
                                 margin: 0,
                                 fontSize: '1.15rem',
                                 fontWeight: 800,
-                                color: actionForm.nextStatus === REPORT_STATUS.RESOLVED ? '#4ade80' : '#2dd4bf'
+                                color: actionForm.nextStatus === REPORT_STATUS.RESOLVED ? 'var(--color-safe)' : 'var(--color-safe)'
                             }}>
                                 {actionForm.nextStatus === REPORT_STATUS.RESOLVED
                                     ? '✅ 위험 해결 - 조치 내용 작성'
@@ -738,10 +739,10 @@ function WorkStopHistoryPage() {
                             <button
                                 onClick={() => setActionForm(null)}
                                 style={{
-                                    background: 'rgba(255,255,255,0.1)',
+                                    background: 'var(--color-border-light)',
                                     border: 'none',
                                     borderRadius: '8px',
-                                    color: 'rgba(203,213,225,0.6)',
+                                    color: 'var(--color-text-muted)',
                                     padding: '0.375rem 0.625rem',
                                     cursor: 'pointer',
                                     fontSize: '0.9rem'
@@ -764,7 +765,7 @@ function WorkStopHistoryPage() {
                             marginBottom: '1.25rem'
                         }}>
                             <div style={{
-                                color: 'rgba(203,213,225,0.8)',
+                                color: 'var(--color-text-secondary)',
                                 fontSize: '0.8rem',
                                 lineHeight: 1.6
                             }}>
@@ -781,12 +782,12 @@ function WorkStopHistoryPage() {
                                 <div style={{ marginBottom: '1rem' }}>
                                     <label style={{
                                         display: 'block',
-                                        color: '#86efac',
+                                        color: 'var(--color-safe)',
                                         fontSize: '0.85rem',
                                         fontWeight: 700,
                                         marginBottom: '0.5rem'
                                     }}>
-                                        📋 어떤 조치를 했는지 <span style={{ color: '#ef4444' }}>*</span>
+                                        📋 어떤 조치를 했는지 <span style={{ color: 'var(--color-danger)' }}>*</span>
                                     </label>
                                     <textarea
                                         value={actionPlan}
@@ -810,7 +811,7 @@ function WorkStopHistoryPage() {
                                         }}
                                     />
                                     {!actionPlan.trim() && (
-                                        <div style={{ color: '#f87171', fontSize: '0.7rem', marginTop: '0.25rem' }}>
+                                        <div style={{ color: 'var(--color-danger)', fontSize: '0.7rem', marginTop: '0.25rem' }}>
                                             조치 내용을 반드시 입력해 주세요
                                         </div>
                                     )}
@@ -819,12 +820,12 @@ function WorkStopHistoryPage() {
                                 <div style={{ marginBottom: '1.25rem' }}>
                                     <label style={{
                                         display: 'block',
-                                        color: '#86efac',
+                                        color: 'var(--color-safe)',
                                         fontSize: '0.85rem',
                                         fontWeight: 700,
                                         marginBottom: '0.5rem'
                                     }}>
-                                        🔧 어떻게 조치했는지 <span style={{ color: '#ef4444' }}>*</span>
+                                        🔧 어떻게 조치했는지 <span style={{ color: 'var(--color-danger)' }}>*</span>
                                     </label>
                                     <textarea
                                         value={actionMethod}
@@ -848,7 +849,7 @@ function WorkStopHistoryPage() {
                                         }}
                                     />
                                     {!actionMethod.trim() && (
-                                        <div style={{ color: '#f87171', fontSize: '0.7rem', marginTop: '0.25rem' }}>
+                                        <div style={{ color: 'var(--color-danger)', fontSize: '0.7rem', marginTop: '0.25rem' }}>
                                             조치 방법을 반드시 입력해 주세요
                                         </div>
                                     )}
@@ -862,12 +863,12 @@ function WorkStopHistoryPage() {
                                 <div style={{ marginBottom: '1rem' }}>
                                     <label style={{
                                         display: 'block',
-                                        color: '#5eead4',
+                                        color: 'var(--color-safe)',
                                         fontSize: '0.85rem',
                                         fontWeight: 700,
                                         marginBottom: '0.5rem'
                                     }}>
-                                        🔍 확인 사항 <span style={{ color: '#ef4444' }}>*</span>
+                                        🔍 확인 사항 <span style={{ color: 'var(--color-danger)' }}>*</span>
                                     </label>
                                     <textarea
                                         value={resumeVerification}
@@ -891,7 +892,7 @@ function WorkStopHistoryPage() {
                                         }}
                                     />
                                     {!resumeVerification.trim() && (
-                                        <div style={{ color: '#f87171', fontSize: '0.7rem', marginTop: '0.25rem' }}>
+                                        <div style={{ color: 'var(--color-danger)', fontSize: '0.7rem', marginTop: '0.25rem' }}>
                                             확인 사항을 반드시 입력해 주세요
                                         </div>
                                     )}
@@ -900,12 +901,12 @@ function WorkStopHistoryPage() {
                                 <div style={{ marginBottom: '1.25rem' }}>
                                     <label style={{
                                         display: 'block',
-                                        color: '#5eead4',
+                                        color: 'var(--color-safe)',
                                         fontSize: '0.85rem',
                                         fontWeight: 700,
                                         marginBottom: '0.5rem'
                                     }}>
-                                        ✅ 조치 완료 확인 내용 <span style={{ color: '#ef4444' }}>*</span>
+                                        ✅ 조치 완료 확인 내용 <span style={{ color: 'var(--color-danger)' }}>*</span>
                                     </label>
                                     <textarea
                                         value={resumeActionNote}
@@ -929,7 +930,7 @@ function WorkStopHistoryPage() {
                                         }}
                                     />
                                     {!resumeActionNote.trim() && (
-                                        <div style={{ color: '#f87171', fontSize: '0.7rem', marginTop: '0.25rem' }}>
+                                        <div style={{ color: 'var(--color-danger)', fontSize: '0.7rem', marginTop: '0.25rem' }}>
                                             조치 완료 확인 내용을 반드시 입력해 주세요
                                         </div>
                                     )}
@@ -947,7 +948,7 @@ function WorkStopHistoryPage() {
                                     borderRadius: '12px',
                                     border: '1px solid rgba(148,163,184,0.2)',
                                     background: 'transparent',
-                                    color: 'rgba(203,213,225,0.7)',
+                                    color: 'var(--color-text-secondary)',
                                     fontSize: '0.85rem',
                                     fontWeight: 600,
                                     cursor: 'pointer'
@@ -972,8 +973,8 @@ function WorkStopHistoryPage() {
                                         (actionForm.nextStatus === REPORT_STATUS.RESUMED && resumeVerification.trim() && resumeActionNote.trim())
                                     )
                                         ? actionForm.nextStatus === REPORT_STATUS.RESOLVED
-                                            ? 'linear-gradient(135deg, #22c55e, #16a34a)'
-                                            : 'linear-gradient(135deg, #14b8a6, #0d9488)'
+                                            ? 'var(--color-safe)'
+                                            : 'var(--color-safe)'
                                         : 'rgba(148,163,184,0.15)',
                                     color: (
                                         (actionForm.nextStatus === REPORT_STATUS.RESOLVED && actionPlan.trim() && actionMethod.trim()) ||

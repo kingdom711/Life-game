@@ -171,7 +171,7 @@ function AdminRewardApproval() {
                                 background: activeTab === tab.key
                                     ? 'linear-gradient(135deg, var(--color-secondary-light), var(--color-secondary))'
                                     : 'transparent',
-                                color: activeTab === tab.key ? COLOR.text : COLOR.textMuted,
+                                color: activeTab === tab.key ? 'var(--color-on-primary)' : COLOR.textMuted,
                                 fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer',
                                 transition: 'all 0.2s'
                             }}
@@ -272,7 +272,7 @@ function AdminRewardApproval() {
                                                 className="ui-btn-core"
                                                 style={{
                                                     flex: 1, border: 'none', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer',
-                                                    background: 'linear-gradient(135deg, #22c55e, #16a34a)', color: '#fff'
+                                                    background: 'var(--color-safe)', color: '#fff'
                                                 }}
                                             >
                                                 승인
@@ -282,7 +282,7 @@ function AdminRewardApproval() {
                                                 className="ui-btn-core"
                                                 style={{
                                                     flex: 1, border: 'none', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer',
-                                                    background: 'rgba(239,68,68,0.2)', color: COLOR.danger
+                                                    background: 'var(--color-danger-bg)', color: COLOR.danger
                                                 }}
                                             >
                                                 거절
@@ -304,7 +304,7 @@ function AdminRewardApproval() {
                                                 style={{
                                                     width: '100%', padding: '0.7rem', marginBottom: 8,
                                                     borderRadius: 8, border: '1px solid rgba(34,197,94,0.3)',
-                                                    background: '#0f172a', color: '#fff', fontSize: '0.9rem'
+                                                    background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '0.9rem'
                                                 }}
                                             />
                                             <div style={{ display: 'flex', gap: 8 }}>
@@ -314,7 +314,7 @@ function AdminRewardApproval() {
                                                     className="ui-btn-core"
                                                     style={{
                                                         flex: 1, border: 'none', fontWeight: 700, cursor: 'pointer',
-                                                        background: 'linear-gradient(135deg, #22c55e, #16a34a)', color: '#fff',
+                                                        background: 'var(--color-safe)', color: '#fff',
                                                         opacity: processing ? 0.7 : 1
                                                     }}
                                                 >
@@ -347,7 +347,7 @@ function AdminRewardApproval() {
                                                 style={{
                                                     width: '100%', padding: '0.7rem', marginBottom: 8,
                                                     borderRadius: 8, border: '1px solid rgba(239,68,68,0.3)',
-                                                    background: '#0f172a', color: '#fff', fontSize: '0.9rem'
+                                                    background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '0.9rem'
                                                 }}
                                             />
                                             <div style={{ display: 'flex', gap: 8 }}>
@@ -357,7 +357,7 @@ function AdminRewardApproval() {
                                                     className="ui-btn-core"
                                                     style={{
                                                         flex: 1, border: 'none', fontWeight: 700, cursor: 'pointer',
-                                                        background: 'linear-gradient(135deg, #ef4444, #dc2626)', color: '#fff',
+                                                        background: 'var(--color-danger)', color: '#fff',
                                                         opacity: processing ? 0.7 : 1
                                                     }}
                                                 >

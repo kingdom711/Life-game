@@ -212,24 +212,6 @@
   backdrop-filter: none;
 }
 
-.admin-dashboard .page-state-title,
-.admin-dashboard .page-state-icon {
-  color: var(--color-text);
-}
-
-.admin-dashboard .page-state-description {
-  color: var(--color-text-muted);
-}
-
-.admin-dashboard .page-notice-error {
-  background: #fff1f2;
-  border-color: #fda4af;
-}
-
-.admin-dashboard .page-notice-error :is(.page-notice-title, .page-notice-description) {
-  color: #9f1239;
-}
-
 @media (min-width: 1100px) {
   .admin-metric-grid {
     grid-template-columns: repeat(6, minmax(0, 1fr));

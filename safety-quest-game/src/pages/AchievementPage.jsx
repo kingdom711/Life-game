@@ -1,3 +1,4 @@
+import { getAccentInk } from '../utils/uiColors';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -72,7 +73,7 @@ function AchievementPage() {
                 {/* 헤더 */}
                 <div style={{ marginBottom: '2rem' }}>
                     <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{
-                        background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                        background: 'linear-gradient(135deg, var(--color-warning), var(--color-warning-dark))',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         backgroundClip: 'text'
@@ -92,7 +93,7 @@ function AchievementPage() {
                         borderRadius: '12px',
                         padding: '0.75rem 1rem',
                         marginBottom: '1rem',
-                        color: '#4ade80',
+                        color: 'var(--color-safe)',
                         fontWeight: 600,
                         fontSize: '0.9rem',
                         textAlign: 'center'
@@ -110,7 +111,7 @@ function AchievementPage() {
                                     달성 현황
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-                                    <span style={{ fontSize: '2rem', fontWeight: 800, color: '#fbbf24' }}>
+                                    <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--color-warning)' }}>
                                         {summary.unlocked}
                                     </span>
                                     <span style={{ fontSize: '1rem', color: 'var(--color-text-muted)' }}>
@@ -118,7 +119,7 @@ function AchievementPage() {
                                     </span>
                                     <span style={{
                                         fontSize: '0.85rem',
-                                        color: '#fbbf24',
+                                        color: 'var(--color-warning)',
                                         fontWeight: 600,
                                         marginLeft: '0.5rem'
                                     }}>
@@ -150,10 +151,10 @@ function AchievementPage() {
                                     padding: '0.75rem 1rem',
                                     textAlign: 'center'
                                 }}>
-                                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#fbbf24' }}>
+                                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-warning)' }}>
                                         {summary.unclaimed}
                                     </div>
-                                    <div style={{ fontSize: '0.75rem', color: '#fbbf24' }}>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--color-warning)' }}>
                                         수령 대기
                                     </div>
                                 </div>
@@ -183,7 +184,7 @@ function AchievementPage() {
                                 background: activeCategory === cat.id
                                     ? 'rgba(251, 191, 36, 0.15)'
                                     : 'rgba(255,255,255,0.05)',
-                                color: activeCategory === cat.id ? '#fbbf24' : 'var(--color-text-muted)',
+                                color: activeCategory === cat.id ? 'var(--color-warning)' : 'var(--color-text-muted)',
                                 fontSize: '0.85rem',
                                 fontWeight: 600,
                                 cursor: 'pointer',
@@ -209,7 +210,7 @@ function AchievementPage() {
                                 key={achievement.id}
                                 className="card"
                                 style={{
-                                    opacity: achievement.unlocked ? 1 : 0.7,
+                                    opacity: 1,
                                     border: canClaim
                                         ? `2px solid ${rarityColor}`
                                         : undefined,
@@ -255,7 +256,7 @@ function AchievementPage() {
                                                 padding: '0.15rem 0.4rem',
                                                 borderRadius: '4px',
                                                 background: rarityBg,
-                                                color: rarityColor,
+                                                color: getAccentInk(rarityColor),
                                                 fontWeight: 700
                                             }}>
                                                 {RARITY_NAMES[achievement.rarity] || achievement.rarity}
@@ -311,8 +312,8 @@ function AchievementPage() {
                                                     padding: '0.5rem 1rem',
                                                     borderRadius: '8px',
                                                     border: 'none',
-                                                    background: `linear-gradient(135deg, ${rarityColor}, ${rarityColor}cc)`,
-                                                    color: '#0f172a',
+                                                    background: getAccentInk(rarityColor),
+                                                    color: 'var(--color-on-primary)',
                                                     fontWeight: 700,
                                                     fontSize: '0.8rem',
                                                     cursor: 'pointer',

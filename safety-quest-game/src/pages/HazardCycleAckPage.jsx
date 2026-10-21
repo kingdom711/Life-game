@@ -86,18 +86,18 @@ function HazardCycleAckPage() {
                 </button>
             </div>
 
-            <p className="rounded-lg border border-blue-400/20 bg-blue-500/10 px-4 py-2 text-xs text-blue-200">
+            <p className="rounded-lg border px-4 py-2 text-xs" style={{ borderColor: 'var(--color-info-border)', background: 'var(--color-info-bg)', color: 'var(--color-info)' }}>
                 산업안전보건법 제36조 2항 — 위험성평가 시 근로자 참여 증빙. 본 확인 기록은 위험성평가표 PDF에 포함되어
                 고용노동부 점검 시 "근로자 참여 이행" 증거로 사용됩니다.
             </p>
 
             {error && (
-                <div className="rounded-lg border border-red-400/30 bg-red-500/10 px-4 py-2 text-sm text-red-100">
+                <div className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: 'var(--color-danger-border)', background: 'var(--color-danger-bg)', color: 'var(--color-danger)' }}>
                     {error}
                 </div>
             )}
             {notice && (
-                <div className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-100">
+                <div className="rounded-lg border px-4 py-2 text-sm" style={{ borderColor: 'var(--color-safe-border)', background: 'var(--color-safe-bg)', color: 'var(--color-safe)' }}>
                     {notice}
                 </div>
             )}
@@ -132,7 +132,8 @@ function HazardCycleAckPage() {
                     rows={3}
                     maxLength={500}
                     placeholder="현장에서 확인한 내용 / 추가 의견 (선택)"
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-sm text-slate-200 outline-none focus:border-blue-500"
+                    className="w-full rounded-xl border px-3 py-2 text-sm"
+                    style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface)', color: 'var(--color-text)' }}
                 />
                 <button
                     onClick={handleAck}

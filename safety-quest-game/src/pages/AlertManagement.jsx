@@ -133,10 +133,10 @@ function AlertManagement({ role }) {
 
     const getTypeLabel = (type) => {
         switch (type) {
-            case 'danger': return { label: '위험', color: COLOR.danger, icon: '🚨' };
-            case 'warning': return { label: '주의', color: COLOR.warningLight, icon: '⚠️' };
-            case 'info': return { label: '안내', color: COLOR.primaryLight, icon: 'ℹ️' };
-            default: return { label: '알림', color: COLOR.textMuted, icon: '📢' };
+            case 'danger': return { label: '위험', color: COLOR.danger, bg: 'var(--color-danger-bg)', border: 'var(--color-danger-border)', icon: '🚨' };
+            case 'warning': return { label: '주의', color: COLOR.warningLight, bg: 'var(--color-warning-bg)', border: 'var(--color-warning-border)', icon: '⚠️' };
+            case 'info': return { label: '안내', color: COLOR.primaryLight, bg: 'var(--color-info-bg)', border: 'var(--color-info-border)', icon: 'ℹ️' };
+            default: return { label: '알림', color: COLOR.textMuted, bg: 'var(--color-surface-subtle)', border: 'var(--color-border)', icon: '📢' };
         }
     };
 
@@ -178,7 +178,7 @@ function AlertManagement({ role }) {
                             border: 'none',
                             borderRadius: '12px',
                             padding: '0.75rem 1.5rem',
-                            color: COLOR.text,
+                            color: 'var(--color-on-primary)',
                             fontWeight: 600,
                             cursor: 'pointer',
                             display: 'flex',
@@ -204,7 +204,7 @@ function AlertManagement({ role }) {
                 {/* 알림 작성/수정 폼 */}
                 {isFormOpen && (
                     <div style={{
-                        background: 'linear-gradient(135deg, rgba(30, 27, 75, 0.95) 0%, rgba(55, 48, 107, 0.9) 100%)',
+                        background: 'var(--color-surface)',
                         border: '2px solid rgba(139, 92, 246, 0.4)',
                         borderRadius: '16px',
                         padding: '1.5rem',
@@ -367,7 +367,7 @@ function AlertManagement({ role }) {
                                     style={{
                                         border: 'none',
                                         background: `linear-gradient(135deg, ${COLOR.secondary} 0%, ${COLOR.secondaryDark} 100%)`,
-                                        color: COLOR.text,
+                                        color: 'var(--color-on-primary)',
                                         fontWeight: 600,
                                         cursor: 'pointer'
                                     }}
@@ -427,8 +427,8 @@ function AlertManagement({ role }) {
                                             width: '48px',
                                             height: '48px',
                                             borderRadius: '12px',
-                                            background: `${typeInfo.color}20`,
-                                            border: `2px solid ${typeInfo.color}40`,
+                                            background: typeInfo.bg,
+                                            border: `2px solid ${typeInfo.border}`,
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -450,7 +450,7 @@ function AlertManagement({ role }) {
                                                     fontSize: '0.75rem',
                                                     padding: '0.15rem 0.5rem',
                                                     borderRadius: '4px',
-                                                    background: `${typeInfo.color}30`,
+                                                    background: typeInfo.bg,
                                                     color: typeInfo.color,
                                                     fontWeight: 600
                                                 }}>

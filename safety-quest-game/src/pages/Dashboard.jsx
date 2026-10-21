@@ -63,9 +63,9 @@ const COLOR = {
     text: 'var(--color-text)',
     textSecondary: 'var(--color-text-secondary)',
     textMuted: 'var(--color-text-muted)',
-    textDim: 'rgba(203, 213, 225, 0.6)',
-    textFaint: 'rgba(203, 213, 225, 0.5)',
-    textStrong: 'rgba(203, 213, 225, 0.9)',
+    textDim: 'var(--color-text-muted)',
+    textFaint: 'var(--color-text-muted)',
+    textStrong: 'var(--color-text-secondary)',
     primaryLight: 'var(--color-primary-light)',
     primary: 'var(--color-primary)',
     secondaryLight: 'var(--color-secondary-light)',
@@ -83,21 +83,21 @@ const COLOR = {
 
 const ALERT_TYPE_THEME = {
     danger: {
-        bg: 'rgba(239, 68, 68, 0.15)',
+        bg: 'var(--color-danger-bg)',
         border: 'rgba(239, 68, 68, 0.4)',
         label: '위험',
         labelColor: 'var(--color-danger-light)',
         icon: '🚨'
     },
     warning: {
-        bg: 'rgba(251, 191, 36, 0.15)',
+        bg: 'var(--color-warning-bg)',
         border: 'rgba(251, 191, 36, 0.4)',
         label: '주의',
         labelColor: 'var(--color-warning-light)',
         icon: '⚠️'
     },
     info: {
-        bg: 'rgba(56, 189, 248, 0.15)',
+        bg: 'var(--color-info-bg)',
         border: 'rgba(56, 189, 248, 0.4)',
         label: '안내',
         labelColor: 'var(--color-primary-light)',
@@ -830,8 +830,8 @@ function Dashboard({ role }) {
                                         padding: '0.5rem 1rem',
                                         borderRadius: '8px',
                                         border: 'none',
-                                        background: `linear-gradient(135deg, ${COLOR.secondary} 0%, var(--color-secondary-dark) 100%)`,
-                                        color: COLOR.text,
+                                        background: 'var(--color-primary)',
+                                        color: 'var(--color-on-primary)',
                                         fontWeight: 600,
                                         cursor: 'pointer',
                                         fontSize: '0.875rem',

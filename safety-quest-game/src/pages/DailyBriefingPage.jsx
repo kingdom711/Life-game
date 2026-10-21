@@ -84,7 +84,7 @@ function DailyBriefingPage() {
             <div className="page">
                 <div className="container" style={{ textAlign: 'center', paddingTop: '3rem' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🤖</div>
-                    <div style={{ color: '#60a5fa', fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+                    <div style={{ color: 'var(--color-info)', fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.5rem' }}>
                         AI 브리핑 생성 중...
                     </div>
                     <div style={{ color: '#64748b', fontSize: '0.85rem' }}>
@@ -125,7 +125,7 @@ function DailyBriefingPage() {
                 {/* 어제 요약 */}
                 <div style={{
                     padding: '1.25rem', borderRadius: '14px', marginBottom: '1rem',
-                    background: 'rgba(255,255,255,0.02)',
+                    background: 'var(--color-surface)',
                     border: '1px solid rgba(255,255,255,0.06)'
                 }}>
                     <h3 style={{ color: 'var(--color-text)', fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.95rem' }}>
@@ -163,20 +163,20 @@ function DailyBriefingPage() {
                         background: 'rgba(234,179,8,0.05)',
                         border: '1px solid rgba(234,179,8,0.15)'
                     }}>
-                        <h3 style={{ color: '#fbbf24', fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.95rem' }}>
+                        <h3 style={{ color: 'var(--color-warning)', fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.95rem' }}>
                             ⚠️ 주의 사항
                         </h3>
                         {briefing.incidents.map((inc, idx) => (
                             <div key={idx} style={{
                                 padding: '0.5rem 0.75rem', borderRadius: '8px', marginBottom: '0.5rem',
-                                background: 'rgba(0,0,0,0.2)', fontSize: '0.85rem'
+                                background: 'var(--color-surface-subtle)', fontSize: '0.85rem'
                             }}>
                                 <span style={{ color: 'var(--color-text)', fontWeight: 600 }}>
                                     {inc.location} — {inc.type}
                                 </span>
                                 <span style={{
                                     marginLeft: '0.5rem', fontSize: '0.75rem',
-                                    color: inc.status === '미해결' ? '#f87171' : '#4ade80',
+                                    color: inc.status === '미해결' ? 'var(--color-danger)' : 'var(--color-safe)',
                                     fontWeight: 600
                                 }}>
                                     [{inc.status}]
@@ -195,7 +195,7 @@ function DailyBriefingPage() {
                     background: 'rgba(59,130,246,0.05)',
                     border: '1px solid rgba(59,130,246,0.15)'
                 }}>
-                    <h3 style={{ color: '#60a5fa', fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.95rem' }}>
+                    <h3 style={{ color: 'var(--color-info)', fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.95rem' }}>
                         💡 AI 추천 액션
                     </h3>
                     {briefing.recommendations.map((rec, idx) => (
@@ -203,7 +203,7 @@ function DailyBriefingPage() {
                             display: 'flex', gap: '0.5rem', marginBottom: '0.4rem',
                             fontSize: '0.85rem', color: 'var(--color-text-secondary)'
                         }}>
-                            <span style={{ color: '#60a5fa' }}>{idx + 1}.</span>
+                            <span style={{ color: 'var(--color-info)' }}>{idx + 1}.</span>
                             {rec}
                         </div>
                     ))}
@@ -218,7 +218,7 @@ function DailyBriefingPage() {
                 }}>
                     <span style={{ fontSize: '1.5rem' }}>🏆</span>
                     <div>
-                        <div style={{ color: '#fbbf24', fontWeight: 700, fontSize: '0.85rem' }}>
+                        <div style={{ color: 'var(--color-warning)', fontWeight: 700, fontSize: '0.85rem' }}>
                             어제의 안전 스타
                         </div>
                         <div style={{ color: 'var(--color-text)', fontSize: '0.9rem' }}>
@@ -235,19 +235,19 @@ function SummaryItem({ label, value, sub, warn }) {
     return (
         <div style={{
             padding: '0.5rem 0.75rem', borderRadius: '8px',
-            background: 'rgba(0,0,0,0.2)'
+            background: 'var(--color-surface-subtle)'
         }}>
             <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '0.2rem' }}>
                 {label}
             </div>
             <div style={{
                 fontSize: '1.1rem', fontWeight: 800,
-                color: warn ? '#fbbf24' : 'var(--color-text)'
+                color: warn ? 'var(--color-warning)' : 'var(--color-text)'
             }}>
                 {value} {warn && '⚠️'}
             </div>
             {sub && (
-                <div style={{ fontSize: '0.7rem', color: '#f87171', fontWeight: 600 }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--color-danger)', fontWeight: 600 }}>
                     {sub}
                 </div>
             )}

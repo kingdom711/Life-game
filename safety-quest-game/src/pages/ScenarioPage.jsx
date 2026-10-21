@@ -1,3 +1,4 @@
+import { getAccentInk } from '../utils/uiColors';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -12,17 +13,17 @@ import { getScenarioById } from '../data/scenarioData';
 
 // 난이도 설정
 const DIFFICULTY_CONFIG = {
-  easy: { label: '쉬움', color: '#4ade80', bg: 'rgba(74, 222, 128, 0.15)', border: 'rgba(74, 222, 128, 0.3)' },
-  medium: { label: '보통', color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.3)' },
-  hard: { label: '어려움', color: '#f87171', bg: 'rgba(248, 113, 113, 0.15)', border: 'rgba(248, 113, 113, 0.3)' }
+  easy: { label: '쉬움', color: 'var(--color-safe)', bg: 'rgba(74, 222, 128, 0.15)', border: 'rgba(74, 222, 128, 0.3)' },
+  medium: { label: '보통', color: 'var(--color-warning)', bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.3)' },
+  hard: { label: '어려움', color: 'var(--color-danger)', bg: 'rgba(248, 113, 113, 0.15)', border: 'rgba(248, 113, 113, 0.3)' }
 };
 
 // 카테고리 설정
 const CATEGORY_CONFIG = {
-  fall: { label: '추락', color: '#60a5fa' },
-  electric: { label: '전기', color: '#facc15' },
-  fire: { label: '화재', color: '#fb923c' },
-  chemical: { label: '화학', color: '#a78bfa' },
+  fall: { label: '추락', color: 'var(--color-info)' },
+  electric: { label: '전기', color: 'var(--color-warning)' },
+  fire: { label: '화재', color: 'var(--color-warning)' },
+  chemical: { label: '화학', color: 'var(--color-secondary)' },
   general: { label: '일반', color: 'var(--color-text-muted)' }
 };
 
@@ -129,7 +130,7 @@ function ScenarioPage() {
             <div style={{ fontSize: '4rem', textAlign: 'center', marginBottom: '1rem' }}>
               {scorePercent >= 90 ? '🏆' : scorePercent >= 60 ? '👍' : '📖'}
             </div>
-            <h2 style={{ ...styles.completionTitle, color: gradeColor }}>
+            <h2 style={{ ...styles.completionTitle, color: getAccentInk(gradeColor) }}>
               시나리오 완료!
             </h2>
             <p style={styles.completionSubtitle}>{activeScenario.title}</p>
@@ -140,7 +141,7 @@ function ScenarioPage() {
                 ...styles.scoreCircle,
                 border: `4px solid ${gradeColor}`
               }}>
-                <div style={{ fontSize: '2rem', fontWeight: 800, color: gradeColor }}>{scorePercent}%</div>
+                <div style={{ fontSize: '2rem', fontWeight: 800, color: getAccentInk(gradeColor) }}>{scorePercent}%</div>
                 <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>{gradeLabel}</div>
               </div>
             </div>
@@ -155,7 +156,7 @@ function ScenarioPage() {
               </div>
               <div style={styles.rewardItem}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>획득 경험치</div>
-                <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#a78bfa' }}>
+                <div style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--color-secondary)' }}>
                   +{completionResult.earnedExp}EXP
                 </div>
               </div>
@@ -175,7 +176,7 @@ function ScenarioPage() {
                     <span style={{ fontSize: '0.85rem', color: 'var(--color-text)' }}>
                       {result.correct ? '✅' : result.points > 0 ? '⚠️' : '❌'} 단계 {idx + 1}
                     </span>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: result.correct ? '#4ade80' : result.points > 0 ? '#fbbf24' : '#f87171' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: result.correct ? 'var(--color-safe)' : result.points > 0 ? 'var(--color-warning)' : 'var(--color-danger)' }}>
                       +{result.points}점
                     </span>
                   </div>
@@ -369,7 +370,7 @@ function ScenarioPage() {
                         ...styles.badge,
                         background: diff.bg,
                         border: `1px solid ${diff.border}`,
-                        color: diff.color
+                        color: getAccentInk(diff.color)
                       }}>
                         {diff.label}
                       </span>
@@ -378,7 +379,7 @@ function ScenarioPage() {
                         ...styles.badge,
                         background: `color-mix(in srgb, ${cat.color} 13%, transparent)`,
                         border: `1px solid color-mix(in srgb, ${cat.color} 25%, transparent)`,
-                        color: cat.color
+                        color: getAccentInk(cat.color)
                       }}>
                         {cat.label}
                       </span>
@@ -396,7 +397,7 @@ function ScenarioPage() {
                       background: scenario.progress.completed
                         ? 'rgba(74, 222, 128, 0.15)'
                         : 'rgba(148, 163, 184, 0.1)',
-                      color: scenario.progress.completed ? '#4ade80' : '#64748b'
+                      color: scenario.progress.completed ? 'var(--color-safe)' : '#64748b'
                     }}>
                       {scenario.progress.completed ? '✅ 완료' : '미완료'}
                     </span>
@@ -439,7 +440,7 @@ const styles = {
     alignItems: 'center',
     padding: '0.5rem 1rem',
     borderRadius: '10px',
-    background: 'rgba(255, 255, 255, 0.05)',
+    background: 'var(--color-surface)',
     border: '1px solid rgba(255, 255, 255, 0.1)',
     color: 'var(--color-text-muted)',
     fontSize: '0.85rem',
@@ -469,7 +470,7 @@ const styles = {
     gap: '1.5rem',
     padding: '1rem 1.25rem',
     borderRadius: '14px',
-    background: 'rgba(255, 255, 255, 0.03)',
+    background: 'var(--color-surface)',
     border: '1px solid rgba(255, 255, 255, 0.06)',
     marginBottom: '1.5rem'
   },
@@ -489,7 +490,7 @@ const styles = {
   statDivider: {
     width: '1px',
     height: '28px',
-    background: 'rgba(255, 255, 255, 0.08)'
+    background: 'var(--color-surface)'
   },
   scenarioCard: {
     padding: '1.25rem',
@@ -507,7 +508,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: '12px',
-    background: 'rgba(255, 255, 255, 0.05)',
+    background: 'var(--color-surface)',
     flexShrink: 0
   },
   scenarioTitle: {
@@ -578,7 +579,7 @@ const styles = {
   progressBarTrack: {
     width: '100%',
     height: '6px',
-    background: 'rgba(255, 255, 255, 0.08)',
+    background: 'var(--color-surface)',
     borderRadius: '3px',
     overflow: 'hidden',
     marginBottom: '1.25rem'
@@ -622,22 +623,22 @@ const styles = {
   choiceCorrect: {
     background: 'rgba(74, 222, 128, 0.12)',
     border: '2px solid rgba(74, 222, 128, 0.4)',
-    color: '#4ade80'
+    color: 'var(--color-safe)'
   },
   choicePartial: {
     background: 'rgba(251, 191, 36, 0.12)',
     border: '2px solid rgba(251, 191, 36, 0.4)',
-    color: '#fbbf24'
+    color: 'var(--color-warning)'
   },
   choiceWrong: {
     background: 'rgba(248, 113, 113, 0.12)',
     border: '2px solid rgba(248, 113, 113, 0.4)',
-    color: '#f87171'
+    color: 'var(--color-danger)'
   },
   feedbackCard: {
     padding: '1.25rem',
     borderRadius: '14px',
-    background: 'rgba(255, 255, 255, 0.03)',
+    background: 'var(--color-surface)',
     border: '1px solid rgba(255, 255, 255, 0.08)',
     marginBottom: '1rem'
   },
@@ -645,7 +646,7 @@ const styles = {
     width: '100%',
     padding: '0.9rem',
     borderRadius: '14px',
-    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+    background: 'var(--color-primary)',
     border: 'none',
     color: '#ffffff',
     fontSize: '1rem',
@@ -702,7 +703,7 @@ const styles = {
     borderRadius: '10px',
     background: 'rgba(251, 191, 36, 0.15)',
     border: '1px solid rgba(251, 191, 36, 0.3)',
-    color: '#fbbf24',
+    color: 'var(--color-warning)',
     fontSize: '0.85rem',
     fontWeight: 700,
     marginBottom: '1.5rem'

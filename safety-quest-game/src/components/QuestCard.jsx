@@ -52,14 +52,14 @@ function QuestCard({ quest, onComplete, isLocked = false }) {
             {isLocked && !rewardClaimed && (
                 <div style={{
                     position: 'absolute', inset: 0,
-                    background: 'rgba(0, 0, 0, 0.6)',
+                    background: 'rgb(247 245 238 / 96%)',
                     display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center',
                     zIndex: 20, borderRadius: '0.75rem',
                     gap: '0.5rem'
                 }}>
                     <span style={{ fontSize: '2.5rem' }}>🔒</span>
-                    <span style={{ fontSize: '0.8rem', color: '#fbbf24', fontWeight: 600 }}>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--color-warning)', fontWeight: 600 }}>
                         교육을 먼저 완료하세요
                     </span>
                 </div>
@@ -96,7 +96,7 @@ function QuestCard({ quest, onComplete, isLocked = false }) {
                             progress={percentage}
                             color={isCompleted ? 'var(--color-safe)' : 'var(--color-primary-light)'}
                         />
-                        <span className="progress-text text-sm text-slate-500 font-bold">
+                        <span className="progress-text text-sm font-bold" style={{ color: 'var(--color-text-muted)' }}>
                             {progress.current} / {target}
                         </span>
                     </>

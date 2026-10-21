@@ -50,7 +50,7 @@ function AdminModeSelector({ onSelectAdmin, onSelectTest }) {
                             cursor: 'pointer',
                         }}
                     >
-                        <BarChart3 size={28} color="#60a5fa" />
+                        <BarChart3 size={28} color="var(--color-info)" />
                         <h2 style={{ color: 'var(--color-text)', margin: '0.85rem 0 0.5rem', fontSize: '1.2rem' }}>
                             관리자 대시보드
                         </h2>
@@ -72,7 +72,7 @@ function AdminModeSelector({ onSelectAdmin, onSelectTest }) {
                             cursor: 'pointer',
                         }}
                     >
-                        <FlaskConical size={28} color="#22c55e" />
+                        <FlaskConical size={28} color="var(--color-safe)" />
                         <h2 style={{ color: 'var(--color-text)', margin: '0.85rem 0 0.5rem', fontSize: '1.2rem' }}>
                             테스트 모드
                         </h2>

@@ -129,11 +129,11 @@ const NotificationCenter = ({ isOpen, onClose }) => {
 
     return (
         <div style={styles.overlay} onClick={onClose}>
-            <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.modal} role="dialog" aria-modal="true" aria-labelledby="notification-center-title" onClick={(e) => e.stopPropagation()}>
                 {/* 헤더 */}
                 <div style={styles.header}>
                     <div style={styles.headerLeft}>
-                        <h2 style={styles.headerTitle}>
+                        <h2 id="notification-center-title" style={styles.headerTitle}>
                             <span role="img" aria-label="bell">🔔</span> 알림 센터
                         </h2>
                         {unreadCount > 0 && (
@@ -143,19 +143,22 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                     <div style={styles.headerRight}>
                         {unreadCount > 0 && (
                             <button
+                                type="button"
                                 style={styles.markAllBtn}
                                 onClick={handleMarkAllAsRead}
                                 onMouseOver={(e) => {
-                                    e.currentTarget.style.background = 'rgba(59, 130, 246, 0.3)';
+                                    e.currentTarget.style.background = 'var(--color-info-bg)';
                                 }}
                                 onMouseOut={(e) => {
-                                    e.currentTarget.style.background = 'rgba(59, 130, 246, 0.15)';
+                                    e.currentTarget.style.background = 'var(--color-primary-soft)';
                                 }}
                             >
                                 모두 읽음
                             </button>
                         )}
                         <button
+                            type="button"
+                            aria-label="알림 센터 닫기"
                             style={styles.closeBtn}
                             onClick={onClose}
                             onMouseOver={(e) => {
@@ -181,25 +184,16 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                         notifications.map((notification) => {
                             const typeColor = getTypeColor(notification.type);
                             return (
-                                <div
+                                <button
                                     key={notification.id}
+                                    type="button"
+                                    className="notification-center-item"
+                                    data-read={notification.read}
                                     style={{
                                         ...styles.notificationItem,
-                                        background: notification.read
-                                            ? 'rgba(30, 41, 59, 0.3)'
-                                            : 'rgba(30, 41, 59, 0.7)',
                                         borderLeft: `3px solid ${typeColor}`
                                     }}
                                     onClick={() => handleNotificationClick(notification)}
-                                    onMouseOver={(e) => {
-                                        e.currentTarget.style.background = 'rgba(30, 41, 59, 0.9)';
-                                        e.currentTarget.style.borderColor = `${typeColor}`;
-                                    }}
-                                    onMouseOut={(e) => {
-                                        e.currentTarget.style.background = notification.read
-                                            ? 'rgba(30, 41, 59, 0.3)'
-                                            : 'rgba(30, 41, 59, 0.7)';
-                                    }}
                                 >
                                     {/* 타입 아이콘 */}
                                     <div style={{
@@ -228,7 +222,7 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                                             {getRelativeTime(notification.timestamp)}
                                         </span>
                                     </div>
-                                </div>
+                                </button>
                             );
                         })
                     )}
@@ -245,24 +239,25 @@ const styles = {
         left: 0,
         right: 0,
         bottom: 0,
-        background: 'rgba(0, 0, 0, 0.6)',
+        background: 'rgb(36 38 54 / 48%)',
         display: 'flex',
         alignItems: 'flex-start',
         justifyContent: 'center',
         paddingTop: '60px',
         zIndex: 9999,
-        backdropFilter: 'blur(4px)'
+        backdropFilter: 'none'
     },
     modal: {
-        background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-        border: '2px solid rgba(59, 130, 246, 0.4)',
+        background: 'var(--color-surface)',
+        color: 'var(--color-text)',
+        border: '1px solid var(--color-border)',
         borderRadius: '16px',
         width: '100%',
         maxWidth: '500px',
         maxHeight: '70vh',
         display: 'flex',
         flexDirection: 'column',
-        boxShadow: '0 0 30px rgba(59, 130, 246, 0.3), 0 20px 60px rgba(0, 0, 0, 0.5)',
+        boxShadow: 'var(--shadow-lg)',
         overflow: 'hidden',
         margin: '0 16px'
     },
@@ -271,7 +266,7 @@ const styles = {
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: '18px 20px',
-        borderBottom: '1px solid rgba(59, 130, 246, 0.2)',
+        borderBottom: '1px solid var(--color-border)',
         background: 'var(--color-surface)'
     },
     headerLeft: {
@@ -289,8 +284,8 @@ const styles = {
         gap: '8px'
     },
     badge: {
-        background: '#ef4444',
-        color: 'white',
+        background: 'var(--color-danger)',
+        color: 'var(--color-on-primary)',
         fontSize: '0.75rem',
         fontWeight: '700',
         padding: '2px 8px',
@@ -305,9 +300,9 @@ const styles = {
         gap: '10px'
     },
     markAllBtn: {
-        background: 'rgba(59, 130, 246, 0.15)',
-        border: '1px solid rgba(59, 130, 246, 0.3)',
-        color: '#60a5fa',
+        background: 'var(--color-primary-soft)',
+        border: '1px solid var(--color-primary-border)',
+        color: 'var(--color-primary)',
         padding: '6px 14px',
         borderRadius: '8px',
         cursor: 'pointer',
@@ -322,8 +317,8 @@ const styles = {
         fontSize: '1.8rem',
         cursor: 'pointer',
         padding: 0,
-        width: '32px',
-        height: '32px',
+        width: '44px',
+        height: '44px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -350,6 +345,10 @@ const styles = {
         margin: 0
     },
     notificationItem: {
+        width: '100%',
+        border: 0,
+        textAlign: 'left',
+        font: 'inherit',
         display: 'flex',
         alignItems: 'flex-start',
         gap: '14px',
@@ -408,7 +407,7 @@ const styles = {
         WebkitBoxOrient: 'vertical'
     },
     time: {
-        color: '#64748b',
+        color: 'var(--color-text-muted)',
         fontSize: '0.75rem',
         marginTop: '2px'
     }

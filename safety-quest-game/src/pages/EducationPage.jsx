@@ -16,6 +16,7 @@ import {
     getCumulativeWatchTime
 } from '../utils/educationManager';
 import { CATEGORY_INFO } from '../data/educationData';
+import { getAccentInk } from '../utils/uiColors';
 import { quizAttempts, getKSTDateString } from '../utils/storage';
 
 /**
@@ -258,7 +259,7 @@ const EducationPage = () => {
                                     className="text-xs px-2 py-1 rounded-full font-medium"
                                     style={{
                                         backgroundColor: `${categoryInfo?.color}20`,
-                                        color: categoryInfo?.color
+                                        color: getAccentInk(categoryInfo?.color)
                                     }}
                                 >
                                     {categoryInfo?.name}
